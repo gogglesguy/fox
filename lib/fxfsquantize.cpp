@@ -33,9 +33,6 @@
 */
 
 
-using namespace FX;
-
-
 // Up to 256 colors: 3 bits R, 3 bits G, 2 bits B  (RRRGGGBB)
 #define REDMASK          0xe0
 #define REDSHIFT         0
@@ -43,6 +40,8 @@ using namespace FX;
 #define GREENSHIFT       3
 #define BLUEMASK         0xc0
 #define BLUESHIFT        6
+
+using namespace FX;
 
 /*******************************************************************************/
 

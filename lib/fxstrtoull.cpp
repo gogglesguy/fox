@@ -25,7 +25,6 @@
 #include "fxascii.h"
 #include "FXString.h"
 
-
 /*
   Notes:
   - Thread-safe conversion of strings to unsigned long and int, with extra parameter

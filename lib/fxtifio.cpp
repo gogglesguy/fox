@@ -30,7 +30,6 @@
 #include <tiffio.h>
 #endif
 
-
 /*
   Notes:
   - Made error and warning handlers call FOX's warning handler.

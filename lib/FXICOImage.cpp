@@ -30,7 +30,6 @@
 #include "FXICOImage.h"
 
 
-
 /*
   Notes:
 */

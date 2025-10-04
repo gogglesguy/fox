@@ -56,6 +56,9 @@ public:
   /// Initialize box to fully contain the given bounding sphere
   FXRangef(const FXSpheref& sphere);
 
+  /// Assign with vector
+  FXRangef& operator=(const FXVec3f& p){ lower=upper=p; return *this; }
+
   /// Assignment
   FXRangef& operator=(const FXRangef& bounds){ lower=bounds.lower; upper=bounds.upper; return *this; }
 

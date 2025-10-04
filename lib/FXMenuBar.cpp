@@ -49,6 +49,9 @@
     somehow does not allow keyboard navigation.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -191,7 +194,7 @@ long FXMenuBar::onMotion(FXObject*,FXSelector,void* ptr){
 
 // Button pressed
 long FXMenuBar::onButtonPress(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onButtonPress %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this));
   handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);
   return 1;
   }
@@ -200,7 +203,7 @@ long FXMenuBar::onButtonPress(FXObject*,FXSelector,void*){
 // Button released
 long FXMenuBar::onButtonRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
-  FXTRACE((200,"%s::onButtonRelease %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this));
   if(ev->moved){ handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr); }
   return 1;
   }
@@ -208,7 +211,7 @@ long FXMenuBar::onButtonRelease(FXObject*,FXSelector,void* ptr){
 
 // Unpost the menu
 long FXMenuBar::onCmdUnpost(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onCmdUnpost %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this));
   if(getFocus()) getFocus()->killFocus();
   //killFocus();
   return 1;

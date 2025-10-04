@@ -46,35 +46,38 @@
     it (if writing)?
 */
 
-using namespace FX;
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1002
 
-namespace FX {
+using namespace FX;
 
 /*******************************************************************************/
 
+namespace FX {
+
 // Create JSON file i/o object
 FXJSONString::FXJSONString(){
-  FXTRACE((100,"FXJSONString::FXJSONString\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONString::FXJSONString\n"));
   }
 
 
 // Create JSON string i/o object and open it
 FXJSONString::FXJSONString(const FXString& string,Direction d){
-  FXTRACE((100,"FXJSONString::FXJSONString(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONString::FXJSONString(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   open(string,d);
   }
 
 
 // Create JSON string i/o object and open it
 FXJSONString::FXJSONString(const FXchar* string,FXuval length,Direction d){
-  FXTRACE((100,"FXJSONString::FXJSONString(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONString::FXJSONString(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   open(string,length,d);
   }
 
 
 // Open archive for operation
 FXbool FXJSONString::open(const FXString& string,Direction d){
-  FXTRACE((101,"FXJSONString::open(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_DETAIL,"FXJSONString::open(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   FXASSERT(dir==Stop);
   buffer=string;
   if(FXJSON::open(buffer.text(),buffer.length(),d)){
@@ -87,7 +90,7 @@ FXbool FXJSONString::open(const FXString& string,Direction d){
 
 // Open archive for operation
 FXbool FXJSONString::open(const FXchar* string,FXuval length,Direction d){
-  FXTRACE((101,"FXJSONString::open(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_DETAIL,"FXJSONString::open(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   FXASSERT(dir==Stop);
   buffer.assign(string,length);
   if(FXJSON::open(buffer.text(),buffer.length(),d)){
@@ -127,14 +130,14 @@ FXival FXJSONString::flush(FXival count){
 
 // Close stream and delete buffers
 FXbool FXJSONString::close(){
-  FXTRACE((101,"FXJSONString::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXJSONString::close()\n"));
   return FXJSON::close();
   }
 
 
 // Close JSON file
 FXJSONString::~FXJSONString(){
-  FXTRACE((100,"FXJSONString::~FXJSONString\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONString::~FXJSONString\n"));
   close();
   }
 

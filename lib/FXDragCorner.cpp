@@ -40,12 +40,6 @@
 #include "FXApp.h"
 #include "FXDragCorner.h"
 
-
-#define CORNERSIZE    17
-
-#define DISPLAY(app) ((Display*)((app)->getDisplay()))
-
-
 /*
   Notes:
   - Need to grab server while dragging?
@@ -53,8 +47,12 @@
     and so on are properly observed.
 */
 
-using namespace FX;
 
+#define CORNERSIZE    17
+
+#define DISPLAY(app) ((Display*)((app)->getDisplay()))
+
+using namespace FX;
 
 /*******************************************************************************/
 

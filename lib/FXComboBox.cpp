@@ -303,8 +303,10 @@ long FXComboBox::onFocusDown(FXObject*,FXSelector,void*){
 // Mouse wheel
 long FXComboBox::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
+  FXint index;
   if(isEnabled()){
-    FXint index=getCurrentItem();
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    index=getCurrentItem();
     if(event->code<0){
       if(index<0) index=0;
       else if(index<getNumItems()-1) index++;

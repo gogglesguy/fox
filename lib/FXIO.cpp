@@ -31,7 +31,6 @@
 #include "FXIO.h"
 
 
-
 /*
   Notes:
   - The class FXIO provides the interface to stream- or block-devices.

@@ -43,7 +43,6 @@
 #include "FXIcon.h"
 #include "FXToggleButton.h"
 
-
 /*
   Notes:
   - If the altlabel is empty, the normal label will be used;

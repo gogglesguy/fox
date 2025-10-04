@@ -29,7 +29,6 @@
 #include "FXStream.h"
 #include "FXColors.h"
 
-
 /*
   Notes:
   - The transparent color hopefully does not occur in the image.
@@ -48,7 +47,6 @@
 #define HASH2(x,n)      (1|(((unsigned int)(x)*17)%((n)-1)))    // Number [1..n-2]
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

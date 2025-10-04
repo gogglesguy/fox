@@ -33,7 +33,6 @@
 #include "FXThread.h"
 #include "FXPerformance.h"
 #include "FXPNGImage.h"
-
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
@@ -125,11 +124,6 @@
       3  Avg    Recon(x) = Filt(x) + floor((Recon(a)+Recon(b)) /2
       4  Paeth  Recon(x) = Filt(x) + PaethPredictor(Recon(a),Recon(b),Recon(c))
 
-  - Technically, we should check special "alphacolor" by 16-bit/channel
-    comparisons, not post-conversion FXColor to FXColor.  But not sure
-    how much of a problem it really is, once you use 16-bit/channel
-    depth you're already dealing with large images, anyway...
-
   - Possible future improvements:
 
     1) Detect on-off alpha case, i.e. pixels either opaque or fully
@@ -154,6 +148,12 @@
        use x/257 = ((x*2139127681)>>32)>>7 as a way to improve the situation,
        but it'll be loads slower and one may not see the difference.
 
+    6) Check special for alpha-color during format translation to FOX
+       BGRA.  We can use vector-compare and blend.  Dispatch table should
+       map alpha, image type, bit-depth, and interlace mode into function
+       pointer.  For RGB and Gray, we'll have special alpha-color versions
+       to handle this effectively.
+
   - References:
 
     http://www.w3.org/TR/REC-png.html
@@ -176,6 +176,7 @@ namespace FX {
 
 #ifdef HAVE_ZLIB_H  /////////////////////////////////////////////////////////////
 
+// Pixel structure
 union RGBAPixel {
   struct {
     FXuchar b;
@@ -327,24 +328,26 @@ public:
   FXuint        intwidth[7];            // Widgth of image for each interlace pass
   FXuint        intheight[7];           // Height of image for each interlace pass
   FXuint        intbytes[7];            // Number of bytes for each interlace pass
-  FXushort      backcolor[3];           // Background color spec
-  FXushort      alfacolor[3];           // Alpha color spec
+  FXushort      backRed;                // Background color spec
+  FXushort      backGreen;
+  FXushort      backBlue;
+  FXushort      alfaRed;                // Alpha color spec
+  FXushort      alfaGreen;
+  FXushort      alfaBlue;
+  FXbool        back;                   // Back color set
+  FXbool        alfa;                   // Alpha color set
 public:
   FXbool header(FXStream& store);
   FXbool palette(FXStream& store,FXuint length);
   FXbool background(FXStream& store,FXuint length);
   FXbool transparency(FXStream& store,FXuint length);
-  void applyTransparency();
   FXbool decode();
   FXbool data(FXStream& store,FXuint length);
   FXbool end(FXStream& store,FXuint length);
 public:
 
   // Initialize decoder
-  PNGDecoder():image(nullptr),buffer(nullptr),buffersize(0),width(0),height(0),imagetype(Indexed),bitdepth(8),compression(Deflate),filter(FiltNone),interlace(NoInterlace),stride(0),numbytes(0),totbytes(0),ncolormap(0){
-    backcolor[0]=backcolor[1]=backcolor[2]=0;
-    alfacolor[0]=alfacolor[1]=alfacolor[2]=0;
-    clearElms(&stream,1);
+  PNGDecoder():image(nullptr),buffer(nullptr),buffersize(0),width(0),height(0),imagetype(Indexed),bitdepth(8),compression(Deflate),filter(FiltNone),interlace(NoInterlace),stride(0),numbytes(0),totbytes(0),ncolormap(0),backRed(0),backGreen(0),backBlue(0),alfaRed(0),alfaGreen(0),alfaBlue(0),back(false),alfa(false){
     }
 
   // Load image
@@ -426,7 +429,7 @@ FXbool PNGDecoder::header(FXStream& store){
   // Compute some handy values
   ch=channels[imagetype];
   numbytes=(width*ch*bitdepth+7)>>3;
-  totbytes=numbytes*height+height;      // One extra byte/line
+  totbytes=numbytes*height+height;              // One extra byte/line
   stride=(ch*bitdepth+7)>>3;
 
   FXTRACE((TOPIC_DETAIL,"fxloadPNG: Header:\n"));
@@ -462,7 +465,11 @@ FXbool PNGDecoder::header(FXStream& store){
     FXTRACE((TOPIC_DETAIL,"fxloadPNG: intheight = %5u %5u %5u %5u %5u %5u %5u\n",intheight[0],intheight[1],intheight[2],intheight[3],intheight[4],intheight[5],intheight[6]));
     }
 
+  // Entire image, with a bit extra for decompression plus decoding
+  buffersize=(totbytes*5)/4+(numbytes+1)*2;
+
   FXTRACE((TOPIC_DETAIL,"fxloadPNG: totbytes  = %u\n",totbytes));
+  FXTRACE((TOPIC_DETAIL,"fxloadPNG: buffersize= %u\n",buffersize));
 
   // OK?
   return (store.status()==FXStreamOK);
@@ -520,7 +527,6 @@ FXbool PNGDecoder::palette(FXStream& store,FXuint length){
 FXbool PNGDecoder::background(FXStream& store,FXuint length){
   FXuint   crc=CRC32::CRC(~0,bKGD);
   FXuint   chunkcrc=0;
-  FXushort r,g,b;
   FXuchar  x;
 
   FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD length = %u\n",length));
@@ -534,10 +540,11 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
       }
     store >> x;
     crc=CRC32::CRC(crc,x);
-    backcolor[0]=colormap[x].r;
-    backcolor[1]=colormap[x].g;
-    backcolor[2]=colormap[x].b;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backcolor[0],backcolor[1],backcolor[2]));
+    backRed=colormap[x].r;
+    backGreen=colormap[x].g;
+    backBlue=colormap[x].b;
+    back=true;
+    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
     break;
   case RGB:
   case RGBA:
@@ -545,16 +552,14 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
       FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length));
       return false;
       }
-    store >> r;
-    store >> g;
-    store >> b;
-    crc=CRC32::CRC(crc,r);
-    crc=CRC32::CRC(crc,g);
-    crc=CRC32::CRC(crc,b);
-    backcolor[0]=r;
-    backcolor[1]=g;
-    backcolor[2]=b;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backcolor[0],backcolor[1],backcolor[2]));
+    store >> backRed;
+    store >> backGreen;
+    store >> backBlue;
+    crc=CRC32::CRC(crc,backRed);
+    crc=CRC32::CRC(crc,backGreen);
+    crc=CRC32::CRC(crc,backBlue);
+    back=true;
+    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
     break;
   case Gray:
   case GrayAlpha:
@@ -562,12 +567,12 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
       FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length));
       return false;
       }
-    store >> g;
-    crc=CRC32::CRC(crc,g);
-    backcolor[0]=g;
-    backcolor[1]=g;
-    backcolor[2]=g;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backcolor[0],backcolor[1],backcolor[2]));
+    store >> backRed;
+    backGreen=backRed;
+    backBlue=backRed;
+    crc=CRC32::CRC(crc,backRed);
+    back=true;
+    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
     break;
   default:
     __unreachable();
@@ -594,7 +599,6 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
   PERFORMANCE_COUNTER(PNGDecoder_transparency);
   FXuint   crc=CRC32::CRC(~0,tRNS);
   FXuint   chunkcrc=0;
-  FXushort r,g,b;
   FXuchar  x;
 
   FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS length = %u\n",length));
@@ -619,16 +623,14 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
       FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length));
       return false;
       }
-    store >> r;
-    store >> g;
-    store >> b;
-    crc=CRC32::CRC(crc,r);
-    crc=CRC32::CRC(crc,g);
-    crc=CRC32::CRC(crc,b);
-    alfacolor[0]=r;
-    alfacolor[1]=g;
-    alfacolor[2]=b;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfacolor[0],alfacolor[1],alfacolor[2]));
+    store >> alfaRed;
+    store >> alfaGreen;
+    store >> alfaBlue;
+    crc=CRC32::CRC(crc,alfaRed);
+    crc=CRC32::CRC(crc,alfaGreen);
+    crc=CRC32::CRC(crc,alfaBlue);
+    alfa=true;
+    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue));
     break;
   case Gray:
   case GrayAlpha:
@@ -636,12 +638,12 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
       FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length));
       return false;
       }
-    store >> g;
-    crc=CRC32::CRC(crc,g);
-    alfacolor[0]=g;
-    alfacolor[1]=g;
-    alfacolor[2]=g;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfacolor[0],alfacolor[1],alfacolor[2]));
+    store >> alfaRed;
+    alfaGreen=alfaRed;
+    alfaBlue=alfaRed;
+    crc=CRC32::CRC(crc,alfaRed);
+    alfa=true;
+    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue));
     break;
   default:
     __unreachable();
@@ -657,48 +659,20 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
   }
 
 
-// Apply transparancy, i.e. a special color designated to be
-// used as fully transparent.
-// FIXME Technically, this should be made to work for
-// bitdepth==16 but right now, it doesn't; reason: we don't
-// store bitdepth==16 images, but only up to 8.
-void PNGDecoder::applyTransparency(){
-/* FIXME before copyPixels
-  const FXColor CLEARALPHA=FXRGBA(255,255,255,0);
-  if(alfacolor[0] && alfacolor[1] && alfacolor[2]  && (imagetype==RGB || imagetype==Gray)){
-    FXuint npixels=width*height;
-    FXColor color;
-    for(FXuint i=0; i<npixels; ++i){
-      if((color=image[i])==transparency){ image[i]=color&CLEARALPHA; }
-      }
-    }
-*/
-  }
-
 /*******************************************************************************/
 
-PERFORMANCE_RECORDER(PNGDecoder_decodeIndex1BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeIndex2BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeIndex4BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeIndex8BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGray1BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGray2BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGray4BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGray8BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGray16BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGrayAlfa8BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeGrayAlfa16BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeRGB8BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeRGB16BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeRGBA8BPP);
-PERFORMANCE_RECORDER(PNGDecoder_decodeRGBA16BPP);
+// Decode function
+typedef void (*DecodeFunc)(FXColor*,const PNGDecoder *,const FXuchar*,FXuval,FXuval);
 
+// Decode arbitrary step size cases
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeX1BPP);
 
 // Decode 1 bit/pixel indexed
-static void decodeIndex1BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeIndex1BPP);
+static void decodeX1BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeX1BPP);
   FXuchar w;
-  while(8<=n){
+  while(8<n){
     w=*src++;
     *dst=dec->colormap[w>>7].c;     dst+=s;
     *dst=dec->colormap[1&(w>>6)].c; dst+=s;
@@ -710,21 +684,24 @@ static void decodeIndex1BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* sr
     *dst=dec->colormap[1&w].c;      dst+=s;
     n-=8;
     }
-  if(0<n){ w=*src; *dst=dec->colormap[w>>7].c;     dst+=s;
-  if(1<n){         *dst=dec->colormap[1&(w>>6)].c; dst+=s;
-  if(2<n){         *dst=dec->colormap[1&(w>>5)].c; dst+=s;
-  if(3<n){         *dst=dec->colormap[1&(w>>4)].c; dst+=s;
-  if(4<n){         *dst=dec->colormap[1&(w>>3)].c; dst+=s;
-  if(5<n){         *dst=dec->colormap[1&(w>>2)].c; dst+=s;
-  if(6<n){         *dst=dec->colormap[1&(w>>1)].c; dst+=s; }}}}}}}
+  w=*src;
+  if(0<n){ *dst=dec->colormap[w>>7].c;     dst+=s;
+  if(1<n){ *dst=dec->colormap[1&(w>>6)].c; dst+=s;
+  if(2<n){ *dst=dec->colormap[1&(w>>5)].c; dst+=s;
+  if(3<n){ *dst=dec->colormap[1&(w>>4)].c; dst+=s;
+  if(4<n){ *dst=dec->colormap[1&(w>>3)].c; dst+=s;
+  if(5<n){ *dst=dec->colormap[1&(w>>2)].c; dst+=s;
+  if(6<n){ *dst=dec->colormap[1&(w>>1)].c; dst+=s;
+  if(7<n){ *dst=dec->colormap[1&w].c;      dst+=s; }}}}}}}}
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeX2BPP);
 
 // Decode 2 bit/pixel indexed
-static void decodeIndex2BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeIndex2BPP);
+static void decodeX2BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeX2BPP);
   FXuchar w;
-  while(4<=n){
+  while(4<n){
     w=*src++;
     *dst=dec->colormap[w>>6].c;     dst+=s;
     *dst=dec->colormap[3&(w>>4)].c; dst+=s;
@@ -732,44 +709,48 @@ static void decodeIndex2BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* sr
     *dst=dec->colormap[3&w].c;      dst+=s;
     n-=4;
     }
-  if(0<n){ w=*src; *dst=dec->colormap[w>>6].c;     dst+=s;
-  if(1<n){         *dst=dec->colormap[3&(w>>4)].c; dst+=s;
-  if(2<n){         *dst=dec->colormap[3&(w>>2)].c; dst+=s; }}}
+  w=*src;
+  if(0<n){ *dst=dec->colormap[w>>6].c;     dst+=s;
+  if(1<n){ *dst=dec->colormap[3&(w>>4)].c; dst+=s;
+  if(2<n){ *dst=dec->colormap[3&(w>>2)].c; dst+=s;
+  if(3<n){ *dst=dec->colormap[3&w].c;      dst+=s; }}}}
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeX4BPP);
 
 // Decode 4 bit/pixel indexed
-static void decodeIndex4BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeIndex4BPP);
+static void decodeX4BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeX4BPP);
   FXuchar w;
-  while(2<=n){
+  while(2<n){
     w=*src++;
     *dst=dec->colormap[w>>4].c; dst+=s;
     *dst=dec->colormap[w&15].c; dst+=s;
     n-=2;
     }
-  if(0<n){ w=*src; *dst=dec->colormap[w>>4].c; }
+  w=*src;
+  if(0<n){ *dst=dec->colormap[w>>4].c; dst+=s;
+  if(1<n){ *dst=dec->colormap[w&15].c; dst+=s; }}
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeX8BPP);
 
 // Decode 8 bit/pixel indexed
-static void decodeIndex8BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeIndex8BPP);
-  FXuchar w;
+static void decodeX8BPP(FXColor* dst,const PNGDecoder *dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeX8BPP);
   while(n){
-    w=*src++;
-    *dst=dec->colormap[w].c;
-    dst+=s;
+    *dst=dec->colormap[*src++].c; dst+=s;
     n--;
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeG1BPP);
 
 // Decode 1 bit/pixel gray
-static void decodeGray1BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray1BPP);
+static void decodeG1BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG1BPP);
   FXuchar w;
-  while(8<=n){
+  while(8<n){
     w=*src++;
     *dst=map1Bit[w>>7];     dst+=s;
     *dst=map1Bit[1&(w>>6)]; dst+=s;
@@ -781,21 +762,25 @@ static void decodeGray1BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FX
     *dst=map1Bit[1&w];      dst+=s;
     n-=8;
     }
-  if(0<n){ w=*src; *dst=map1Bit[w>>7];     dst+=s;
-  if(1<n){         *dst=map1Bit[1&(w>>6)]; dst+=s;
-  if(2<n){         *dst=map1Bit[1&(w>>5)]; dst+=s;
-  if(3<n){         *dst=map1Bit[1&(w>>4)]; dst+=s;
-  if(4<n){         *dst=map1Bit[1&(w>>3)]; dst+=s;
-  if(5<n){         *dst=map1Bit[1&(w>>2)]; dst+=s;
-  if(6<n){         *dst=map1Bit[1&(w>>1)]; dst+=s; }}}}}}}
+  w=*src;
+  if(0<n){ *dst=map1Bit[w>>7];     dst+=s;
+  if(1<n){ *dst=map1Bit[1&(w>>6)]; dst+=s;
+  if(2<n){ *dst=map1Bit[1&(w>>5)]; dst+=s;
+  if(3<n){ *dst=map1Bit[1&(w>>4)]; dst+=s;
+  if(4<n){ *dst=map1Bit[1&(w>>3)]; dst+=s;
+  if(5<n){ *dst=map1Bit[1&(w>>2)]; dst+=s;
+  if(6<n){ *dst=map1Bit[1&(w>>1)]; dst+=s;
+  if(7<n){ *dst=map1Bit[1&w];      dst+=s; }}}}}}}}
   }
 
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeG2BPP);
+
 // Decode 2 bit/pixel gray
-static void decodeGray2BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray2BPP);
+static void decodeG2BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG2BPP);
   FXuchar w;
-  while(4<=n){
+  while(4<n){
     w=*src++;
     *dst=map2Bit[w>>6];     dst+=s;
     *dst=map2Bit[3&(w>>4)]; dst+=s;
@@ -803,62 +788,80 @@ static void decodeGray2BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FX
     *dst=map2Bit[3&w];      dst+=s;
     n-=4;
     }
-  if(0<n){ w=*src; *dst=map2Bit[w>>6];     dst+=s;
-  if(1<n){         *dst=map2Bit[3&(w>>4)]; dst+=s;
-  if(2<n){         *dst=map2Bit[3&(w>>2)]; dst+=s; }}}
+  w=*src;
+  if(0<n){ *dst=map2Bit[w>>6];     dst+=s;
+  if(1<n){ *dst=map2Bit[3&(w>>4)]; dst+=s;
+  if(2<n){ *dst=map2Bit[3&(w>>2)]; dst+=s;
+  if(3<n){ *dst=map2Bit[3&w];      dst+=s; }}}}
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeG4BPP);
 
 // Decode 4 bit/pixel gray
-static void decodeGray4BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray4BPP);
+static void decodeG4BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG4BPP);
   FXuchar w;
-  while(2<=n){
+  while(2<n){
     w=*src++;
     *dst=map4Bit[w>>4]; dst+=s;
     *dst=map4Bit[w&15]; dst+=s;
     n-=2;
     }
-  if(0<n){ w=*src; *dst=map4Bit[w>>4]; }
+  w=*src;
+  if(0<n){ *dst=map4Bit[w>>4]; dst+=s;
+  if(1<n){ *dst=map4Bit[w&15]; dst+=s; }}
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeG8BPPi);
 
 // Decode 8 bit/pixel gray
-static void decodeGray8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray8BPP);
+static void decodeG8BPPi(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG8BPPi);
   FXuchar g;
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
   const __m128i gr1=_mm_set_epi8(-1, 3, 3, 3, -1, 2, 2, 2, -1, 1, 1, 1,-1, 0, 0, 0);
   const __m128i gr2=_mm_set_epi8(-1, 7, 7, 7, -1, 6, 6, 6, -1, 5, 5, 5,-1, 4, 4, 4);
+  const __m128i gr3=_mm_set_epi8(-1,11,11,11, -1,10,10,10, -1, 9, 9, 9,-1, 8, 8, 8);
+  const __m128i gr4=_mm_set_epi8(-1,15,15,15, -1,14,14,14, -1,13,13,13,-1,12,12,12);
   const __m128i alfa=_mm_set_epi8(255,0,0,0, 255,0,0,0, 255,0,0,0, 255,0,0,0);
-  __m128i xxxx,aaaa,bbbb;
-  while(8<=n){
-    xxxx=_mm_loadu_si64(src); src+=8;
+  __m128i xxxx,aaaa,bbbb,cccc,dddd;
+  while(16<=n){
+    xxxx=_mm_loadu_si128((const __m128i*)src); src+=16;
     aaaa=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr1),alfa);
+    bbbb=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr2),alfa);
+    cccc=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr3),alfa);
+    dddd=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr4),alfa);
     *dst=_mm_extract_epi32(aaaa,0); dst+=s;
     *dst=_mm_extract_epi32(aaaa,1); dst+=s;
     *dst=_mm_extract_epi32(aaaa,2); dst+=s;
     *dst=_mm_extract_epi32(aaaa,3); dst+=s;
-    bbbb=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr2),alfa);
     *dst=_mm_extract_epi32(bbbb,0); dst+=s;
     *dst=_mm_extract_epi32(bbbb,1); dst+=s;
     *dst=_mm_extract_epi32(bbbb,2); dst+=s;
     *dst=_mm_extract_epi32(bbbb,3); dst+=s;
-    n-=8;
+    *dst=_mm_extract_epi32(cccc,0); dst+=s;
+    *dst=_mm_extract_epi32(cccc,1); dst+=s;
+    *dst=_mm_extract_epi32(cccc,2); dst+=s;
+    *dst=_mm_extract_epi32(cccc,3); dst+=s;
+    *dst=_mm_extract_epi32(dddd,0); dst+=s;
+    *dst=_mm_extract_epi32(dddd,1); dst+=s;
+    *dst=_mm_extract_epi32(dddd,2); dst+=s;
+    *dst=_mm_extract_epi32(dddd,3); dst+=s;
+    n-=16;
     }
 #endif
   while(n){
-    g=src[0];
-    *dst=FXRGB(g,g,g);
-    dst+=s;
-    src+=1;
+    g=*src++;
+    *dst=FXRGB(g,g,g); dst+=s;
     n--;
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeG16BPP);
+
 // Decode 16 bit/pixel gray
-static void decodeGray16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray16BPP);
+static void decodeG16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG16BPP);
   FXushort g;
   while(n){
     g=((src[0]<<8)|src[1])/257;
@@ -869,28 +872,40 @@ static void decodeGray16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,F
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeGA8BPPi);
 
 // Decode 8 bit/pixel gray-alpha
-static void decodeGrayAlfa8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGrayAlfa8BPP);
+static void decodeGA8BPPi(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeGA8BPPi);
   FXuchar g,a;
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
   const __m128i gr1=_mm_set_epi8( 7, 6, 6, 6,  5, 4, 4, 4,  3, 2, 2, 2, 1, 0, 0, 0);
   const __m128i gr2=_mm_set_epi8(15,14,14,14, 13,12,12,12, 11,10,10,10, 9, 8, 8, 8);
-  __m128i xxxx,aaaa,bbbb;
-  while(8<=n){
+  __m128i xxxx,yyyy,aaaa,bbbb,cccc,dddd;
+  while(16<=n){
     xxxx=_mm_loadu_si128((const __m128i*)src); src+=16;
+    yyyy=_mm_loadu_si128((const __m128i*)src); src+=16;
     aaaa=_mm_shuffle_epi8(xxxx,gr1);
+    bbbb=_mm_shuffle_epi8(xxxx,gr2);
+    cccc=_mm_shuffle_epi8(yyyy,gr1);
+    dddd=_mm_shuffle_epi8(yyyy,gr2);
     *dst=_mm_extract_epi32(aaaa,0); dst+=s;
     *dst=_mm_extract_epi32(aaaa,1); dst+=s;
     *dst=_mm_extract_epi32(aaaa,2); dst+=s;
     *dst=_mm_extract_epi32(aaaa,3); dst+=s;
-    bbbb=_mm_shuffle_epi8(xxxx,gr2);
     *dst=_mm_extract_epi32(bbbb,0); dst+=s;
     *dst=_mm_extract_epi32(bbbb,1); dst+=s;
     *dst=_mm_extract_epi32(bbbb,2); dst+=s;
     *dst=_mm_extract_epi32(bbbb,3); dst+=s;
-    n-=8;
+    *dst=_mm_extract_epi32(cccc,0); dst+=s;
+    *dst=_mm_extract_epi32(cccc,1); dst+=s;
+    *dst=_mm_extract_epi32(cccc,2); dst+=s;
+    *dst=_mm_extract_epi32(cccc,3); dst+=s;
+    *dst=_mm_extract_epi32(dddd,0); dst+=s;
+    *dst=_mm_extract_epi32(dddd,1); dst+=s;
+    *dst=_mm_extract_epi32(dddd,2); dst+=s;
+    *dst=_mm_extract_epi32(dddd,3); dst+=s;
+    n-=16;
     }
 #endif
   while(n){
@@ -903,10 +918,11 @@ static void decodeGrayAlfa8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* sr
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeGA16BPP);
 
 // Decode 16 bit/pixel gray-alpha
-static void decodeGrayAlfa16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGrayAlfa16BPP);
+static void decodeGA16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeGA16BPP);
   FXushort g,a;
   while(n){
     g=((src[0]<<8)|src[1])/257;
@@ -918,23 +934,27 @@ static void decodeGrayAlfa16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* s
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGB8BPPi);
 
 // Decode 8 bit/pixel rgb
-static void decodeRGB8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeRGB8BPP);
+static void decodeRGB8BPPi(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGB8BPPi);
   FXuchar r,g,b;
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
-  const __m128i shuf=_mm_set_epi8(-1, 9,10,11, -1, 6, 7, 8, -1, 3, 4, 5, -1, 0, 1, 2);
+  const __m128i shuf1=_mm_set_epi8(-1, 9,10,11,-1, 6, 7, 8,-1, 3, 4, 5,-1, 0, 1, 2);
+  const __m128i shuf2=_mm_set_epi8(-1, 5, 6, 7,-1, 2, 3, 4,-1,15, 0, 1,-1,12,13,14);
+  const __m128i shuf3=_mm_set_epi8(-1, 1, 2, 3,-1,14,15, 0,-1,11,12,13,-1, 8, 9,10);
+  const __m128i shuf4=_mm_set_epi8(-1,13,14,15,-1,10,11,12,-1, 7, 8, 9,-1, 4, 5, 6);
   const __m128i alfa=_mm_set_epi8(255,0,0,0, 255,0,0,0, 255,0,0,0, 255,0,0,0);
   __m128i aaaa,bbbb,cccc,xxxx,yyyy,zzzz,wwww;
   while(16<=n){
     aaaa=_mm_loadu_si128((const __m128i*)src); src+=16;
     bbbb=_mm_loadu_si128((const __m128i*)src); src+=16;
     cccc=_mm_loadu_si128((const __m128i*)src); src+=16;
-    xxxx=_mm_or_si128(_mm_shuffle_epi8(aaaa,shuf),alfa);
-    yyyy=_mm_or_si128(_mm_shuffle_epi8(_mm_alignr_epi8(bbbb,aaaa,12),shuf),alfa);
-    zzzz=_mm_or_si128(_mm_shuffle_epi8(_mm_alignr_epi8(cccc,bbbb,8),shuf),alfa);
-    wwww=_mm_or_si128(_mm_shuffle_epi8(_mm_alignr_epi8(cccc,cccc,4),shuf),alfa);
+    xxxx=_mm_or_si128(_mm_shuffle_epi8(aaaa,shuf1),alfa);
+    yyyy=_mm_or_si128(_mm_shuffle_epi8(_mm_blend_epi16(aaaa,bbbb,0x0F),shuf2),alfa);
+    zzzz=_mm_or_si128(_mm_shuffle_epi8(_mm_blend_epi16(bbbb,cccc,0x0F),shuf3),alfa);
+    wwww=_mm_or_si128(_mm_shuffle_epi8(cccc,shuf4),alfa);
     *dst=_mm_extract_epi32(xxxx,0); dst+=s;
     *dst=_mm_extract_epi32(xxxx,1); dst+=s;
     *dst=_mm_extract_epi32(xxxx,2); dst+=s;
@@ -955,15 +975,16 @@ static void decodeRGB8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXu
     }
 #endif
   while(n){
-    r=src[0];
-    g=src[1];
-    b=src[2];
+    r=*src++;
+    g=*src++;
+    b=*src++;
     *dst=FXRGB(r,g,b);
     dst+=s;
-    src+=3;
     n--;
     }
   }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGB16BPP);
 
 // Decode 16 bit/pixel rgb
 static void decodeRGB16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
@@ -980,19 +1001,24 @@ static void decodeRGB16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FX
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGBA8BPPi);
 
 // Decode 8 bit/pixel rgba
-static void decodeRGBA8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeRGBA8BPP);
+static void decodeRGBA8BPPi(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGBA8BPPi);
   FXuchar r,g,b,a;
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
   const __m128i bgra=_mm_set_epi8(15,12,13,14, 11,8,9,10, 7,4,5,6, 3,0,1,2);
-  __m128i aaaa,bbbb;
-  while(8<=n){
+  __m128i aaaa,bbbb,cccc,dddd;
+  while(16<=n){
     aaaa=_mm_loadu_si128((const __m128i*)src); src+=16;
-    aaaa=_mm_shuffle_epi8(aaaa,bgra);
     bbbb=_mm_loadu_si128((const __m128i*)src); src+=16;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=16;
+    dddd=_mm_loadu_si128((const __m128i*)src); src+=16;
+    aaaa=_mm_shuffle_epi8(aaaa,bgra);
     bbbb=_mm_shuffle_epi8(bbbb,bgra);
+    cccc=_mm_shuffle_epi8(cccc,bgra);
+    dddd=_mm_shuffle_epi8(dddd,bgra);
     *dst=_mm_extract_epi32(aaaa,0); dst+=s;
     *dst=_mm_extract_epi32(aaaa,1); dst+=s;
     *dst=_mm_extract_epi32(aaaa,2); dst+=s;
@@ -1001,7 +1027,15 @@ static void decodeRGBA8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FX
     *dst=_mm_extract_epi32(bbbb,1); dst+=s;
     *dst=_mm_extract_epi32(bbbb,2); dst+=s;
     *dst=_mm_extract_epi32(bbbb,3); dst+=s;
-    n-=8;
+    *dst=_mm_extract_epi32(cccc,0); dst+=s;
+    *dst=_mm_extract_epi32(cccc,1); dst+=s;
+    *dst=_mm_extract_epi32(cccc,2); dst+=s;
+    *dst=_mm_extract_epi32(cccc,3); dst+=s;
+    *dst=_mm_extract_epi32(dddd,0); dst+=s;
+    *dst=_mm_extract_epi32(dddd,1); dst+=s;
+    *dst=_mm_extract_epi32(dddd,2); dst+=s;
+    *dst=_mm_extract_epi32(dddd,3); dst+=s;
+    n-=16;
     }
 #endif
   while(n){
@@ -1016,6 +1050,7 @@ static void decodeRGBA8BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FX
     }
   }
 
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGBA16BPP);
 
 // Decode 16 bit/pixel rgba
 static void decodeRGBA16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval s){
@@ -1033,17 +1068,313 @@ static void decodeRGBA16BPP(FXColor* dst,const PNGDecoder *,const FXuchar* src,F
     }
   }
 
-typedef void (*DecodeFunc)(FXColor*,const PNGDecoder *,const FXuchar*,FXuval,FXuval);
+/*******************************************************************************/
 
-// Function table of mapping image_type and log(bits) to decode function
-static const DecodeFunc decodeFunc[7][5]={
-  {decodeGray1BPP,decodeGray2BPP,decodeGray4BPP,decodeGray8BPP,decodeGray16BPP},        // Gray
-  {nullptr,nullptr,nullptr,nullptr,nullptr},                                            // N/A
-  {nullptr,nullptr,nullptr,decodeRGB8BPP,decodeRGB16BPP},                               // RGB
-  {decodeIndex1BPP,decodeIndex2BPP,decodeIndex4BPP,decodeIndex8BPP,nullptr},            // Index
-  {nullptr,nullptr,nullptr,decodeGrayAlfa8BPP,decodeGrayAlfa16BPP},                     // Gray Alpha
-  {nullptr,nullptr,nullptr,nullptr,nullptr},                                            // N/A
-  {nullptr,nullptr,nullptr,decodeRGBA8BPP,decodeRGBA16BPP}                              // RGBA
+// Decode unit step size special cases
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG8BPPn);
+
+// Decode 8 bit/pixel gray
+static void decodeG8BPPn(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG8BPPn);
+  FXuchar g;
+#if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
+  const __m128i gr1=_mm_set_epi8(-1, 3, 3, 3, -1, 2, 2, 2, -1, 1, 1, 1,-1, 0, 0, 0);
+  const __m128i gr2=_mm_set_epi8(-1, 7, 7, 7, -1, 6, 6, 6, -1, 5, 5, 5,-1, 4, 4, 4);
+  const __m128i gr3=_mm_set_epi8(-1,11,11,11, -1,10,10,10, -1, 9, 9, 9,-1, 8, 8, 8);
+  const __m128i gr4=_mm_set_epi8(-1,15,15,15, -1,14,14,14, -1,13,13,13,-1,12,12,12);
+  const __m128i alfa=_mm_set_epi8(255,0,0,0, 255,0,0,0, 255,0,0,0, 255,0,0,0);
+  __m128i xxxx,aaaa,bbbb,cccc,dddd;
+  while(16<=n){
+    xxxx=_mm_loadu_si128((const __m128i*)src); src+=16;
+    aaaa=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr1),alfa);
+    bbbb=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr2),alfa);
+    cccc=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr3),alfa);
+    dddd=_mm_or_si128(_mm_shuffle_epi8(xxxx,gr4),alfa);
+    _mm_storeu_si128((__m128i*)dst,aaaa); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,bbbb); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,cccc); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,dddd); dst+=4;
+    n-=16;
+    }
+#endif
+  while(n){
+    g=*src++;
+    *dst++=FXRGB(g,g,g);
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeGA8BPPn);
+
+// Decode 8 bit/pixel gray-alpha
+static void decodeGA8BPPn(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeGA8BPPn);
+  FXuchar g,a;
+#if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
+  const __m128i gr1=_mm_set_epi8( 7, 6, 6, 6,  5, 4, 4, 4,  3, 2, 2, 2, 1, 0, 0, 0);
+  const __m128i gr2=_mm_set_epi8(15,14,14,14, 13,12,12,12, 11,10,10,10, 9, 8, 8, 8);
+  __m128i xxxx,yyyy,aaaa,bbbb,cccc,dddd;
+  while(16<=n){
+    xxxx=_mm_loadu_si128((const __m128i*)src); src+=16;
+    yyyy=_mm_loadu_si128((const __m128i*)src); src+=16;
+    aaaa=_mm_shuffle_epi8(xxxx,gr1);
+    bbbb=_mm_shuffle_epi8(xxxx,gr2);
+    cccc=_mm_shuffle_epi8(yyyy,gr1);
+    dddd=_mm_shuffle_epi8(yyyy,gr2);
+    _mm_storeu_si128((__m128i*)dst,aaaa); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,bbbb); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,cccc); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,dddd); dst+=4;
+    n-=16;
+    }
+#endif
+  while(n){
+    g=*src++;
+    a=*src++;
+    *dst++=FXRGBA(g,g,g,a);
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGB8BPPn);
+
+// Decode 8 bit/pixel rgb
+static void decodeRGB8BPPn(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGB8BPPn);
+  FXuchar r,g,b;
+#if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
+  const __m128i shuf1=_mm_set_epi8(-1, 9,10,11,-1, 6, 7, 8,-1, 3, 4, 5,-1, 0, 1, 2);
+  const __m128i shuf2=_mm_set_epi8(-1, 5, 6, 7,-1, 2, 3, 4,-1,15, 0, 1,-1,12,13,14);
+  const __m128i shuf3=_mm_set_epi8(-1, 1, 2, 3,-1,14,15, 0,-1,11,12,13,-1, 8, 9,10);
+  const __m128i shuf4=_mm_set_epi8(-1,13,14,15,-1,10,11,12,-1, 7, 8, 9,-1, 4, 5, 6);
+  const __m128i alfa=_mm_set_epi8(255,0,0,0, 255,0,0,0, 255,0, 0, 0, 255,0,0,0);
+  __m128i aaaa,bbbb,cccc,xxxx,yyyy,zzzz,wwww;
+  while(16<=n){
+    aaaa=_mm_loadu_si128((const __m128i*)src); src+=16;
+    bbbb=_mm_loadu_si128((const __m128i*)src); src+=16;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=16;
+    xxxx=_mm_or_si128(_mm_shuffle_epi8(aaaa,shuf1),alfa);
+    yyyy=_mm_or_si128(_mm_shuffle_epi8(_mm_blend_epi16(aaaa,bbbb,0x0F),shuf2),alfa);
+    zzzz=_mm_or_si128(_mm_shuffle_epi8(_mm_blend_epi16(bbbb,cccc,0x0F),shuf3),alfa);
+    wwww=_mm_or_si128(_mm_shuffle_epi8(cccc,shuf4),alfa);
+    _mm_storeu_si128((__m128i*)dst,xxxx); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,yyyy); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,zzzz); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,wwww); dst+=4;
+    n-=16;
+    }
+#endif
+  while(n){
+    r=*src++;
+    g=*src++;
+    b=*src++;
+    *dst++=FXRGB(r,g,b);
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGBA8BPPn);
+
+// Decode 8 bit/pixel rgba
+static void decodeRGBA8BPPn(FXColor* dst,const PNGDecoder *,const FXuchar* src,FXuval n,FXuval){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGBA8BPPn);
+  FXuchar r,g,b,a;
+#if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
+  const __m128i bgra=_mm_set_epi8(15,12,13,14, 11,8,9,10, 7,4,5,6, 3,0,1,2);
+  __m128i aaaa,bbbb,cccc,dddd;
+  while(16<=n){
+    aaaa=_mm_loadu_si128((const __m128i*)src); src+=16;
+    bbbb=_mm_loadu_si128((const __m128i*)src); src+=16;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=16;
+    dddd=_mm_loadu_si128((const __m128i*)src); src+=16;
+    aaaa=_mm_shuffle_epi8(aaaa,bgra);
+    bbbb=_mm_shuffle_epi8(bbbb,bgra);
+    cccc=_mm_shuffle_epi8(cccc,bgra);
+    dddd=_mm_shuffle_epi8(dddd,bgra);
+    _mm_storeu_si128((__m128i*)dst,aaaa); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,bbbb); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,cccc); dst+=4;
+    _mm_storeu_si128((__m128i*)dst,dddd); dst+=4;
+    n-=16;
+    }
+#endif
+  while(n){
+    r=*src++;
+    g=*src++;
+    b=*src++;
+    a=*src++;
+    *dst++=FXRGBA(r,g,b,a);
+    n--;
+    }
+  }
+
+/*******************************************************************************/
+
+// Decode with special Alpha-Color replacement by transparent pixel
+
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG1BPPa);
+
+// Decode 1bpp gray image, with alfa-color
+static void decodeG1BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG1BPPa);
+  FXuchar a=dec->alfaRed,w,c0,c1,c2,c3,c4,c5,c6,c7;
+  while(8<n){
+    w=*src++;
+    c0=w>>7;     *dst=(c0!=a)?map1Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+    c1=(w>>6)&1; *dst=(c1!=a)?map1Bit[c1]:FXRGBA(0,0,0,0); dst+=s;
+    c2=(w>>5)&1; *dst=(c2!=a)?map1Bit[c2]:FXRGBA(0,0,0,0); dst+=s;
+    c3=(w>>4)&1; *dst=(c3!=a)?map1Bit[c3]:FXRGBA(0,0,0,0); dst+=s;
+    c4=(w>>3)&1; *dst=(c4!=a)?map1Bit[c4]:FXRGBA(0,0,0,0); dst+=s;
+    c5=(w>>2)&1; *dst=(c5!=a)?map1Bit[c5]:FXRGBA(0,0,0,0); dst+=s;
+    c6=(w>>1)&1; *dst=(c6!=a)?map1Bit[c6]:FXRGBA(0,0,0,0); dst+=s;
+    c7=w&1;      *dst=(c7!=a)?map1Bit[c7]:FXRGBA(0,0,0,0); dst+=s;
+    n-=8;
+    }
+  w=*src;
+  if(0<n){ c0=w>>7;     *dst=(c0!=a)?map1Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+  if(1<n){ c1=(w>>6)&1; *dst=(c1!=a)?map1Bit[c1]:FXRGBA(0,0,0,0); dst+=s;
+  if(2<n){ c2=(w>>5)&1; *dst=(c2!=a)?map1Bit[c2]:FXRGBA(0,0,0,0); dst+=s;
+  if(3<n){ c3=(w>>4)&1; *dst=(c3!=a)?map1Bit[c3]:FXRGBA(0,0,0,0); dst+=s;
+  if(4<n){ c4=(w>>3)&1; *dst=(c4!=a)?map1Bit[c4]:FXRGBA(0,0,0,0); dst+=s;
+  if(5<n){ c5=(w>>2)&1; *dst=(c5!=a)?map1Bit[c5]:FXRGBA(0,0,0,0); dst+=s;
+  if(6<n){ c6=(w>>1)&1; *dst=(c6!=a)?map1Bit[c6]:FXRGBA(0,0,0,0); dst+=s;
+  if(7<n){ c7=w&1;      *dst=(c7!=a)?map1Bit[c7]:FXRGBA(0,0,0,0); dst+=s; }}}}}}}}
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG2BPPa);
+
+// Decode 2bpp gray image, with alfa-color
+static void decodeG2BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG2BPPa);
+  FXuchar a=dec->alfaRed,w,c0,c1,c2,c3;
+  while(4<n){
+    w=*src++;
+    c0=w>>6;     *dst=(c0!=a)?map2Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+    c1=(w>>4)&3; *dst=(c1!=a)?map2Bit[c1]:FXRGBA(0,0,0,0); dst+=s;
+    c2=(w>>2)&3; *dst=(c2!=a)?map2Bit[c2]:FXRGBA(0,0,0,0); dst+=s;
+    c3=w&3;      *dst=(c3!=a)?map2Bit[c3]:FXRGBA(0,0,0,0); dst+=s;
+    n-=4;
+    }
+  w=*src;
+  if(0<n){ c0=w>>6;     *dst=(c0!=a)?map2Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+  if(1<n){ c1=(w>>4)&3; *dst=(c1!=a)?map2Bit[c1]:FXRGBA(0,0,0,0); dst+=s;
+  if(2<n){ c2=(w>>2)&3; *dst=(c2!=a)?map2Bit[c2]:FXRGBA(0,0,0,0); dst+=s;
+  if(3<n){ c3=w&3;      *dst=(c3!=a)?map2Bit[c3]:FXRGBA(0,0,0,0); dst+=s; }}}}
+  }
+
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG4BPPa);
+
+// Apply alpha-color to 4BPP gray image
+static void decodeG4BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG4BPPa);
+  FXuchar a=dec->alfaRed,w,c0,c1;
+  while(2<n){
+    w=*src++;
+    c0=w>>4; *dst=(c0!=a)?map4Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+    c1=w&15; *dst=(c1!=a)?map4Bit[c1]:FXRGBA(0,0,0,0); dst+=s;
+    n-=2;
+    }
+  w=*src;
+  if(0<n){ c0=w>>4; *dst=(c0!=a)?map4Bit[c0]:FXRGBA(0,0,0,0); dst+=s;
+  if(1<n){ c1=w&15; *dst=(c1!=a)?map4Bit[c1]:FXRGBA(0,0,0,0); dst+=s; } }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG8BPPa);
+
+// Apply alpha-color to 8BPP gray image
+static void decodeG8BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG8BPPa);
+  FXuchar a=dec->alfaRed,w;
+  while(n){
+    w=*src++;
+    *dst=(w!=a)?FXRGB(w,w,w):FXRGBA(0,0,0,0); dst+=s;
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeG16BPPa);
+
+// Apply alpha-color to 16BPP gray image
+static void decodeG16BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeG16BPPa);
+  FXushort a=dec->alfaRed,w,c;
+  while(n){
+    w=(src[0]<<8)|src[1]; c=w/257;
+    *dst=(w!=a)?FXRGB(c,c,c):FXRGBA(0,0,0,0); dst+=s;
+    src+=2;
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGB8BPPa);
+
+// Apply alpha-color to 8BPP RGB image
+static void decodeRGB8BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGB8BPPa);
+  FXuchar ar=dec->alfaRed,ag=dec->alfaGreen,ab=dec->alfaBlue,r,g,b;
+  while(n){
+    r=*src++;
+    g=*src++;
+    b=*src++;
+    *dst=(r!=ar || g!=ag || b!=ab) ? FXRGB(r,g,b) : FXRGBA(0,0,0,0); dst+=s;
+    n--;
+    }
+  }
+
+PERFORMANCE_RECORDER(PNGDecoder_decodeRGB16BPPa);
+
+// Apply alpha-color to 8BPP RGB image
+static void decodeRGB16BPPa(FXColor* dst,const PNGDecoder* dec,const FXuchar* src,FXuval n,FXuval s){
+  PERFORMANCE_COUNTER(PNGDecoder_decodeRGB16BPPa);
+  FXushort ar=dec->alfaRed,ag=dec->alfaGreen,ab=dec->alfaBlue,r,g,b;
+  while(n){
+    r=(src[0]<<8)|src[1];
+    g=(src[2]<<8)|src[3];
+    b=(src[4]<<8)|src[5];
+    *dst=(r!=ar || g!=ag || b!=ab) ? FXRGB(r/257,g/257,b/257) : FXRGBA(0,0,0,0); dst+=s;
+    src+=6;
+    n--;
+    }
+  }
+
+/*******************************************************************************/
+
+// Generic (arbitrary step) decode functions
+static const DecodeFunc decodeA7Func[7][5]={
+  {decodeG1BPP,decodeG2BPP,decodeG4BPP,decodeG8BPPi,decodeG16BPP},      // Gray
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGB8BPPi,decodeRGB16BPP},              // RGB
+  {decodeX1BPP,decodeX2BPP,decodeX4BPP,decodeX8BPP,nullptr},            // Index
+  {nullptr,nullptr,nullptr,decodeGA8BPPi,decodeGA16BPP},                // Gray Alpha
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGBA8BPPi,decodeRGBA16BPP}             // RGBA
+  };
+
+
+// Non-interlaced (unit step) accelerated decode functions
+static const DecodeFunc decodeNIFunc[7][5]={
+  {decodeG1BPP,decodeG2BPP,decodeG4BPP,decodeG8BPPn,decodeG16BPP},      // Gray
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGB8BPPn,decodeRGB16BPP},              // RGB
+  {decodeX1BPP,decodeX2BPP,decodeX4BPP,decodeX8BPP,nullptr},            // Index
+  {nullptr,nullptr,nullptr,decodeGA8BPPn,decodeGA16BPP},                // Gray Alpha
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGBA8BPPn,decodeRGBA16BPP}             // RGBA
+  };
+
+
+// Generic (arbitrary step) decode functions with alfa-color
+static const DecodeFunc decodeAlfaFunc[7][5]={
+  {decodeG1BPPa,decodeG2BPPa,decodeG4BPPa,decodeG8BPPa,decodeG16BPPa},  // Gray
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGB8BPPa,decodeRGB16BPPa},             // RGB
+  {decodeX1BPP,decodeX2BPP,decodeX4BPP,decodeX8BPP,nullptr},            // Index
+  {nullptr,nullptr,nullptr,decodeGA8BPPi,decodeGA16BPP},                // Gray Alpha
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                            // N/A
+  {nullptr,nullptr,nullptr,decodeRGBA8BPPi,decodeRGBA16BPP}             // RGBA
   };
 
 /*******************************************************************************/
@@ -1063,54 +1394,6 @@ static inline FXuchar predictor(FXshort a,FXshort b,FXshort c){
   return a;
   }
 
-
-#if 0
-// Decode one line
-// . c b . . .
-// . a x . . .
-//static
-static void decodeLine2(FXuchar filt,FXuchar* __restrict dst,const FXuchar* __restrict px,const FXuchar* __restrict pa,const FXuchar* __restrict pb,const FXuchar* __restrict pc,FXuval count,FXuval step){
-  FXuval i=0;
-  switch(filt){
-  case FiltNone:
-    do{ dst[i]=px[i]; }while(++i<count);
-    return;
-  case FiltSub:
-    do{ dst[i]=px[i]; }while(++i<step);
-    do{ dst[i]=px[i]+pa[i]; }while(++i<count);
-    return;
-  case FiltUp:
-    if(pb){
-      do{ dst[i]=px[i]+pb[i]; }while(++i<count);
-      }
-    else{
-      do{ dst[i]=px[i]; }while(++i<count);
-      }
-    return;
-  case FiltAvg:
-    if(pb){
-      do{ dst[i]=px[i]+(pb[i]>>1); }while(++i<step);
-      do{ dst[i]=px[i]+((pa[i]+pb[i])>>1); }while(++i<count);
-      }
-    else{
-      do{ dst[i]=px[i]; }while(++i<step);
-      do{ dst[i]=px[i]+(pa[i]>>1); }while(++i<count);
-      }
-    return;
-  case FiltPaeth:
-    if(pb){
-      do{ dst[i]=px[i]+pb[i]; }while(++i<step);
-      do{ dst[i]=px[i]+predictor(pa[i],pb[i],pc[i]); }while(++i<count);
-      }
-    else{
-      do{ dst[i]=px[i]; }while(++i<step);
-      do{ dst[i]=px[i]+pa[i]; }while(++i<count);
-      }
-    return;
-    }
-  __unreachable();
-  }
-#endif
 
 PERFORMANCE_RECORDER(PNGDecoder_decodeLine);
 
@@ -1171,11 +1454,18 @@ static void decodeLine(FXuchar filt,FXuchar* __restrict cur,const FXuchar* __res
 
 PERFORMANCE_RECORDER(PNGDecoder_decode);
 
-
 // Decode image
+// For each row, use decode filter the row to obtain original data.
+// Subsequently, transform each pixel into FOX BGRA representation.
+// If an alpha-color was specified, RGB and Gray image types may
+// have alpha-color pixel value replaced by fully transparant pixel.
+// We have highly optimized decode routines for the most important
+// image formats (RGB, RGBA, Gray, GrayAlpha). These are selected
+// through a dispatch table keying on image type and bit-depth.
+// On x86-64 we try to do 16 pixels per loop using SSE.
 FXbool PNGDecoder::decode(){
   PERFORMANCE_COUNTER(PNGDecoder_decode);
-  DecodeFunc df=decodeFunc[imagetype][logBitdepth[bitdepth]];
+  DecodeFunc dec=nullptr;
   FXuchar* cur=buffer;
   FXuchar* prv=nullptr;
   FXColor* dst;
@@ -1183,13 +1473,17 @@ FXbool PNGDecoder::decode(){
 
   // Interlaced mode
   if(interlace==Adam7){
+    dec=decodeA7Func[imagetype][logBitdepth[bitdepth]];
+    if(alfa){
+      dec=decodeAlfaFunc[imagetype][logBitdepth[bitdepth]];
+      }
     for(FXuint pass=0; pass<7; prv=nullptr,++pass){
       for(FXuint row=0; row<intheight[pass]; ++row){
         filt=*cur++;
         if(__unlikely(FiltPaeth<filt)) return false;
         decodeLine(filt,cur,prv,intbytes[pass],stride);
         dst=image+xoffset[pass]+((yoffset[pass]+(ystep[pass]*row))*width);
-        df(dst,this,cur,intwidth[pass],xstep[pass]);
+        dec(dst,this,cur,intwidth[pass],xstep[pass]);
         prv=cur;
         cur+=intbytes[pass];
         }
@@ -1198,12 +1492,16 @@ FXbool PNGDecoder::decode(){
 
   // Normal mode
   else{
+    dec=decodeNIFunc[imagetype][logBitdepth[bitdepth]];
+    if(alfa){
+      dec=decodeAlfaFunc[imagetype][logBitdepth[bitdepth]];
+      }
     for(FXuint row=0; row<height; ++row){
       filt=*cur++;
       if(__unlikely(FiltPaeth<filt)) return false;
       decodeLine(filt,cur,prv,numbytes,stride);
       dst=image+(row*width);
-      df(dst,this,cur,width,1);
+      dec(dst,this,cur,width,1);
       prv=cur;
       cur+=numbytes;
       }
@@ -1215,21 +1513,6 @@ FXbool PNGDecoder::decode(){
 PERFORMANCE_RECORDER(PNGDecoder_data);
 PERFORMANCE_RECORDER(PNGDecoder_inflate);
 
-
-//  buffer         next_out
-//   |               |
-//   |               |           next_in
-//   |               |             |
-//   |               |             |
-//   +---------------+-------------+-------------+
-//   | uncompressed  | inflating   | compressed  |
-//   +---------------+-------------+-------------+
-//   |               |             |             |
-//   |               |             |             |
-//   |               |<-avail_out->|<-avail_in-->|
-//   |                                           |
-//   |                                           |
-//   |<-------------- buffersize --------------->|
 
 // Load data
 // The zlib inflate() is set up decompress the entire image to the START
@@ -1244,6 +1527,22 @@ PERFORMANCE_RECORDER(PNGDecoder_inflate);
 // All bytes in the IDAT chunk must be CRCed, even if the expected IDAT length
 // exceeds the expected amount for the full image (totbytes). However, inflate()
 // stops further processing of data when the full image has been decompressed.
+//
+//  buffer          next_out
+//   |                |
+//   |                |           next_in
+//   |                |             |
+//   |                |             |
+//   +----------------+-------------+-------------+
+//   | uncompressed   | inflating   | compressed  |
+//   +----------------+-------------+-------------+
+//   |                |             |             |
+//   |                |             |             |
+//   |                |<-avail_out->|<-avail_in-->|
+//   |                                            |
+//   |                                            |
+//   |<--------------- buffersize --------------->|
+//
 FXbool PNGDecoder::data(FXStream& store,FXuint length){
   PERFORMANCE_COUNTER(PNGDecoder_data);
   FXuint crc=CRC32::CRC(~0,IDAT);
@@ -1262,7 +1561,7 @@ FXbool PNGDecoder::data(FXStream& store,FXuint length){
     // so we can compute its CRC].
     stream.avail_in=FXMIN(length,totbytes);
 
-    // We now have room for [transfer] new data
+    // We now have room for [transfer] of new data
     stream.next_in=buffer+buffersize-stream.avail_in;
 
     // Load compressed block
@@ -1316,9 +1615,6 @@ FXbool PNGDecoder::end(FXStream& store,FXuint length){
     return false;
     }
 
-  // Apply alpha color
-  applyTransparency();
-
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
@@ -1344,16 +1640,14 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
   // Load header
   if(header(store)){
 
+    // Clear it
+    clearElms(&stream,1);
+
     // Initialize zlib
     if(inflateInit(&stream)==Z_OK){
 
       // Finally, image to be returned
       if(allocElms(image,width*height)){
-
-        // Size of buffer 1.25 x totbytes + 2 x numbytes + 2
-        buffersize=((totbytes*5+3)>>2)+((numbytes+1)<<1);
-
-        FXTRACE((TOPIC_DETAIL,"fxloadPNG: buffersize = %u\n",buffersize));
 
         // Allocate storage
         if(allocElms(buffer,buffersize)){
@@ -1496,13 +1790,12 @@ public:
   FXuint        ncolormap;              // Number of colors in colormap
   RGBAPixel     colormap[256];          // Colormap
   RGBAPixel     colortable[512];        // Color to index hash table
-  FXushort      indextable[512];        // Indexes assigned for each color
-  FXushort      alfacolor[3];           // Alpha color spec
+  FXuchar       indextable[512];        // Indexes assigned for each color
 public:
   FXuint analyze() const;
-  FXbool mapcolors();
-  FXuint index(FXColor color) const;
-  FXbool unused();
+  FXuint colorindexes();
+  FXuint greyindexes();
+  FXuchar index(FXColor color) const;
   FXbool header(FXStream& store);
   FXbool palette(FXStream& store) const;
   FXbool transparency(FXStream& store) const;
@@ -1513,11 +1806,6 @@ public:
 
   // Initialize encoder
   PNGEncoder():image(nullptr),buffer(nullptr),buffersize(0),width(0),height(0),imagetype(0),bitdepth(8),compression(Deflate),filter(FiltNone),interlace(NoInterlace),stride(0),totbytes(0),numbytes(0),ncolormap(0){
-    alfacolor[0]=alfacolor[1]=alfacolor[2]=0;
-    clearElms(&stream,1);
-    clearElms(colormap,ARRAYNUMBER(colormap));
-    clearElms(colortable,ARRAYNUMBER(colortable));
-    clearElms(indextable,ARRAYNUMBER(indextable));
     }
 
   // Save image
@@ -1549,32 +1837,6 @@ FXuint PNGEncoder::analyze() const {
   }
 
 
-// Find unused color, an (r,g,b) triplet that does not occur in
-// the image.  This may be used to encode full-transparent alpha
-// in case we have either fully transparent or fully opaque pixels,
-// saving us the trouble of writing a boring alpha channel.
-FXbool PNGEncoder::unused(){
-  const FXColor* end=image+width*height;
-  const FXColor* ptr=image;
-  FXbool result=false;
-  FXuchar used[3][256];
-  FXColor color;
-  clearElms(used,ARRAYNUMBER(used));
-  while(ptr!=end){
-    color=*ptr++;
-    used[0][FXBLUEVAL(color)]=1;
-    used[1][FXGREENVAL(color)]=1;
-    used[2][FXREDVAL(color)]=1;
-    }
-  for(FXuint i=0; i<256; ++i){
-    if(used[0][i]==0){ alfacolor[2]=i; result=true; }
-    if(used[1][i]==0){ alfacolor[1]=i; result=true; }
-    if(used[2][i]==0){ alfacolor[0]=i; result=true; }
-    }
-  return result;
-  }
-
-
 // Simple but quite fast "hash" function
 static inline FXuint HashColor(FXColor clr){
   return clr*0x9E3779B1;
@@ -1584,7 +1846,7 @@ static inline FXuint HashColor(FXColor clr){
 // Find index given color in table; note that we now know the
 // color to be in the map, so only loop exit is at the location
 // of the color [no un-initialized slots will be visited].
-FXuint PNGEncoder::index(FXColor color) const {
+FXuchar PNGEncoder::index(FXColor color) const {
   FXuint p,b,x;
   p=b=HashColor(color);
   while(__unlikely(colortable[x=p&511].c!=color)){
@@ -1604,39 +1866,20 @@ static inline FXbool operator>(const RGBAPixel& p,const RGBAPixel& q){
   }
 
 
-// Arrange colors by increasing alpha, so opaque pixels
-// would appear at the END of the map, allowing the list
-// of alpha-values to be shorter than the whole palette.
-static void sortmap(RGBAPixel colormap[],FXint n){
-  RGBAPixel color;
-  FXint s=1,i,j;
-  while(s<=n/9){ s=3*s+1; }
-  while(0<s){
-    for(i=s+1; i<=n; ++i){
-      color=colormap[i-1];
-      for(j=i; s<j && (colormap[j-s-1]>color); j-=s){
-        colormap[j-1]=colormap[j-s-1];
-        }
-      colormap[j-1]=color;
-      }
-    s/=3;
-    }
-  }
+PERFORMANCE_RECORDER(PNGEncoder_colorindexes);
 
 
-PERFORMANCE_RECORDER(PNGEncoder_mapcolors);
-
-
-// Collect colors of the image into a colormap; bail if there's more
-// than 256 individual colors; otherwise, sort the colors and assign
-// each color an index into the sorted list.
-FXbool PNGEncoder::mapcolors(){
-  PERFORMANCE_COUNTER(PNGEncoder_mapcolors);
-  const FXColor ALPHA=FXRGBA(0,0,0,255);
+// Count distinct colors in image
+FXuint PNGEncoder::colorindexes(){
+  PERFORMANCE_COUNTER(PNGEncoder_colorindexes);
   FXuint  npixels=width*height;
   FXuint  ncolors=0;
-  FXuint  i,p,b,x;
   FXColor color;
+  FXuint  i,p,b,x;
+
+  // Clear color table and index table
+  clearElms(colortable,ARRAYNUMBER(colortable));
+  clearElms(indextable,ARRAYNUMBER(indextable));
 
   // Hash all colors from image
   for(i=0; i<npixels; ++i){
@@ -1654,41 +1897,73 @@ FXbool PNGEncoder::mapcolors(){
       b>>=5;
       }
 
-    // Not fitting
-    if(__unlikely(ncolors>=256)) return false;
+    // Too many colors for palette
+    if(__unlikely(ncolors>=256)) return 0;
 
     // Color to index mappings
     // Count number of non-opaque colors; if only
     // opaque colors are present, we may not need
     // to save a transparancy list at all!
-    FXASSERT(x<512);
     colortable[x].c=color;
     indextable[x]=1;
-
-    // Add to map
-    colormap[ncolors].c=color;
     ncolors++;
 
     // Next pixel
 nxt:continue;
     }
 
-  // Sort map by alpha
-  sortmap(colormap,ncolors);
-
-  // Now assign colors to index; note we now
-  // know each color MUST be in the map!
-  for(i=0; i<ncolors; ++i){
-    color=colormap[i].c;
-    p=b=HashColor(color);
-    while(colortable[x=p&511].c!=color){
-      p=(p<<2)+p+b+1;
-      b>>=5;
-      }
+  // Build colormap from hash table
+  for(x=0,i=0; x<512; ++x){
+    if(!indextable[x]) continue;
     indextable[x]=i;
+    colormap[i]=colortable[x];
+    ++i;
     }
+
+  // Set colormap size
   ncolormap=ncolors;
-  return true;
+
+  // Check bits/pixel
+  if(16<ncolors) return 8;
+  if(4<ncolors) return 4;
+  if(2<ncolors) return 2;
+  return 1;
+  }
+
+
+PERFORMANCE_RECORDER(PNGEncoder_greyindexes);
+
+// Count distinct colors in greyscale image
+FXuint PNGEncoder::greyindexes(){
+  PERFORMANCE_COUNTER(PNGEncoder_greyindexes);
+  FXuint  npixels=width*height;
+  FXuint  ncolors=0;
+  FXColor color;
+  FXuint  i,x;
+
+  // Count unique grey levels
+  for(i=0; i<npixels; ++i){
+    color=image[i];
+    x=FXBLUEVAL(color);
+    ncolors+=!indextable[x];
+    indextable[x]=1;
+    }
+
+  // Check bits/pixel
+  if(ncolors<=16){
+    x=indextable[0]+indextable[255];
+    if(ncolors==x) return 1;
+    x+=indextable[85]+indextable[170];
+    if(ncolors==x) return 2;
+    x+=indextable[17]+indextable[34];
+    x+=indextable[51]+indextable[68];
+    x+=indextable[102]+indextable[119];
+    x+=indextable[136]+indextable[153];
+    x+=indextable[187]+indextable[204];
+    x+=indextable[221]+indextable[238];
+    if(ncolors==x) return 4;
+    }
+  return 8;
   }
 
 
@@ -1762,81 +2037,80 @@ FXbool PNGEncoder::transparency(FXStream& store) const {
 
 /*******************************************************************************/
 
+// Encode function
+typedef void (*EncodeFunc)(FXuchar*,const PNGEncoder* enc,const FXColor*,FXuval);
 
-PERFORMANCE_RECORDER(PNGEncoder_encodeIndex1BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeIndex2BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeIndex4BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeIndex8BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeGray1BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeGray2BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeGray4BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeGray8BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeGrayAlfa8BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeRGB8BPP);
-PERFORMANCE_RECORDER(PNGEncoder_encodeRGBA8BPP);
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeX1BPP);
 
 // Encode 1 bit/pixel indexed
-static void encodeIndex1BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeIndex1BPP);
-  FXuchar s;
-  while(8<=n){
-    s= enc->index(src[0])<<7;
-    s|=enc->index(src[1])<<6;
-    s|=enc->index(src[2])<<5;
-    s|=enc->index(src[3])<<4;
-    s|=enc->index(src[4])<<3;
-    s|=enc->index(src[5])<<2;
-    s|=enc->index(src[6])<<1;
-    s|=enc->index(src[7]);
-    *dst++=s;
+static void encodeX1BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeX1BPP);
+  FXuchar w;
+  while(8<n){
+    w= enc->index(src[0])<<7;
+    w|=enc->index(src[1])<<6;
+    w|=enc->index(src[2])<<5;
+    w|=enc->index(src[3])<<4;
+    w|=enc->index(src[4])<<3;
+    w|=enc->index(src[5])<<2;
+    w|=enc->index(src[6])<<1;
+    w|=enc->index(src[7]);
+    *dst++=w;
     src+=8;
     n-=8;
     }
-  if(1<=n){ s= enc->index(src[0])<<7;
-  if(2<=n){ s|=enc->index(src[1])<<6;
-  if(3<=n){ s|=enc->index(src[2])<<5;
-  if(4<=n){ s|=enc->index(src[3])<<4;
-  if(5<=n){ s|=enc->index(src[4])<<3;
-  if(6<=n){ s|=enc->index(src[5])<<2;
-  if(7<=n){ s|=enc->index(src[6])<<1; }}}}}} *dst=s; }
+  if(0<n){ w= enc->index(src[0])<<7;
+  if(1<n){ w|=enc->index(src[1])<<6;
+  if(2<n){ w|=enc->index(src[2])<<5;
+  if(3<n){ w|=enc->index(src[3])<<4;
+  if(4<n){ w|=enc->index(src[4])<<3;
+  if(5<n){ w|=enc->index(src[5])<<2;
+  if(6<n){ w|=enc->index(src[6])<<1;
+  if(7<n){ w|=enc->index(src[7]); }}}}}}} *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeX2BPP);
 
 // Encode 2 bit/pixel indexed
-static void encodeIndex2BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeIndex2BPP);
-  FXuchar s;
-  while(4<=n){
-    s= enc->index(src[0])<<6;
-    s|=enc->index(src[1])<<4;
-    s|=enc->index(src[2])<<2;
-    s|=enc->index(src[3]);
-    *dst++=s;
+static void encodeX2BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeX2BPP);
+  FXuchar w;
+  while(4<n){
+    w= enc->index(src[0])<<6;
+    w|=enc->index(src[1])<<4;
+    w|=enc->index(src[2])<<2;
+    w|=enc->index(src[3]);
+    *dst++=w;
     src+=4;
     n-=4;
     }
-  if(1<=n){ s= enc->index(src[0])<<6;
-  if(2<=n){ s|=enc->index(src[1])<<4;
-  if(3<=n){ s|=enc->index(src[2])<<2; }} *dst=s; }
+  if(0<n){ w= enc->index(src[0])<<6;
+  if(1<n){ w|=enc->index(src[1])<<4;
+  if(2<n){ w|=enc->index(src[2])<<2;
+  if(3<n){ w|=enc->index(src[3]); }}} *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeX4BPP);
 
 // Encode 4 bit/pixel indexed
-static void encodeIndex4BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeIndex4BPP);
-  while(2<=n){
+static void encodeX4BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeX4BPP);
+  FXuchar w;
+  while(2<n){
     *dst++=(enc->index(src[0])<<4) | (enc->index(src[1]));
     src+=2;
     n-=2;
     }
-  if(1<=n){ *dst++=enc->index(src[0]); }
+  if(0<n){ w= enc->index(src[0]);
+  if(1<n){ w|=enc->index(src[1]); } *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeX8BPP);
 
 // Encode 8 bit/pixel indexed
-static void encodeIndex8BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeIndex8BPP);
+static void encodeX8BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeX8BPP);
   while(n){
     *dst++=enc->index(*src);
     src++;
@@ -1844,12 +2118,13 @@ static void encodeIndex8BPP(FXuchar* dst,const PNGEncoder* enc,const FXColor* sr
     }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeG1BPP);
 
 // Encode 1 bit/pixel gray
-static void encodeGray1BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeGray1BPP);
+static void encodeG1BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeG1BPP);
   FXuchar w;
-  while(8<=n){
+  while(8<n){
     w= ((FXBLUEVAL(src[0]))&0x80);
     w|=((FXBLUEVAL(src[1])>>1)&0x40);
     w|=((FXBLUEVAL(src[2])>>2)&0x20);
@@ -1862,21 +2137,23 @@ static void encodeGray1BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXu
     src+=8;
     n-=8;
     }
-  if(1<=n){ w= ((FXBLUEVAL(src[0]))&0x80);
-  if(2<=n){ w|=((FXBLUEVAL(src[1])>>1)&0x40);
-  if(3<=n){ w|=((FXBLUEVAL(src[2])>>2)&0x20);
-  if(4<=n){ w|=((FXBLUEVAL(src[3])>>3)&0x10);
-  if(5<=n){ w|=((FXBLUEVAL(src[4])>>4)&0x08);
-  if(6<=n){ w|=((FXBLUEVAL(src[5])>>5)&0x04);
-  if(7<=n){ w|=((FXBLUEVAL(src[6])>>6)&0x02); }}}}}} *dst=w; }
+  if(0<n){ w= ((FXBLUEVAL(src[0]))&0x80);
+  if(1<n){ w|=((FXBLUEVAL(src[1])>>1)&0x40);
+  if(2<n){ w|=((FXBLUEVAL(src[2])>>2)&0x20);
+  if(3<n){ w|=((FXBLUEVAL(src[3])>>3)&0x10);
+  if(4<n){ w|=((FXBLUEVAL(src[4])>>4)&0x08);
+  if(5<n){ w|=((FXBLUEVAL(src[5])>>5)&0x04);
+  if(6<n){ w|=((FXBLUEVAL(src[6])>>6)&0x02);
+  if(7<n){ w|=((FXBLUEVAL(src[7])>>7)&0x01); }}}}}}} *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeG2BPP);
 
 // Encode 2 bit/pixel gray
-static void encodeGray2BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeGray2BPP);
+static void encodeG2BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeG2BPP);
   FXuchar w;
-  while(4<=n){
+  while(4<n){
     w= ((FXBLUEVAL(src[0]))&0xC0);
     w|=((FXBLUEVAL(src[1])>>2)&0x30);
     w|=((FXBLUEVAL(src[2])>>4)&0x0C);
@@ -1885,41 +2162,53 @@ static void encodeGray2BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXu
     src+=4;
     n-=4;
     }
-  if(1<=n){ w= ((FXBLUEVAL(src[0]))&0xC0);
-  if(2<=n){ w|=((FXBLUEVAL(src[1])>>2)&0x30);
-  if(3<=n){ w|=((FXBLUEVAL(src[2])>>4)&0x0C); }} *dst=w; }
+  if(0<n){ w= ((FXBLUEVAL(src[0]))&0xC0);
+  if(1<n){ w|=((FXBLUEVAL(src[1])>>2)&0x30);
+  if(2<n){ w|=((FXBLUEVAL(src[2])>>4)&0x0C);
+  if(3<n){ w|=((FXBLUEVAL(src[3])>>6)&0x03); }}} *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeG4BPP);
 
 // Encode 4 bit/pixel gray
-static void encodeGray4BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGDecoder_decodeGray4BPP);
+static void encodeG4BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeG4BPP);
   FXuchar w;
-  while(2<=n){
+  while(2<n){
     w= FXBLUEVAL(src[0])&0xF0;
     w|=FXBLUEVAL(src[1])>>4;
     *dst++=w;
     src+=2;
     n-=2;
     }
-  if(1<=n){ *dst++=(FXBLUEVAL(src[0])&0xF0); }
+  if(0<n){ w= FXBLUEVAL(src[0])&0xF0;
+  if(1<n){ w|=FXBLUEVAL(src[1])>>4; } *dst=w; }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeG8BPP);
 
 // Encode 8 bit/pixel gray
-static void encodeGray8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeGray8BPP);
+static void encodeG8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeG8BPP);
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
-  const __m128i gray=_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,8,4,0);
-  __m128i aaaa,bbbb;
-  while(8<=n){
+  const __m128i gray1=_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,8,4,0);
+  const __m128i gray2=_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,12,8,4,0,-1,-1,-1,-1);
+  const __m128i gray3=_mm_set_epi8(-1,-1,-1,-1,12,8,4,0,-1,-1,-1,-1,-1,-1,-1,-1);
+  const __m128i gray4=_mm_set_epi8(12,8,4,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1);
+  __m128i aaaa,bbbb,cccc,dddd;
+  while(16<=n){
     aaaa=_mm_loadu_si128((const __m128i*)src); src+=4;
     bbbb=_mm_loadu_si128((const __m128i*)src); src+=4;
-    aaaa=_mm_shuffle_epi8(aaaa,gray);
-    bbbb=_mm_shuffle_epi8(bbbb,gray);
-    _mm_storeu_si32(dst,aaaa); dst+=4;
-    _mm_storeu_si32(dst,bbbb); dst+=4;
-    n-=8;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=4;
+    dddd=_mm_loadu_si128((const __m128i*)src); src+=4;
+    aaaa=_mm_shuffle_epi8(aaaa,gray1);
+    bbbb=_mm_shuffle_epi8(bbbb,gray2);
+    cccc=_mm_shuffle_epi8(cccc,gray3);
+    dddd=_mm_shuffle_epi8(dddd,gray4);
+    aaaa=_mm_or_si128(aaaa,bbbb);
+    cccc=_mm_or_si128(cccc,dddd);
+    _mm_storeu_si128((__m128i*)dst,_mm_or_si128(aaaa,cccc)); dst+=16;
+    n-=16;
     }
 #endif
   while(n){
@@ -1929,22 +2218,23 @@ static void encodeGray8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXu
     }
   }
 
-
+PERFORMANCE_RECORDER(PNGEncoder_encodeGA8BPP);
 
 // Encode 8 bit/channel gray-alpha
-static void encodeGrayAlfa8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
-  PERFORMANCE_COUNTER(PNGEncoder_encodeGrayAlfa8BPP);
+static void encodeGA8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
+  PERFORMANCE_COUNTER(PNGEncoder_encodeGA8BPP);
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
-  const __m128i gray=_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,15,12,11,8,7,4,3,0);
-  __m128i aaaa,bbbb;
-  while(8<=n){
+  const __m128i gray1=_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,15,12,11,8,7,4,3,0);
+  const __m128i gray2=_mm_set_epi8(15,12,11,8,7,4,3,0,-1,-1,-1,-1,-1,-1,-1,-1);
+  __m128i aaaa,bbbb,cccc,dddd;
+  while(16<=n){
     aaaa=_mm_loadu_si128((const __m128i*)src); src+=4;
     bbbb=_mm_loadu_si128((const __m128i*)src); src+=4;
-    aaaa=_mm_shuffle_epi8(aaaa,gray);
-    bbbb=_mm_shuffle_epi8(bbbb,gray);
-    _mm_storeu_si64(dst,aaaa); dst+=8;
-    _mm_storeu_si64(dst,bbbb); dst+=8;
-    n-=8;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=4;
+    dddd=_mm_loadu_si128((const __m128i*)src); src+=4;
+    _mm_storeu_si128((__m128i*)dst,_mm_or_si128(_mm_shuffle_epi8(aaaa,gray1),_mm_shuffle_epi8(bbbb,gray2))); dst+=16;
+    _mm_storeu_si128((__m128i*)dst,_mm_or_si128(_mm_shuffle_epi8(cccc,gray1),_mm_shuffle_epi8(dddd,gray2))); dst+=16;
+    n-=16;
     }
 #endif
   while(n){
@@ -1955,6 +2245,7 @@ static void encodeGrayAlfa8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src
     }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeRGB8BPP);
 
 // Encode 8 bit/channel rgb
 static void encodeRGB8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
@@ -1989,21 +2280,28 @@ static void encodeRGB8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuv
     }
   }
 
+PERFORMANCE_RECORDER(PNGEncoder_encodeRGBA8BPP);
 
 // Encode 8 bit/channel rgba
 static void encodeRGBA8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXuval n){
   PERFORMANCE_COUNTER(PNGEncoder_encodeRGBA8BPP);
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSSE3__) && defined(__SSE4_1__)
   const __m128i rgba=_mm_set_epi8(15,12,13,14, 11,8,9,10, 7,4,5,6, 3,0,1,2);
-  __m128i aaaa,bbbb;
-  while(8<=n){
+  __m128i aaaa,bbbb,cccc,dddd;
+  while(16<=n){
     aaaa=_mm_loadu_si128((const __m128i*)src); src+=4;
     bbbb=_mm_loadu_si128((const __m128i*)src); src+=4;
+    cccc=_mm_loadu_si128((const __m128i*)src); src+=4;
+    dddd=_mm_loadu_si128((const __m128i*)src); src+=4;
     aaaa=_mm_shuffle_epi8(aaaa,rgba);
     bbbb=_mm_shuffle_epi8(bbbb,rgba);
+    cccc=_mm_shuffle_epi8(cccc,rgba);
+    dddd=_mm_shuffle_epi8(dddd,rgba);
     _mm_storeu_si128((__m128i*)dst,aaaa); dst+=16;
     _mm_storeu_si128((__m128i*)dst,bbbb); dst+=16;
-    n-=8;
+    _mm_storeu_si128((__m128i*)dst,cccc); dst+=16;
+    _mm_storeu_si128((__m128i*)dst,dddd); dst+=16;
+    n-=16;
     }
 #endif
   while(n){
@@ -2017,17 +2315,15 @@ static void encodeRGBA8BPP(FXuchar* dst,const PNGEncoder*,const FXColor* src,FXu
   }
 
 
-typedef void (*EncodeFunc)(FXuchar*,const PNGEncoder* enc,const FXColor*,FXuval);
-
 // Function table of mapping image_type and log(bits) to decode function
 static const EncodeFunc encodeFunc[7][5]={
-  {encodeGray1BPP,encodeGray2BPP,encodeGray4BPP,encodeGray8BPP,nullptr},        // Gray
-  {nullptr,nullptr,nullptr,nullptr,nullptr},                                    // N/A
-  {nullptr,nullptr,nullptr,encodeRGB8BPP,nullptr},                              // RGB
-  {encodeIndex1BPP,encodeIndex2BPP,encodeIndex4BPP,encodeIndex8BPP,nullptr},    // Index
-  {nullptr,nullptr,nullptr,encodeGrayAlfa8BPP,nullptr},                         // Gray Alpha
-  {nullptr,nullptr,nullptr,nullptr,nullptr},                                    // N/A
-  {nullptr,nullptr,nullptr,encodeRGBA8BPP,nullptr}                              // RGBA
+  {encodeG1BPP,encodeG2BPP,encodeG4BPP,encodeG8BPP,nullptr},    // Gray
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                    // N/A
+  {nullptr,nullptr,nullptr,encodeRGB8BPP,nullptr},              // RGB
+  {encodeX1BPP,encodeX2BPP,encodeX4BPP,encodeX8BPP,nullptr},    // Index
+  {nullptr,nullptr,nullptr,encodeGA8BPP,nullptr},               // Gray Alpha
+  {nullptr,nullptr,nullptr,nullptr,nullptr},                    // N/A
+  {nullptr,nullptr,nullptr,encodeRGBA8BPP,nullptr}              // RGBA
   };
 
 
@@ -2088,7 +2384,6 @@ static inline FXuchar findBestFilter(FXuchar* __restrict dst,const FXuchar* __re
 
 /*******************************************************************************/
 
-
 PERFORMANCE_RECORDER(PNGEncoder_encode);
 
 
@@ -2148,24 +2443,25 @@ PERFORMANCE_RECORDER(PNGEncoder_data);
 PERFORMANCE_RECORDER(PNGEncoder_deflate);
 
 
+// Save image data
+// New version writes one row at a time, and requires no
+// backup to earlier point in the stream to overwrite chunksize.
+//
 //  buffer         next_out
 //   |               |
 //   |               |           next_in
 //   |               |             |
 //   |               |             |
-//   +---------------+-------------+-------------+
-//   | compressed    | deflating   | compressed  |
-//   +---------------+-------------+-------------+
-//   |               |             |             |
-//   |               |             |             |
-//   |               |<-avail_out->|<-totbytes-->|
-//   |                                           |
-//   |                                           |
-//   |<-------------- buffersize --------------->|
-
-// Save image data
-// New version writes one row at a time, and requires no
-// backup to earlier point in the stream to overwrite chunksize.
+//   +---------------+-------------+--------------+
+//   | compressed    | deflating   | uncompressed |
+//   +---------------+-------------+--------------+
+//   |               |             |              |
+//   |               |             |              |
+//   |               |<-avail_out->|<--totbytes-->|
+//   |                                            |
+//   |                                            |
+//   |<-------------- buffersize ---------------->|
+//
 FXbool PNGEncoder::data(FXStream& store){
   PERFORMANCE_COUNTER(PNGEncoder_data);
   FXuint crc=CRC32::CRC(~0,IDAT);
@@ -2232,6 +2528,7 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
   FXint  level=Z_DEFAULT_COMPRESSION;
   FXbool result=false;
   FXuint mode;
+  FXuint bits;
   FXuint ch;
 
   // Init image data
@@ -2252,21 +2549,26 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
 
   // Pick RGBA, RGB, GrayAlpha, or Gray
   if(mode&PNG_IMAGE_GRAY){
-    imagetype=GrayAlpha;
-    if(mode&PNG_IMAGE_OPAQUE) imagetype=Gray;
+    imagetype=(mode&PNG_IMAGE_OPAQUE) ? Gray : GrayAlpha;
     }
   else{
-    imagetype=RGBA;
-    if(mode&PNG_IMAGE_OPAQUE) imagetype=RGB;
+    imagetype=(mode&PNG_IMAGE_OPAQUE) ? RGB : RGBA;
     }
 
   // Try indexed color mode
   if(flags&PNG_INDEX_COLOR){
-    if(mapcolors()){
-      imagetype=Indexed;
-      if(ncolormap<=16) bitdepth=4;
-      if(ncolormap<=4)  bitdepth=2;
-      if(ncolormap<=2)  bitdepth=1;
+    if(imagetype==Gray){
+      bits=greyindexes();
+      if(bits){
+        bitdepth=bits;
+        }
+      }
+    else{
+      bits=colorindexes();
+      if(bits){
+        imagetype=Indexed;
+        bitdepth=bits;
+        }
       }
     }
 
@@ -2305,6 +2607,9 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
     // Compression options
     if(flags&PNG_COMPRESS_FAST) level=Z_BEST_SPEED;
     if(flags&PNG_COMPRESS_BEST) level=Z_BEST_COMPRESSION;
+
+    // Clear compressor
+    clearElms(&stream,1);
 
     // Initialize zlib
     if(deflateInit(&stream,level)==Z_OK){

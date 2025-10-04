@@ -1,7 +1,7 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [85])
+m4_define([fox_level], [86])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
@@ -144,7 +144,7 @@ AC_MSG_RESULT([$enable_release])
 if test "x$enable_release" = "xyes" ; then
   CXXFLAGS="${CXXFLAGS} -O2 -DNDEBUG"
   if test "${GXX}" = "yes" ; then
-    CXXFLAGS="${CXXFLAGS} -ffast-math -fstrict-overflow -fstrict-aliasing -finline-functions -fomit-frame-pointer -fcf-protection=none -fno-stack-protector"
+    CXXFLAGS="${CXXFLAGS} -ffast-math -fstrict-overflow -fstrict-aliasing -finline-functions -fomit-frame-pointer "
     LDFLAGS="-s ${LDFLAGS}"
   fi
 fi

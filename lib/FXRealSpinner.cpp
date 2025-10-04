@@ -45,7 +45,6 @@
 #include "FXArrowButton.h"
 #include "FXRealSpinner.h"
 
-
 /*
   Notes:
   - Based on Lyle's FXSpinner.
@@ -64,7 +63,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 //  Message map
 FXDEFMAP(FXRealSpinner) FXRealSpinnerMap[]={

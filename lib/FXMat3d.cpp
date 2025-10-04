@@ -38,6 +38,7 @@
 
 /*
   Notes:
+
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
 */
@@ -67,6 +68,7 @@ namespace FX {
 #define _mm_storeu_sd(p,x)    _mm_store_sd(p,x)
 #define _mm_loadu_sd(p)       _mm_load_sd(p)
 
+
 // Initialize matrix from scalar
 FXMat3d::FXMat3d(FXdouble s){
 #if defined(FOX_HAS_AVX)
@@ -84,6 +86,14 @@ FXMat3d::FXMat3d(FXdouble s){
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
   m[2][0]=s; m[2][1]=s; m[2][2]=s;
 #endif
+  }
+
+
+// Initialize matrix from components
+FXMat3d::FXMat3d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a20,FXdouble a21,FXdouble a22){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
   }
 
 
@@ -129,39 +139,9 @@ FXMat3d::FXMat3d(const FXMat4d& s){
   }
 
 
-// Initialize matrix from array
-FXMat3d::FXMat3d(const FXdouble s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0]));
-  _mm256_storeu_pd(&m[1][1],_mm256_loadu_pd(&s[4]));
-  _mm256_storeu_sd(&m[2][2],_mm256_loadu_sd(&s[8]));
-#elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0]));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&s[2]));
-  _mm_storeu_pd(&m[1][1],_mm_loadu_pd(&s[4]));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&s[6]));
-  _mm_storeu_sd(&m[2][2],_mm_loadu_sd(&s[8]));
-#else
-  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
-  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
-  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-#endif
-  }
-
-
-// Initialize diagonal matrix
-FXMat3d::FXMat3d(FXdouble a,FXdouble b,FXdouble c){
-  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0;
-  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0;
-  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;
-  }
-
-
-// Initialize matrix from components
-FXMat3d::FXMat3d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a20,FXdouble a21,FXdouble a22){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+// Initialize matrix from quaternion
+FXMat3d::FXMat3d(const FXQuatd& quat){
+  quat.getAxes(m[0],m[1],m[2]);
   }
 
 
@@ -179,9 +159,39 @@ FXMat3d::FXMat3d(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c){
   }
 
 
-// Initialize matrix from quaternion
-FXMat3d::FXMat3d(const FXQuatd& quat){
-  quat.getAxes(m[0],m[1],m[2]);
+// Initialize diagonal matrix
+FXMat3d::FXMat3d(FXdouble a,FXdouble b,FXdouble c){
+  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0;
+  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0;
+  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;
+  }
+
+
+// Initialize diagonal matrix
+FXMat3d::FXMat3d(const FXVec3d& d){
+  m[0][0]=d[0]; m[0][1]=0.0;  m[0][2]=0.0;
+  m[1][0]=0.0;  m[1][1]=d[1]; m[1][2]=0.0;
+  m[2][0]=0.0;  m[2][1]=0.0;  m[2][2]=d[2];
+  }
+
+
+// Initialize matrix from array
+FXMat3d::FXMat3d(const FXdouble s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0]));
+  _mm256_storeu_pd(&m[1][1],_mm256_loadu_pd(&s[4]));
+  _mm256_storeu_sd(&m[2][2],_mm256_loadu_sd(&s[8]));
+#elif defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0]));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&s[2]));
+  _mm_storeu_pd(&m[1][1],_mm_loadu_pd(&s[4]));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&s[6]));
+  _mm_storeu_sd(&m[2][2],_mm_loadu_sd(&s[8]));
+#else
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+#endif
   }
 
 
@@ -300,6 +310,15 @@ FXMat3d& FXMat3d::set(FXdouble s){
   }
 
 
+// Set value from components
+FXMat3d& FXMat3d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a20,FXdouble a21,FXdouble a22){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+  return *this;
+  }
+
+
 // Set value from 2x2 rotation and scale matrix
 FXMat3d& FXMat3d::set(const FXMat2d& s){
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=0.0;
@@ -345,41 +364,9 @@ FXMat3d& FXMat3d::set(const FXMat4d& s){
   }
 
 
-// Set value from array
-FXMat3d& FXMat3d::set(const FXdouble s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0]));
-  _mm256_storeu_pd(&m[1][1],_mm256_loadu_pd(&s[4]));
-  _mm256_storeu_sd(&m[2][2],_mm256_loadu_sd(&s[8]));
-#elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0]));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&s[2]));
-  _mm_storeu_pd(&m[1][1],_mm_loadu_pd(&s[4]));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&s[6]));
-  _mm_storeu_sd(&m[2][2],_mm_loadu_sd(&s[8]));
-#else
-  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
-  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
-  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-#endif
-  return *this;
-  }
-
-
-// Set diagonal matrix
-FXMat3d& FXMat3d::set(FXdouble a,FXdouble b,FXdouble c){
-  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0;
-  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0;
-  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;
-  return *this;
-  }
-
-
-// Set value from components
-FXMat3d& FXMat3d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a20,FXdouble a21,FXdouble a22){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+// Set value from quaternion
+FXMat3d& FXMat3d::set(const FXQuatd& quat){
+  quat.getAxes(m[0],m[1],m[2]);
   return *this;
   }
 
@@ -399,9 +386,41 @@ FXMat3d& FXMat3d::set(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c){
   }
 
 
-// Set value from quaternion
-FXMat3d& FXMat3d::set(const FXQuatd& quat){
-  quat.getAxes(m[0],m[1],m[2]);
+// Set diagonal matrix
+FXMat3d& FXMat3d::set(FXdouble a,FXdouble b,FXdouble c){
+  m[0][0]=a;   m[0][1]=0.0; m[0][2]=0.0;
+  m[1][0]=0.0; m[1][1]=b;   m[1][2]=0.0;
+  m[2][0]=0.0; m[2][1]=0.0; m[2][2]=c;
+  return *this;
+  }
+
+
+// Initialize diagonal matrix
+FXMat3d& FXMat3d::set(const FXVec3d& d){
+  m[0][0]=d[0]; m[0][1]=0.0;  m[0][2]=0.0;
+  m[1][0]=0.0;  m[1][1]=d[1]; m[1][2]=0.0;
+  m[2][0]=0.0;  m[2][1]=0.0;  m[2][2]=d[2];
+  return *this;
+  }
+
+
+// Set value from array
+FXMat3d& FXMat3d::set(const FXdouble s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(&s[0]));
+  _mm256_storeu_pd(&m[1][1],_mm256_loadu_pd(&s[4]));
+  _mm256_storeu_sd(&m[2][2],_mm256_loadu_sd(&s[8]));
+#elif defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&s[0]));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&s[2]));
+  _mm_storeu_pd(&m[1][1],_mm_loadu_pd(&s[4]));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&s[6]));
+  _mm_storeu_sd(&m[2][2],_mm_loadu_sd(&s[8]));
+#else
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+#endif
   return *this;
   }
 

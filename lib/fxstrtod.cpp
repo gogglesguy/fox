@@ -27,7 +27,6 @@
 #include "FXMetaClass.h"
 #include "fxascii.h"
 
-
 /*
   Notes:
   - Thread-safe conversion of strings to double and float, with extra parameter

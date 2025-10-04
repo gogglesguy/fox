@@ -30,7 +30,6 @@
 #include "FXDDSImage.h"
 
 
-
 /*
   Notes:
   - Support for displaying texture images; note, FOX decompresses these back to RGB;

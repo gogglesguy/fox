@@ -41,7 +41,6 @@
 #include "FXApp.h"
 #include "FXSplitter.h"
 
-
 /*
   Notes:
   - Reversed split option starts parting out from right [bottom].

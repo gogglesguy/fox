@@ -35,20 +35,16 @@
 #include "FXStat.h"
 #include "FXFile.h"
 
-
-
 /*
   Notes:
   - Find out stuff about files and directories.
 */
-
 
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Return true if it is a hidden file (note: Windows-only attribute)
 FXbool FXStat::isHidden() const {

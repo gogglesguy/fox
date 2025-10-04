@@ -1083,11 +1083,11 @@ static FXdouble permutations(FXdouble n,FXdouble r){
   }
 
 
-// Combinations
+// Combinations nCr
 //
-//               n!
-// result =  ----------
-//            r! (n-r)!
+//           ( n )         n!
+// result =  (   )  =  ----------
+//           ( r )      r! (n-r)!
 //
 static FXdouble combinations(FXdouble n,FXdouble r){
   FXdouble num=Math::lrint(n);
@@ -1107,6 +1107,31 @@ static FXdouble combinations(FXdouble n,FXdouble r){
   return dblnan.f;
   }
 
+/*
+// Compute combinations nCr
+//
+//           ( n )         n!
+// result =  (   )  =  ----------
+//           ( r )      r! (n-r)!
+// 
+static ulong binomial(FXulong n,FXulong r){
+  if(r<=n){
+    if(n<(r<<1)) r=n-r;
+    if(0<r){
+      FXulong b=n-r+1;
+      FXulong f=b;
+      FXulong j=2;
+      while(j<=r){
+        b*=++f;
+        b/=j++;
+        }
+      return b;
+      }
+    return 1;
+    }
+  return 0;
+  }
+*/
 
 // Reset calculator
 void Calculator::clearAll(){

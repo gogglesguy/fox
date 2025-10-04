@@ -95,7 +95,6 @@
 #define DIRSTYLEMASK (TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES)
 
 
-
 using namespace FX;
 
 /*******************************************************************************/

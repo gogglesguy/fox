@@ -36,6 +36,9 @@ public:
   /// Default constructor; value is not initialized
   FXVec4d(){}
 
+  /// Initialize all components the same
+  explicit FXVec4d(FXdouble d):x(d),y(d),z(d),w(d){}
+
   /// Construct with 3-vector
   FXVec4d(const FXVec3d& v,FXdouble s=0.0):x(v.x),y(v.y),z(v.z),w(s){}
 
@@ -60,14 +63,17 @@ public:
   /// Assignment from array of doubles
   FXVec4d& operator=(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];return *this;}
 
+  /// Assign with constant
+  FXVec4d& set(FXdouble d){x=d;y=d;z=d;w=d;return *this;}
+
+  /// Set value from components
+  FXVec4d& set(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww){x=xx;y=yy;z=zz;w=ww;return *this;}
+
   /// Set value from another vector
   FXVec4d& set(const FXVec4d& v){x=v.x;y=v.y;z=v.z;w=v.w;return *this;}
 
   /// Set value from array of doubles
   FXVec4d& set(const FXdouble v[]){x=v[0];y=v[1];z=v[2];w=v[3];return *this;}
-
-  /// Set value from components
-  FXVec4d& set(FXdouble xx,FXdouble yy,FXdouble zz,FXdouble ww){x=xx;y=yy;z=zz;w=ww;return *this;}
 
   /// Assigning operators
   FXVec4d& operator*=(FXdouble n){ return set(x*n,y*n,z*n,w*n); }

@@ -28,12 +28,13 @@
 #include "FXTextCodec.h"
 #include "FXUTF8Codec.h"
 
-
 /*
   Notes:
   - This is the utf-8 codec used for external inputs; it takes care of
     things like BOM's (0xFEFF or "\xEFxBB\xBF" )being inserted.
 */
+
+using namespace FX;
 
 /*******************************************************************************/
 

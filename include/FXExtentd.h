@@ -49,6 +49,9 @@ public:
   /// Initialize with explicit values
   FXExtentd(FXdouble xl,FXdouble xh,FXdouble yl,FXdouble yh):lower(xl,yl),upper(xh,yh){}
 
+  /// Assign with vector
+  FXExtentd& operator=(const FXVec2d& p){ lower=upper=p; return *this; }
+
   /// Assignment
   FXExtentd& operator=(const FXExtentd& ext){ lower=ext.lower; upper=ext.upper; return *this; }
 

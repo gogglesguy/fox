@@ -425,7 +425,10 @@ FXString FXPath::expand(const FXString& file,FXint level){
 #else
     if(file[0]=='~'){
       FXint e=1;
-      while(Ascii::isAlphaNumeric(file[e]) || file[e]=='_') e++;
+      while(file[e] && file[e]!='/'){
+        if(file[e]=='\\' && file[e+1]) e++;
+        e++;
+        }
       if(1<e){
         return FXSystem::getUserDirectory(file.mid(1,e-1))+expandEnvironmentVariables(file.mid(e,file.length()-e),level);
         }
@@ -647,7 +650,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 //    /aa/bb/../..      -> /
 //    /..               -> /
 //    ./aa/bb/../../    -> ./
-//    ./aa/bb/../..     -> .
+//    ./aa/bb/../.."    -> .
 //    ./aa/bb/../../../ -> ../
 //    ./aa/bb/../../..  -> ..
 //    /aa/bb/../../../  -> /
@@ -659,12 +662,23 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 //    ./a               -> a
 //    /////./././       -> /
 //    /.                -> /
+//    ./                -> ./
 //    /a/b/./           -> /a/b/
 //    /a/b/.            -> /a/b
 //    /a/./b/.          -> /a/b
 //    /a/./b/./         -> /a/b/
 //    ./..              -> ..
 //    /aa/bb/..         -> /aa
+//    ../..             -> ../..
+//    ../a/../b         -> ../b
+//    a/../b            -> b
+//    a/b/../../../     -> ../
+//    /a/b/../../../    -> /
+//    ../a/./b          -> ../a/b
+//    /a/.              -> /a
+//    /a../c/.          -> /a../c
+//    /..a/c/.          -> /..a/c
+//    ../../c/.         -> ../../c
 //
 FXString FXPath::simplify(const FXString& file){
   if(!file.empty()){
@@ -1180,7 +1194,7 @@ FXbool FXPath::isValidPath(const FXString& file){
 #if defined(WIN32)           // WINDOWS
 
 // Enquote filename to make safe for shell
-// Quoting with double quotes is needed:
+// Enclose with double quotes is needed:
 //   - If force=true
 //   - If white space before, in, or after letters
 //   - If filename is empty
@@ -1364,7 +1378,7 @@ FXString FXPath::dequote(const FXString& file){
 #else                         // UNIX
 
 // Enquote filename to make safe for shell
-// Quoting with single quote when:
+// Enclose with single quotes when:
 //   - If force=true
 //   - If white space before, in, or after letters
 //   - If filename is empty
@@ -2071,7 +2085,12 @@ FXString FXPath::unique(const FXString& file){
 
 /*******************************************************************************/
 
-// Search pathlist for file
+// Search pathlist for file.
+// If the file is absolute, return it.
+// If the file is relative, make it absolute w.r.t. current directory, and return it.
+// Otherwise, check each expanded component of pathlist and return the absolute path
+// under the component of pathlist where the file is found.
+// If file was empty string, isn't found, or doesn't exist, return the empty string.
 FXString FXPath::search(const FXString& pathlist,const FXString& file){
   if(!file.empty()){
     FXString path;
@@ -2079,6 +2098,11 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
     FXint end=0;
     if(FXPath::isAbsolute(file)){
       if(FXStat::exists(file)) return file;
+      return FXString::null;
+      }
+    if(FXPath::isRelative(file)){
+      path=FXPath::absolute(file);
+      if(FXStat::exists(path)) return path;
       return FXString::null;
       }
     while(pathlist[end]){
@@ -2095,10 +2119,17 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
 
 /*******************************************************************************/
 
-// Relativize to path list
+// Relativize file to path list.
+// If file is not absolute, its already relative, so just return file.
+// Otherwise, check if file is under one of the components of pathlist.
+// If there is more than one such component, keep the shortest path.
+// Ensure that whatever the final relative path ends up being, it
+// still references the same file when searching pathlist for it.
+// If not located under any component of pathlist, then just keep the
+// absolute path; it can not be relativized to the given list.
 FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
-  FXString result(file);
-  if(!file.empty()){
+  if(FXPath::isAbsolute(file)){
+    FXString result(file);
     FXString base;
     FXString res;
     FXint beg=0;
@@ -2118,8 +2149,9 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
           }
         }
       }
+    return result;
     }
-  return result;
+  return file;
   }
 
 /*******************************************************************************/
@@ -2143,20 +2175,6 @@ FXbool FXPath::hasExecExtension(const FXString& file){
     while(end<pathext.length());
     }
   return false;
-  }
-
-
-// Define our own as Windows is missing this function
-static const char *fxstrcasestr(const FXchar *haystack,const FXchar *needle){
-  const FXchar *a,*b;
-  while(*haystack){
-    a=haystack;
-    b=needle;
-    while((*a++ | 32) == (*b++ | 32)){
-      if(!*b) return haystack;
-      }
-    }
-  return nullptr;
   }
 
 

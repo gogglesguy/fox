@@ -47,9 +47,12 @@
 
 /*
   Notes:
-  - Accelerators.
-  - Help text from constructor is third part; second part should be
-    accelerator key combination.
+  - Parse hotkey from label 1st part of the text, and strip the "&" from it.
+  - Parse help text from 3rd part of the text.
+  - The 2nd part of the text would have the accelerator.  But we don't need
+    that here.
+  - While typically not showing a tool tip, you can still set this by calling
+    setTipText() directly.
   - When menu label changes, hotkey might have to be adjusted.
   - Fix it so menu stays up when after Alt-F, you press Alt-E.
   - Look into SEL_FOCUS_SELF some more:- menus should not
@@ -109,18 +112,17 @@ FXMenuCaption::FXMenuCaption(){
 // Menu entry
 FXMenuCaption::FXMenuCaption(FXComposite* p,const FXString& text,FXIcon* ic,FXuint opts):FXWindow(p,opts,0,0,0,0){
   FXString string=text.section('\t',0);
-  hotkey=parseHotKey(string);
   label=stripHotKey(string);
-  hotoff=findHotKey(string);
   font=getApp()->getNormalFont();
   help=text.section('\t',2);
-  tip=text.section('\t',1);
   textColor=getApp()->getForeColor();
   selbackColor=getApp()->getSelMenuBackColor();
   seltextColor=getApp()->getSelMenuTextColor();
   hiliteColor=getApp()->getHiliteColor();
   shadowColor=getApp()->getShadowColor();
   icon=ic;
+  hotkey=parseHotKey(string);
+  hotoff=findHotKey(string);
   addHotKey(hotkey);
   flags|=FLAG_SHOWN;
   }

@@ -81,7 +81,6 @@
 #define LEGAL(p)  ((p)!=nullptr && (p)!=VOID)
 #define BSHIFT    5
 
-
 using namespace FX;
 
 /*******************************************************************************/
@@ -91,7 +90,7 @@ namespace FX {
 
 // Empty object list
 extern const FXival __hash__empty__[];
-const FXival __hash__empty__[7]={1,0,1,0,0};
+const FXival __hash__empty__[7]={1,0,1,0,0,0,0};
 
 
 // Adjust the size of the table

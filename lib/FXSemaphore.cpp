@@ -31,28 +31,33 @@
   - Implementation using Condition and Mutex now used for MacOSX and Minix.
     This may be less performant than a true semaphore, but its a nice and fully functional
     fallback until full posix semaphore implementation is available.
+
   - Increased reserved for pthread_mutex_t as up to 11 FXuval's in size on MacOSX,
     worst case is on 32-bit versions.
+
   - Keep in mind we can not do sizeof() in the header file, as we're trying to avoid
     including system-headers from public accessible FOX header files.  This is so
     as to avoid "accidental" incorporation of declarations or unexpected macros,
     that may clash.
+
   - Also we want to avoid calls to memory allocators as that would incur a big
     performance penalty; besides, a memory allocator may need to call locking
     primitives since memory is a resource shared by all threads.
+
   - The upshot is that the space allocated for the semaphore may be a bit more
     than strictly necessary on some machines.  It may actually be a good thing
     as this increases the odds of these datastructures living in dedicated
     cache-lines.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
 
-
-/*******************************************************************************/
 
 // Initialize semaphore with given count
 FXSemaphore::FXSemaphore(FXint count){
@@ -63,8 +68,8 @@ FXSemaphore::FXSemaphore(FXint count){
   // If this fails on your machine, determine what value of
   // sizeof(pthread_cond_t) and sizeof(pthread_mutex_t) is
   // supposed to be and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
-  //FXTRACE((150,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
   FXASSERT_STATIC(sizeof(FXuval)*9 >= sizeof(pthread_cond_t));
   FXASSERT_STATIC(sizeof(FXuval)*11 >= sizeof(pthread_mutex_t));
   data[0]=count;
@@ -74,7 +79,7 @@ FXSemaphore::FXSemaphore(FXint count){
   // If this fails on your machine, determine what value
   // of sizeof(sem_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(sem_t));
   sem_init((sem_t*)data,0,(unsigned int)count);
 #endif
@@ -82,18 +87,21 @@ FXSemaphore::FXSemaphore(FXint count){
 
 
 // Decrement semaphore, waiting if count is zero
-void FXSemaphore::wait(){
+FXbool FXSemaphore::wait(){
 #if defined(WIN32)
-  WaitForSingleObject((HANDLE)data[0],INFINITE);
+  return WaitForSingleObject((HANDLE)data[0],INFINITE)==WAIT_OBJECT_0;
 #elif (defined(__APPLE__) || defined(__minix))
-  pthread_mutex_lock((pthread_mutex_t*)&data[10]);
-  while(data[0]==0){
-    pthread_cond_wait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10]);
+  if(pthread_mutex_lock((pthread_mutex_t*)&data[10])==0){
+    while(data[0]==0){
+      pthread_cond_wait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10]);
+      }
+    data[0]-=1;
+    pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+    return true;
     }
-  data[0]-=1;
-  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+  return false;
 #else
-  sem_wait((sem_t*)data);
+  return sem_wait((sem_t*)data)==0;
 #endif
   }
 
@@ -110,36 +118,38 @@ FXbool FXSemaphore::wait(FXTime nsec){
     }
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;
 #elif (defined(__APPLE__) || defined(__minix))
-  pthread_mutex_lock((pthread_mutex_t*)&data[10]);
-  while(data[0]==0){
-    if(0<nsec){
-      if(nsec<forever){
-#if (_POSIX_C_SOURCE >= 199309L)
-        struct timespec ts;
-        clock_gettime(CLOCK_REALTIME,&ts);
-        ts.tv_sec=ts.tv_sec+(ts.tv_nsec+nsec)/1000000000;
-        ts.tv_nsec=(ts.tv_nsec+nsec)%1000000000;
-        if(pthread_cond_timedwait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10],&ts)!=0) goto x;
-#else
-        struct timespec ts;
-        struct timeval tv;
-        gettimeofday(&tv,nullptr);
-        tv.tv_usec*=1000;
-        ts.tv_sec=tv.tv_sec+(tv.tv_usec+nsec)/1000000000;
-        ts.tv_nsec=(tv.tv_usec+nsec)%1000000000;
-        if(pthread_cond_timedwait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10],&ts)!=0) goto x;
-#endif
+  if(pthread_mutex_lock((pthread_mutex_t*)&data[10])==0){
+    while(data[0]==0){
+      if(0<nsec){
+        if(nsec<forever){
+  #if (_POSIX_C_SOURCE >= 199309L)
+          struct timespec ts;
+          clock_gettime(CLOCK_REALTIME,&ts);
+          ts.tv_sec=ts.tv_sec+(ts.tv_nsec+nsec)/1000000000;
+          ts.tv_nsec=(ts.tv_nsec+nsec)%1000000000;
+          if(pthread_cond_timedwait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10],&ts)!=0) goto x;
+  #else
+          struct timespec ts;
+          struct timeval tv;
+          gettimeofday(&tv,nullptr);
+          tv.tv_usec*=1000;
+          ts.tv_sec=tv.tv_sec+(tv.tv_usec+nsec)/1000000000;
+          ts.tv_nsec=(tv.tv_usec+nsec)%1000000000;
+          if(pthread_cond_timedwait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10],&ts)!=0) goto x;
+  #endif
+          continue;
+          }
+        pthread_cond_wait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10]);
         continue;
         }
-      pthread_cond_wait((pthread_cond_t*)&data[1],(pthread_mutex_t*)&data[10]);
-      continue;
+  x:  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+      return false;
       }
-x:  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
-    return false;
+    --data[0];
+    pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+    return true;
     }
-  --data[0];
-  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
-  return true;
+  return false;
 #else
   if(0<nsec){
     if(nsec<forever){
@@ -171,14 +181,16 @@ FXbool FXSemaphore::trywait(){
 #if defined(WIN32)
   return WaitForSingleObject((HANDLE)data[0],0)==WAIT_OBJECT_0;
 #elif (defined(__APPLE__) || defined(__minix))
-  pthread_mutex_lock((pthread_mutex_t*)&data[10]);
-  if(data[0]==0){
+  if(pthread_mutex_lock((pthread_mutex_t*)&data[10])==0){
+    if(data[0]==0){
+      pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+      return false;
+      }
+    data[0]-=1;
     pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
-    return false;
+    return true;
     }
-  data[0]-=1;
-  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
-  return true;
+  return false;
 #else
   return sem_trywait((sem_t*)data)==0;
 #endif
@@ -186,16 +198,19 @@ FXbool FXSemaphore::trywait(){
 
 
 // Increment semaphore
-void FXSemaphore::post(){
+FXbool FXSemaphore::post(){
 #if defined(WIN32)
-  ReleaseSemaphore((HANDLE)data[0],1,nullptr);
+  return ReleaseSemaphore((HANDLE)data[0],1,nullptr)!=0;
 #elif (defined(__APPLE__) || defined(__minix))
-  pthread_mutex_lock((pthread_mutex_t*)&data[10]);
-  data[0]+=1;
-  pthread_cond_signal((pthread_cond_t*)&data[1]);
-  pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+  if(pthread_mutex_lock((pthread_mutex_t*)&data[10])==0){
+    data[0]+=1;
+    pthread_cond_signal((pthread_cond_t*)&data[1]);
+    pthread_mutex_unlock((pthread_mutex_t*)&data[10]);
+    return true;
+    }
+  return false;
 #else
-  sem_post((sem_t*)data);
+  return sem_post((sem_t*)data)==0;
 #endif
   }
 

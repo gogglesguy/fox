@@ -45,7 +45,6 @@
 #include "FXDragCorner.h"
 #include "FXStatusLine.h"
 
-
 /*
   Notes:
   - Fallback text is displayed when neither cursor window or

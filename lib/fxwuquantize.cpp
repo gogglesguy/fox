@@ -53,7 +53,6 @@ using namespace FX;
 
 namespace FX {
 
-
 extern FXbool fxwuquantize(FXuchar* dst,const FXColor* src,FXColor* colormap,FXint& actualcolors,FXint w,FXint h,FXint maxcolors);
 
 

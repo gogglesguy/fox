@@ -29,14 +29,11 @@
 #include "FXMemoryStream.h"
 #include "FXXPMImage.h"
 
-
-
 /*
   Notes:
 */
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

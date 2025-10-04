@@ -30,12 +30,10 @@
 #include "FXRectangle.h"
 #include "FXRegion.h"
 
-
 /*
   Notes:
   - Add some more ways to create regions
 */
-
 
 using namespace FX;
 

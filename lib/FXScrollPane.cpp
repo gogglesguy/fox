@@ -46,7 +46,6 @@
 #include "FXMenuPane.h"
 #include "FXScrollPane.h"
 
-
 /*
   Notes:
   - Should we reset the topmost item each time it is shown?

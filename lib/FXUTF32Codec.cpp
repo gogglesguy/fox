@@ -28,15 +28,15 @@
 #include "FXTextCodec.h"
 #include "FXUTF32Codec.h"
 
-
 /*
   Notes:
 */
 
+using namespace FX;
+
 /*******************************************************************************/
 
 namespace FX {
-
 
 const FXwchar BOM_BE=0x0000FEFF;
 const FXwchar BOM_LE=0xFFFE0000;

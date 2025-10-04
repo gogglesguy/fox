@@ -36,6 +36,9 @@
   - Support for JPEG 2000 image file compression.
 */
 
+#define TOPIC_DETAIL 1015
+
+
 // Contents of signature box
 #define SIGNATURE       0x0d0a870a              // Value for signature box
 
@@ -77,14 +80,11 @@
 #define BOX_XML         0x786d6c20              // XML box
 #define BOX_RREQ        0x72726571              // RREQ box
 
-#define TOPIC_DETAIL 1015
-
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 #ifndef FXLOADJP2
 extern FXAPI FXbool fxcheckJP2(FXStream& store);

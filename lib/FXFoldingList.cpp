@@ -69,6 +69,8 @@
   - FIXME if no text, you're unable to see if an item is selected.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
 
 #define ICON_SPACING        4   // Spacing between parent and child in x direction
 #define TEXT_SPACING        4   // Spacing between icon and text
@@ -77,10 +79,8 @@
 #define HALFBOX_SIZE        4   // Half box size
 #define BOX_FUDGE           3   // Fudge border around box
 
-
 #define SELECT_MASK         (FOLDINGLIST_SINGLESELECT|FOLDINGLIST_BROWSESELECT)
 #define FOLDINGLIST_MASK    (SELECT_MASK|FOLDINGLIST_AUTOSELECT|FOLDINGLIST_SHOWS_LINES|FOLDINGLIST_SHOWS_BOXES|FOLDINGLIST_ROOT_BOXES)
-
 
 using namespace FX;
 
@@ -608,7 +608,7 @@ FXint FXFoldingList::getContentWidth(){
 
 
 // Determine content height of tree list
-FXint FXFoldingList::getContentHeight(){        // FIXME header should not be included in height
+FXint FXFoldingList::getContentHeight(){
   if(flags&FLAG_RECALC) recompute();
   return treeHeight;
   }
@@ -618,11 +618,11 @@ FXint FXFoldingList::getContentHeight(){        // FIXME header should not be in
 void FXFoldingList::layout(){
   FXint hh=header->getDefaultHeight();
 
-  // Place scroll bars
-  placeScrollBars(width,height-hh);
-
   // Place header control
   header->position(0,0,width,hh);
+
+  // Place scroll bars
+  placeScrollBars(width,height-hh);
 
   // Set line size based on item size
   if(firstitem){
@@ -1251,7 +1251,6 @@ long FXFoldingList::onLeave(FXObject* sender,FXSelector sel,void* ptr){
 
 // We timed out, i.e. the user didn't move for a while
 long FXFoldingList::onTipTimer(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onTipTimer %p\n",getClassName(),this));
   flags|=FLAG_TIP;
   return 1;
   }

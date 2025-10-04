@@ -39,6 +39,8 @@
   - You can change some access mode flags of the file descriptor.
 */
 
+#define TOPIC_DETAIL    1002
+
 // Bad handle value
 #ifdef WIN32
 #define BadHandle INVALID_HANDLE_VALUE
@@ -106,24 +108,24 @@ FXuint FXIODevice::mode() const {
   if(device!=BadHandle){
 #if defined(WIN32)
     FXuint result=FXIO::NoAccess;
-    PUBLIC_OBJECT_BASIC_INFORMATION obi;
     DWORD flags=0;
     if(GetHandleInformation(device,&flags)!=0){
       result=FXIO::ReadWrite;
       if(flags&HANDLE_FLAG_INHERIT){ result|=FXIO::Inheritable; }
 /*
+      PUBLIC_OBJECT_BASIC_INFORMATION obi;
       if(fxNtQueryObject(device,ObjectBasicInformation,&obi,sizeof(obi),nullptr)>=0){
-        //FXTRACE((100,"obi.Attributes     = %08x\n",obi.Attributes));
-        //FXTRACE((100,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
-        //FXTRACE((100,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
-        //FXTRACE((100,"obi.HandleCount    = %08x\n",obi.HandleCount));
-        //FXTRACE((100,"obi.PointerCount   = %08x\n",obi.PointerCount));
+        //FXTRACE((TOPIC_DETAIL,"obi.Attributes     = %08x\n",obi.Attributes));
+        //FXTRACE((TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
+        //FXTRACE((TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
+        //FXTRACE((TOPIC_DETAIL,"obi.HandleCount    = %08x\n",obi.HandleCount));
+        //FXTRACE((TOPIC_DETAIL,"obi.PointerCount   = %08x\n",obi.PointerCount));
         if(obi.GrantedAccess&GENERIC_READ){ result|=FXIO::ReadOnly; }
         if(obi.GrantedAccess&GENERIC_WRITE){ result|=FXIO::WriteOnly; }
         if(obi.GrantedAccess&GENERIC_ALL){ result|=FXIO::ReadWrite; }
         if(obi.GrantedAccess&GENERIC_EXECUTE){ result|=FXIO::Executable; }
         }
-      FXTRACE((100,"result             = %08x\n",result));
+      FXTRACE((TOPIC_DETAIL,"result             = %08x\n",result));
 */
       return result;
       }

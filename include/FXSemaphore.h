@@ -46,17 +46,21 @@ public:
   /// Initialize semaphore with given count
   FXSemaphore(FXint count=1);
 
-  /// Decrement semaphore by 1, waiting if count is zero
-  void wait();
+  /// Decrement semaphore by 1, waiting if count is zero.
+  /// Return false if an error occurred.
+  FXbool wait();
 
-  /// Try decrement semaphore; return false if timed out
+  /// Try decrement semaphore; return true if successful.
+  /// Return false if timed out or an error occurred.
   FXbool wait(FXTime nsec);
 
-  /// Try decrement semaphore, and return false if count was zero
+  /// Try decrement semaphore, and return true if successful.
+  /// Return false if count was zero or if an error occurred.
   FXbool trywait();
 
-  /// Increment semaphore by 1
-  void post();
+  /// Increment semaphore by 1.
+  /// Return false if an error occurred.
+  FXbool post();
 
   /// Delete semaphore
   ~FXSemaphore();

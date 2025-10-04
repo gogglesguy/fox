@@ -35,6 +35,9 @@ public:
   /// Default constructor; value is not initialized
   FXVec3f(){}
 
+  /// Initialize all components the same
+  explicit FXVec3f(FXfloat d):x(d),y(d),z(d){}
+
   /// Initialize from 2-vector
   FXVec3f(const FXVec2f& v,FXfloat s=0.0f):x(v.x),y(v.y),z(s){}
 
@@ -59,14 +62,17 @@ public:
   /// Assignment from array of floats
   FXVec3f& operator=(const FXfloat v[]){x=v[0];y=v[1];z=v[2];return *this;}
 
+  /// Assign with constant
+  FXVec3f& set(FXfloat d){x=d;y=d;z=d;return *this;}
+
+  /// Set value from components
+  FXVec3f& set(FXfloat xx,FXfloat yy,FXfloat zz){x=xx;y=yy;z=zz;return *this;}
+
   /// Set value from another vector
   FXVec3f& set(const FXVec3f& v){x=v.x;y=v.y;z=v.z;return *this;}
 
   /// Set value from array of floats
   FXVec3f& set(const FXfloat v[]){x=v[0];y=v[1];z=v[2];return *this;}
-
-  /// Set value from components
-  FXVec3f& set(FXfloat xx,FXfloat yy,FXfloat zz){x=xx;y=yy;z=zz;return *this;}
 
   /// Assigning operators
   FXVec3f& operator*=(FXfloat n){ return set(x*n,y*n,z*n); }

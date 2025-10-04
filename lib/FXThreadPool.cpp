@@ -36,7 +36,6 @@
 #include "FXLFQueue.h"
 #include "FXThreadPool.h"
 
-
 /*
   Notes:
   - Process tasks from lock-free queue using multiple threads.
@@ -75,6 +74,9 @@
 
 */
 
+#define TOPIC_DETAIL    1002
+
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -88,7 +90,7 @@ FXAutoThreadStorageKey FXThreadPool::reference;
 
 // Create thread pool
 FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),stacksize(0),expiration(forever),maximum(FXThread::processors()),minimum(1),workers(0),running(0){
-  FXTRACE((100,"FXThreadPool::FXThreadPool(%d)\n",sz));
+  FXTRACE((TOPIC_DETAIL,"FXThreadPool::FXThreadPool(%d)\n",sz));
   }
 
 
@@ -179,7 +181,7 @@ FXbool FXThreadPool::startWorker(){
 // Start thread pool
 FXuint FXThreadPool::start(FXuint count){
   FXuint result=0;
-  FXTRACE((150,"FXThreadPool::start(%u)\n",count));
+  FXTRACE((TOPIC_DETAIL,"FXThreadPool::start(%u)\n",count));
   if(atomicBoolCas(&running,0,2)){
 
     // Start number of workers
@@ -300,7 +302,7 @@ FXbool FXThreadPool::waitFor(FXCompletion& comp){
 
 // Stop thread pool
 FXbool FXThreadPool::stop(){
-  FXTRACE((150,"FXThreadPool::stop()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXThreadPool::stop()\n"));
   if(atomicBoolCas(&running,1,2)){
     FXint w=threads.count();
 
@@ -332,7 +334,7 @@ FXbool FXThreadPool::stop(){
 
 // Delete thread pool
 FXThreadPool::~FXThreadPool(){
-  FXTRACE((100,"FXThreadPool::~FXThreadPool()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXThreadPool::~FXThreadPool()\n"));
   stop();
   }
 

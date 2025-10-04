@@ -23,6 +23,9 @@ int main(int argc,char* argv[]){
   FXchar buf[1000];
   FXDictionary dict;
 
+  FXUNUSED(argc);
+  FXUNUSED(argv);
+
   max=0;
   tot=0;
   ins=0;

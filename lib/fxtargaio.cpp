@@ -40,11 +40,9 @@
 
 using namespace FX;
 
-
 /*******************************************************************************/
 
 namespace FX {
-
 
 #ifndef FXLOADTGA
 extern FXAPI FXbool fxcheckTGA(FXStream& store);

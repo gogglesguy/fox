@@ -52,8 +52,6 @@
 #include "FXWizard.h"
 #include "icons.h"
 
-
-
 /*
   Notes:
   - It may be nice to be able to sensitize/desensitize the "Next" button based on

@@ -34,14 +34,17 @@ public:
   /// Default constructor; value is not initialized
   FXVec2f(){}
 
+  /// Initialize with constant
+  explicit FXVec2f(FXfloat d):x(d),y(d){}
+
+  /// Initialize from components
+  FXVec2f(FXfloat xx,FXfloat yy):x(xx),y(yy){}
+
   /// Initialize from another vector
   FXVec2f(const FXVec2f& v):x(v.x),y(v.y){}
 
   /// Initialize from array of floats
   FXVec2f(const FXfloat v[]):x(v[0]),y(v[1]){}
-
-  /// Initialize from components
-  FXVec2f(FXfloat xx,FXfloat yy):x(xx),y(yy){}
 
   /// Return a non-const reference to the ith element
   FXfloat& operator[](FXint i){return (&x)[i];}
@@ -55,14 +58,17 @@ public:
   /// Assignment from array of floats
   FXVec2f& operator=(const FXfloat v[]){x=v[0];y=v[1];return *this;}
 
+  /// Set value with constant
+  FXVec2f& set(FXfloat d){x=d;y=d;return *this;}
+
+  /// Set value from components
+  FXVec2f& set(FXfloat xx,FXfloat yy){x=xx;y=yy;return *this;}
+
   /// Set value from another vector
   FXVec2f& set(const FXVec2f& v){x=v.x;y=v.y;return *this;}
 
   /// Set value from array of floats
   FXVec2f& set(const FXfloat v[]){x=v[0];y=v[1];return *this;}
-
-  /// Set value from components
-  FXVec2f& set(FXfloat xx,FXfloat yy){x=xx;y=yy;return *this;}
 
   /// Assigning operators
   FXVec2f& operator*=(FXfloat n){ return set(x*n,y*n); }

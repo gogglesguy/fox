@@ -42,7 +42,6 @@
 #include "FXApp.h"
 #include "FXShell.h"
 
-
 /*
   Notes:
   - FXShell handles keys to implement focus change messages.

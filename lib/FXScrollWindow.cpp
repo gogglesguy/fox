@@ -44,7 +44,6 @@
 #include "FXScrollBar.h"
 #include "FXScrollWindow.h"
 
-
 /*
   Notes:
   - Intercepts pagedn/pageup to scroll.
@@ -55,7 +54,6 @@
 */
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

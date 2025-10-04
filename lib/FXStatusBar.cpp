@@ -47,16 +47,12 @@
 #include "FXStatusLine.h"
 #include "FXStatusBar.h"
 
-
-
 /*
   Notes:
   - Drag corner shown whenever option says it is.
 */
 
-
 using namespace FX;
-
 
 /*******************************************************************************/
 

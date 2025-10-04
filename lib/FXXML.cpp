@@ -210,12 +210,14 @@
 #define MINBUFFER  256 //1024         // Minimum buffer size
 #define MAXTOKEN   128           // Maximum token size
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1002
 
 using namespace FX;
 
-namespace FX {
-
 /*******************************************************************************/
+
+namespace FX {
 
 // Character properties
 enum {
@@ -592,20 +594,20 @@ FXbool FXXML::encode(FXString& dst,const FXString& src,FXuint flags){
 
 // Construct XML parser instance
 FXXML::FXXML():offset(0),current(nullptr),column(0),line(1),enc(UTF8){
-  FXTRACE((100,"FXXML::FXXML\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXML::FXXML\n"));
   }
 
 
 // Construct XML parser instance and pass it external buffer
 FXXML::FXXML(FXchar* buffer,FXuval sz,Direction d):FXParseBuffer(buffer,sz,d),offset(0),current(nullptr),column(0),line(1),enc(UTF8){
-  FXTRACE((100,"FXXML::FXXML(%p,%ld,%s)\n",buffer,sz,d==Load?"Load":d==Save?"Save":"Stop"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXML::FXXML(%p,%ld,%s)\n",buffer,sz,d==Load?"Load":d==Save?"Save":"Stop"));
   open(buffer,sz,d);
   }
 
 
 // Open XML stream for given direction d
 FXbool FXXML::open(FXchar* buffer,FXuval sz,Direction d){
-  FXTRACE((101,"FXXML::open(%p,%ld,%s)\n",buffer,sz,d==Load?"Load":d==Save?"Save":"Stop"));
+  FXTRACE((TOPIC_DETAIL,"FXXML::open(%p,%ld,%s)\n",buffer,sz,d==Load?"Load":d==Save?"Save":"Stop"));
   if(FXParseBuffer::open(buffer,sz,d)){
     current=nullptr;
     column=0;
@@ -1058,7 +1060,7 @@ FXXML::Error FXXML::parseexternalid(){
     spaces();
     if((err=parsestring(syslit))!=ErrOK) return err;
     ///
-    FXTRACE((101,"SYSTEM \"%s\"\n",syslit.text()));
+    FXTRACE((TOPIC_DETAIL,"SYSTEM \"%s\"\n",syslit.text()));
     return ErrOK;
     }
   if(match("PUBLIC",6)){
@@ -1066,7 +1068,7 @@ FXXML::Error FXXML::parseexternalid(){
     if((err=parsestring(publit))!=ErrOK) return err;
     spaces();
     if((err=parsestring(syslit))!=ErrOK) return err;
-    FXTRACE((101,"PUBLIC \"%s\" \"%s\"\n",publit.text(),syslit.text()));
+    FXTRACE((TOPIC_DETAIL,"PUBLIC \"%s\" \"%s\"\n",publit.text(),syslit.text()));
     ///
     return ErrOK;
     }
@@ -1079,7 +1081,7 @@ FXXML::Error FXXML::parseinternalsubset(){
   FXXML::Error err;
   spaces();
   if(match('[')){
-    FXTRACE((101,"internalsubset\n"));
+    FXTRACE((TOPIC_DETAIL,"internalsubset\n"));
     while(need(MAXTOKEN)){
       switch(sptr[0]){
       case '\t':
@@ -1126,28 +1128,28 @@ FXXML::Error FXXML::parseinternalsubset(){
         if(sptr[1]=='!' && sptr[2]=='E' && sptr[3]=='L' && sptr[4]=='E' && sptr[5]=='M' && sptr[6]=='E' && sptr[7]=='N' && sptr[8]=='T'){
           column+=9;
           sptr+=9;
-          FXTRACE((101,"<!ELEMENT\n"));
+          FXTRACE((TOPIC_DETAIL,"<!ELEMENT\n"));
           rptr=sptr;
           continue;
           }
         if(sptr[1]=='!' && sptr[2]=='A' && sptr[3]=='T' && sptr[4]=='T' && sptr[5]=='L' && sptr[6]=='I' && sptr[7]=='T'){
           column+=8;
           sptr+=8;
-          FXTRACE((101,"<!ATTLIST\n"));
+          FXTRACE((TOPIC_DETAIL,"<!ATTLIST\n"));
           rptr=sptr;
           continue;
           }
         if(sptr[1]=='!' && sptr[2]=='E' && sptr[3]=='N' && sptr[4]=='T' && sptr[5]=='I' && sptr[6]=='T' && sptr[7]=='Y'){
           column+=8;
           sptr+=8;
-          FXTRACE((101,"<!ENTITY\n"));
+          FXTRACE((TOPIC_DETAIL,"<!ENTITY\n"));
           rptr=sptr;
           continue;
           }
         if(sptr[1]=='!' && sptr[2]=='N' && sptr[3]=='O' && sptr[4]=='T' && sptr[5]=='A' && sptr[6]=='T' && sptr[7]=='I' && sptr[8]=='O' && sptr[9]=='N'){
           column+=10;
           sptr+=10;
-          FXTRACE((101,"<!NOTATION\n"));
+          FXTRACE((TOPIC_DETAIL,"<!NOTATION\n"));
           rptr=sptr;
           continue;
           }
@@ -1173,7 +1175,7 @@ FXXML::Error FXXML::parsedeclarations(){
   spaces();
   if(name()){
     docname.assign(rptr,sptr-rptr);
-    FXTRACE((101,"docname=%s\n",docname.text()));
+    FXTRACE((TOPIC_DETAIL,"docname=%s\n",docname.text()));
     if((err=parseexternalid())!=ErrOK) return err;
     if((err=parseinternalsubset())!=ErrOK) return err;
     spaces();
@@ -1606,7 +1608,7 @@ FXXML::Error FXXML::parse(){
   current=nullptr;
   if(need(MAXTOKEN)){
     enc=guess();
-    FXTRACE((101,"encoding=%s\n",encodingName[enc]));
+    FXTRACE((TOPIC_DETAIL,"encoding=%s\n",encodingName[enc]));
     while(need(MAXTOKEN)){
       rptr=sptr;
       switch(sptr[0]){
@@ -1696,7 +1698,7 @@ FXXML::Error FXXML::parse(){
 
 // Close it
 FXbool FXXML::close(){
-  FXTRACE((101,"XML::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"XML::close()\n"));
   if(FXParseBuffer::close()){
     current=nullptr;
     return true;
@@ -1707,7 +1709,7 @@ FXbool FXXML::close(){
 
 // Clean up
 FXXML::~FXXML(){
-  FXTRACE((100,"FXXML::~FXXML\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXML::~FXXML\n"));
   close();
   }
 

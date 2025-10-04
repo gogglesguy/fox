@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -69,6 +69,8 @@ protected:
   FXToolBar           *toolbar;                 // Tool bar
   FXToolBar           *searchbar;               // Incremental search bar
   FXTextField         *searchtext;              // Incremental search text field
+  FXArrowButton       *ar1;                     // Up arrow in incremental search bar
+  FXArrowButton       *ar2;                     // Down arrow in incremental search bar
   FXStatusBar         *statusbar;               // Status bar
   FXFont              *font;                    // Text window font
   Syntax              *syntax;                  // Syntax highlighter

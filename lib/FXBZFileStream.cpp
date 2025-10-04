@@ -45,9 +45,9 @@
 #define WORKFACTOR    0         // See bzip2 documentation
 #define BUFFERSIZE    8192      // Size of the buffer
 
+using namespace FX;
 
 /*******************************************************************************/
-
 
 namespace FX {
 

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -550,9 +550,9 @@ void TextWindow::createMenubar(){
   // Edit Menu entries
   new FXMenuCommand(editmenu,tr("&Undo\tCtl-Z\tUndo last change."),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
   new FXMenuCommand(editmenu,tr("&Redo\tCtl-Shift-Z\tRedo last undo."),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
+  new FXMenuCommand(editmenu,tr("Revert\tAlt-R\tRevert to last-saved."),getApp()->reverticon,&undolist,FXUndoList::ID_REVERT);
   new FXMenuCommand(editmenu,tr("Undo all\tAlt-Z\tUndo all."),nullptr,&undolist,FXUndoList::ID_UNDO_ALL);
   new FXMenuCommand(editmenu,tr("Redo all\tShift-Alt-Z\tRedo all."),nullptr,&undolist,FXUndoList::ID_REDO_ALL);
-  new FXMenuCommand(editmenu,tr("Revert\tAlt-R\tRevert to last-saved."),nullptr,&undolist,FXUndoList::ID_REVERT);
   new FXMenuSeparator(editmenu);
   new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy selection to clipboard."),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
   new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut selection to clipboard."),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
@@ -592,7 +592,7 @@ void TextWindow::createMenubar(){
   new FXMenuSeparator(gotomenu);
   new FXMenuCommand(gotomenu,tr("Goto matching (..)\tCtl-M\tGoto matching brace or parenthesis."),nullptr,editor,FXText::ID_GOTO_MATCHING);
   new FXMenuSeparator(gotomenu);
-  new FXMenuCommand(gotomenu,tr("&Insert point\tAlt-I\tGo back to position of last edit."),getApp()->pointicon,this,ID_INSERTPOINT);
+  new FXMenuCommand(gotomenu,tr("&Insert point\tAlt-I\tGoto position of last edit."),getApp()->pointicon,this,ID_INSERTPOINT);
   new FXMenuCommand(gotomenu,tr("&Set bookmark\tAlt-B\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK);
   new FXMenuCommand(gotomenu,tr("&Next bookmark\tAlt-N\tMove cursor to next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK);
   new FXMenuCommand(gotomenu,tr("&Previous bookmark\tAlt-P\tMove cursor to previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK);
@@ -818,8 +818,8 @@ void TextWindow::createSearchbar(){
   searchtext->setTipText(tr("Incremental Search (Ctl-I)"));
   searchtext->setHelpText(tr("Incremental search for a string."));
   FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
-  FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_UP,ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
-  FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  ar1=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_UP,ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  ar2=new FXArrowButton(searcharrows,this,ID_ISEARCH_HIST_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
   ar1->setArrowSize(3);
   ar2->setArrowSize(3);
   ar1->setBackColor(searchtext->getBackColor());
@@ -1134,6 +1134,7 @@ FXbool TextWindow::saveBuffer(const FXString& file,FXString& buffer,FXuint bits)
 
 /*******************************************************************************/
 
+
 // Load file
 FXbool TextWindow::loadFile(const FXString& file){
   FXString buffer;
@@ -1149,6 +1150,12 @@ FXbool TextWindow::loadFile(const FXString& file){
 
   // Try load buffer
   if(TextWindow::loadBuffer(file,buffer,bits)){
+
+/*
+FXuint sum=1;
+sum=ADLER32::SUM(sum,(const FXuchar*)buffer.text(),buffer.length());
+fxmessage("adler32=%08x\n",sum);
+*/
 
     // Set text
     editor->setText(buffer);
@@ -4063,6 +4070,8 @@ void TextWindow::startISearch(){
       searchbar->recalc();
       }
     searchtext->setBackColor(getApp()->getBackColor());
+    ar1->setBackColor(searchtext->getBackColor());
+    ar2->setBackColor(searchtext->getBackColor());
     searchtext->setText(FXString::null);
     searchtext->setFocus();
     searchstring=FXString::null;
@@ -4082,6 +4091,8 @@ void TextWindow::finishISearch(){
       searchbar->recalc();
       }
     searchtext->setBackColor(getApp()->getBackColor());
+    ar1->setBackColor(searchtext->getBackColor());
+    ar2->setBackColor(searchtext->getBackColor());
     searchtext->setText(FXString::null);
     editor->setFocus();
     isearchReplace=false;
@@ -4118,6 +4129,8 @@ FXbool TextWindow::performISearch(const FXString& text,FXuint opts,FXbool advanc
 
   // Restore normal color
   searchtext->setBackColor(getApp()->getBackColor());
+  ar1->setBackColor(searchtext->getBackColor());
+  ar2->setBackColor(searchtext->getBackColor());
 
   // If entry is empty, clear selection and jump back to start
   if(text.empty()){
@@ -4138,6 +4151,8 @@ FXbool TextWindow::performISearch(const FXString& text,FXuint opts,FXbool advanc
     // Search text, beep if not found
     if(!editor->findText(text,beg,end,start,opts,10)){
       searchtext->setBackColor(FXRGB(255,128,128));
+      ar1->setBackColor(searchtext->getBackColor());
+      ar2->setBackColor(searchtext->getBackColor());
       getApp()->beep();
       return false;
       }
@@ -4146,10 +4161,17 @@ FXbool TextWindow::performISearch(const FXString& text,FXuint opts,FXbool advanc
     if(!(opts&SEARCH_BACKWARD) && start==beg[0] && beg[0]==end[0]){
       if(!editor->findText(text,beg,end,start+1,opts,10)){
         searchtext->setBackColor(FXRGB(255,128,128));
+        ar1->setBackColor(searchtext->getBackColor());
+        ar2->setBackColor(searchtext->getBackColor());
         getApp()->beep();
         return false;
         }
       }
+
+    // Found color
+    searchtext->setBackColor(FXRGB(128,255,128));
+    ar1->setBackColor(searchtext->getBackColor());
+    ar2->setBackColor(searchtext->getBackColor());
 
     // Select matching text
     if(opts&SEARCH_BACKWARD){
@@ -4298,6 +4320,9 @@ long TextWindow::onCmdISearchHistDn(FXObject*,FXSelector,void*){
   else{
     isearchIndex=-1;
     searchstring=FXString::null;
+    searchtext->setBackColor(getApp()->getBackColor());
+    ar1->setBackColor(searchtext->getBackColor());
+    ar2->setBackColor(searchtext->getBackColor());
     searchtext->setText(FXString::null,true);
     }
   return 1;
@@ -4508,11 +4533,22 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
 
     // Context menu
     FXMenuPane popupmenu(this,POPUP_SHRINKWRAP);
-    new FXMenuCommand(&popupmenu,tr("Undo"),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
-    new FXMenuCommand(&popupmenu,tr("Redo"),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
+
+    // Undo/redo last operation
+    new FXMenuCommand(&popupmenu,tr("Undo\t\tUndo last change."),getApp()->undoicon,&undolist,FXUndoList::ID_UNDO);
+    new FXMenuCommand(&popupmenu,tr("Redo\t\tRedo last undo."),getApp()->redoicon,&undolist,FXUndoList::ID_REDO);
+    //new FXMenuCommand(&popupmenu,tr("Revert\t\tRevert to last-saved."),getApp()->reverticon,&undolist,FXUndoList::ID_REVERT);
     new FXMenuSeparator(&popupmenu);
-    new FXMenuCommand(&popupmenu,tr("Find next selected\t\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
-    new FXMenuCommand(&popupmenu,tr("Find previous selected\t\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+
+    //new FXMenuSeparator(&popupmenu);
+    //new FXMenuCommand(&popupmenu,tr("Find next selected\t\tSearch next occurrence of selected text."),getApp()->searchnexticon,this,ID_SEARCH_SEL_FORW);
+    //new FXMenuCommand(&popupmenu,tr("Find previous selected\t\tSearch previous occurrence of selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
+
+    // Editing
+    new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
+    new FXMenuCommand(&popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
+    new FXMenuCommand(&popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
+    new FXMenuCommand(&popupmenu,tr("Delete"),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
     new FXMenuSeparator(&popupmenu);
 
     // Open selected
@@ -4523,16 +4559,11 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCascade(&popupmenu,tr("Switch windows\t\tSwitch to another window."),getApp()->docsicon,windowmenu);
     new FXMenuSeparator(&popupmenu);
 
-    // Editing
-    new FXMenuCommand(&popupmenu,tr("Cut"),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
-    new FXMenuCommand(&popupmenu,tr("Copy"),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
-    new FXMenuCommand(&popupmenu,tr("Paste"),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
-    new FXMenuCommand(&popupmenu,tr("Delete"),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
-    new FXMenuSeparator(&popupmenu);
-
     // Bookmarks
-    new FXMenuCommand(&popupmenu,tr("Insert point\t\tGo back to position of last edit."),getApp()->pointicon,this,ID_INSERTPOINT);
+    new FXMenuCommand(&popupmenu,tr("Insert point\t\tGoto position of last edit."),getApp()->pointicon,this,ID_INSERTPOINT);
     new FXMenuCommand(&popupmenu,tr("Set bookmark\t\tSet bookmark at cursor location."),getApp()->bookseticon,this,ID_SET_MARK);
+    new FXMenuCommand(&popupmenu,tr("Next bookmark\t\tMove cursor to next bookmark."),getApp()->booknexticon,this,ID_NEXT_MARK);
+    new FXMenuCommand(&popupmenu,tr("Previous bookmark\t\tMove cursor to previous bookmark."),getApp()->bookprevicon,this,ID_PREV_MARK);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_0);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_1);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_2);
@@ -4626,7 +4657,7 @@ long TextWindow::onCheckChange(FXObject*,FXSelector,void*){
           // Warn user file was removed from disk
           FXuint answer=FXMessageBox::warning(this,MBOX_YES_NO,tr("File Was Removed From Disk"),tr("Save file: %s back to disk?"),getFilename().text());
           if(answer==MBOX_CLICKED_YES){
-            saveDoc();
+            saveDocAs();
             }
           }
         }

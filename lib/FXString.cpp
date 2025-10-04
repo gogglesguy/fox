@@ -31,7 +31,6 @@
 #include "FXString.h"
 #include "FXException.h"
 
-
 /*
   Notes:
   - The special pointer-value null represents an empty "" string.
@@ -68,7 +67,6 @@
       CL = (U & 0x3FF) + 0xDC00
 
 */
-
 
 // The string buffer is always rounded to a multiple of ROUNDVAL
 // which must be 2^n.  Thus, small size changes will not result in any
@@ -281,7 +279,8 @@ FXwchar FXString::wcprv(FXint& p) const {
 
 // Increment byte offset by one utf8 character
 FXint FXString::inc(FXint p) const {
-  return (++p>=length() || isUTF8(str[p]) || ++p>=length() || isUTF8(str[p]) || ++p>=length() || isUTF8(str[p]) || ++p), p;
+  FXASSERT(0<=p && p<length());
+  return (isUTF8(str[++p]) || isUTF8(str[++p]) || isUTF8(str[++p]) || ++p), p;
   }
 
 
@@ -294,7 +293,8 @@ FXint FXString::inc(FXint p,FXint n) const {
 
 // Decrement byte offset by one utf8 character
 FXint FXString::dec(FXint p) const {
-  return (--p<=0 || isUTF8(str[p]) || --p<=0 || isUTF8(str[p]) || --p<=0 || isUTF8(str[p]) || --p), p;
+  FXASSERT(0<p && p<=length());
+  return (isUTF8(str[--p]) || isUTF8(str[--p]) || isUTF8(str[--p]) || --p), p;
   }
 
 

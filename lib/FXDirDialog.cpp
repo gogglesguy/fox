@@ -58,7 +58,6 @@
 #include "FXDirDialog.h"
 
 
-
 /*
   Notes:
   - Wraps the FXDirSelector directory selection mega widget.

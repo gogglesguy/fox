@@ -608,12 +608,13 @@ long FXScrollBar::onMotion(FXObject*,FXSelector,void* ptr){
 
 // Mouse wheel
 long FXScrollBar::onMouseWheel(FXObject*,FXSelector,void* ptr){
+  FXEvent* ev=(FXEvent*)ptr;
+  FXint jump,dragjump,r;
   if(isEnabled()){
-    FXEvent* ev=(FXEvent*)ptr;
-    FXint r=range-page;
-    FXint jump,dragjump;
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
     getApp()->removeTimeout(this,ID_AUTOSCROLL);
     if(!(ev->state&(LEFTBUTTONMASK|MIDDLEBUTTONMASK|RIGHTBUTTONMASK))){
+      r=range-page;
 
       // With modifiers, scroll multiples of lines or pages
       if(ev->state&SHIFTMASK) jump=7*page;      // Siebenmeilenstiefel

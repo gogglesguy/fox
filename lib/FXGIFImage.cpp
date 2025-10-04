@@ -30,14 +30,12 @@
 #include "FXGIFImage.h"
 
 
-
 /*
   Notes:
   - Only free image if owned!
 */
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

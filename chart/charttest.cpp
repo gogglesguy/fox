@@ -134,6 +134,11 @@ ChartWindow::ChartWindow(FXApp* a):FXMainWindow(a,"Chart Test",nullptr,nullptr,D
   plot->getAxis(FX2DChart::YLO)->setNumberFont(vertNumberFont);
   plot->getAxis(FX2DChart::YHI)->setNumberFont(vertNumberFont);
 
+  plot->getAxis(FX2DChart::XLO)->setLabelOffset(0);
+  plot->getAxis(FX2DChart::XHI)->setLabelOffset(0);
+  plot->getAxis(FX2DChart::YLO)->setLabelOffset(0);
+  plot->getAxis(FX2DChart::YHI)->setLabelOffset(0);
+
   // Change text styles
   plot->getAxis(FX2DChart::XLO)->setLabelStyle(TEXT_JUSTIFY_CENTER|TEXT_ATTACH_TOP);
   plot->getAxis(FX2DChart::XHI)->setLabelStyle(TEXT_JUSTIFY_CENTER|TEXT_ATTACH_BOTTOM);

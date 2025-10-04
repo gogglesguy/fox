@@ -45,10 +45,10 @@
   - Base class for all creatable resources connected via the display.
 */
 
-using namespace FX;
-
 enum { MAGIC = 0x464f5831 };
 
+
+using namespace FX;
 
 /*******************************************************************************/
 

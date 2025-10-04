@@ -31,7 +31,6 @@
 #include "FXSystem.h"
 #include "FXURL.h"
 
-
 /*
   Notes:
 

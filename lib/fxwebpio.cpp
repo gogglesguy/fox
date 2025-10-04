@@ -31,8 +31,6 @@
 #include "webp/decode.h"
 #endif
 
-
-
 /*
   Notes:
   - Support for Google WEBP image file compression.

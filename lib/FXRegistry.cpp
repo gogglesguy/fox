@@ -158,6 +158,9 @@
                         defaults to "/etc/xdg".
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+
 #define MAXNAME   200
 #define MAXVALUE  2000
 
@@ -191,6 +194,7 @@ const FXchar FXRegistry::foxrc[]=FOXRC;
 
 // Make registry object
 FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey(akey),vendorkey(vkey),systemdirs(SYSTEMDIRS),userdir(USERDIR){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRegistry::FXRegistry\n"));
 #if defined(WIN32)
   ascii=false;
 #else
@@ -206,7 +210,7 @@ FXbool FXRegistry::readFromRegistry(FXptr hroot,FXbool mrk){
   HKEY hsoftware;
   FXbool ok=false;
 
-  FXTRACE((100,"FXRegistry::readFromRegistry(%p,%d)\n",hroot,mrk));
+  FXTRACE((TOPIC_DETAIL,"FXRegistry::readFromRegistry(%p,%d)\n",hroot,mrk));
 
   // Open Software registry section
   if(RegOpenKeyExA((HKEY)hroot,"Software",0,KEY_READ,&hsoftware)==ERROR_SUCCESS){
@@ -300,7 +304,7 @@ FXbool FXRegistry::readFromRegistryGroup(const FXString& group,FXptr hbase,FXboo
 FXbool FXRegistry::writeToRegistry(FXptr hroot){
   FXbool ok=false;
 
-  FXTRACE((100,"FXRegistry::writeToRegistry(%p)\n",hroot));
+  FXTRACE((TOPIC_DETAIL,"FXRegistry::writeToRegistry(%p)\n",hroot));
 
   // Have application key
   if(!applicationkey.empty()){
@@ -548,6 +552,7 @@ FXbool FXRegistry::write(){
 
 // Destructor
 FXRegistry::~FXRegistry(){
+  FXTRACE((TOPIC_CONSTRUCT,"FXRegistry::~FXRegistry\n"));
   }
 
 }

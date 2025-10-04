@@ -31,7 +31,6 @@
 #include "FXPPMImage.h"
 
 
-
 /*
   Notes:
   - PPM does not support alpha in the file format.

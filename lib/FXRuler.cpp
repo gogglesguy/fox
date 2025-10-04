@@ -42,8 +42,6 @@
 #include "FXApp.h"
 #include "FXRuler.h"
 
-
-
 /*
   Notes:
   - If showing arrows for cursor position, draw them down (right)
@@ -176,7 +174,6 @@
 #define RULER_ALIGN_MASK (RULER_ALIGN_CENTER|RULER_ALIGN_LEFT|RULER_ALIGN_RIGHT|RULER_ALIGN_STRETCH)
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

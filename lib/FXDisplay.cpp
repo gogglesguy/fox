@@ -30,9 +30,9 @@
 
 using namespace FX;
 
-namespace FX {
-
 /*******************************************************************************/
+
+namespace FX {
 
 // Construct display
 FXDisplay::FXDisplay():display(nullptr){

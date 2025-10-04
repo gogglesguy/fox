@@ -50,7 +50,6 @@
 
 #define JUSTIFY_MASK (JUSTIFY_HZ_APART|JUSTIFY_VT_APART)
 
-
 using namespace FX;
 
 /*******************************************************************************/

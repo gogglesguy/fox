@@ -49,8 +49,6 @@
 #include "FXReplaceDialog.h"
 #include "FXSearchDialog.h"
 
-
-
 /*
   Notes:
 

@@ -104,6 +104,12 @@ public:
   /// Find position of given key, returning -1 if not found
   FXival find(const FXString& ky) const { return find(ky.text()); }
 
+  /// Check if key is mapped
+  FXbool has(const FXchar* ky) const { return 0<=find(ky); }
+
+  /// Check if key is mapped
+  FXbool has(const FXString& ky) const { return 0<=find(ky); }
+
   /// Return reference to slot assocated with given key
   FXStringDictionary& at(const FXchar* ky);
 

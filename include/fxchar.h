@@ -49,7 +49,7 @@ static inline FXbool seqUTF8(FXchar c){
 
 /// Length of UTF8 character, in bytes
 static inline FXival lenUTF8(FXchar c){
-  return ((0xE5000000>>((c>>3)&0x1E))&3)+1;
+  return ((0xE5000000>>((c&0xF0)>>3))&3)+1;
   }
 
 /// Length of UTF8 character, in bytes

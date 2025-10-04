@@ -27,6 +27,7 @@
   Notes:
 */
 
+#define TOPIC_DETAIL    1002
 
 using namespace FX;
 
@@ -66,14 +67,14 @@ FXival fxosversion(FXchar version[],FXival len){
     OSVERSIONINFOEXW osv;
     osv.dwOSVersionInfoSize=sizeof(osv);
     if(fxRtlGetVersion(&osv)==0){
-      FXTRACE((100,"fxosversion: dwMajorVersion=%d\n",osv.dwMajorVersion));
-      FXTRACE((100,"fxosversion: dwMinorVersion=%d\n",osv.dwMinorVersion));
-      FXTRACE((100,"fxosversion: dwBuildNumber=%d\n",osv.dwBuildNumber));
-      FXTRACE((100,"fxosversion: dwPlatformId=%d\n",osv.dwPlatformId));
-      FXTRACE((100,"fxosversion: wServicePackMajor=%d\n",osv.wServicePackMajor));
-      FXTRACE((100,"fxosversion: wServicePackMinor=%d\n",osv.wServicePackMinor));
-      FXTRACE((100,"fxosversion: wSuiteMask=%d\n",osv.wSuiteMask));
-      FXTRACE((100,"fxosversion: wProductType=%d\n",osv.wProductType));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: dwMajorVersion=%d\n",osv.dwMajorVersion));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: dwMinorVersion=%d\n",osv.dwMinorVersion));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: dwBuildNumber=%d\n",osv.dwBuildNumber));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: dwPlatformId=%d\n",osv.dwPlatformId));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: wServicePackMajor=%d\n",osv.wServicePackMajor));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: wServicePackMinor=%d\n",osv.wServicePackMinor));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: wSuiteMask=%d\n",osv.wSuiteMask));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: wProductType=%d\n",osv.wProductType));
       return __snprintf(version,len,"%d.%d.%d.%d",osv.dwMajorVersion,osv.dwMinorVersion,osv.dwBuildNumber,osv.dwPlatformId);
       }
     version[0]='\0';
@@ -162,10 +163,10 @@ FXival fxosversion(FXchar version[],FXival len){   // FIXME will change
   if(0<len){
     struct utsname buffer;
     if(uname(&buffer)==0){
-      FXTRACE((100,"fxosversion: sysname=%s\n",buffer.sysname));
-      FXTRACE((100,"fxosversion: nodename=%s\n",buffer.nodename));
-      FXTRACE((100,"fxosversion: release=%s\n",buffer.release));
-      FXTRACE((100,"fxosversion: version=%s\n",buffer.version));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: sysname=%s\n",buffer.sysname));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: nodename=%s\n",buffer.nodename));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: release=%s\n",buffer.release));
+      FXTRACE((TOPIC_DETAIL,"fxosversion: version=%s\n",buffer.version));
       return fxstrlcpy(version,buffer.release,len);
       }
     //return __snprintf(version,len,"%d.%d.%d",LINUX_VERSION_MAJOR,LINUX_VERSION_PATCHLEVEL,LINUX_VERSION_SUBLEVEL);

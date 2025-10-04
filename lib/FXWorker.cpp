@@ -28,7 +28,6 @@
 #include "FXThread.h"
 #include "FXWorker.h"
 
-
 /*
   Notes:
   - A Worker is a thread that performs a Runnable.
@@ -39,16 +38,17 @@
   - Exceptions thrown by the runnable cause early termination of the runnable.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
-
-
-namespace FX {
 
 /*******************************************************************************/
 
+namespace FX {
+
 // Create worker for runnable
 FXWorker::FXWorker(FXRunnable* task):runnable(task){
-  FXTRACE((100,"FXWorker::FXWorker %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWorker::FXWorker %p\n",this));
   }
 
 
@@ -83,7 +83,7 @@ FXWorker* FXWorker::execute(FXRunnable* task,FXuval stacksize){
 
 // Destroy
 FXWorker::~FXWorker(){
-  FXTRACE((100,"FXWorker::~FXWorker %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXWorker::~FXWorker %p\n",this));
   runnable=(FXRunnable*)-1L;
   }
 

@@ -44,7 +44,7 @@ enum {
   AXIS_TICKS_OUTSIDE  = 0x0400,         /// Tickmarks outside box
   AXIS_TICKS_CROSS    = 0x0600,         /// Tickmarks inside and outside box
   AXIS_GRID_MAJOR     = 0x0800,         /// Grid lines drawn on major ticks
-  AXIS_GRID_MINOR     = 0x1000,         /// Grid lines drawn on major ticks
+  AXIS_GRID_MINOR     = 0x1000,         /// Grid lines drawn on minor ticks
   AXIS_GRID_FRONT     = 0x2000          /// Grid in front of data
   };
 

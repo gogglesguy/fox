@@ -51,7 +51,9 @@
   To do:
 */
 
-
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 using namespace FX;
 
@@ -188,7 +190,7 @@ void FXConsole::layout(){
     if(style.no()){ style.no(totallines); }
     }
 
-  FXTRACE((100,"visiblelines=%d historylines=%d totallines=%d hh=%d space=%d\n",visiblelines,historylines,totallines,hh,height-margintop-marginbottom));
+  FXTRACE((TOPIC_DETAIL,"visiblelines=%d historylines=%d totallines=%d hh=%d space=%d\n",visiblelines,historylines,totallines,hh,height-margintop-marginbottom));
 
   // Scrollbars adjusted
   placeScrollBars(width,height);
@@ -318,7 +320,7 @@ void FXConsole::drawContents(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h) con
   FXint ln;
   if(tl<0) tl=0;
   if(bl>=contents.no()) bl=contents.no()-1;
-  FXTRACE((100,"tl=%d bl=%d\n",tl,bl));
+  FXTRACE((TOPIC_DETAIL,"tl=%d bl=%d\n",tl,bl));
   for(ln=tl; ln<=bl; ln++){
     drawTextLine(dc,ln,x,x+w);
     }

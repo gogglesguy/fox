@@ -39,7 +39,6 @@
 #include "FXApp.h"
 #include "FXVerticalFrame.h"
 
-
 /*
   Notes:
   - Filled items shrink as well as stretch.

@@ -185,6 +185,10 @@
 
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -376,7 +380,7 @@ FXPrintDialog::FXPrintDialog(FXWindow* own,const FXString& caption,FXuint opts,F
 
   // Parse size
   getApp()->reg().readFormatEntry("PAPER",key,"[%[^]]] %lf %lf %lf %lf %lf %lf",name,&printer.mediawidth,&printer.mediaheight,&printer.leftmargin,&printer.rightmargin,&printer.topmargin,&printer.bottommargin);
-  FXTRACE((100,"Media=\"%s\" w=%g h=%g lm=%g rm=%g tm=%g bm=%g\n",name,printer.mediawidth,printer.mediaheight,printer.leftmargin,printer.rightmargin,printer.topmargin,printer.bottommargin));
+  FXTRACE((TOPIC_DETAIL,"Media=\"%s\" w=%g h=%g lm=%g rm=%g tm=%g bm=%g\n",name,printer.mediawidth,printer.mediaheight,printer.leftmargin,printer.rightmargin,printer.topmargin,printer.bottommargin));
 
   // Initial flags
   printer.flags=0;
@@ -527,53 +531,53 @@ long FXPrintDialog::onCmdToPrinter(FXObject*,FXSelector,void*){
   getApp()->reg().writeIntEntry("PRINTER","printtofile",false);
   printer.name=printername->getText();
   printer.flags&=~PRINT_DEST_FILE;
-  FXTRACE((100,"Print to printer: %s\n",printer.name.text()));
+  FXTRACE((TOPIC_DETAIL,"Print to printer: %s\n",printer.name.text()));
 
 // #ifdef HAVE_CUPS_H
 //   int num_dests;
 //   cups_dest_t *dests;
 //   num_dests=cupsGetDests(&dests);
-//   FXTRACE((1,"num_dests=%d\n",num_dests));
+//   FXTRACE((TOPIC_DETAIL,"num_dests=%d\n",num_dests));
 //   for(int i=0; i<num_dests; i++){
-//     FXTRACE((1,"printer name=%s instance=%s default=%d\n",dests[i].name,dests[i].instance,dests[i].is_default));
+//     FXTRACE((TOPIC_DETAIL,"printer name=%s instance=%s default=%d\n",dests[i].name,dests[i].instance,dests[i].is_default));
 //     const char* ppdfilename;
 //     ppdfilename=cupsGetPPD(dests[i].name);
 //     if(ppdfilename){
 //       ppd_file_t* ppd;
 //       ppd=ppdOpenFile(ppdfilename);
 //       if(ppd){
-//         FXTRACE((1,"got ppd\n"));
-//         FXTRACE((1,"ppd->jcl_begin=%d\n",ppd->jcl_begin));
-//         FXTRACE((1,"ppd->jcl_ps=%d\n",ppd->jcl_ps));
-//         FXTRACE((1,"ppd->jcl_end=%d\n",ppd->jcl_end));
-//         FXTRACE((1,"ppd->num_fonts=%d\n",ppd->num_fonts));
-//         for(int f=0; f<ppd->num_fonts; f++) FXTRACE((1,"ppd->fonts[%d]=%s\n",f,ppd->fonts[f]));
-//         FXTRACE((1,"ppd->manufacturer=%s\n",ppd->manufacturer));
-//         FXTRACE((1,"ppd->modelname=%s\n",ppd->modelname));
-//         FXTRACE((1,"ppd->nickname=%s\n",ppd->nickname));
-//         FXTRACE((1,"ppd->shortnickname=%s\n",ppd->shortnickname));
-//         FXTRACE((1,"ppd->ttrasterizer=%s\n",ppd->ttrasterizer));
-//         FXTRACE((1,"ppd->product=%s\n",ppd->product));
-//         FXTRACE((1,"ppd->patches=%s\n",ppd->patches));
-//         FXTRACE((1,"ppd->lang_version=%s\n",ppd->lang_version));
-//         FXTRACE((1,"ppd->lang_encoding=%s\n",ppd->lang_encoding));
-//         FXTRACE((1,"ppd->landscape=%d\n",ppd->landscape));
-//         FXTRACE((1,"ppd->language_level=%d\n",ppd->language_level));
-//         FXTRACE((1,"ppd->model_number=%d\n",ppd->model_number));
-//         FXTRACE((1,"ppd->manual_copies=%d\n",ppd->manual_copies));
-//         FXTRACE((1,"ppd->throughput=%d\n",ppd->throughput));
-//         FXTRACE((1,"ppd->variable_sizes=%d\n",ppd->variable_sizes));
-//         FXTRACE((1,"ppd->num_sizes=%d\n",ppd->num_sizes));
+//         FXTRACE((TOPIC_DETAIL,"got ppd\n"));
+//         FXTRACE((TOPIC_DETAIL,"ppd->jcl_begin=%d\n",ppd->jcl_begin));
+//         FXTRACE((TOPIC_DETAIL,"ppd->jcl_ps=%d\n",ppd->jcl_ps));
+//         FXTRACE((TOPIC_DETAIL,"ppd->jcl_end=%d\n",ppd->jcl_end));
+//         FXTRACE((TOPIC_DETAIL,"ppd->num_fonts=%d\n",ppd->num_fonts));
+//         for(int f=0; f<ppd->num_fonts; f++) FXTRACE((TOPIC_DETAIL,"ppd->fonts[%d]=%s\n",f,ppd->fonts[f]));
+//         FXTRACE((TOPIC_DETAIL,"ppd->manufacturer=%s\n",ppd->manufacturer));
+//         FXTRACE((TOPIC_DETAIL,"ppd->modelname=%s\n",ppd->modelname));
+//         FXTRACE((TOPIC_DETAIL,"ppd->nickname=%s\n",ppd->nickname));
+//         FXTRACE((TOPIC_DETAIL,"ppd->shortnickname=%s\n",ppd->shortnickname));
+//         FXTRACE((TOPIC_DETAIL,"ppd->ttrasterizer=%s\n",ppd->ttrasterizer));
+//         FXTRACE((TOPIC_DETAIL,"ppd->product=%s\n",ppd->product));
+//         FXTRACE((TOPIC_DETAIL,"ppd->patches=%s\n",ppd->patches));
+//         FXTRACE((TOPIC_DETAIL,"ppd->lang_version=%s\n",ppd->lang_version));
+//         FXTRACE((TOPIC_DETAIL,"ppd->lang_encoding=%s\n",ppd->lang_encoding));
+//         FXTRACE((TOPIC_DETAIL,"ppd->landscape=%d\n",ppd->landscape));
+//         FXTRACE((TOPIC_DETAIL,"ppd->language_level=%d\n",ppd->language_level));
+//         FXTRACE((TOPIC_DETAIL,"ppd->model_number=%d\n",ppd->model_number));
+//         FXTRACE((TOPIC_DETAIL,"ppd->manual_copies=%d\n",ppd->manual_copies));
+//         FXTRACE((TOPIC_DETAIL,"ppd->throughput=%d\n",ppd->throughput));
+//         FXTRACE((TOPIC_DETAIL,"ppd->variable_sizes=%d\n",ppd->variable_sizes));
+//         FXTRACE((TOPIC_DETAIL,"ppd->num_sizes=%d\n",ppd->num_sizes));
 //         for(int s=0; s<ppd->num_sizes; s++){
 //           ppd_size_t *sz=&ppd->sizes[s];
-//           FXTRACE((1,"sz->marked=%d\n",sz->marked));
-//           FXTRACE((1,"sz->name=%s\n",sz->name));
-//           FXTRACE((1,"sz->width=%f\n",sz->width));
-//           FXTRACE((1,"sz->length=%f\n",sz->length));
-//           FXTRACE((1,"sz->top=%f\n",sz->top));
-//           FXTRACE((1,"sz->bottom=%f\n",sz->bottom));
-//           FXTRACE((1,"sz->left=%f\n",sz->left));
-//           FXTRACE((1,"sz->right=%f\n",sz->right));
+//           FXTRACE((TOPIC_DETAIL,"sz->marked=%d\n",sz->marked));
+//           FXTRACE((TOPIC_DETAIL,"sz->name=%s\n",sz->name));
+//           FXTRACE((TOPIC_DETAIL,"sz->width=%f\n",sz->width));
+//           FXTRACE((TOPIC_DETAIL,"sz->length=%f\n",sz->length));
+//           FXTRACE((TOPIC_DETAIL,"sz->top=%f\n",sz->top));
+//           FXTRACE((TOPIC_DETAIL,"sz->bottom=%f\n",sz->bottom));
+//           FXTRACE((TOPIC_DETAIL,"sz->left=%f\n",sz->left));
+//           FXTRACE((TOPIC_DETAIL,"sz->right=%f\n",sz->right));
 //           }
 //         ppdClose(ppd);
 //         }
@@ -581,7 +585,7 @@ long FXPrintDialog::onCmdToPrinter(FXObject*,FXSelector,void*){
 //     }
 //   const char *defdest;
 //   defdest=cupsGetDefault();
-//   FXTRACE((1,"default destination=%s\n",defdest));
+//   FXTRACE((TOPIC_DETAIL,"default destination=%s\n",defdest));
 // #endif
   return 1;
   }
@@ -599,7 +603,7 @@ long FXPrintDialog::onCmdToFile(FXObject*,FXSelector,void*){
   getApp()->reg().writeIntEntry("PRINTER","printtofile",true);
   printer.name=filename->getText();
   printer.flags|=PRINT_DEST_FILE;
-  FXTRACE((100,"Print to file: %s\n",printer.name.text()));
+  FXTRACE((TOPIC_DETAIL,"Print to file: %s\n",printer.name.text()));
   return 1;
   }
 
@@ -634,7 +638,7 @@ long FXPrintDialog::onCmdBrowse(FXObject*,FXSelector,void*){
   getApp()->reg().writeStringEntry("PRINTER","file",name.text());
   if(printer.flags&PRINT_DEST_FILE){
     printer.name=name;
-    FXTRACE((100,"Print to file: %s\n",printer.name.text()));
+    FXTRACE((TOPIC_DETAIL,"Print to file: %s\n",printer.name.text()));
     }
   return 1;
   }
@@ -673,7 +677,7 @@ long FXPrintDialog::onCmdFileName(FXObject*,FXSelector,void*){
   getApp()->reg().writeStringEntry("PRINTER","file",name.text());
   if(printer.flags&PRINT_DEST_FILE){
     printer.name=name;
-    FXTRACE((100,"Print to file: %s\n",printer.name.text()));
+    FXTRACE((TOPIC_DETAIL,"Print to file: %s\n",printer.name.text()));
     }
   return 1;
   }
@@ -701,7 +705,7 @@ long FXPrintDialog::onCmdPrinterName(FXObject*,FXSelector,void*){
   getApp()->reg().writeStringEntry("PRINTER","printer",name.text());
   if(!(printer.flags&PRINT_DEST_FILE)){
     printer.name=name;
-    FXTRACE((100,"Print to printer: %s\n",printer.name.text()));
+    FXTRACE((TOPIC_DETAIL,"Print to printer: %s\n",printer.name.text()));
 //
 //   // If using CUPS, we list the available media types for this printer
 // #ifndef WIN32
@@ -713,9 +717,9 @@ long FXPrintDialog::onCmdPrinterName(FXObject*,FXSelector,void*){
 //   ppd=ppdOpenFile(ppd_file);
 //   if(!ppd) return 1;
 //   media->clearItems();
-//   FXTRACE((100,"num_sizes=%d\n",ppd->num_sizes));
+//   FXTRACE((TOPIC_DETAIL,"num_sizes=%d\n",ppd->num_sizes));
 //   for(int s=0; s<ppd->num_sizes; s++){
-//     FXTRACE((100,"ppd->sizes[%d].name=%s\n",s,ppd->sizes[s].name));
+//     FXTRACE((TOPIC_DETAIL,"ppd->sizes[%d].name=%s\n",s,ppd->sizes[s].name));
 //     media->appendItem(ppd->sizes[s].name);
 //     }
 //   ppdClose(ppd);
@@ -950,7 +954,7 @@ long FXPrintDialog::onCmdMedia(FXObject*,FXSelector,void*){
   getApp()->reg().writeIntEntry("PRINTER","media",printer.mediasize);
   __snprintf(key,sizeof(key),"%d",printer.mediasize);
   getApp()->reg().readFormatEntry("PAPER",key,"[%[^]]] %lf %lf %lf %lf %lf %lf",name,&printer.mediawidth,&printer.mediaheight,&printer.leftmargin,&printer.rightmargin,&printer.topmargin,&printer.bottommargin);
-  FXTRACE((100,"Media=\"%s\" w=%g h=%g lm=%g rm=%g tm=%g bm=%g\n",name,printer.mediawidth,printer.mediaheight,printer.leftmargin,printer.rightmargin,printer.topmargin,printer.bottommargin));
+  FXTRACE((TOPIC_DETAIL,"Media=\"%s\" w=%g h=%g lm=%g rm=%g tm=%g bm=%g\n",name,printer.mediawidth,printer.mediaheight,printer.leftmargin,printer.rightmargin,printer.topmargin,printer.bottommargin));
   return 1;
   }
 

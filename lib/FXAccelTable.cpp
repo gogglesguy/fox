@@ -66,7 +66,6 @@
 #define EMPTYSLOT       0xfffffffe   // Previously used, now empty slot
 #define UNUSEDSLOT      0xffffffff   // Unsused slot marker
 
-
 using namespace FX;
 
 /*******************************************************************************/

@@ -76,7 +76,6 @@ FXDEFMAP(FXToolBarShell) FXToolBarShellMap[]={
   };
 
 
-
 // Object implementation
 FXIMPLEMENT(FXToolBarShell,FXTopWindow,FXToolBarShellMap,ARRAYNUMBER(FXToolBarShellMap))
 

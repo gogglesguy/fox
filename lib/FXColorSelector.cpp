@@ -104,9 +104,6 @@ using namespace FX;
 
 namespace FX {
 
-
-/*******************************************************************************/
-
 // Map
 FXDEFMAP(FXColorSelector) FXColorSelectorMap[]={
   FXMAPFUNC(SEL_UPDATE,FXColorSelector::ID_ALPHA_TEXT,FXColorSelector::onUpdAlphaText),

@@ -41,7 +41,6 @@
 #include "FXApp.h"
 #include "FXSwitcher.h"
 
-
 /*
   Notes:
   - We do not look at LAYOUT_FIX_WIDTH and LAYOUT_FIX_HEIGHT because

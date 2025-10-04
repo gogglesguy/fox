@@ -47,8 +47,11 @@
 
 /*
   Notes:
-  - Help text from constructor is third part; second part should be
-    accelerator key combination.
+  - Parse hotkey from label 1st part of the text, and strip the "&" from it.
+  - Parse help text from 3rd part of the text.
+  - The 2nd part of the text has the accelerator. Parse the modifier/key
+    combination from it, and set the accelerator callback from owner widget's
+    accelerator table to this widget.
   - When menu label changes, hotkey might have to be adjusted.
   - Fix it so menu stays up when after Alt-F, you press Alt-E.
   - MenuItems should be derived from FXLabel.
@@ -60,6 +63,8 @@
     in ptr in callback.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
 #define TOPIC_KEYBOARD  1009
 
 #define LEADSPACE   22
@@ -212,7 +217,7 @@ long FXMenuCommand::onKeyRelease(FXObject*,FXSelector,void* ptr){
 
 // Hot key combination pressed
 long FXMenuCommand::onHotKeyPress(FXObject*,FXSelector,void* ptr){
-  FXTRACE((200,"%s::onHotKeyPress %p\n",getClassName(),this));
+  FXTRACE((TOPIC_KEYBOARD,"%s::onHotKeyPress %p\n",getClassName(),this));
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled() && !(flags&FLAG_PRESSED)){
     flags|=FLAG_PRESSED;
@@ -223,7 +228,7 @@ long FXMenuCommand::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 
 // Hot key combination released
 long FXMenuCommand::onHotKeyRelease(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onHotKeyRelease %p\n",getClassName(),this));
+  FXTRACE((TOPIC_KEYBOARD,"%s::onHotKeyRelease %p\n",getClassName(),this));
   if(isEnabled() && (flags&FLAG_PRESSED)){
     flags&=~FLAG_PRESSED;
     getParent()->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);

@@ -56,11 +56,10 @@
 
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
 
-
-/*******************************************************************************/
 
 // Initialize completion counter
 FXCompletion::FXCompletion():semaphore(1),counter(0){

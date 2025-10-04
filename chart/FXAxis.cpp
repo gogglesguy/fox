@@ -77,9 +77,6 @@ void FXAxis::detach(){
   numberfont->detach();
   }
 
-#if defined(WIN32) || defined(__minix)
-#define lrint(x) ((x)+0.5)
-#endif
 
 // Draw axis
 void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXint dy) const {
@@ -102,8 +99,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       minl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*minorspace)/minorspace);
       minh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*minorspace)/minorspace);
       for(i=minl; i<=minh; i++){
-        x=fx+lrint(mulx*(i*minorspace-axisrange.minimum));
-        y=fy+lrint(muly*(i*minorspace-axisrange.minimum));
+        x=fx+Math::lrint(mulx*(i*minorspace-axisrange.minimum));
+        y=fy+Math::lrint(muly*(i*minorspace-axisrange.minimum));
         dc.drawLine(x,y,x+dx,y+dy);
         }
       }
@@ -114,8 +111,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       majl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
       majh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
       for(i=majl; i<=majh; i++){
-        x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
-        y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
+        x=fx+Math::lrint(mulx*(i*majorspace-axisrange.minimum));
+        y=fy+Math::lrint(muly*(i*majorspace-axisrange.minimum));
         dc.drawLine(x,y,x+dx,y+dy);
         }
       }
@@ -136,8 +133,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       minl=(FXint)Math::ceil(axisrange.minimum/minorspace);
       minh=(FXint)Math::floor(axisrange.maximum/minorspace);
       for(i=minl; i<=minh; i++){
-        x=fx+lrint(mulx*(i*minorspace-axisrange.minimum));
-        y=fy+lrint(muly*(i*minorspace-axisrange.minimum));
+        x=fx+Math::lrint(mulx*(i*minorspace-axisrange.minimum));
+        y=fy+Math::lrint(muly*(i*minorspace-axisrange.minimum));
         dc.drawLine(x-tout*ex,y-tout*ey,x+tin*ex,y+tin*ey);
         }
       }
@@ -150,8 +147,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
       majl=(FXint)Math::ceil(axisrange.minimum/majorspace);
       majh=(FXint)Math::floor(axisrange.maximum/majorspace);
       for(i=majl; i<=majh; i++){
-        x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
-        y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
+        x=fx+Math::lrint(mulx*(i*majorspace-axisrange.minimum));
+        y=fy+Math::lrint(muly*(i*majorspace-axisrange.minimum));
         dc.drawLine(x-tout*ex,y-tout*ey,x+tin*ex,y+tin*ey);
         }
       }
@@ -165,8 +162,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
         majl=(FXint)Math::ceil((axisrange.minimum+FUDGE_FACTOR*majorspace)/majorspace);
         majh=(FXint)Math::floor((axisrange.maximum-FUDGE_FACTOR*majorspace)/majorspace);
         for(i=majl; i<=majh; i++){
-          x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
-          y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
+          x=fx+Math::lrint(mulx*(i*majorspace-axisrange.minimum));
+          y=fy+Math::lrint(muly*(i*majorspace-axisrange.minimum));
           num.format("%g",i*majorspace);
           drawText(dc,num,x+tin*ex,y+tin*ey,numberstyle);
           }
@@ -176,8 +173,8 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
         majl=(FXint)Math::ceil(axisrange.minimum/majorspace);
         majh=(FXint)Math::floor(axisrange.maximum/majorspace);
         for(i=majl; i<=majh; i++){
-          x=fx+lrint(mulx*(i*majorspace-axisrange.minimum));
-          y=fy+lrint(muly*(i*majorspace-axisrange.minimum));
+          x=fx+Math::lrint(mulx*(i*majorspace-axisrange.minimum));
+          y=fy+Math::lrint(muly*(i*majorspace-axisrange.minimum));
           num.format("%g",i*majorspace);
           drawText(dc,num,x-tout*ex,y-tout*ey,numberstyle);
           }
@@ -186,6 +183,7 @@ void FXAxis::drawAxis(FXDC& dc,FXint fx,FXint fy,FXint tx,FXint ty,FXint dx,FXin
           }
         else if(numberstyle&(TEXT_ATTACH_LEFT|TEXT_ATTACH_RIGHT)){
           tout+=textWidth(numberfont,"8.8");
+//fxmessage("tout+=%d\n",textWidth(numberfont,"8.8"));
           }
         }
       }

@@ -46,7 +46,6 @@
 #include "FXScrollBar.h"
 #include "FXTreeList.h"
 
-
 /*
   Notes:
   - Tooltip should pop up exactly on top of current item.
@@ -71,7 +70,6 @@
 #define HALFBOX_SIZE        4   // Half box size
 #define BOX_FUDGE           3   // Fudge border around box
 
-
 #define SELECT_MASK         (TREELIST_SINGLESELECT|TREELIST_BROWSESELECT)
 #define TREELIST_MASK       (SELECT_MASK|TREELIST_AUTOSELECT|TREELIST_SHOWS_LINES|TREELIST_SHOWS_BOXES|TREELIST_ROOT_BOXES)
 
@@ -81,7 +79,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Object implementation
 FXIMPLEMENT(FXTreeItem,FXObject,nullptr,0)

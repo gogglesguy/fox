@@ -44,7 +44,6 @@ using namespace FX;
 
 namespace FX {
 
-
 // Create a queue and set its size to sz
 FXWSQueue::FXWSQueue(FXint sz):top(0),bot(0){
   setSize(sz);

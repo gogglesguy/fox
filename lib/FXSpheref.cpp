@@ -40,7 +40,6 @@
   - Negative radius represents empty bounding sphere.
 */
 
-
 using namespace FX;
 
 /**************************  S p h e r e   C l a s s   *************************/

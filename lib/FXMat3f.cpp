@@ -38,10 +38,10 @@
 
 /*
   Notes:
+
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
 */
-
 
 using namespace FX;
 
@@ -67,6 +67,14 @@ FXMat3f::FXMat3f(FXfloat s){
   m[1][0]=s; m[1][1]=s; m[1][2]=s;
   m[2][0]=s; m[2][1]=s; m[2][2]=s;
 #endif
+  }
+
+
+// Initialize matrix from components
+FXMat3f::FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
   }
 
 
@@ -107,36 +115,9 @@ FXMat3f::FXMat3f(const FXMat4f& s){
   }
 
 
-// Initialize matrix from array
-FXMat3f::FXMat3f(const FXfloat s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
-  _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
-#elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
-  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
-#else
-  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
-  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
-  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-#endif
-  }
-
-
-// Initialize diagonal matrix
-FXMat3f::FXMat3f(FXfloat a,FXfloat b,FXfloat c){
-  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
-  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
-  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
-  }
-
-
-// Initialize matrix from components
-FXMat3f::FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+// Initialize matrix from quaternion
+FXMat3f::FXMat3f(const FXQuatf& quat){
+  quat.getAxes(m[0],m[1],m[2]);
   }
 
 
@@ -154,9 +135,36 @@ FXMat3f::FXMat3f(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
   }
 
 
-// Initialize matrix from quaternion
-FXMat3f::FXMat3f(const FXQuatf& quat){
-  quat.getAxes(m[0],m[1],m[2]);
+// Initialize diagonal matrix
+FXMat3f::FXMat3f(FXfloat a,FXfloat b,FXfloat c){
+  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
+  }
+
+
+// Set diagonal matrix
+FXMat3f::FXMat3f(const FXVec3f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1]; m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=d[2];
+  }
+
+
+// Initialize matrix from array
+FXMat3f::FXMat3f(const FXfloat s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
+  _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
+#elif defined(FOX_HAS_SSE)
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
+  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
+#else
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+#endif
   }
 
 
@@ -263,6 +271,15 @@ FXMat3f& FXMat3f::set(FXfloat s){
   }
 
 
+// Set value from components
+FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+  return *this;
+  }
+
+
 // Set value from 2x2 rotation and scale matrix
 FXMat3f& FXMat3f::set(const FXMat2f& s){
   m[0][0]=s[0][0]; m[0][1]=s[0][1]; m[0][2]=0.0f;
@@ -305,38 +322,9 @@ FXMat3f& FXMat3f::set(const FXMat4f& s){
   }
 
 
-// Set value from array
-FXMat3f& FXMat3f::set(const FXfloat s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
-  _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
-#elif defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
-  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
-  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
-#else
-  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
-  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
-  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
-#endif
-  return *this;
-  }
-
-
-// Set diagonal matrix
-FXMat3f& FXMat3f::set(FXfloat a,FXfloat b,FXfloat c){
-  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
-  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
-  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
-  return *this;
-  }
-
-
-// Set value from components
-FXMat3f& FXMat3f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a20,FXfloat a21,FXfloat a22){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22;
+// Set value from quaternion
+FXMat3f& FXMat3f::set(const FXQuatf& quat){
+  quat.getAxes(m[0],m[1],m[2]);
   return *this;
   }
 
@@ -356,9 +344,38 @@ FXMat3f& FXMat3f::set(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c){
   }
 
 
-// Set value from quaternion
-FXMat3f& FXMat3f::set(const FXQuatf& quat){
-  quat.getAxes(m[0],m[1],m[2]);
+// Set diagonal matrix
+FXMat3f& FXMat3f::set(FXfloat a,FXfloat b,FXfloat c){
+  m[0][0]=a;    m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=b;    m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=c;
+  return *this;
+  }
+
+
+// Initialize diagonal matrix
+FXMat3f& FXMat3f::set(const FXVec3f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f; m[0][2]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1]; m[1][2]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=d[2];
+  return *this;
+  }
+
+
+// Set value from array
+FXMat3f& FXMat3f::set(const FXfloat s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_ps(&m[0][0],_mm256_loadu_ps(s+0));
+  _mm_store_ss    (&m[2][2],_mm_load_ss    (s+8));
+#elif defined(FOX_HAS_SSE)
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][1],_mm_loadu_ps(s+4));
+  _mm_store_ss (&m[2][2],_mm_load_ss (s+8));
+#else
+  m[0][0]=s[0]; m[0][1]=s[1]; m[0][2]=s[2];
+  m[1][0]=s[3]; m[1][1]=s[4]; m[1][2]=s[5];
+  m[2][0]=s[6]; m[2][1]=s[7]; m[2][2]=s[8];
+#endif
   return *this;
   }
 

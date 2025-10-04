@@ -67,6 +67,7 @@ $(top_srcdir)/adie/quit_gif.gif \
 $(top_srcdir)/adie/redo_gif.gif \
 $(top_srcdir)/adie/reload_gif.gif \
 $(top_srcdir)/adie/replace_gif.gif \
+$(top_srcdir)/adie/revert_gif.gif \
 $(top_srcdir)/adie/save_gif.gif \
 $(top_srcdir)/adie/saveall_gif.gif \
 $(top_srcdir)/adie/saveas_gif.gif \
@@ -79,6 +80,8 @@ $(top_srcdir)/adie/search_case.gif \
 $(top_srcdir)/adie/search_nocase.gif \
 $(top_srcdir)/adie/search_word.gif \
 $(top_srcdir)/adie/search_noword.gif \
+$(top_srcdir)/adie/search_word2.gif \
+$(top_srcdir)/adie/search_noword2.gif \
 $(top_srcdir)/adie/search_up.gif \
 $(top_srcdir)/adie/search_dn.gif \
 $(top_srcdir)/adie/searchicon_gif.gif \

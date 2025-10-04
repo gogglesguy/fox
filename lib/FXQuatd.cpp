@@ -171,7 +171,7 @@ FXVec3d FXQuatd::getRotation() const {
 
 
 // Set unit quaternion to modified rodrigues parameters.
-// Modified Rodriques parameters are defined as MRP = tan(theta/4)*E,
+// Modified Rodrigues parameters are defined as MRP = tan(theta/4)*E,
 // where theta is rotation angle (radians), and E is unit axis of rotation.
 // Reference: "A survey of Attitude Representations", Malcolm D. Shuster,
 // Journal of Astronautical sciences, Vol. 41, No. 4, Oct-Dec. 1993, pp. 476,
@@ -341,47 +341,39 @@ void FXQuatd::getYawRollPitch(FXdouble& yaw,FXdouble& roll,FXdouble& pitch) cons
 
 
 // Set quaternion from axes
-// "Converting a Rotation Matrix to a Quaternion," Mike Day, Insomniac Games.
+// Singularity-free matrix to quaternion using Cayley’s method.
+// "A Survey on the Computation of Quaternions from Rotation Matrices", S. Sarabandi
+// and F. Thomas, pg. 14, eq. (76)..(79).
+// "Singularity-Free Computation of Quaternions From Rotation Matrices in E4 and E3"
+// S. Sarabandi, A. Perez-Gracia and F. Thomas, pg. 5, eq. (23)...(26).
 void FXQuatd::setAxes(const FXVec3d& ex,const FXVec3d& ey,const FXVec3d& ez){
-  FXdouble t;
-  if(ez.z<0.0){
-    if(ex.x>ey.y){
-      t=1.0+ex.x-ey.y-ez.z;
-      x=t;
-      y=ex.y+ey.x;
-      z=ez.x+ex.z;
-      w=ey.z-ez.y;
-      }
-    else{
-      t=1.0-ex.x+ey.y-ez.z;
-      x=ex.y+ey.x;
-      y=t;
-      z=ey.z+ez.y;
-      w=ez.x-ex.z;
-      }
-    }
-  else{
-    if(ex.x<-ey.y){
-      t=1.0-ex.x-ey.y+ez.z;
-      x=ez.x+ex.z;
-      y=ey.z+ez.y;
-      z=t;
-      w=ex.y-ey.x;
-      }
-    else{
-      t=1.0+ex.x+ey.y+ez.z;
-      x=ey.z-ez.y;
-      y=ez.x-ex.z;
-      z=ex.y-ey.x;
-      w=t;
-      }
-    }
-  FXASSERT(t>0.0);
-  t=0.5/Math::sqrt(t);
-  x*=t;
-  y*=t;
-  z*=t;
-  w*=t;
+  FXdouble opxpypz=1.0+ex.x+ey.y+ez.z;
+  FXdouble opxmymz=1.0+ex.x-ey.y-ez.z;
+  FXdouble omxpymz=1.0-ex.x+ey.y-ez.z;
+  FXdouble omxmypz=1.0-ex.x-ey.y+ez.z;
+  FXdouble xymyx=ex.y-ey.x;
+  FXdouble xypyx=ex.y+ey.x;
+  FXdouble yzmzy=ey.z-ez.y;
+  FXdouble yzpzy=ey.z+ez.y;
+  FXdouble zxmxz=ez.x-ex.z;
+  FXdouble zxpxz=ez.x+ex.z;
+  FXdouble x0=Math::sqr(opxmymz);
+  FXdouble y0=Math::sqr(omxpymz);
+  FXdouble z0=Math::sqr(omxmypz);
+  FXdouble w0=Math::sqr(opxpypz);
+  FXdouble x1=Math::sqr(xypyx);
+  FXdouble z1=Math::sqr(xymyx);
+  FXdouble x2=Math::sqr(yzmzy);
+  FXdouble y2=Math::sqr(yzpzy);
+  FXdouble x3=Math::sqr(zxpxz);
+  FXdouble y3=Math::sqr(zxmxz);
+  x=0.25*Math::sqrt(x0+x1+x2+x3);
+  y=0.25*Math::sqrt(y0+x1+y2+y3);
+  z=0.25*Math::sqrt(z0+z1+y2+x3);
+  w=0.25*Math::sqrt(w0+z1+x2+y3);
+  x=Math::copysign(x,yzmzy);
+  y=Math::copysign(y,zxmxz);
+  z=Math::copysign(z,xymyx);
   }
 
 
@@ -435,9 +427,16 @@ FXVec3d FXQuatd::getZAxis() const {
   }
 
 
-// Exponentiate unit quaternion
-// Given q = theta*(x*i+y*j+z*k), where length of (x,y,z) is 1,
-// then exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta).
+// Exponentiate quaternion.
+// Given:
+//
+//   q = theta*(x*i+y*j+z*k),
+//
+// then:
+//
+//   exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta)
+//
+// with length of (x,y,z) = 1.
 FXQuatd FXQuatd::exp() const {
   FXQuatd result(0.0,0.0,0.0,1.0);
   FXdouble mag2(x*x+y*y+z*z);
@@ -454,9 +453,15 @@ FXQuatd FXQuatd::exp() const {
   }
 
 
-// Take logarithm of unit quaternion
-// Given q = sin(theta)*(x*i+y*j+z*k)+cos(theta), length of (x,y,z) is 1,
-// then log(q) = theta*(x*i+y*j+z*k).
+// Take logarithm of quaternion.
+// Given:
+//
+//   q = sin(theta)*(x*i+y*j+z*k)+cos(theta)
+//
+// with length of (x,y,z) = 1. then :
+//
+//   log(q) = theta*(x*i+y*j+z*k)
+//
 FXQuatd FXQuatd::log() const {
   FXQuatd result(0.0,0.0,0.0,0.0);
   FXdouble mag2(x*x+y*y+z*z);
@@ -471,10 +476,29 @@ FXQuatd FXQuatd::log() const {
   }
 
 
-// Power of quaternion
+// Power of quaternion is formally defined as:
+//
+//   q.pow(t) := (t*q.log()).exp()
+//
+// We can short-circuit some calculations by noting the rotation axis
+// (i.e. the imaginary part) need not be normalized more than once;
+// thus, we save 1 division, 1 square root, and a dot-product.
 FXQuatd FXQuatd::pow(FXdouble t) const {
-  return (log()*t).exp();
+  FXQuatd result(0.0,0.0,0.0,1.0);
+  FXdouble mag2(x*x+y*y+z*z);
+  if(0.0<mag2){
+    FXdouble mag(Math::sqrt(mag2));
+    FXdouble phi(Math::atan2(mag,w)*t);
+    FXdouble s(Math::sin(phi)/mag);
+    FXdouble c(Math::cos(phi));
+    result.x=x*s;
+    result.y=y*s;
+    result.z=z*s;
+    result.w=c;
+    }
+  return result;
   }
+
 
 
 // Rotation unit-quaternion and vector v . q = (q . v . q*) where q* is
@@ -663,58 +687,6 @@ FXQuatd lerpdot(const FXQuatd& u,const FXQuatd& v,FXdouble f){
 /*******************************************************************************/
 
 // 1/(i*(2*i+1)) for i>=1
-const FXdouble u8_0=0.333333333333333333333333;
-const FXdouble u8_1=0.1;
-const FXdouble u8_2=0.047619047619047619047619;
-const FXdouble u8_3=0.027777777777777777777778;
-const FXdouble u8_4=0.018181818181818181818182;
-const FXdouble u8_5=0.012820512820512820512820;
-const FXdouble u8_6=0.009523809523809523809524;
-const FXdouble u8_7=0.00735294117647058823529412*1.85298109240830;
-
-// i/(2*i+1) for i>=1
-const FXdouble v8_0=0.333333333333333333333333;
-const FXdouble v8_1=0.4;
-const FXdouble v8_2=0.428571428571428571428571;
-const FXdouble v8_3=0.444444444444444444444444;
-const FXdouble v8_4=0.454545454545454545454545;
-const FXdouble v8_5=0.461538461538461538461538;
-const FXdouble v8_6=0.466666666666666666666667;
-const FXdouble v8_7=0.470588235294117647058824*1.85298109240830;
-
-
-// It is assumed that the angle between q0 and q1 is acute, i.e. angle between
-// q0 and q1 is less than pi/2.
-//
-// Based on "A Fast and Accurate Algorithm for Computing SLERP", by David Eberly.
-FXQuatd fastlerp8(const FXQuatd& q0,const FXQuatd& q1,FXdouble t){
-  FXdouble xm1=q0.x*q1.x+q0.y*q1.y+q0.z*q1.z+q0.w*q1.w-1.0;      // x-1 = cos(theta)-1
-  FXdouble d=1.0-t;
-  FXdouble sqrT=t*t;
-  FXdouble sqrD=d*d;
-  FXdouble bD0=(u8_0*sqrD-v8_0)*xm1;
-  FXdouble bD1=(u8_1*sqrD-v8_1)*xm1;
-  FXdouble bD2=(u8_2*sqrD-v8_2)*xm1;
-  FXdouble bD3=(u8_3*sqrD-v8_3)*xm1;
-  FXdouble bD4=(u8_4*sqrD-v8_4)*xm1;
-  FXdouble bD5=(u8_5*sqrD-v8_5)*xm1;
-  FXdouble bD6=(u8_6*sqrD-v8_6)*xm1;
-  FXdouble bD7=(u8_7*sqrD-v8_7)*xm1;
-  FXdouble bT0=(u8_0*sqrT-v8_0)*xm1;
-  FXdouble bT1=(u8_1*sqrT-v8_1)*xm1;
-  FXdouble bT2=(u8_2*sqrT-v8_2)*xm1;
-  FXdouble bT3=(u8_3*sqrT-v8_3)*xm1;
-  FXdouble bT4=(u8_4*sqrT-v8_4)*xm1;
-  FXdouble bT5=(u8_5*sqrT-v8_5)*xm1;
-  FXdouble bT6=(u8_6*sqrT-v8_6)*xm1;
-  FXdouble bT7=(u8_7*sqrT-v8_7)*xm1;
-  FXdouble f0=d*(1.0+bD0*(1.0+bD1*(1.0+bD2*(1.0+bD3*(1.0+bD4*(1.0+bD5*(1.0+bD6*(1.0+bD7))))))));
-  FXdouble f1=t*(1.0+bT0*(1.0+bT1*(1.0+bT2*(1.0+bT3*(1.0+bT4*(1.0+bT5*(1.0+bT6*(1.0+bT7))))))));
-  FXQuatd result(f0*q0+f1*q1);
-  return result;
-  }
-
-// 1/(i*(2*i+1)) for i>=1
 const FXdouble u10_0=0.333333333333333333333333;
 const FXdouble u10_1=0.1;
 const FXdouble u10_2=0.047619047619047619047619;
@@ -739,37 +711,39 @@ const FXdouble v10_8=0.473684210526315789473684;
 const FXdouble v10_9=0.476190476190476190476190*1.87666328810155;
 
 
-FXQuatd fastlerp10(const FXQuatd& q0,const FXQuatd& q1,FXdouble t){
-  FXdouble xm1=q0.x*q1.x+q0.y*q1.y+q0.z*q1.z+q0.w*q1.w-1.0;      // x-1 = cos(theta)-1
-  FXdouble d=1.0-t;
-  FXdouble sqrT=t*t;
-  FXdouble sqrD=d*d;
-  FXdouble bD0=(u10_0*sqrD-v10_0)*xm1;
-  FXdouble bD1=(u10_1*sqrD-v10_1)*xm1;
-  FXdouble bD2=(u10_2*sqrD-v10_2)*xm1;
-  FXdouble bD3=(u10_3*sqrD-v10_3)*xm1;
-  FXdouble bD4=(u10_4*sqrD-v10_4)*xm1;
-  FXdouble bD5=(u10_5*sqrD-v10_5)*xm1;
-  FXdouble bD6=(u10_6*sqrD-v10_6)*xm1;
-  FXdouble bD7=(u10_7*sqrD-v10_7)*xm1;
-  FXdouble bD8=(u10_8*sqrD-v10_8)*xm1;
-  FXdouble bD9=(u10_9*sqrD-v10_9)*xm1;
-  FXdouble bT0=(u10_0*sqrT-v10_0)*xm1;
-  FXdouble bT1=(u10_1*sqrT-v10_1)*xm1;
-  FXdouble bT2=(u10_2*sqrT-v10_2)*xm1;
-  FXdouble bT3=(u10_3*sqrT-v10_3)*xm1;
-  FXdouble bT4=(u10_4*sqrT-v10_4)*xm1;
-  FXdouble bT5=(u10_5*sqrT-v10_5)*xm1;
-  FXdouble bT6=(u10_6*sqrT-v10_6)*xm1;
-  FXdouble bT7=(u10_7*sqrT-v10_7)*xm1;
-  FXdouble bT8=(u10_8*sqrT-v10_8)*xm1;
-  FXdouble bT9=(u10_9*sqrT-v10_9)*xm1;
-  FXdouble f0=d*(1.0+bD0*(1.0+bD1*(1.0+bD2*(1.0+bD3*(1.0+bD4*(1.0+bD5*(1.0+bD6*(1.0+bD7*(1.0+bD8*(1.0+bD9))))))))));
-  FXdouble f1=t*(1.0+bT0*(1.0+bT1*(1.0+bT2*(1.0+bT3*(1.0+bT4*(1.0+bT5*(1.0+bT6*(1.0+bT7*(1.0+bT8*(1.0+bT9))))))))));
-  FXQuatd result(f0*q0+f1*q1);
-  return result;
+// Fast approximate spherical lerp of unit quaternions u,v (with angle between u,v < pi/2)
+// Based on "A Fast and Accurate Algorithm for Computing SLERP", by David Eberly.
+FXQuatd fastlerp(const FXQuatd& u,const FXQuatd& v,FXdouble t){
+  FXdouble xm1=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w-1.0;     // x-1 = cos(theta)-1
+  FXdouble f=1.0-t;
+  FXdouble tt=t*t;
+  FXdouble ff=f*f;
+  FXdouble F0=(u10_0*ff-v10_0)*xm1;
+  FXdouble F1=(u10_1*ff-v10_1)*xm1;
+  FXdouble F2=(u10_2*ff-v10_2)*xm1;
+  FXdouble F3=(u10_3*ff-v10_3)*xm1;
+  FXdouble F4=(u10_4*ff-v10_4)*xm1;
+  FXdouble F5=(u10_5*ff-v10_5)*xm1;
+  FXdouble F6=(u10_6*ff-v10_6)*xm1;
+  FXdouble F7=(u10_7*ff-v10_7)*xm1;
+  FXdouble F8=(u10_8*ff-v10_8)*xm1;
+  FXdouble F9=(u10_9*ff-v10_9)*xm1;
+  FXdouble T0=(u10_0*tt-v10_0)*xm1;
+  FXdouble T1=(u10_1*tt-v10_1)*xm1;
+  FXdouble T2=(u10_2*tt-v10_2)*xm1;
+  FXdouble T3=(u10_3*tt-v10_3)*xm1;
+  FXdouble T4=(u10_4*tt-v10_4)*xm1;
+  FXdouble T5=(u10_5*tt-v10_5)*xm1;
+  FXdouble T6=(u10_6*tt-v10_6)*xm1;
+  FXdouble T7=(u10_7*tt-v10_7)*xm1;
+  FXdouble T8=(u10_8*tt-v10_8)*xm1;
+  FXdouble T9=(u10_9*tt-v10_9)*xm1;
+  FXdouble F=f*(1.0+F0*(1.0+F1*(1.0+F2*(1.0+F3*(1.0+F4*(1.0+F5*(1.0+F6*(1.0+F7*(1.0+F8*(1.0+F9))))))))));
+  FXdouble T=t*(1.0+T0*(1.0+T1*(1.0+T2*(1.0+T3*(1.0+T4*(1.0+T5*(1.0+T6*(1.0+T7*(1.0+T8*(1.0+T9))))))))));
+  return u*F+v*T;
   }
 
+#if 0
 
 // 1/(i*(2*i+1)) for i>=1
 const FXdouble u12_0=0.333333333333333333333333;
@@ -801,39 +775,38 @@ const FXdouble v12_11=0.48*1.89371240325272;
 
 
 // About 26 clocks, err = ~1E-6
-FXQuatd fastlerp12(const FXQuatd& q0,const FXQuatd& q1,FXdouble t){
-  FXdouble xm1=q0.x*q1.x+q0.y*q1.y+q0.z*q1.z+q0.w*q1.w-1.0;      // x-1 = cos(theta)-1
-  FXdouble d=1.0-t;
-  FXdouble sqrT=t*t;
-  FXdouble sqrD=d*d;
-  FXdouble bD0=(u12_0*sqrD-v12_0)*xm1;
-  FXdouble bD1=(u12_1*sqrD-v12_1)*xm1;
-  FXdouble bD2=(u12_2*sqrD-v12_2)*xm1;
-  FXdouble bD3=(u12_3*sqrD-v12_3)*xm1;
-  FXdouble bD4=(u12_4*sqrD-v12_4)*xm1;
-  FXdouble bD5=(u12_5*sqrD-v12_5)*xm1;
-  FXdouble bD6=(u12_6*sqrD-v12_6)*xm1;
-  FXdouble bD7=(u12_7*sqrD-v12_7)*xm1;
-  FXdouble bD8=(u12_8*sqrD-v12_8)*xm1;
-  FXdouble bD9=(u12_9*sqrD-v12_9)*xm1;
-  FXdouble bD10=(u12_10*sqrD-v12_10)*xm1;
-  FXdouble bD11=(u12_11*sqrD-v12_11)*xm1;
-  FXdouble bT0=(u12_0*sqrT-v12_0)*xm1;
-  FXdouble bT1=(u12_1*sqrT-v12_1)*xm1;
-  FXdouble bT2=(u12_2*sqrT-v12_2)*xm1;
-  FXdouble bT3=(u12_3*sqrT-v12_3)*xm1;
-  FXdouble bT4=(u12_4*sqrT-v12_4)*xm1;
-  FXdouble bT5=(u12_5*sqrT-v12_5)*xm1;
-  FXdouble bT6=(u12_6*sqrT-v12_6)*xm1;
-  FXdouble bT7=(u12_7*sqrT-v12_7)*xm1;
-  FXdouble bT8=(u12_8*sqrT-v12_8)*xm1;
-  FXdouble bT9=(u12_9*sqrT-v12_9)*xm1;
-  FXdouble bT10=(u12_10*sqrT-v12_10)*xm1;
-  FXdouble bT11=(u12_11*sqrT-v12_11)*xm1;
-  FXdouble f0=d*(1.0+bD0*(1.0+bD1*(1.0+bD2*(1.0+bD3*(1.0+bD4*(1.0+bD5*(1.0+bD6*(1.0+bD7*(1.0+bD8*(1.0+bD9*(1.0+bD10*(1.0+bD11))))))))))));
-  FXdouble f1=t*(1.0+bT0*(1.0+bT1*(1.0+bT2*(1.0+bT3*(1.0+bT4*(1.0+bT5*(1.0+bT6*(1.0+bT7*(1.0+bT8*(1.0+bT9*(1.0+bT10*(1.0+bT11))))))))))));
-  FXQuatd result(f0*q0+f1*q1);
-  return result;
+FXQuatd fastlerp12(const FXQuatd& u,const FXQuatd& v,FXdouble t){
+  FXdouble xm1=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w-1.0;      // x-1 = cos(theta)-1
+  FXdouble f=1.0-t;
+  FXdouble tt=t*t;
+  FXdouble ff=f*f;
+  FXdouble F0=(u12_0*ff-v12_0)*xm1;
+  FXdouble F1=(u12_1*ff-v12_1)*xm1;
+  FXdouble F2=(u12_2*ff-v12_2)*xm1;
+  FXdouble F3=(u12_3*ff-v12_3)*xm1;
+  FXdouble F4=(u12_4*ff-v12_4)*xm1;
+  FXdouble F5=(u12_5*ff-v12_5)*xm1;
+  FXdouble F6=(u12_6*ff-v12_6)*xm1;
+  FXdouble F7=(u12_7*ff-v12_7)*xm1;
+  FXdouble F8=(u12_8*ff-v12_8)*xm1;
+  FXdouble F9=(u12_9*ff-v12_9)*xm1;
+  FXdouble F10=(u12_10*ff-v12_10)*xm1;
+  FXdouble F11=(u12_11*ff-v12_11)*xm1;
+  FXdouble T0=(u12_0*tt-v12_0)*xm1;
+  FXdouble T1=(u12_1*tt-v12_1)*xm1;
+  FXdouble T2=(u12_2*tt-v12_2)*xm1;
+  FXdouble T3=(u12_3*tt-v12_3)*xm1;
+  FXdouble T4=(u12_4*tt-v12_4)*xm1;
+  FXdouble T5=(u12_5*tt-v12_5)*xm1;
+  FXdouble T6=(u12_6*tt-v12_6)*xm1;
+  FXdouble T7=(u12_7*tt-v12_7)*xm1;
+  FXdouble T8=(u12_8*tt-v12_8)*xm1;
+  FXdouble T9=(u12_9*tt-v12_9)*xm1;
+  FXdouble T10=(u12_10*tt-v12_10)*xm1;
+  FXdouble T11=(u12_11*tt-v12_11)*xm1;
+  FXdouble F=f*(1.0+F0*(1.0+F1*(1.0+F2*(1.0+F3*(1.0+F4*(1.0+F5*(1.0+F6*(1.0+F7*(1.0+F8*(1.0+F9*(1.0+F10*(1.0+F11))))))))))));
+  FXdouble T=t*(1.0+T0*(1.0+T1*(1.0+T2*(1.0+T3*(1.0+T4*(1.0+T5*(1.0+T6*(1.0+T7*(1.0+T8*(1.0+T9*(1.0+T10*(1.0+T11))))))))))));
+  return u*F+v*T;
   }
 
 
@@ -877,115 +850,48 @@ const FXdouble v16_15=0.484848484848484848484848*1.91666919924319;       // Best
 
 
 // About 39 clocks, err = ~3.5E-8
-FXQuatd fastlerp16(const FXQuatd& q0,const FXQuatd& q1,FXdouble t){
-  FXdouble xm1=q0.x*q1.x+q0.y*q1.y+q0.z*q1.z+q0.w*q1.w-1.0;      // x-1 = cos(theta)-1
-  FXdouble d=1.0-t;
-  FXdouble sqrT=t*t;
-  FXdouble sqrD=d*d;
-  FXdouble bD0=(u16_0*sqrD-v16_0)*xm1;
-  FXdouble bT0=(u16_0*sqrT-v16_0)*xm1;
-  FXdouble bD1=(u16_1*sqrD-v16_1)*xm1;
-  FXdouble bT1=(u16_1*sqrT-v16_1)*xm1;
-  FXdouble bD2=(u16_2*sqrD-v16_2)*xm1;
-  FXdouble bT2=(u16_2*sqrT-v16_2)*xm1;
-  FXdouble bD3=(u16_3*sqrD-v16_3)*xm1;
-  FXdouble bT3=(u16_3*sqrT-v16_3)*xm1;
-  FXdouble bD4=(u16_4*sqrD-v16_4)*xm1;
-  FXdouble bT4=(u16_4*sqrT-v16_4)*xm1;
-  FXdouble bD5=(u16_5*sqrD-v16_5)*xm1;
-  FXdouble bT5=(u16_5*sqrT-v16_5)*xm1;
-  FXdouble bD6=(u16_6*sqrD-v16_6)*xm1;
-  FXdouble bT6=(u16_6*sqrT-v16_6)*xm1;
-  FXdouble bD7=(u16_7*sqrD-v16_7)*xm1;
-  FXdouble bT7=(u16_7*sqrT-v16_7)*xm1;
-  FXdouble bD8=(u16_8*sqrD-v16_8)*xm1;
-  FXdouble bT8=(u16_8*sqrT-v16_8)*xm1;
-  FXdouble bD9=(u16_9*sqrD-v16_9)*xm1;
-  FXdouble bT9=(u16_9*sqrT-v16_9)*xm1;
-  FXdouble bD10=(u16_10*sqrD-v16_10)*xm1;
-  FXdouble bT10=(u16_10*sqrT-v16_10)*xm1;
-  FXdouble bD11=(u16_11*sqrD-v16_11)*xm1;
-  FXdouble bT11=(u16_11*sqrT-v16_11)*xm1;
-  FXdouble bD12=(u16_12*sqrD-v16_12)*xm1;
-  FXdouble bT12=(u16_12*sqrT-v16_12)*xm1;
-  FXdouble bD13=(u16_13*sqrD-v16_13)*xm1;
-  FXdouble bT13=(u16_13*sqrT-v16_13)*xm1;
-  FXdouble bD14=(u16_14*sqrD-v16_14)*xm1;
-  FXdouble bT14=(u16_14*sqrT-v16_14)*xm1;
-  FXdouble bD15=(u16_15*sqrD-v16_15)*xm1;
-  FXdouble bT15=(u16_15*sqrT-v16_15)*xm1;
-  FXdouble f0=d*(1.0+bD0*(1.0+bD1*(1.0+bD2*(1.0+bD3*(1.0+bD4*(1.0+bD5*(1.0+bD6*(1.0+bD7*(1.0+bD8*(1.0+bD9*(1.0+bD10*(1.0+bD11*(1.0+bD12*(1.0+bD13*(1.0+bD14*(1.0+bD15))))))))))))))));
-  FXdouble f1=t*(1.0+bT0*(1.0+bT1*(1.0+bT2*(1.0+bT3*(1.0+bT4*(1.0+bT5*(1.0+bT6*(1.0+bT7*(1.0+bT8*(1.0+bT9*(1.0+bT10*(1.0+bT11*(1.0+bT12*(1.0+bT13*(1.0+bT14*(1.0+bT15))))))))))))))));
-  FXQuatd result(f0*q0+f1*q1);
-  return result;
+FXQuatd fastlerp16(const FXQuatd& u,const FXQuatd& v,FXdouble t){
+  FXdouble xm1=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w-1.0;      // x-1 = cos(theta)-1
+  FXdouble f=1.0-t;
+  FXdouble tt=t*t;
+  FXdouble ff=f*f;
+  FXdouble F0=(u16_0*ff-v16_0)*xm1;
+  FXdouble F1=(u16_1*ff-v16_1)*xm1;
+  FXdouble F2=(u16_2*ff-v16_2)*xm1;
+  FXdouble F3=(u16_3*ff-v16_3)*xm1;
+  FXdouble F4=(u16_4*ff-v16_4)*xm1;
+  FXdouble F5=(u16_5*ff-v16_5)*xm1;
+  FXdouble F6=(u16_6*ff-v16_6)*xm1;
+  FXdouble F7=(u16_7*ff-v16_7)*xm1;
+  FXdouble F8=(u16_8*ff-v16_8)*xm1;
+  FXdouble F9=(u16_9*ff-v16_9)*xm1;
+  FXdouble F10=(u16_10*ff-v16_10)*xm1;
+  FXdouble F11=(u16_11*ff-v16_11)*xm1;
+  FXdouble F12=(u16_12*ff-v16_12)*xm1;
+  FXdouble F13=(u16_13*ff-v16_13)*xm1;
+  FXdouble F14=(u16_14*ff-v16_14)*xm1;
+  FXdouble F15=(u16_15*ff-v16_15)*xm1;
+  FXdouble T0=(u16_0*tt-v16_0)*xm1;
+  FXdouble T1=(u16_1*tt-v16_1)*xm1;
+  FXdouble T2=(u16_2*tt-v16_2)*xm1;
+  FXdouble T3=(u16_3*tt-v16_3)*xm1;
+  FXdouble T4=(u16_4*tt-v16_4)*xm1;
+  FXdouble T5=(u16_5*tt-v16_5)*xm1;
+  FXdouble T6=(u16_6*tt-v16_6)*xm1;
+  FXdouble T7=(u16_7*tt-v16_7)*xm1;
+  FXdouble T8=(u16_8*tt-v16_8)*xm1;
+  FXdouble T9=(u16_9*tt-v16_9)*xm1;
+  FXdouble T10=(u16_10*tt-v16_10)*xm1;
+  FXdouble T11=(u16_11*tt-v16_11)*xm1;
+  FXdouble T12=(u16_12*tt-v16_12)*xm1;
+  FXdouble T13=(u16_13*tt-v16_13)*xm1;
+  FXdouble T14=(u16_14*tt-v16_14)*xm1;
+  FXdouble T15=(u16_15*t-v16_15)*xm1;
+  FXdouble F=f*(1.0+F0*(1.0+F1*(1.0+F2*(1.0+F3*(1.0+F4*(1.0+F5*(1.0+F6*(1.0+F7*(1.0+F8*(1.0+F9*(1.0+F10*(1.0+F11*(1.0+F12*(1.0+F13*(1.0+F14*(1.0+F15))))))))))))))));
+  FXdouble T=t*(1.0+T0*(1.0+T1*(1.0+T2*(1.0+T3*(1.0+T4*(1.0+T5*(1.0+T6*(1.0+T7*(1.0+T8*(1.0+T9*(1.0+T10*(1.0+T11*(1.0+T12*(1.0+T13*(1.0+T14*(1.0+T15))))))))))))))));
+  return u*F+v*T;
   }
 
-#if 0
-
-FXQuatd lerp1(const FXQuatd& u,const FXQuatd& v,TDouble f){
-  return lerp(u,v,f);
-  }
-
-
-FXQuatd lerp2(const FXQuatd& u,const FXQuatd& v,TDouble f){
-  return fastlerp(u,v,f);
-  }
-
-
-// Test fast slerp() vs slerp()
-void fastSlerpTest(){
-  FXRandom rng(FXThread::ticks());
-  FXQuat q1,q2,qf,qs,qd,qworst1,qworst2;
-  FXdouble t,dot,err;
-  FXdouble eworst=0.0;
-  FXdouble tworst=0.0;
-  fxmessage("fastSlerpTest:\n");
-
-  for(FXival i=0; i<1000000000L; ++i){
-    t=rng.randDouble();
-    q1.x=2.0*rng.randDouble()-1.0;
-    q1.y=2.0*rng.randDouble()-1.0;
-    q1.z=2.0*rng.randDouble()-1.0;
-    q1.w=2.0*rng.randDouble()-1.0;
-    q2.x=2.0*rng.randDouble()-1.0;
-    q2.y=2.0*rng.randDouble()-1.0;
-    q2.z=2.0*rng.randDouble()-1.0;
-    q2.w=2.0*rng.randDouble()-1.0;
-    q1=normalize(q1);
-    q2=normalize(q2);
-    dot=q1.x*q2.x+q1.y*q2.y+q1.z*q2.z+q1.w*q2.w;
-//  if(0.667457216028384<=dot){
-    if(0.0<=dot){
-      qs=lerp1(q1,q2,t);
-      qf=lerp2(q1,q2,t);
-      qd=qs-qf;
-      err=qd.length2();
-      if(err>eworst){
-        qworst1=q1;
-        qworst2=q2;
-        tworst=t;
-        eworst=err;
-        }
-      }
-    }
-  if(0.0<=eworst){
-    qs=lerp(qworst1,qworst2,t);
-    qf=fastlerp(qworst1,qworst2,t);
-    qd=qs-qf;
-    dot=qworst1.x*qworst2.x+qworst1.y*qworst2.y+qworst1.z*qworst2.z+qworst1.w*qworst2.w;
-    fxmessage("q1  = (%12.8lf,%12.8lf,%12.8lf,%12.8lf)\n",qworst1.x,qworst1.y,qworst1.z,qworst1.w);
-    fxmessage("q2  = (%12.8lf,%12.8lf,%12.8lf,%12.8lf)\n",qworst2.x,qworst2.y,qworst2.z,qworst2.w);
-    fxmessage("qs  = (%12.8lf,%12.8lf,%12.8lf,%12.8lf)\n",qs.x,qs.y,qs.z,qs.w);
-    fxmessage("qf  = (%12.8lf,%12.8lf,%12.8lf,%12.8lf)\n",qf.x,qf.y,qf.z,qf.w);
-    fxmessage("qd  = (%12.8le,%12.8le,%12.8le,%12.8le)\n",qd.x,qd.y,qd.z,qd.w);
-    fxmessage("|qs|= %.16lE\n",qs.length());
-    fxmessage("|qf|= %.16lE\n",qf.length());
-    fxmessage("err = %.16lE\n",Math::sqrt(eworst));
-    fxmessage("dot = %.16lE\n",dot);
-    fxmessage("arg = %.16lE (%.16lg deg)\n",Math::acos(dot),Math::RTOD*Math::acos(dot));
-    fxmessage("t   = %.16lE\n",tworst);
-    }
-  }
 #endif
 
 /*******************************************************************************/

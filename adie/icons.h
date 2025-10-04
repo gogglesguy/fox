@@ -1,4 +1,4 @@
-/*********** Generated on 2024/08/15 23:38:05 by reswrap version 6.0.0 *********/
+/*********** Generated on 2025/05/18 11:09:57 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -159,6 +159,9 @@ extern const unsigned char reload_gif[];
 /* Created by reswrap from file ../adie/replace_gif.gif */
 extern const unsigned char replace_gif[];
 
+/* Created by reswrap from file ../adie/revert_gif.gif */
+extern const unsigned char revert_gif[];
+
 /* Created by reswrap from file ../adie/save_gif.gif */
 extern const unsigned char save_gif[];
 
@@ -194,6 +197,12 @@ extern const unsigned char search_word[];
 
 /* Created by reswrap from file ../adie/search_noword.gif */
 extern const unsigned char search_noword[];
+
+/* Created by reswrap from file ../adie/search_word2.gif */
+extern const unsigned char search_word2[];
+
+/* Created by reswrap from file ../adie/search_noword2.gif */
+extern const unsigned char search_noword2[];
 
 /* Created by reswrap from file ../adie/search_up.gif */
 extern const unsigned char search_up[];

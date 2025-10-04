@@ -44,6 +44,8 @@
     let me know about it (jeroen@fox-toolkit.net).
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -56,14 +58,14 @@ FXMutex::FXMutex(FXbool recursive){
   // If this fails on your machine, determine what value
   // of sizeof(CRITICAL_SECTION) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(CRITICAL_SECTION));
   InitializeCriticalSection((CRITICAL_SECTION*)data);
 #else
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_mutex_t));
   pthread_mutexattr_t mutexatt;
   pthread_mutexattr_init(&mutexatt);

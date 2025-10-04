@@ -54,7 +54,6 @@
     radio buttons are involved.
 */
 
-
 #define RADIOBUTTON_MASK  (RADIOBUTTON_AUTOGRAY|RADIOBUTTON_AUTOHIDE)
 
 using namespace FX;

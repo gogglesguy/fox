@@ -39,7 +39,12 @@ public:
   FXMat3f(){}
 
   /// Initialize matrix from scalar
-  FXMat3f(FXfloat s);
+  explicit FXMat3f(FXfloat s);
+
+  /// Initialize matrix from components
+  FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,
+          FXfloat a10,FXfloat a11,FXfloat a12,
+          FXfloat a20,FXfloat a21,FXfloat a22);
 
   /// Initialize with 2x2 rotation and scale matrix
   FXMat3f(const FXMat2f& s);
@@ -50,22 +55,20 @@ public:
   /// Initialize from rotation and scaling part of 4x4 matrix
   FXMat3f(const FXMat4f& s);
 
-  /// Initialize matrix from array
-  FXMat3f(const FXfloat s[]);
-
-  /// Initialize diagonal matrix
-  FXMat3f(FXfloat a,FXfloat b,FXfloat c);
-
-  /// Initialize matrix from components
-  FXMat3f(FXfloat a00,FXfloat a01,FXfloat a02,
-          FXfloat a10,FXfloat a11,FXfloat a12,
-          FXfloat a20,FXfloat a21,FXfloat a22);
+  /// Initialize matrix from quaternion
+  FXMat3f(const FXQuatf& quat);
 
   /// Initialize matrix from three vectors
   FXMat3f(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c);
 
-  /// Initialize matrix from quaternion
-  FXMat3f(const FXQuatf& quat);
+  /// Initialize diagonal matrix
+  FXMat3f(FXfloat a,FXfloat b,FXfloat c);
+
+  /// Initialize diagonal matrix
+  explicit FXMat3f(const FXVec3f& d);
+
+  /// Initialize matrix from array
+  explicit FXMat3f(const FXfloat s[]);
 
   /// Assignment from scalar
   FXMat3f& operator=(FXfloat s);
@@ -84,6 +87,11 @@ public:
   /// Set value from scalar
   FXMat3f& set(FXfloat s);
 
+  /// Set value from components
+  FXMat3f& set(FXfloat a00,FXfloat a01,FXfloat a02,
+               FXfloat a10,FXfloat a11,FXfloat a12,
+               FXfloat a20,FXfloat a21,FXfloat a22);
+
   /// Set value from 2x2 rotation and scale matrix
   FXMat3f& set(const FXMat2f& s);
 
@@ -93,22 +101,20 @@ public:
   /// Set from rotation and scaling part of 4x4 matrix
   FXMat3f& set(const FXMat4f& s);
 
-  /// Set value from array
-  FXMat3f& set(const FXfloat s[]);
-
-  /// Set diagonal matrix
-  FXMat3f& set(FXfloat a,FXfloat b,FXfloat c);
-
-  /// Set value from components
-  FXMat3f& set(FXfloat a00,FXfloat a01,FXfloat a02,
-               FXfloat a10,FXfloat a11,FXfloat a12,
-               FXfloat a20,FXfloat a21,FXfloat a22);
+  /// Set value from quaternion
+  FXMat3f& set(const FXQuatf& quat);
 
   /// Set value from three vectors
   FXMat3f& set(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c);
 
-  /// Set value from quaternion
-  FXMat3f& set(const FXQuatf& quat);
+  /// Set diagonal matrix
+  FXMat3f& set(FXfloat a,FXfloat b,FXfloat c);
+
+  /// Set diagonal matrix
+  FXMat3f& set(const FXVec3f& d);
+
+  /// Set value from array
+  FXMat3f& set(const FXfloat s[]);
 
   /// Assignment operators
   FXMat3f& operator+=(const FXMat3f& w);

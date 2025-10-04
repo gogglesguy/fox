@@ -45,7 +45,6 @@
 #include "FXArrowButton.h"
 #include "FXSpinner.h"
 
-
 /*
   To do:
   - Should this also be derived from FXTextField instead?
@@ -67,7 +66,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 //  Message map
 FXDEFMAP(FXSpinner) FXSpinnerMap[]={
@@ -243,6 +241,7 @@ long FXSpinner::onCmdDecrement(FXObject*,FXSelector,void*){
 // Rolling mouse wheel in text field works as if hitting up or down buttons
 long FXSpinner::onWheelEntry(FXObject*,FXSelector,void* ptr){
   if(isEnabled() && isEditable()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
     if(((FXEvent*)ptr)->code>0){
       if(((FXEvent*)ptr)->state&CONTROLMASK) incrementByAmount(incr*10,true);
       else increment(true);

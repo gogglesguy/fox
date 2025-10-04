@@ -146,12 +146,12 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     </ClCompile>
     <CustomBuildStep>
       <Command>cd $(SolutionDir)..\lib
-$(OutputPath)reswrap.exe -nc -i  icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookmrk_gif.gif bookclr_gif.gif bookset_gif.gif bookdel_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp redo_gif.gif undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif
-$(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookmrk_gif.gif bookclr_gif.gif bookset_gif.gif bookdel_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp redo_gif.gif undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
+$(OutputPath)reswrap.exe -nc -i  icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif
+$(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>icons.cpp;icons.h</Outputs>
-      <Inputs>arrownext.gif;arrowprev.gif;bigapp.gif;bigcdrom.gif;bigcomputer.gif;bigdesktop.gif;bigdoc.gif;bigfloppy.gif;bigfloppy3.gif;bigfloppy5.gif;bigfolder.gif;bigfolderopen.gif;bigharddisk.gif;bignetdrive.gif;bignethood.gif;bookmrk_gif.gif;bookclr_gif.gif;bookset_gif.gif;bookdel_gif.gif;clearentry.gif;cmymode.gif;dialmode.gif;dirup_gif.gif;docktop.gif;dockbottom.gif;dockleft.gif;dockright.gif;dockfree.gif;dockflip.gif;entericon.gif;erroricon.gif;eyedrop.gif;filecancel.gif;fileaccept.gif;filecopy.gif;filemove.gif;filehidden.gif;filelink.gif;filerename.gif;filedelete.gif;fileshown.gif;foldernew.gif;gotohome.gif;gotowork.gif;hammer_gif.gif;hsvmode.gif;infoicon.gif;landscape.gif;listmode.gif;miniapp.gif;minicdrom.gif;minicomputer.gif;minidesktop.gif;minidoc.gif;minifloppy.gif;minifloppy3.gif;minifloppy5.gif;minifolder.gif;minifolderopen.gif;miniharddisk.gif;mininetdrive.gif;mininethood.gif;minizipdrive.gif;newfolder.bmp;portrait.gif;questionicon.gif;rgbmode.gif;searchicon.gif;showbigicons.gif;showdetails.gif;showsmallicons.gif;sorting.bmp;redo_gif.gif;undo_gif.gif;warningicon.gif;winclose.gif;winmaximize.gif;winminimize.gif;winrestore.gif</Inputs>
+      <Inputs>arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Inputs>
       <TreatOutputAsContent>
       </TreatOutputAsContent>
       <Message>Reswrapping icons...</Message>
@@ -216,12 +216,12 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     </Link>
     <CustomBuildStep>
       <Command>cd $(SolutionDir)..\lib
-$(OutputPath)reswrap.exe -nc -i  icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookmrk_gif.gif bookclr_gif.gif bookset_gif.gif bookdel_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp redo_gif.gif undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif
-$(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookmrk_gif.gif bookclr_gif.gif bookset_gif.gif bookdel_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif docktop.gif dockbottom.gif dockleft.gif dockright.gif dockfree.gif dockflip.gif entericon.gif erroricon.gif eyedrop.gif filecancel.gif fileaccept.gif filecopy.gif filemove.gif filehidden.gif filelink.gif filerename.gif filedelete.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp redo_gif.gif undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
+$(OutputPath)reswrap.exe -nc -i  icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif
+$(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>icons.cpp;icons.h</Outputs>
-      <Inputs>arrownext.gif;arrowprev.gif;bigapp.gif;bigcdrom.gif;bigcomputer.gif;bigdesktop.gif;bigdoc.gif;bigfloppy.gif;bigfloppy3.gif;bigfloppy5.gif;bigfolder.gif;bigfolderopen.gif;bigharddisk.gif;bignetdrive.gif;bignethood.gif;bookmrk_gif.gif;bookclr_gif.gif;bookset_gif.gif;bookdel_gif.gif;clearentry.gif;cmymode.gif;dialmode.gif;dirup_gif.gif;docktop.gif;dockbottom.gif;dockleft.gif;dockright.gif;dockfree.gif;dockflip.gif;entericon.gif;erroricon.gif;eyedrop.gif;filecancel.gif;fileaccept.gif;filecopy.gif;filemove.gif;filehidden.gif;filelink.gif;filerename.gif;filedelete.gif;fileshown.gif;foldernew.gif;gotohome.gif;gotowork.gif;hammer_gif.gif;hsvmode.gif;infoicon.gif;landscape.gif;listmode.gif;miniapp.gif;minicdrom.gif;minicomputer.gif;minidesktop.gif;minidoc.gif;minifloppy.gif;minifloppy3.gif;minifloppy5.gif;minifolder.gif;minifolderopen.gif;miniharddisk.gif;mininetdrive.gif;mininethood.gif;minizipdrive.gif;newfolder.bmp;portrait.gif;questionicon.gif;rgbmode.gif;searchicon.gif;showbigicons.gif;showdetails.gif;showsmallicons.gif;sorting.bmp;redo_gif.gif;undo_gif.gif;warningicon.gif;winclose.gif;winmaximize.gif;winminimize.gif;winrestore.gif</Inputs>
+      <Inputs>arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Inputs>
       <Message>Reswrapping icons...</Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
@@ -246,6 +246,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <ClInclude Include="..\..\include\FX88598Codec.h" />
     <ClInclude Include="..\..\include\FX88599Codec.h" />
     <ClInclude Include="..\..\include\FXAccelTable.h" />
+    <ClInclude Include="..\..\include\fxadler32.h" />
     <ClInclude Include="..\..\include\FXApp.h" />
     <ClInclude Include="..\..\include\FXArray.h" />
     <ClInclude Include="..\..\include\FXArrowButton.h" />
@@ -455,6 +456,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <ClInclude Include="..\..\include\FXPath.h" />
     <ClInclude Include="..\..\include\FXPCXIcon.h" />
     <ClInclude Include="..\..\include\FXPCXImage.h" />
+    <ClInclude Include="..\..\include\FXPerformance.h" />
     <ClInclude Include="..\..\include\FXPicker.h" />
     <ClInclude Include="..\..\include\FXPipe.h" />
     <ClInclude Include="..\..\include\FXPNGIcon.h" />
@@ -827,6 +829,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <ClCompile Include="..\..\lib\FXPCXIcon.cpp" />
     <ClCompile Include="..\..\lib\FXPCXImage.cpp" />
     <ClCompile Include="..\..\lib\fxpcxio.cpp" />
+    <ClCompile Include="..\..\lib\FXPerformance.cpp" />
     <ClCompile Include="..\..\lib\FXPicker.cpp" />
     <ClCompile Include="..\..\lib\FXPipe.cpp" />
     <ClCompile Include="..\..\lib\FXPNGIcon.cpp" />
@@ -1032,6 +1035,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <Image Include="..\..\lib\hammer_gif.gif" />
     <Image Include="..\..\lib\hsvmode.gif" />
     <Image Include="..\..\lib\icons.cpparrownext.gif" />
+    <Image Include="..\..\lib\icons.harrownext.gif" />
     <Image Include="..\..\lib\infoicon.gif" />
     <Image Include="..\..\lib\landscape.gif" />
     <Image Include="..\..\lib\listmode.gif" />
@@ -1068,6 +1072,65 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\Makefile.am" />
+    <None Include="..\..\lib\blank.xbm" />
+    <None Include="..\..\lib\blank_mask.xbm" />
+    <None Include="..\..\lib\crosshair.xbm" />
+    <None Include="..\..\lib\crosshair_mask.xbm" />
+    <None Include="..\..\lib\dndask.xbm" />
+    <None Include="..\..\lib\dndask_mask.xbm" />
+    <None Include="..\..\lib\dndcopy.xbm" />
+    <None Include="..\..\lib\dndcopy_mask.xbm" />
+    <None Include="..\..\lib\dndlink.xbm" />
+    <None Include="..\..\lib\dndlink_mask.xbm" />
+    <None Include="..\..\lib\dndmove.xbm" />
+    <None Include="..\..\lib\dndmove_mask.xbm" />
+    <None Include="..\..\lib\dontdrop.xbm" />
+    <None Include="..\..\lib\dontdrop_mask.xbm" />
+    <None Include="..\..\lib\drag.xbm" />
+    <None Include="..\..\lib\drag_mask.xbm" />
+    <None Include="..\..\lib\gray.xbm" />
+    <None Include="..\..\lib\hand.xbm" />
+    <None Include="..\..\lib\hand_mask.xbm" />
+    <None Include="..\..\lib\helparrow.xbm" />
+    <None Include="..\..\lib\helparrow_mask.xbm" />
+    <None Include="..\..\lib\hsplit.xbm" />
+    <None Include="..\..\lib\hsplit_mask.xbm" />
+    <None Include="..\..\lib\move.xbm" />
+    <None Include="..\..\lib\move_mask.xbm" />
+    <None Include="..\..\lib\ne.xbm" />
+    <None Include="..\..\lib\ne_mask.xbm" />
+    <None Include="..\..\lib\nw.xbm" />
+    <None Include="..\..\lib\nw_mask.xbm" />
+    <None Include="..\..\lib\resize.xbm" />
+    <None Include="..\..\lib\resizeleft.xbm" />
+    <None Include="..\..\lib\resizeleft_mask.xbm" />
+    <None Include="..\..\lib\resizetop.xbm" />
+    <None Include="..\..\lib\resizetopleft.xbm" />
+    <None Include="..\..\lib\resizetopleft_mask.xbm" />
+    <None Include="..\..\lib\resizetopright.xbm" />
+    <None Include="..\..\lib\resizetopright_mask.xbm" />
+    <None Include="..\..\lib\resizetop_mask.xbm" />
+    <None Include="..\..\lib\resize_mask.xbm" />
+    <None Include="..\..\lib\rotate.xbm" />
+    <None Include="..\..\lib\rotate_mask.xbm" />
+    <None Include="..\..\lib\se.xbm" />
+    <None Include="..\..\lib\se_mask.xbm" />
+    <None Include="..\..\lib\sw.xbm" />
+    <None Include="..\..\lib\swatch.xbm" />
+    <None Include="..\..\lib\swatch_mask.xbm" />
+    <None Include="..\..\lib\sw_mask.xbm" />
+    <None Include="..\..\lib\translate.xbm" />
+    <None Include="..\..\lib\translate_mask.xbm" />
+    <None Include="..\..\lib\version.rc.in" />
+    <None Include="..\..\lib\vsplit.xbm" />
+    <None Include="..\..\lib\vsplit_mask.xbm" />
+    <None Include="..\..\lib\xsplit.xbm" />
+    <None Include="..\..\lib\xsplit_mask.xbm" />
+    <None Include="..\..\lib\zoom.xbm" />
+    <None Include="..\..\lib\zoom_mask.xbm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\lib\version.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

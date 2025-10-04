@@ -30,7 +30,6 @@
 #include "FXString.h"
 #include "FXTextCodec.h"
 
-
 /*
   Notes:
 
@@ -48,13 +47,9 @@
     of encoding/decoding; need to be able to store ascii in wide characters.
 */
 
-
-
-
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Base class is not instantiated
 FXIMPLEMENT_ABSTRACT(FXTextCodec,FXObject,nullptr,0)

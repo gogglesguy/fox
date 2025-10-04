@@ -370,32 +370,37 @@ long FXDial::onMotion(FXObject*,FXSelector,void* ptr){
 long FXDial::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
   FXint delta,newpos,tmp,mod;
+  if(isEnabled()){
 
-  // Determine the change in dial units; this probably still needs
-  // tweaking. The formula below adjusts the dial position by 1/36
-  // of a revolution for each "hop" of the mousewheel.
-  delta=(event->code*incr)/4320;
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
 
-  // Determine new dial position
-  if(options&DIAL_CYCLIC){
-    mod=range[1]-range[0]+1;
-    tmp=pos+delta-range[0];
-    while(tmp<0) tmp+=mod;
-    newpos=range[0]+tmp%mod;        // FIXME small problem if range[1]-range[0]+1 is UINT_MAX
+    // Determine the change in dial units; this probably still needs
+    // tweaking. The formula below adjusts the dial position by 1/36
+    // of a revolution for each "hop" of the mousewheel.
+    delta=(event->code*incr)/4320;
+
+    // Determine new dial position
+    if(options&DIAL_CYCLIC){
+      mod=range[1]-range[0]+1;
+      tmp=pos+delta-range[0];
+      while(tmp<0) tmp+=mod;
+      newpos=range[0]+tmp%mod;        // FIXME small problem if range[1]-range[0]+1 is UINT_MAX
+      }
+    else{
+      if(pos+delta<range[0]) newpos=range[0];
+      else if(pos+delta>range[1]) newpos=range[1];
+      else newpos=pos+delta;
+      }
+    if(pos!=newpos){
+      pos=newpos;
+      FXASSERT(range[0]<=pos && pos<=range[1]);
+      notchAngle=(notchOffset+(3600*(pos-range[0]))/incr)%3600;
+      update(border+padleft+1,border+padtop+1,width-(border<<1)-padleft-padright-2,height-(border<<1)-padtop-padbottom-2);
+      if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
+      }
+    return 1;
     }
-  else{
-    if(pos+delta<range[0]) newpos=range[0];
-    else if(pos+delta>range[1]) newpos=range[1];
-    else newpos=pos+delta;
-    }
-  if(pos!=newpos){
-    pos=newpos;
-    FXASSERT(range[0]<=pos && pos<=range[1]);
-    notchAngle=(notchOffset+(3600*(pos-range[0]))/incr)%3600;
-    update(border+padleft+1,border+padtop+1,width-(border<<1)-padleft-padright-2,height-(border<<1)-padtop-padbottom-2);
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)(FXival)pos);
-    }
-  return 1;
+  return 0;
   }
 
 

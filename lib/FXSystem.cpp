@@ -34,8 +34,6 @@
 #include "FXSystem.h"
 #include "FXStat.h"
 
-
-
 /*
   Notes:
 

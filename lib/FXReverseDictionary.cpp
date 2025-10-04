@@ -34,7 +34,6 @@
   - Reverse dictionary maps pointers to strings.
 */
 
-
 #define EMPTY     (const_cast<Entry*>((const Entry*)(__reversedictionary__empty__+3)))
 #define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
 #define VOID      ((const void*)-1L)

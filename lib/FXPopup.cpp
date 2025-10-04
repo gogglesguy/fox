@@ -62,9 +62,13 @@
     only layout() is called.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 
 // Frame styles
-#define FRAME_MASK        (FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK)
+#define FRAME_MASK      (FRAME_SUNKEN|FRAME_RAISED|FRAME_THICK)
 
 using namespace FX;
 
@@ -574,7 +578,7 @@ long FXPopup::onMap(FXObject* sender,FXSelector sel,void* ptr){
   FXShell::onMap(sender,sel,ptr);
   getCursorPosition(x,y,buttons);
   if(0<=x && 0<=y && x<width && y<height){
-    FXTRACE((200,"under cursor\n"));
+    FXTRACE((TOPIC_DETAIL,"under cursor\n"));
     if(getGrabOwner()->grabbed()) getGrabOwner()->ungrab();
     }
   return 1;
@@ -595,7 +599,7 @@ long FXPopup::onLayout(FXObject*,FXSelector,void*){
 
 // Pressed button outside popup
 long FXPopup::onButtonPress(FXObject*,FXSelector,void*){
-  FXTRACE((200,"%s::onButtonPress %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this));
   handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);
   //popdown(0);
   return 1;
@@ -605,7 +609,7 @@ long FXPopup::onButtonPress(FXObject*,FXSelector,void*){
 // Released button outside popup
 long FXPopup::onButtonRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXTRACE((200,"%s::onButtonRelease %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this));
   if(event->moved){handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);}
   //popdown(0);
   return 1;
@@ -645,7 +649,7 @@ long FXPopup::onKeyRelease(FXObject* sender,FXSelector sel,void* ptr){
 // Unpost menu in case it was its own owner; otherwise
 // tell the owner to do so.
 long FXPopup::onCmdUnpost(FXObject*,FXSelector,void* ptr){
-  FXTRACE((150,"%s::onCmdUnpost %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this));
   if(grabowner){
     grabowner->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),ptr);
     }
@@ -723,7 +727,7 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
   rw=getRoot()->getWidth();
   rh=getRoot()->getHeight();
 #endif
-  FXTRACE((150,"%s::popup %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::popup %p\n",getClassName(),this));
   grabowner=grabto;
   if((options&POPUP_SHRINKWRAP) || w<=1) w=getDefaultWidth();
   if((options&POPUP_SHRINKWRAP) || h<=1) h=getDefaultHeight();
@@ -741,7 +745,7 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
 
 // Pops down menu and its submenus
 void FXPopup::popdown(){
-  FXTRACE((150,"%s::popdown %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::popdown %p\n",getClassName(),this));
   if(!grabowner) ungrab();
   grabowner=nullptr;
   killFocus();

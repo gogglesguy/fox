@@ -69,10 +69,12 @@
     be reversed.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 // Changable bitmap options
 #define BITMAP_MASK   (BITMAP_KEEP|BITMAP_SHMI|BITMAP_SHMP)
-
 
 using namespace FX;
 
@@ -95,7 +97,7 @@ FXBitmap::FXBitmap(){
 
 // Initialize
 FXBitmap::FXBitmap(FXApp* a,const FXuchar *pix,FXuint opts,FXint w,FXint h):FXDrawable(a,w,h){
-  FXTRACE((100,"FXBitmap::FXBitmap %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXBitmap::FXBitmap %p\n",this));
   FXASSERT((opts&~(BITMAP_OWNED|BITMAP_MASK))==0);
   visual=getApp()->getMonoVisual();
   data=const_cast<FXuchar*>(pix);
@@ -111,7 +113,7 @@ FXBitmap::FXBitmap(FXApp* a,const FXuchar *pix,FXuint opts,FXint w,FXint h):FXDr
 void FXBitmap::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
       // Initialize visual
       visual->create();
@@ -149,7 +151,7 @@ void FXBitmap::release(){
 void FXBitmap::detach(){
   visual->detach();
   if(xid){
-    FXTRACE((100,"%s::detach %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
     xid=0;
     }
   }
@@ -159,7 +161,7 @@ void FXBitmap::detach(){
 void FXBitmap::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 #if defined(WIN32)
       DeleteObject(xid);
 #else
@@ -184,7 +186,7 @@ struct BITMAPINFO256 {
 void FXBitmap::restore(){
   if(xid){
 
-    FXTRACE((100,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this));
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
@@ -255,7 +257,7 @@ void FXBitmap::restore(){
 void FXBitmap::render(){
   if(xid){
 
-    FXTRACE((100,"%s::render bitmap %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render bitmap %p\n",getClassName(),this));
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -325,7 +327,7 @@ void FXBitmap::restore(){
     XImage *xim=nullptr;
     FXint size,x,y;
 
-    FXTRACE((100,"%s::restore bitmap %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::restore bitmap %p\n",getClassName(),this));
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal bitmap size %dx%d.\n",getClassName(),width,height); }
@@ -345,17 +347,17 @@ void FXBitmap::restore(){
       // Should have succeeded
       FXASSERT(xim);
 
-      FXTRACE((150,"bm width = %d\n",xim->width));
-      FXTRACE((150,"bm height = %d\n",xim->height));
-      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm depth = %d\n",xim->depth));
-      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE((TOPIC_DETAIL,"bm width = %d\n",xim->width));
+      FXTRACE((TOPIC_DETAIL,"bm height = %d\n",xim->height));
+      FXTRACE((TOPIC_DETAIL,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
+      FXTRACE((TOPIC_DETAIL,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_pad = %d\n",xim->bitmap_pad));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm depth = %d\n",xim->depth));
+      FXTRACE((TOPIC_DETAIL,"bm bytes_per_line = %d\n",xim->bytes_per_line));
+      FXTRACE((TOPIC_DETAIL,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
 
       // Grab pixels from image
       for(y=0; y<height; y++){
@@ -381,7 +383,7 @@ void FXBitmap::render(){
     XGCValues values;
     GC gc;
 
-    FXTRACE((100,"%s::render bitmap %p\n",getClassName(),this));
+    FXTRACE((TOPIC_CREATION,"%s::render bitmap %p\n",getClassName(),this));
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -398,17 +400,17 @@ void FXBitmap::render(){
       // Try create temp pixel store
       if(!allocElms(xim->data,xim->bytes_per_line*height)){ throw FXMemoryException("unable to render bitmap"); }
 
-      FXTRACE((150,"bm width = %d\n",xim->width));
-      FXTRACE((150,"bm height = %d\n",xim->height));
-      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm depth = %d\n",xim->depth));
-      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE((TOPIC_DETAIL,"bm width = %d\n",xim->width));
+      FXTRACE((TOPIC_DETAIL,"bm height = %d\n",xim->height));
+      FXTRACE((TOPIC_DETAIL,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
+      FXTRACE((TOPIC_DETAIL,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_pad = %d\n",xim->bitmap_pad));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm depth = %d\n",xim->depth));
+      FXTRACE((TOPIC_DETAIL,"bm bytes_per_line = %d\n",xim->bytes_per_line));
+      FXTRACE((TOPIC_DETAIL,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
 
       // Render bits into server-formatted bitmap
       size=xim->bytes_per_line*height;
@@ -441,7 +443,7 @@ void FXBitmap::resize(FXint w,FXint h){
   FXint bw;
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((100,"%s::resize(%d,%d)\n",getClassName(),w,h));
+  FXTRACE((TOPIC_CREATION,"%s::resize(%d,%d)\n",getClassName(),w,h));
   bw=(w+7)>>3;
   if(xid){
 
@@ -499,7 +501,7 @@ void FXBitmap::fill(FXbool color){
 void FXBitmap::scale(FXint w,FXint h){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((100,"%s::scale(%d,%d)\n",getClassName(),w,h));
+  FXTRACE((TOPIC_CREATION,"%s::scale(%d,%d)\n",getClassName(),w,h));
   if(w!=width || h!=height){
     if(data){
       FXuchar *q,*p,bits;
@@ -550,7 +552,7 @@ void FXBitmap::scale(FXint w,FXint h){
 
 // Mirror bitmap horizontally and/or vertically
 void FXBitmap::mirror(FXbool horizontal,FXbool vertical){
-  FXTRACE((100,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
+  FXTRACE((TOPIC_CREATION,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
   if(horizontal || vertical){
     if(data){
       FXuchar *paa,*pa,*pbb,*pb;
@@ -598,7 +600,7 @@ void FXBitmap::mirror(FXbool horizontal,FXbool vertical){
 
 // Rotate bitmap by degrees ccw
 void FXBitmap::rotate(FXint degrees){
-  FXTRACE((100,"%s::rotate(%d)\n",getClassName(),degrees));
+  FXTRACE((TOPIC_CREATION,"%s::rotate(%d)\n",getClassName(),degrees));
   degrees=(degrees+360)%360;
   if(degrees!=0 && width>1 && height>1){
     if(data){
@@ -695,7 +697,7 @@ void FXBitmap::crop(FXint x,FXint y,FXint w,FXint h,FXbool color){
   if(w<1) w=1;
   if(h<1) h=1;
   if(x>=width || y>=height || x+w<=0 || y+h<=0){ fxerror("%s::crop: bad arguments.\n",getClassName()); }
-  FXTRACE((100,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
+  FXTRACE((TOPIC_CREATION,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
   if(data){
     FXuchar *pnn,*poo,*yyy,*pn,*po,*xx;
     FXint oldbw=bytewidth;
@@ -737,7 +739,7 @@ void FXBitmap::crop(FXint x,FXint y,FXint w,FXint h,FXbool color){
       FXASSERT(ch>0);
       yyy=pnn+newbw*ch;
       cpybw=((cw-x+7)>>3)-((-x)>>3);
-      //FXTRACE((1,"ow=%d oh=%d nw=%d nh=%d cw=%d ch=%d sh=%d cpybw=%d\n",ow,oh,nw,nh,cw,ch,sh,cpybw));
+      //FXTRACE((TOPIC_DETAIL,"ow=%d oh=%d nw=%d nh=%d cw=%d ch=%d sh=%d cpybw=%d\n",ow,oh,nw,nh,cw,ch,sh,cpybw));
       do{
         pn=pnn;
         po=poo;
@@ -921,7 +923,7 @@ void FXBitmap::load(FXStream& store){
 
 // Clean up
 FXBitmap::~FXBitmap(){
-  FXTRACE((100,"FXBitmap::~FXBitmap %p\n",this));
+  FXTRACE((TOPIC_CONSTRUCT,"FXBitmap::~FXBitmap %p\n",this));
   destroy();
   if(options&BITMAP_OWNED){freeElms(data);}
   data=(FXuchar*)-1L;

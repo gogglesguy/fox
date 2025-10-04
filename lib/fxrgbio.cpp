@@ -27,8 +27,6 @@
 #include "FXElement.h"
 #include "FXStream.h"
 
-
-
 /*
   Notes:
   - Need to implement RLE compression some time.

@@ -29,6 +29,8 @@
   - Condition variable.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -47,7 +49,7 @@ FXCondition::FXCondition(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)=%d\n",sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)=%d\n",sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
   data[0]=(FXuval)CreateEvent(nullptr,0,0,nullptr);                   // Wakes one, autoreset
   data[1]=(FXuval)CreateEvent(nullptr,1,0,nullptr);                   // Wakes all, manual reset
@@ -57,7 +59,7 @@ FXCondition::FXCondition(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_cond_t));
   pthread_cond_init((pthread_cond_t*)data,nullptr);
 #endif

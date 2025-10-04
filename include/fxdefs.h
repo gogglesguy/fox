@@ -53,23 +53,21 @@
 #endif
 
 
-// Byte order
-#if !defined(FOX_BIGENDIAN)
-#if defined(__GNUC__)
-#if defined(__BYTE_ORDER__)
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+// FOX_BIGENDIAN is byte order 
+#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define FOX_BIGENDIAN 0
-#else
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define FOX_BIGENDIAN 1
-#endif
-#else
-#error "FOX_BIGENDIAN macro not set"
-#endif
-#elif defined(_MSC_VER)
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_PDP_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_PDP_ENDIAN__)
+#error "FOX_BIGENDIAN: does not support PDP endianness!"
+#elif defined(__LITTLE_ENDIAN__) || defined(__LITTLE_ENDIAN)
+#define FOX_BIGENDIAN 0
+#elif defined(__BIG_ENDIAN__) || defined(__BIG_ENDIAN)
+#define FOX_BIGENDIAN 1
+#elif defined(_MSC_VER) || defined(__i386__) || defined(__x86_64__)
 #define FOX_BIGENDIAN 0
 #else
-#error "FOX_BIGENDIAN macro not set"
-#endif
+#error "FOX_BIGENDIAN: endianness could not be determined!"
 #endif
 
 
@@ -111,6 +109,14 @@
 #define FXTEMPLATE_EXTERN
 #endif
 
+// Flag old API as deprecated
+#if defined(_MSC_VER) && defined(_WIN32)
+#define FXDEPRECATED __declspec(deprecated)
+#elif defined(__GNUC__)
+#define FXDEPRECATED __attribute__((deprecated))
+#else
+#define FXDEPRECATED
+#endif
 
 // Data alignment attribute
 #if defined(__GNUC__)
@@ -209,6 +215,9 @@
 #define CDECL
 #endif
 #endif
+
+// Suppress unused parameter warnings
+#define FXUNUSED(prm) (void)(prm)
 
 // Checking printf and scanf format strings
 #if defined(_CC_GNU_) || defined(__GNUG__) || defined(__GNUC__)
@@ -445,14 +454,14 @@ enum {
 /// Linear interpolation between a and b, where 0<=f<=1
 #define FXLERP(a,b,f)      ((a)+((b)-(a))*(f))
 
-/// Offset of member in a structure
-#define STRUCTOFFSET(str,member) (((char *)(&(((str *)0)->member)))-((char *)0))
-
 /// Number of elements in a static array
 #define ARRAYNUMBER(array) (sizeof(array)/sizeof(array[0]))
 
-/// Container class of a member class
-#define CONTAINER(ptr,str,mem) ((str*)(((char*)(ptr))-STRUCTOFFSET(str,mem)))
+// Offset of member in a structure
+#define STRUCTOFFSET(str,member) ((FXival)&(((str *)0)->member))
+
+// Container class of a member class
+#define CONTAINER(ptr,str,mem) ((str*)(((FXival)(ptr))-STRUCTOFFSET(str,mem)))
 
 /// Make int out of two shorts
 #define MKUINT(l,h)        ((((FX::FXuint)(l))&0xffff) | (((FX::FXuint)(h))<<16))
@@ -471,7 +480,7 @@ enum {
 
 
 // Definitions for big-endian machines
-#if FOX_BIGENDIAN == 1
+#if (FOX_BIGENDIAN == 1)
 
 /// Make RGBA color
 #define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(a)) | ((FX::FXuint)(FX::FXuchar)(r)<<8) | ((FX::FXuint)(FX::FXuchar)(g)<<16) | ((FX::FXuint)(FX::FXuchar)(b)<<24))
@@ -504,7 +513,7 @@ enum {
 
 
 // Definitions for little-endian machines
-#if FOX_BIGENDIAN == 0
+#if (FOX_BIGENDIAN == 0)
 
 /// Make RGBA color
 #define FXRGBA(r,g,b,a)    (((FX::FXuint)(FX::FXuchar)(a)<<24) | ((FX::FXuint)(FX::FXuchar)(r)<<16) | ((FX::FXuint)(FX::FXuchar)(g)<<8) | ((FX::FXuint)(FX::FXuchar)(b)))
@@ -574,6 +583,13 @@ enum {
 #else
 #define FXASSERT_STATIC(expr) FXASSERT(expr)
 #endif
+
+
+/**
+* VA_NUM_ARGS(...) Counts the number of arguments of a varyadic macro.
+*/
+#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(__VA_ARGS__,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1)
+#define VA_NUM_ARGS_IMPL(_0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,N,...) N
 
 
 /**
@@ -708,6 +724,12 @@ extern FXAPI FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len);
 /// Safe string concat
 extern FXAPI FXival fxstrlcat(FXchar* dst,const FXchar* src,FXival len);
 
+/// Search substring needle in string haystack
+extern FXAPI FXchar* fxstrstr(const FXchar *haystack,const FXchar *needle);
+
+/// Search substring needle in string haystack, ignoring case
+extern FXAPI FXchar* fxstrcasestr(const FXchar *haystack,const FXchar *needle);
+
 /// Convert RGB to HSV
 extern FXAPI void fxrgb_to_hsv(FXfloat& h,FXfloat& s,FXfloat& v,FXfloat r,FXfloat g,FXfloat b);
 
@@ -770,7 +792,6 @@ extern FXAPI FXbool setTraceTopics(const FXchar* topics,FXbool flag=true);
 
 /// Get operating system version string
 extern FXAPI FXival fxosversion(FXchar version[],FXival len);
-
 
 }
 

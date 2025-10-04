@@ -50,6 +50,8 @@
     screen size.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
 
 #define DISPLAY(app) ((Display*)((app)->display))
 
@@ -121,7 +123,7 @@ static FXbool getMaxScreenSize(FXint& width,FXint& height){
 void FXRootWindow::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::create %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
 
       // Got to have a visual
       if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
@@ -188,7 +190,7 @@ void FXRootWindow::detach(){
 void FXRootWindow::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((100,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
 
       // Normally destroy children
       for(FXWindow *c=getFirst(); c; c=c->getNext()) c->destroy();

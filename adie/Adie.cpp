@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -83,6 +83,7 @@ Adie::Adie(const FXString& name):FXApp(name){
   deleteicon=new FXGIFIcon(this,delete_gif,0,IMAGE_THRESGUESS);
   undoicon=new FXGIFIcon(this,undo_gif);
   redoicon=new FXGIFIcon(this,redo_gif);
+  reverticon=new FXGIFIcon(this,revert_gif);
   fontsicon=new FXGIFIcon(this,fonts_gif);
   helpicon=new FXGIFIcon(this,help_gif);
   quiticon=new FXGIFIcon(this,quit_gif);
@@ -96,8 +97,8 @@ Adie::Adie(const FXString& name):FXApp(name){
   searchnorexicon=new FXGIFIcon(this,search_norex);
   searchcaseicon=new FXGIFIcon(this,search_case);
   searchnocaseicon=new FXGIFIcon(this,search_nocase);
-  searchwordicon=new FXGIFIcon(this,search_word);
-  searchnowordicon=new FXGIFIcon(this,search_noword);
+  searchwordicon=new FXGIFIcon(this,search_word2);
+  searchnowordicon=new FXGIFIcon(this,search_noword2);
   searchupicon=new FXGIFIcon(this,search_up);
   searchdnicon=new FXGIFIcon(this,search_dn);
   bookseticon=new FXGIFIcon(this,bookset2_gif);
@@ -175,6 +176,7 @@ Adie::~Adie(){
   delete deleteicon;
   delete undoicon;
   delete redoicon;
+  delete reverticon;
   delete fontsicon;
   delete helpicon;
   delete quiticon;

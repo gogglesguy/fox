@@ -155,7 +155,7 @@ void FXQuatf::setRotation(const FXVec3f& rot){
 
 
 // Set unit quaternion to modified rodrigues parameters.
-// Modified Rodriques parameters are defined as MRP = tan(theta/4)*E,
+// Modified Rodrigues parameters are defined as MRP = tan(theta/4)*E,
 // where theta is rotation angle (radians), and E is unit axis of rotation.
 // Reference: "A survey of Attitude Representations", Malcolm D. Shuster,
 // Journal of Astronautical sciences, Vol. 41, No. 4, Oct-Dec. 1993, pp. 476,
@@ -340,47 +340,39 @@ void FXQuatf::getYawRollPitch(FXfloat& yaw,FXfloat& roll,FXfloat& pitch) const {
 
 
 // Set quaternion from axes
-// "Converting a Rotation Matrix to a Quaternion," Mike Day, Insomniac Games.
+// Singularity-free matrix to quaternion using Cayley’s method.
+// "A Survey on the Computation of Quaternions from Rotation Matrices", S. Sarabandi
+// and F. Thomas, pg. 14, eq. (76)..(79).
+// "Singularity-Free Computation of Quaternions From Rotation Matrices in E4 and E3"
+// S. Sarabandi, A. Perez-Gracia and F. Thomas, pg. 5, eq. (23)...(26).
 void FXQuatf::setAxes(const FXVec3f& ex,const FXVec3f& ey,const FXVec3f& ez){
-  FXfloat t;
-  if(ez.z<0.0f){
-    if(ex.x>ey.y){
-      t=1.0f+ex.x-ey.y-ez.z;
-      x=t;
-      y=ex.y+ey.x;
-      z=ez.x+ex.z;
-      w=ey.z-ez.y;
-      }
-    else{
-      t=1.0f-ex.x+ey.y-ez.z;
-      x=ex.y+ey.x;
-      y=t;
-      z=ey.z+ez.y;
-      w=ez.x-ex.z;
-      }
-    }
-  else{
-    if(ex.x<-ey.y){
-      t=1.0f-ex.x-ey.y+ez.z;
-      x=ez.x+ex.z;
-      y=ey.z+ez.y;
-      z=t;
-      w=ex.y-ey.x;
-      }
-    else{
-      t=1.0f+ex.x+ey.y+ez.z;
-      x=ey.z-ez.y;
-      y=ez.x-ex.z;
-      z=ex.y-ey.x;
-      w=t;
-      }
-    }
-  FXASSERT(t>0.0f);
-  t=0.5f/Math::sqrt(t);
-  x*=t;
-  y*=t;
-  z*=t;
-  w*=t;
+  FXfloat opxpypz=1.0f+ex.x+ey.y+ez.z;
+  FXfloat opxmymz=1.0f+ex.x-ey.y-ez.z;
+  FXfloat omxpymz=1.0f-ex.x+ey.y-ez.z;
+  FXfloat omxmypz=1.0f-ex.x-ey.y+ez.z;
+  FXfloat xymyx=ex.y-ey.x;
+  FXfloat xypyx=ex.y+ey.x;
+  FXfloat yzmzy=ey.z-ez.y;
+  FXfloat yzpzy=ey.z+ez.y;
+  FXfloat zxmxz=ez.x-ex.z;
+  FXfloat zxpxz=ez.x+ex.z;
+  FXfloat x0=Math::sqr(opxmymz);
+  FXfloat y0=Math::sqr(omxpymz);
+  FXfloat z0=Math::sqr(omxmypz);
+  FXfloat w0=Math::sqr(opxpypz);
+  FXfloat x1=Math::sqr(xypyx);
+  FXfloat z1=Math::sqr(xymyx);
+  FXfloat x2=Math::sqr(yzmzy);
+  FXfloat y2=Math::sqr(yzpzy);
+  FXfloat x3=Math::sqr(zxpxz);
+  FXfloat y3=Math::sqr(zxmxz);
+  x=0.25f*Math::sqrt(x0+x1+x2+x3);
+  y=0.25f*Math::sqrt(y0+x1+y2+y3);
+  z=0.25f*Math::sqrt(z0+z1+y2+x3);
+  w=0.25f*Math::sqrt(w0+z1+x2+y3);
+  x=Math::copysign(x,yzmzy);
+  y=Math::copysign(y,zxmxz);
+  z=Math::copysign(z,xymyx);
   }
 
 
@@ -434,9 +426,16 @@ FXVec3f FXQuatf::getZAxis() const {
   }
 
 
-// Exponentiate unit quaternion
-// Given q = theta*(x*i+y*j+z*k), where length of (x,y,z) is 1,
-// then exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta).
+// Exponentiate quaternion.
+// Given:
+//
+//   q = theta*(x*i+y*j+z*k),
+//
+// then:
+//
+//   exp(q) = sin(theta)*(x*i+y*j+z*k)+cos(theta)
+//
+// with length of (x,y,z) = 1.
 FXQuatf FXQuatf::exp() const {
   FXQuatf result(0.0f,0.0f,0.0f,1.0f);
   FXfloat mag2(x*x+y*y+z*z);
@@ -453,9 +452,15 @@ FXQuatf FXQuatf::exp() const {
   }
 
 
-// Take logarithm of unit quaternion
-// Given q = sin(theta)*(x*i+y*j+z*k)+cos(theta), length of (x,y,z) is 1,
-// then log(q) = theta*(x*i+y*j+z*k).
+// Take logarithm of quaternion.
+// Given:
+//
+//   q = sin(theta)*(x*i+y*j+z*k)+cos(theta)
+//
+// with length of (x,y,z) = 1. then :
+//
+//   log(q) = theta*(x*i+y*j+z*k)
+//
 FXQuatf FXQuatf::log() const {
   FXQuatf result(0.0f,0.0f,0.0f,0.0f);
   FXfloat mag2(x*x+y*y+z*z);
@@ -470,9 +475,27 @@ FXQuatf FXQuatf::log() const {
   }
 
 
-// Power of quaternion
+// Power of quaternion is formally defined as:
+//
+//   q.pow(t) := (t*q.log()).exp()
+//
+// We can short-circuit some calculations by noting the rotation axis
+// (i.e. the imaginary part) need not be normalized more than once;
+// thus, we save 1 division, 1 square root, and a dot-product.
 FXQuatf FXQuatf::pow(FXfloat t) const {
-  return (log()*t).exp();
+  FXQuatf result(0.0f,0.0f,0.0f,1.0f);
+  FXfloat mag2(x*x+y*y+z*z);
+  if(0.0f<mag2){
+    FXfloat mag(Math::sqrt(mag2));
+    FXfloat phi(Math::atan2(mag,w)*t);
+    FXfloat s(Math::sin(phi)/mag);
+    FXfloat c(Math::cos(phi));
+    result.x=x*s;
+    result.y=y*s;
+    result.z=z*s;
+    result.w=c;
+    }
+  return result;
   }
 
 /*******************************************************************************/
@@ -531,7 +554,7 @@ FXQuatf& FXQuatf::adjust(){
 //
 //   q = (A * sin(theta/2), cos(theta/2)).
 //
-// Assuming is f and t are unit length, construct half-way vector:
+// Assuming is f and t are same length, construct half-way vector:
 //
 //   h = (f + t)
 //
@@ -657,6 +680,57 @@ FXQuatf lerpdot(const FXQuatf& u,const FXQuatf& v,FXfloat f){
   result.z=fr*u.z+to*v.z;
   result.w=fr*u.w+to*v.w;
   return result;
+  }
+
+/*******************************************************************************/
+
+// 1/(i*(2*i+1)) for i>=1
+const FXfloat u8_0=0.333333333333333333333333f;
+const FXfloat u8_1=0.1f;
+const FXfloat u8_2=0.047619047619047619047619f;
+const FXfloat u8_3=0.027777777777777777777778f;
+const FXfloat u8_4=0.018181818181818181818182f;
+const FXfloat u8_5=0.012820512820512820512820f;
+const FXfloat u8_6=0.009523809523809523809524f;
+const FXfloat u8_7=0.00735294117647058823529412f*1.85298109240830f;
+
+// i/(2*i+1) for i>=1
+const FXfloat v8_0=0.333333333333333333333333f;
+const FXfloat v8_1=0.4f;
+const FXfloat v8_2=0.428571428571428571428571f;
+const FXfloat v8_3=0.444444444444444444444444f;
+const FXfloat v8_4=0.454545454545454545454545f;
+const FXfloat v8_5=0.461538461538461538461538f;
+const FXfloat v8_6=0.466666666666666666666667f;
+const FXfloat v8_7=0.470588235294117647058824f*1.85298109240830f;
+
+
+// Fast approximate spherical lerp of unit quaternions u,v (with angle between u,v < pi/2)
+// Based on "A Fast and Accurate Algorithm for Computing SLERP", by David Eberly.
+FXQuatf fastlerp(const FXQuatf& u,const FXQuatf& v,FXfloat t){
+  FXfloat xm1=u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w-1.0f;      // x-1 = cos(theta)-1
+  FXfloat f=1.0f-t;
+  FXfloat tt=t*t;
+  FXfloat ff=f*f;
+  FXfloat F0=(u8_0*ff-v8_0)*xm1;
+  FXfloat F1=(u8_1*ff-v8_1)*xm1;
+  FXfloat F2=(u8_2*ff-v8_2)*xm1;
+  FXfloat F3=(u8_3*ff-v8_3)*xm1;
+  FXfloat F4=(u8_4*ff-v8_4)*xm1;
+  FXfloat F5=(u8_5*ff-v8_5)*xm1;
+  FXfloat F6=(u8_6*ff-v8_6)*xm1;
+  FXfloat F7=(u8_7*ff-v8_7)*xm1;
+  FXfloat T0=(u8_0*tt-v8_0)*xm1;
+  FXfloat T1=(u8_1*tt-v8_1)*xm1;
+  FXfloat T2=(u8_2*tt-v8_2)*xm1;
+  FXfloat T3=(u8_3*tt-v8_3)*xm1;
+  FXfloat T4=(u8_4*tt-v8_4)*xm1;
+  FXfloat T5=(u8_5*tt-v8_5)*xm1;
+  FXfloat T6=(u8_6*tt-v8_6)*xm1;
+  FXfloat T7=(u8_7*tt-v8_7)*xm1;
+  FXfloat F=f*(1.0f+F0*(1.0f+F1*(1.0f+F2*(1.0f+F3*(1.0f+F4*(1.0f+F5*(1.0f+F6*(1.0f+F7))))))));
+  FXfloat T=t*(1.0f+T0*(1.0f+T1*(1.0f+T2*(1.0f+T3*(1.0f+T4*(1.0f+T5*(1.0f+T6*(1.0f+T7))))))));
+  return u*F+v*T;
   }
 
 /*******************************************************************************/

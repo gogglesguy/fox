@@ -37,7 +37,11 @@ public:
   FXMat2f(){}
 
   /// Initialize matrix from scalar
-  FXMat2f(FXfloat s);
+  explicit FXMat2f(FXfloat s);
+
+  /// Initialize matrix from components
+  FXMat2f(FXfloat a00,FXfloat a01,
+          FXfloat a10,FXfloat a11);
 
   /// Initialize matrix from another matrix
   FXMat2f(const FXMat2f& s);
@@ -45,17 +49,17 @@ public:
   /// Initialize from rotation and scaling part of 3x3 matrix
   FXMat2f(const FXMat3f& s);
 
-  /// Initialize matrix from array
-  FXMat2f(const FXfloat s[]);
+  /// Initialize matrix from three vectors
+  FXMat2f(const FXVec2f& a,const FXVec2f& b);
 
   /// Initialize diagonal matrix
   FXMat2f(FXfloat a,FXfloat b);
 
-  /// Initialize matrix from components
-  FXMat2f(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11);
+  /// Initialize diagonal matrix
+  explicit FXMat2f(const FXVec2f& d);
 
-  /// Initialize matrix from three vectors
-  FXMat2f(const FXVec2f& a,const FXVec2f& b);
+  /// Initialize matrix from array
+  explicit FXMat2f(const FXfloat s[]);
 
   /// Assignment from scalar
   FXMat2f& operator=(FXfloat s);
@@ -70,23 +74,27 @@ public:
   /// Set value from scalar
   FXMat2f& set(FXfloat s);
 
+  /// Set value from components
+  FXMat2f& set(FXfloat a00,FXfloat a01,
+               FXfloat a10,FXfloat a11);
+
   /// Set value from another matrix
   FXMat2f& set(const FXMat2f& s);
 
   /// Set from rotation and scaling part of 3x3 matrix
   FXMat2f& set(const FXMat3f& s);
 
-  /// Set value from array
-  FXMat2f& set(const FXfloat s[]);
+  /// Set value from two vectors
+  FXMat2f& set(const FXVec2f& a,const FXVec2f& b);
 
   /// Set diagonal matrix
   FXMat2f& set(FXfloat a,FXfloat b);
 
-  /// Set value from components
-  FXMat2f& set(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11);
+  /// Initialize diagonal matrix
+  FXMat2f& set(const FXVec2f& d);
 
-  /// Set value from two vectors
-  FXMat2f& set(const FXVec2f& a,const FXVec2f& b);
+  /// Set value from array
+  FXMat2f& set(const FXfloat s[]);
 
   /// Assignment operators
   FXMat2f& operator+=(const FXMat2f& s);

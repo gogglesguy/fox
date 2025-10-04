@@ -38,7 +38,6 @@
 #include "FXXML.h"
 #include "FXXMLFile.h"
 
-
 /*
   Notes:
 
@@ -50,29 +49,32 @@
     move unwritten bytes to start to have maximum of free space in buffer.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+
 
 using namespace FX;
 
-namespace FX {
-
 /*******************************************************************************/
+
+namespace FX {
 
 // Create XML file i/o object
 FXXMLFile::FXXMLFile(){
-  FXTRACE((100,"FXXMLFile::FXXMLFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile\n"));
   }
 
 
 // Create XML file i/o object and open it
 FXXMLFile::FXXMLFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((100,"FXXMLFile::FXXMLFile(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   open(filename,d,sz);
   }
 
 
 // Open XML file for operation
 FXbool FXXMLFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((101,"FXXMLFile::open(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_DETAIL,"FXXMLFile::open(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(dir==Stop){
     FXchar *buffer;
     if(allocElms(buffer,sz)){
@@ -130,7 +132,7 @@ FXival FXXMLFile::flush(FXival){
 
 // Close stream and delete buffers
 FXbool FXXMLFile::close(){
-  FXTRACE((101,"FXXMLFile::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXXMLFile::close()\n"));
   FXchar *buffer=begptr;
   if(FXXML::close()){
     freeElms(buffer);
@@ -142,7 +144,7 @@ FXbool FXXMLFile::close(){
 
 // Close XML file
 FXXMLFile::~FXXMLFile(){
-  FXTRACE((100,"FXXMLFile::~FXXMLFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::~FXXMLFile\n"));
   close();
   }
 

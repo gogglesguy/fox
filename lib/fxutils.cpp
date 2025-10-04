@@ -31,7 +31,6 @@
 #include "FXString.h"
 #include "FXElement.h"
 
-
 /*
   Notes:
   - Handy global utility functions.
@@ -48,7 +47,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Furnish our own versions
 extern FXAPI FXuint __strtoul(const FXchar *beg,const FXchar** end=nullptr,FXint base=0,FXbool* ok=nullptr);
@@ -368,6 +366,60 @@ void fxtrace(FXuint level,const FXchar* format,...){
   }
 
 /*******************************************************************************/
+
+// Search substring needle in string haystack
+FXchar* fxstrstr(const FXchar *haystack,const FXchar *needle){
+  FXchar n0,n1,h0,h1;
+  const FXchar *s;
+  const FXchar *p;
+  n0=*needle++;
+  if(__likely(n0)){
+    while((h0=*haystack++)!=0){
+      if(h0!=n0) continue;
+      p=haystack;
+      s=needle;
+      while((n1=*s++)!=0){
+        h1=*p++;
+        if(h1!=n1) goto next;
+        }
+      haystack--;
+      return const_cast<FXchar*>(haystack);
+next: ;
+      }
+    return nullptr;
+    }
+  return const_cast<FXchar*>(haystack);
+  }
+
+
+// Search substring needle in string haystack, ignoring case
+FXchar* fxstrcasestr(const FXchar *haystack,const FXchar *needle){
+  FXchar n0,n1,h0,h1;
+  const FXchar *s;
+  const FXchar *p;
+  n0=*needle++;
+  if(__likely(n0)){
+    n0=Ascii::toLower(n0);
+    while((h0=*haystack++)!=0){
+      h0=Ascii::toLower(h0);
+      if(h0!=n0) continue;
+      p=haystack;
+      s=needle;
+      while((n1=*s++)!=0){
+        h1=*p++;
+        n1=Ascii::toLower(n1);
+        h1=Ascii::toLower(h1);
+        if(h1!=n1) goto next;
+        }
+      haystack--;
+      return const_cast<FXchar*>(haystack);
+next: ;
+      }
+    return nullptr;
+    }
+  return const_cast<FXchar*>(haystack);
+  }
+
 
 // Safe string copy
 FXival fxstrlcpy(FXchar* dst,const FXchar* src,FXival len){

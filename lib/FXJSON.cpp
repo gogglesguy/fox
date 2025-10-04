@@ -233,6 +233,10 @@
     if the json5 file is to be loaded correctly.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+#define TOPIC_DEBUG     1002
+
 // Line termination length
 #define ENDLINELENGTH (sizeof(ENDLINE)-1)
 
@@ -284,20 +288,20 @@ const FXuint IdentPart=(1<<CatLetterUpper)|(1<<CatLetterLower)|(1<<CatLetterTitl
 
 // Construct JSON serializer
 FXJSON::FXJSON():offset(0),token(TK_EOF),column(0),indent(0),line(1),wrap(80),quote('"'),flow(Compact),prec(15),fmt(2),esc(0),dent(2),ver(4){
-  FXTRACE((100,"FXJSON::FXJSON\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSON::FXJSON\n"));
   }
 
 
 // Construct and open for loading
 FXJSON::FXJSON(FXchar* buffer,FXuval sz,Direction d):FXParseBuffer(buffer,sz,d),offset(0),token(TK_EOF),column(0),indent(0),line(1),wrap(80),quote('"'),flow(Compact),prec(15),fmt(2),esc(0),dent(2),ver(4){
-  FXTRACE((100,"FXJSON::FXJSON(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSON::FXJSON(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   open(buffer,sz,d);
   }
 
 
 // Open JSON stream for given direction and set its buffer
 FXbool FXJSON::open(FXchar* buffer,FXuval sz,Direction d){
-  FXTRACE((101,"FXJSON::open(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE((TOPIC_DETAIL,"FXJSON::open(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
   if(FXParseBuffer::open(buffer,sz,d)){
     value=FXString::null;
     token=TK_ERROR;
@@ -313,7 +317,7 @@ FXbool FXJSON::open(FXchar* buffer,FXuval sz,Direction d){
 
 // Close json parse buffer
 FXbool FXJSON::close(){
-  FXTRACE((101,"FXJSON::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXJSON::close()\n"));
   if(FXParseBuffer::close()){
     value=FXString::null;
     return true;
@@ -1350,7 +1354,7 @@ FXJSON::Error FXJSON::loadVariant(FXVariant& var){
 
 // Load a variant
 FXJSON::Error FXJSON::load(FXVariant& variant){
-  FXTRACE((101,"FXJSON::load(variant)\n"));
+  FXTRACE((TOPIC_DETAIL,"FXJSON::load(variant)\n"));
   Error err=ErrLoad;
   if(dir==Load){
     token=next();
@@ -1636,7 +1640,7 @@ FXJSON::Error FXJSON::saveVariant(const FXVariant& var){
 
 // Save a variant
 FXJSON::Error FXJSON::save(const FXVariant& variant){
-  FXTRACE((101,"FXJSON::save(variant)\n"));
+  FXTRACE((TOPIC_DETAIL,"FXJSON::save(variant)\n"));
   Error err=ErrSave;
   if(dir==Save){
     err=saveVariant(variant);
@@ -1649,7 +1653,7 @@ FXJSON::Error FXJSON::save(const FXVariant& variant){
 
 // Close stream and clean up
 FXJSON::~FXJSON(){
-  FXTRACE((100,"FXJSON::~FXJSON\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSON::~FXJSON\n"));
   close();
   }
 

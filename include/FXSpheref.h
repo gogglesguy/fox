@@ -50,6 +50,9 @@ public:
   /// Initialize sphere to fully contain the given bounding box
   FXSpheref(const FXRangef& bounds);
 
+  /// Assign with vector
+  FXSpheref& operator=(const FXVec3f& cen){ center=cen; radius=0.0f; return *this; }
+
   /// Assignment
   FXSpheref& operator=(const FXSpheref& sphere){ center=sphere.center; radius=sphere.radius; return *this; }
 

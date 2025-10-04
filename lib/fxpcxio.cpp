@@ -27,8 +27,6 @@
 #include "FXElement.h"
 #include "FXStream.h"
 
-
-
 /*
   Notes:
   - Loading 1-bit/1-plane, 4-bit/1-plane, 8-bit/1-plane and 8-bit/3-plane
@@ -36,6 +34,8 @@
   - Need to check if fewer colors, if so fall back on lower pixel depth
     mode to save space.
 */
+
+#define TOPIC_DETAIL 1020
 
 using namespace FX;
 
@@ -175,7 +175,7 @@ FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         // Total number of pixels
         NumPixels=width*height;
 
-        FXTRACE((100,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding));
+        FXTRACE((TOPIC_DETAIL,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding));
 
         // Scanline buffer
         if(allocElms(line,TotalBytes)){

@@ -28,7 +28,6 @@
 #include "FXTextCodec.h"
 #include "FXUTF16Codec.h"
 
-
 /*
   Notes:
   - Default byte-order in absence of BOM is big-endian.
@@ -39,7 +38,7 @@
   - Error when trying to write surrogate character.
 */
 
-
+using namespace FX;
 
 /*******************************************************************************/
 

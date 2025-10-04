@@ -61,6 +61,7 @@
 */
 
 #define TOPIC_CONSTRUCT  1000
+#define TOPIC_DETAIL    1001
 
 // You can override the default icon locations to search for your
 // particular platform by specifying -DDEFAULTICONPATH="path" on
@@ -102,7 +103,7 @@ FXIconCache::FXIconCache(FXApp* ap,const FXString& sp):app(ap),loader(&FXIconSou
 
 // Insert unique icon loaded from filename into dictionary
 FXIcon* FXIconCache::insert(const FXchar* name){
-  FXTRACE((200,"FXIconCache::insert(\"%s\")\n",name));
+  FXTRACE((TOPIC_DETAIL,"FXIconCache::insert(\"%s\")\n",name));
   FXIcon* result=dict[name];
   if(!result){
     result=loader->loadIconFile(getApp(),FXPath::search(path,name));
@@ -116,14 +117,14 @@ FXIcon* FXIconCache::insert(const FXchar* name){
 
 // Remove icon from cache and delete it
 void FXIconCache::remove(const FXchar* name){
-  FXTRACE((200,"FXIconCache::remove(\"%s\")\n",name));
+  FXTRACE((TOPIC_DETAIL,"FXIconCache::remove(\"%s\")\n",name));
   delete dict.remove(name);
   }
 
 
 // Delete all icons
 void FXIconCache::clear(){
-  FXTRACE((200,"FXIconCache::clear()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXIconCache::clear()\n"));
   for(FXival i=0; i<dict.no(); ++i){
     delete dict.data(i);
     }

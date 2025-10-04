@@ -42,9 +42,6 @@
 #include "FXApp.h"
 #include "FXRealSlider.h"
 
-
-
-
 /*
   Notes:
   - Maybe add bindings for arrow keys for value changes.
@@ -549,14 +546,19 @@ long FXRealSlider::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
 // Mouse wheel
 long FXRealSlider::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
-  FXdouble p=pos+incr*(event->code/120);
-  if(p<range[0]) p=range[0];
-  if(p>range[1]) p=range[1];
-  if(pos!=p){
-    setValue(p);
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&pos);
+  FXdouble p;
+  if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    p=pos+incr*(event->code/120);
+    if(p<range[0]) p=range[0];
+    if(p>range[1]) p=range[1];
+    if(pos!=p){
+      setValue(p);
+      if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&pos);
+      }
+    return 1;
     }
-  return 1;
+  return 0;
   }
 
 

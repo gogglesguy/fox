@@ -42,7 +42,6 @@
 #include "FXPacker.h"
 #include "FXSpring.h"
 
-
 /*
   Notes:
   - Based upon an idea from Amanda Ross.
@@ -53,7 +52,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Object implementation
 FXIMPLEMENT(FXSpring,FXPacker,nullptr,0)

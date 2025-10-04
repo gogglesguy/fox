@@ -42,7 +42,6 @@
 #include "FXColorRing.h"
 
 
-
 /*
 
   Notes:
@@ -110,9 +109,7 @@
 
 #define JUSTIFY_MASK  (JUSTIFY_HZ_APART|JUSTIFY_VT_APART)
 
-
 using namespace FX;
-
 
 /*******************************************************************************/
 
@@ -586,6 +583,7 @@ long FXColorRing::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
 long FXColorRing::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXfloat amount=((FXEvent*)ptr)->code/12.0f;
   if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
     if(((FXEvent*)ptr)->state&CONTROLMASK) amount/=10.0f;
     setHue(Math::fmod(hsv[0]+amount+360.0f,360.0f));
     if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)hsv);

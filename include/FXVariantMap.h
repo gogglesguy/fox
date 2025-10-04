@@ -86,7 +86,7 @@ public:
   FXbool has(const FXchar* ky) const { return 0<=find(ky); }
 
   /// Check if key is mapped
-  FXbool has(const FXString& ky) const { return has(ky.text()); }
+  FXbool has(const FXString& ky) const { return 0<=find(ky); }
 
   /// Return reference to variant assocated with key
   FXVariant& at(const FXchar* ky);

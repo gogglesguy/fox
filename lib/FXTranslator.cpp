@@ -41,7 +41,6 @@
 #include "FXSystem.h"
 #include "FXTranslator.h"
 
-
 /*
   Notes:
   - Since the original input string is potentially used as output string if no

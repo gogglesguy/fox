@@ -306,6 +306,8 @@ extern FXAPI FXQuatf lerp(const FXQuatf& u,const FXQuatf& v,FXfloat f);
 /// Derivative of spherical lerp of unit quaternions u,v
 extern FXAPI FXQuatf lerpdot(const FXQuatf& u,const FXQuatf& v,FXfloat f);
 
+/// Fast approximate spherical lerp of unit quaternions u,v (with angle between u,v < pi/2)
+extern FXAPI FXQuatf fastlerp(const FXQuatf& u,const FXQuatf& v,FXfloat f);
 
 
 /// Cubic hermite quaternion interpolation

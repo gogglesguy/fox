@@ -38,19 +38,7 @@ public:
   FXMat4d(){}
 
   /// Initialize matrix from scalar
-  FXMat4d(FXdouble s);
-
-  /// Initialize with 3x3 rotation and scaling matrix
-  FXMat4d(const FXMat3d& s);
-
-  /// Initialize matrix from another matrix
-  FXMat4d(const FXMat4d& s);
-
-  /// Initialize matrix from array
-  FXMat4d(const FXdouble s[]);
-
-  /// Initialize diagonal matrix
-  FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
+  explicit FXMat4d(FXdouble s);
 
   /// Initialize matrix from components
   FXMat4d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,
@@ -58,11 +46,26 @@ public:
           FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,
           FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33);
 
-  /// Initialize matrix from four vectors
-  FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
+  /// Initialize with 3x3 rotation and scaling matrix
+  FXMat4d(const FXMat3d& s);
+
+  /// Initialize matrix from another matrix
+  FXMat4d(const FXMat4d& s);
 
   /// Initialize matrix from quaternion
   FXMat4d(const FXQuatd& quat);
+
+  /// Initialize matrix from four vectors
+  FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
+
+  /// Initialize diagonal matrix
+  FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
+
+  /// Initialize diagonal matrix
+  explicit FXMat4d(const FXVec4d& d);
+
+  /// Initialize matrix from array
+  explicit FXMat4d(const FXdouble s[]);
 
   /// Assignment from scalar
   FXMat4d& operator=(FXdouble s);
@@ -80,29 +83,32 @@ public:
   /// Set value from scalar
   FXMat4d& set(FXdouble s);
 
-  /// Set value from 3x3 rotation and scaling matrix
-  FXMat4d& set(const FXMat3d& s);
-
-  /// Set value from another matrix
-  FXMat4d& set(const FXMat4d& s);
-
-  /// Set value from array
-  FXMat4d& set(const FXdouble s[]);
-
-  /// Set diagonal matrix
-  FXMat4d& set(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
-
   /// Set value from components
   FXMat4d& set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,
                FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,
                FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,
                FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33);
 
-  /// Set value from four vectors
-  FXMat4d& set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
+  /// Set value from 3x3 rotation and scaling matrix
+  FXMat4d& set(const FXMat3d& s);
+
+  /// Set value from another matrix
+  FXMat4d& set(const FXMat4d& s);
 
   /// Set value from quaternion
   FXMat4d& set(const FXQuatd& quat);
+
+  /// Set value from four vectors
+  FXMat4d& set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d);
+
+  /// Set diagonal matrix
+  FXMat4d& set(FXdouble a,FXdouble b,FXdouble c,FXdouble d);
+
+  /// Set diagonal matrix
+  FXMat4d& set(const FXVec4d& d);
+
+  /// Set value from array
+  FXMat4d& set(const FXdouble s[]);
 
   /// Assignment operators
   FXMat4d& operator+=(const FXMat4d& w);

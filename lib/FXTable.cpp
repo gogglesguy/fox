@@ -56,7 +56,6 @@
 #include "FXSpinner.h"
 #include "FXElement.h"
 
-
 /*
   Notes:
 
@@ -212,12 +211,13 @@
 
 #define TABLE_MASK          (TABLE_COL_SIZABLE|TABLE_ROW_SIZABLE|TABLE_NO_COLSELECT|TABLE_NO_ROWSELECT)
 
+#define TOPIC_DEBUG     1002
+
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Object implementation
 FXIMPLEMENT(FXTableItem,FXObject,nullptr,0)
@@ -880,13 +880,13 @@ FXbool FXTable::setSpanningRange(FXint row,FXint col,FXint fr,FXint lr,FXint fc,
   item=cells[row*ncols+col];
   if(item){
 
-    FXTRACE((100,"item r:%2d c:%2d\n",row,col));
+    FXTRACE((TOPIC_DEBUG,"item r:%2d c:%2d\n",row,col));
 
     // Current span of item
     getSpanningRange(row,col,sr,er,sc,ec);
 
-    FXTRACE((100,"old shape r:%2d..%-2d c:%2d..%-2d\n",sr,er,sc,ec));
-    FXTRACE((100,"new shape r:%2d..%-2d c:%2d..%-2d\n",fr,lr,fc,lc));
+    FXTRACE((TOPIC_DEBUG,"old shape r:%2d..%-2d c:%2d..%-2d\n",sr,er,sc,ec));
+    FXTRACE((TOPIC_DEBUG,"new shape r:%2d..%-2d c:%2d..%-2d\n",fr,lr,fc,lc));
 
     // Cancel editing
     if(sr<=input.fm.row && sc<=input.fm.col && input.to.row<=er && input.to.col<=ec){
@@ -899,10 +899,10 @@ FXbool FXTable::setSpanningRange(FXint row,FXint col,FXint fr,FXint lr,FXint fc,
     FXMINMAX(llrer,hlrer,lr,er);
     FXMINMAX(llcec,hlcec,lc,ec);
 
-    FXTRACE((100,"box 1: r:%2d..%-2d c:%2d..%-2d\n",lfrsr,hfrsr,lfcsc,llcec));
-    FXTRACE((100,"box 2: r:%2d..%-2d c:%2d..%-2d\n",lfrsr,llrer,llcec,hlcec));
-    FXTRACE((100,"box 3: r:%2d..%-2d c:%2d..%-2d\n",llrer,hlrer,hfcsc,hlcec));
-    FXTRACE((100,"box 4: r:%2d..%-2d c:%2d..%-2d\n",hfrsr,hlrer,lfcsc,hfcsc));
+    FXTRACE((TOPIC_DEBUG,"box 1: r:%2d..%-2d c:%2d..%-2d\n",lfrsr,hfrsr,lfcsc,llcec));
+    FXTRACE((TOPIC_DEBUG,"box 2: r:%2d..%-2d c:%2d..%-2d\n",lfrsr,llrer,llcec,hlcec));
+    FXTRACE((TOPIC_DEBUG,"box 3: r:%2d..%-2d c:%2d..%-2d\n",llrer,hlrer,hfcsc,hlcec));
+    FXTRACE((TOPIC_DEBUG,"box 4: r:%2d..%-2d c:%2d..%-2d\n",hfrsr,hlrer,lfcsc,hfcsc));
 
     // FIXME interference check
 
@@ -1024,14 +1024,14 @@ void FXTable::changeFocus(FXWindow *child){
     FXint r=rowAtY(child->getY());
     FXint c=colAtX(child->getX());
 
-FXTRACE((100,"changeFocus: x=%d y=%d r=%d c=%d\n",child->getX(),child->getY(),r,c));
+FXTRACE((TOPIC_DEBUG,"changeFocus: x=%d y=%d r=%d c=%d\n",child->getX(),child->getY(),r,c));
 
     // Item inside one of the cells
     if(0<=r && r<nrows && 0<=c && c<ncols){
       FXTableItem *item;
 
-FXTRACE((100,"changeFocus: yy=%d\n",rowHeader->getY()+rowHeader->getItemOffset(r)));
-FXTRACE((100,"changeFocus: xx=%d\n",colHeader->getX()+colHeader->getItemOffset(c)));
+FXTRACE((TOPIC_DEBUG,"changeFocus: yy=%d\n",rowHeader->getY()+rowHeader->getItemOffset(r)));
+FXTRACE((TOPIC_DEBUG,"changeFocus: xx=%d\n",colHeader->getX()+colHeader->getItemOffset(c)));
 
       // Deactivate old item
       if(0<=current.row && 0<=current.col){
@@ -1633,7 +1633,7 @@ void FXTable::countText(FXint& nr,FXint& nc,const FXchar* text,FXint size,const 
       }
     i++;
     }
-  FXTRACE((100,"countText nr=%d nc=%d\n",nr,nc));
+  FXTRACE((TOPIC_DEBUG,"countText nr=%d nc=%d\n",nr,nc));
   }
 
 
@@ -2123,21 +2123,21 @@ long FXTable::onSelectionRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return text of the selection as UTF-8
     if(event->target==utf8Type){
-      FXTRACE((100,"Request UTF8\n"));
+      FXTRACE((TOPIC_DEBUG,"Request UTF8\n"));
       setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FXTRACE((100,"Request ASCII\n"));
+      FXTRACE((TOPIC_DEBUG,"Request ASCII\n"));
       setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXTRACE((100,"Request UTF16\n"));
+      FXTRACE((TOPIC_DEBUG,"Request UTF16\n"));
       setDNDData(FROM_SELECTION,event->target,string);
       return 1;
       }
@@ -2180,7 +2180,7 @@ long FXTable::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return clipped text as CSV
     if(event->target==csvType){
-      FXTRACE((100,"Request CSV\n"));
+      FXTRACE((TOPIC_DEBUG,"Request CSV\n"));
       string.substitute('\t',',',true);
       setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
@@ -2188,21 +2188,21 @@ long FXTable::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
     // Return clipped text as UTF-8
     if(event->target==utf8Type){
-      FXTRACE((100,"Request UTF8\n"));
+      FXTRACE((TOPIC_DEBUG,"Request UTF8\n"));
       setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
 
     // Return clipped text translated to 8859-1
     if(event->target==stringType || event->target==textType){
-      FXTRACE((100,"Request ASCII\n"));
+      FXTRACE((TOPIC_DEBUG,"Request ASCII\n"));
       setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
 
     // Return text of the selection translated to UTF-16
     if(event->target==utf16Type){
-      FXTRACE((100,"Request UTF16\n"));
+      FXTRACE((TOPIC_DEBUG,"Request UTF16\n"));
       setDNDData(FROM_CLIPBOARD,event->target,string);
       return 1;
       }
@@ -2333,14 +2333,14 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // First, try csv
       if(getDNDData(FROM_CLIPBOARD,csvType,string)){
-        FXTRACE((100,"Paste CSV\n"));
+        FXTRACE((TOPIC_DEBUG,"Paste CSV\n"));
 #ifdef WIN32
         dosToUnix(string);
 #endif
         countText(nr,nc,string,"\t,""\n");
         range.to.row=range.fm.row+nr-1;
         range.to.col=range.fm.col+nc-1;
-        FXTRACE((100,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
+        FXTRACE((TOPIC_DEBUG,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
         overlayText(range.fm.row,range.to.row,range.fm.col,range.to.col,string,"\t,","\n",true);
         selectRange(range.fm.row,range.to.row,range.fm.col,range.to.col,true);
         return 1;
@@ -2348,14 +2348,14 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // First, try UTF-8
       if(getDNDData(FROM_CLIPBOARD,utf8Type,string)){
-        FXTRACE((100,"Paste UTF8\n"));
+        FXTRACE((TOPIC_DEBUG,"Paste UTF8\n"));
 #ifdef WIN32
         dosToUnix(string);
 #endif
         countText(nr,nc,string,"\t,""\n");
         range.to.row=range.fm.row+nr-1;
         range.to.col=range.fm.col+nc-1;
-        FXTRACE((100,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
+        FXTRACE((TOPIC_DEBUG,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
         overlayText(range.fm.row,range.to.row,range.fm.col,range.to.col,string,"\t,","\n",true);
         selectRange(range.fm.row,range.to.row,range.fm.col,range.to.col,true);
         return 1;
@@ -2363,14 +2363,14 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // Next, try UTF-16
       if(getDNDData(FROM_CLIPBOARD,utf16Type,string)){
-        FXTRACE((100,"Paste UTF16\n"));
+        FXTRACE((TOPIC_DEBUG,"Paste UTF16\n"));
 #ifdef WIN32
         dosToUnix(string);
 #endif
         countText(nr,nc,string,"\t,""\n");
         range.to.row=range.fm.row+nr-1;
         range.to.col=range.fm.col+nc-1;
-        FXTRACE((100,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
+        FXTRACE((TOPIC_DEBUG,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
         overlayText(range.fm.row,range.to.row,range.fm.col,range.to.col,string,"\t,","\n",true);
         selectRange(range.fm.row,range.to.row,range.fm.col,range.to.col,true);
         return 1;
@@ -2378,14 +2378,14 @@ long FXTable::onCmdPasteSel(FXObject*,FXSelector,void*){
 
       // Next, try good old Latin-1
       if(getDNDData(FROM_CLIPBOARD,stringType,string)){
-        FXTRACE((100,"Paste ASCII\n"));
+        FXTRACE((TOPIC_DEBUG,"Paste ASCII\n"));
 #ifdef WIN32
         dosToUnix(string);
 #endif
         countText(nr,nc,string,"\t,""\n");
         range.to.row=range.fm.row+nr-1;
         range.to.col=range.fm.col+nc-1;
-        FXTRACE((100,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
+        FXTRACE((TOPIC_DEBUG,"range.fm.row=%d range.to.row=%d range.fm.col=%d range.to.col=%d\n",range.fm.row,range.to.row,range.fm.col,range.to.col));
         overlayText(range.fm.row,range.to.row,range.fm.col,range.to.col,string,"\t,","\n",true);
         selectRange(range.fm.row,range.to.row,range.fm.col,range.to.col,true);
         return 1;
@@ -2534,7 +2534,7 @@ void FXTable::drawContents(FXDC& dc,FXint x,FXint y,FXint w,FXint h){
   if(lc>=ncols) lc=ncols-1;
   if(lr>=nrows) lr=nrows-1;
 
-  //FXTRACE((100,"fc=%d lc=%d fr=%d lr=%d\n",fc,lc,fr,lr));
+  //FXTRACE((TOPIC_DEBUG,"fc=%d lc=%d fr=%d lr=%d\n",fc,lc,fr,lr));
 
   FXASSERT(0<=fc && lc<ncols);
   FXASSERT(0<=fr && lr<nrows);
@@ -3540,7 +3540,7 @@ void FXTable::insertRows(FXint row,FXint nr,FXbool notify){
 
   nrows=n;
 
-  FXTRACE((100,"nrows=%d\n",nrows));
+  FXTRACE((TOPIC_DEBUG,"nrows=%d\n",nrows));
 
   // Fix up anchor, extent, and current
   if(anchor.row>=row) anchor.row+=nr;
@@ -3630,7 +3630,7 @@ void FXTable::insertColumns(FXint col,FXint nc,FXbool notify){
 
   ncols=n;
 
-  FXTRACE((100,"ncols=%d\n",ncols));
+  FXTRACE((TOPIC_DEBUG,"ncols=%d\n",ncols));
 
   // Fix up anchor, extent, and current
   if(anchor.col>=col) anchor.col+=nc;
@@ -3708,7 +3708,7 @@ void FXTable::removeRows(FXint row,FXint nr,FXbool notify){
     for(c=0; c<ncols; c++){
       item=oldcells[r*ncols+c];
       if(item && (r==0 || oldcells[(r-1)*ncols+c]!=item) && (c==0 || oldcells[r*ncols+c-1]!=item) && (row+nr==nrows || oldcells[(row+nr)*ncols+c]!=item)){
-        FXTRACE((150,"delete item %s\n",item->getText().text()));
+        FXTRACE((TOPIC_DEBUG,"delete item %s\n",item->getText().text()));
         delete item;
         }
       }
@@ -3754,7 +3754,7 @@ void FXTable::removeRows(FXint row,FXint nr,FXbool notify){
   // Update row count
   nrows=n;
 
-  FXTRACE((100,"nrows=%d\n",nrows));
+  FXTRACE((TOPIC_DEBUG,"nrows=%d\n",nrows));
 
   FXASSERT(-1<=anchor.row && anchor.row<nrows);
   FXASSERT(-1<=current.row && current.row<nrows);
@@ -3813,7 +3813,7 @@ void FXTable::removeColumns(FXint col,FXint nc,FXbool notify){
     for(c=col; c<col+nc; c++){
       item=oldcells[r*ncols+c];
       if(item && (r==0 || oldcells[(r-1)*ncols+c]!=item) && (c==0 || oldcells[r*ncols+c-1]!=item) && (col+nc==ncols || oldcells[r*ncols+col+nc]!=item)){
-        FXTRACE((150,"delete item %s\n",item->getText().text()));
+        FXTRACE((TOPIC_DEBUG,"delete item %s\n",item->getText().text()));
         delete item;
         }
       }
@@ -3859,7 +3859,7 @@ void FXTable::removeColumns(FXint col,FXint nc,FXbool notify){
   // Update columns count
   ncols=n;
 
-  FXTRACE((100,"ncols=%d\n",ncols));
+  FXTRACE((TOPIC_DEBUG,"ncols=%d\n",ncols));
 
   FXASSERT(-1<=anchor.col && anchor.col<ncols);
   FXASSERT(-1<=current.col && current.col<ncols);

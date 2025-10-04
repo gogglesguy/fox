@@ -36,7 +36,6 @@ using namespace FX;
 
 namespace FX {
 
-
 // Suggested file extension
 const FXchar FXWEBPImage::fileExt[]="webp";
 

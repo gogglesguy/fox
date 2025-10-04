@@ -80,10 +80,8 @@
 #define BadHandle  -1
 #endif
 
-
 // Test
 #undef HAVE_INOTIFY_INIT1
-
 
 using namespace FX;
 

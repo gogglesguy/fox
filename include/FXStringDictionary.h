@@ -87,7 +87,7 @@ public:
   FXbool has(const FXchar* ky) const { return 0<=find(ky); }
 
   /// Check if key is mapped
-  FXbool has(const FXString& ky) const { return has(ky.text()); }
+  FXbool has(const FXString& ky) const { return 0<=find(ky); }
 
   /// Return reference to slot assocated with given key
   FXString& at(const FXchar* ky,FXbool mrk=false);

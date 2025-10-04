@@ -94,6 +94,9 @@
     changing from expanded to collapsed; other options are however possible.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 #define REFRESHINTERVAL     1000000000  // Interval between refreshes
 #define REFRESHFREQUENCY    30          // File systems not supporting mod-time, refresh every nth time
@@ -558,7 +561,7 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Delete selected files
   if(((FXEvent*)ptr)->target==deleteType){
-    FXTRACE((100,"Delete files not yet implemented\n"));
+    FXTRACE((TOPIC_DETAIL,"Delete files not yet implemented\n"));
     return 1;
     }
   return 0;
@@ -946,6 +949,8 @@ fnd:*pn=item; pn=&item->link;
 void FXDirList::listRootItems(FXbool force,FXbool notify){
   FXDirItem *item=(FXDirItem*)firstitem;
 
+  FXUNUSED(force);
+
   // First time, make root node
   if(!item) item=list=(FXDirItem*)appendItem(nullptr,PATHSEPSTRING,harddiskicon,harddiskicon,nullptr,notify);
 
@@ -1234,7 +1239,7 @@ FXTreeItem* FXDirList::expandPath(const FXString& path,FXbool notify){
 
 // Set current file; return true if success
 FXbool FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
-  FXTRACE((100,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
   FXTreeItem* item;
   if((item=expandPath(FXPath::absolute(pathname),notify))!=nullptr){
     setAnchorItem(item);
@@ -1254,7 +1259,7 @@ FXString FXDirList::getCurrentFile() const {
 
 // Set current directory; return true if success
 FXbool FXDirList::setDirectory(const FXString& pathname,FXbool notify){
-  FXTRACE((100,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   FXTreeItem* item;
   if((item=expandPath(FXPath::absolute(pathname),notify))!=nullptr){
     expandTree(item,notify);

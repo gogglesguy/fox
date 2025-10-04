@@ -46,6 +46,10 @@
 
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+#define TOPIC_DEBUG     1002
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -54,20 +58,20 @@ namespace FX {
 
 // Create INI file i/o object
 FXINIFile::FXINIFile(){
-  FXTRACE((100,"FXINIFile::FXINIFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXINIFile::FXINIFile\n"));
   }
 
 
 // Create INI file i/o object and open it
 FXINIFile::FXINIFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((100,"FXINIFile::FXINIFile(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_CONSTRUCT,"FXINIFile::FXINIFile(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   open(filename,d,sz);
   }
 
 
 // Open INI for load or save
 FXbool FXINIFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((101,"FXINIFile::open(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_DETAIL,"FXINIFile::open(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(dir==Stop){
     FXchar *buffer;
     if(allocElms(buffer,sz)){
@@ -96,7 +100,7 @@ FXival FXINIFile::fill(FXival){
     sptr=begptr+(sptr-rptr);
     rptr=begptr;
     nbytes=file.readBlock(wptr,endptr-wptr);
-    FXTRACE((104,"FXINIFile::fill() = %ld\n",nbytes));
+    FXTRACE((TOPIC_DEBUG,"FXINIFile::fill() = %ld\n",nbytes));
     if(0<=nbytes){
       wptr+=nbytes;
       if(wptr<endptr){ wptr[0]='\0'; }
@@ -112,7 +116,7 @@ FXival FXINIFile::flush(FXival){
   if(dir==Save){
     FXival nbytes;
     nbytes=file.writeBlock(rptr,wptr-rptr);
-    FXTRACE((104,"FXINIFile::flush() = %ld\n",nbytes));
+    FXTRACE((TOPIC_DEBUG,"FXINIFile::flush() = %ld\n",nbytes));
     if(0<=nbytes){
       rptr+=nbytes;
       moveElms(begptr,rptr,wptr-rptr);
@@ -127,7 +131,7 @@ FXival FXINIFile::flush(FXival){
 
 // Close stream and delete buffers
 FXbool FXINIFile::close(){
-  FXTRACE((101,"FXINIFile::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXINIFile::close()\n"));
   FXchar *buffer=begptr;
   if(FXINI::close()){
     freeElms(buffer);
@@ -139,7 +143,7 @@ FXbool FXINIFile::close(){
 
 // Close INI stream and clean up.
 FXINIFile::~FXINIFile(){
-  FXTRACE((100,"FXINIFile::~FXINIFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXINIFile::~FXINIFile\n"));
   close();
   }
 

@@ -54,6 +54,8 @@
 #include "fxascii.h"
 #include "fxunicode.h"
 #include "fxcpuid.h"
+#include "fxcrc.h"
+#include "fxadler32.h"
 
 // FOX classes
 #include "FXhalf.h"
@@ -77,6 +79,7 @@
 #include "FXAutoThreadStorageKey.h"
 #include "FXRunnable.h"
 #include "FXThread.h"
+#include "FXPerformance.h"
 #include "FXScopedThread.h"
 #include "FXStream.h"
 #include "FXAutoPtr.h"

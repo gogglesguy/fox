@@ -73,7 +73,6 @@
 #define MINHEIGHT        30                         // Minimum height
 #define TITLESPACE       120                        // Width of title when minimized
 
-
 using namespace FX;
 
 /*******************************************************************************/

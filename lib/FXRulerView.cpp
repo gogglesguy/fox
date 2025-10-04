@@ -45,13 +45,11 @@
 #include "FXRuler.h"
 #include "FXRulerView.h"
 
-
 /*
   Notes:
   - Should implement DND drags/drops, cut/paste
   - Right-mouse scroll.
 */
-
 
 #define RULERVIEW_MASK (RULERVIEW_ALIGN_STRETCH_X|RULERVIEW_ALIGN_STRETCH_Y)
 
@@ -59,14 +57,11 @@
 
 #define VSCROLLMASK (VSCROLLER_ALWAYS|VSCROLLER_NEVER|VSCROLLING_ON|VSCROLLING_OFF|SCROLLERS_DONT_TRACK)
 
-
 using namespace FX;
-
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Map
 FXDEFMAP(FXRulerView) FXRulerViewMap[]={

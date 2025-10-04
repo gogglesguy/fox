@@ -29,14 +29,14 @@
 #include "FXElement.h"
 #include "FXStream.h"
 
-
-
 /*
   Notes:
   - Definitely a 'no-frills' format.
   - Certainly not optimized for speed; but it works.
   - No support for values greater than 255.
 */
+
+#define TOPIC_DETAIL 1019
 
 using namespace FX;
 
@@ -126,7 +126,7 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
           if(maxvalue<=0 || maxvalue>=256) return false;
           }
 
-        FXTRACE((100,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format));
+        FXTRACE((TOPIC_DETAIL,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format));
 
         // Allocate buffer
         if(callocElms(data,npixels)){

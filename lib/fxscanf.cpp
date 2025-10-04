@@ -25,7 +25,6 @@
 #include "fxascii.h"
 #include "FXString.h"
 
-
 /*
   Notes:
   - It may be not perfect, but at least its the same on all platforms.
@@ -101,13 +100,11 @@
 #endif
 #endif
 
-
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Type modifiers
 enum {

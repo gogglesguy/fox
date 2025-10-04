@@ -40,8 +40,6 @@
 #include "FXApp.h"
 #include "FXRecentFiles.h"
 
-
-
 /*
   Notes:
   - Use the auto-hide or auto-gray feature to hide menus which are connected
@@ -49,13 +47,11 @@
   - Default constructor is deprecated in applications; used only for serialization.
 */
 
-
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Up to 32 files kepts
 const FXchar FXRecentFiles::key[32][7]={

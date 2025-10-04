@@ -35,7 +35,6 @@
 #include "FXWindow.h"
 #include "FXUndoList.h"
 
-
 /*
   Notes:
 
@@ -116,8 +115,8 @@
     history before deleting linear history.
 */
 
+#define TOPIC_CONSTRUCT 1000
 #define TOPIC_DEBUG     1002
-
 
 using namespace FX;
 
@@ -228,6 +227,7 @@ FXIMPLEMENT(FXUndoList,FXCommandGroup,FXUndoListMap,ARRAYNUMBER(FXUndoListMap))
 
 // Make new empty undo list
 FXUndoList::FXUndoList():space(0),undocount(0),redocount(0),marker(0),markset(false),alternate(true),working(false){
+  FXTRACE((TOPIC_CONSTRUCT,"FXUndoList::FXUndoList\n"));
   }
 
 
@@ -868,6 +868,7 @@ long FXUndoList::onCmdDumpStats(FXObject*,FXSelector,void*){
 
 // Destroy now
 FXUndoList::~FXUndoList(){
+  FXTRACE((TOPIC_CONSTRUCT,"FXUndoList::~FXUndoList\n"));
   clear();
   }
 

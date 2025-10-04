@@ -50,7 +50,6 @@
 
 #define DISPLAY(app) ((Display*)((app)->display))
 
-
 using namespace FX;
 
 /*******************************************************************************/

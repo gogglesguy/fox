@@ -357,6 +357,7 @@ FXXPMIcon.h \
 FXXPMImage.h \
 fx.h \
 fx3d.h \
+fxadler32.h \
 fxascii.h \
 fxchar.h \
 fxcpuid.h \

@@ -25,6 +25,10 @@
 #include "FXCallback.h"
 #endif
 
+#ifndef FXMETACLASS_H
+#include "FXMetaClass.h"
+#endif
+
 namespace FX {
 
 

@@ -48,7 +48,6 @@ typedef int INT32;
 #endif
 
 
-
 /*
   Notes:
   - Add more options for fast jpeg loading.
@@ -68,7 +67,6 @@ typedef int INT32;
 */
 
 #define JPEG_BUFFER_SIZE 4096
-
 
 using namespace FX;
 

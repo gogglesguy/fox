@@ -913,7 +913,7 @@ void FXCompile::gettok(){
         while(Ascii::isWord(*tail)){
           token=((token<<5)+token) ^ (FXuchar)*tail++;
           }
-        //FXTRACE((1,"token=%u\n",token));
+        //FXTRACE((TOPIC_DETAIL,"token=%u\n",token));
         return;
       default:
         token=TK_ERROR;

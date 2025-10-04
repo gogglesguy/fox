@@ -64,6 +64,10 @@
     PACK_UNIFORM_HEIGHT!
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 // Definitions for Motif-style WM Hints.
 #ifndef WIN32
 #define MWM_HINTS_FUNCTIONS	(1L << 0)       // Definitions for FXMotifHints.flags
@@ -310,18 +314,18 @@ void FXTopWindow::killFocus(){
 /*
     if(GetFocus()==(HWND)xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((100,"focus back to owner\n"));
+        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
         SetFocus((HWND)getOwner()->id());
         }
       else{
-        FXTRACE((100,"focus back to NULL\n"));
+        FXTRACE((TOPIC_DETAIL,"focus back to NULL\n"));
         SetFocus((HWND)nullptr);
         }
       }
 */
     if(GetActiveWindow()==(HWND)xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((100,"focus back to owner\n"));
+        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
         SetActiveWindow((HWND)getOwner()->getShell()->id());        // Fix from Sander
         //SetForegroundWindow((HWND)getOwner()->getShell()->id());
         }
@@ -332,11 +336,11 @@ void FXTopWindow::killFocus(){
     XGetInputFocus(DISPLAY(getApp()),&win,&dum);
     if(win==xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((100,"focus back to owner\n"));
+        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
         XSetInputFocus(DISPLAY(getApp()),getOwner()->id(),RevertToPointerRoot,CurrentTime);
         }
       else{
-        FXTRACE((100,"focus back to NULL\n"));
+        FXTRACE((TOPIC_DETAIL,"focus back to NULL\n"));
         XSetInputFocus(DISPLAY(getApp()),PointerRoot,RevertToPointerRoot,CurrentTime);
         }
       }
@@ -1568,14 +1572,14 @@ long FXTopWindow::onCmdClose(FXObject*,FXSelector,void*){
 
 // Session is about to close, give opportunity to save data
 long FXTopWindow::onSessionNotify(FXObject*,FXSelector,void* ptr){
-  FXTRACE((100,"%s::onSessionNotify %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onSessionNotify %p\n",getClassName(),this));
   return target && target->tryHandle(this,FXSEL(SEL_SESSION_NOTIFY,message),ptr);
   }
 
 
 // Session has closed, close the window with prejudice
 long FXTopWindow::onSessionClosed(FXObject*,FXSelector,void* ptr){
-  FXTRACE((100,"%s::onSessionClosed %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onSessionClosed %p\n",getClassName(),this));
   if(target) target->tryHandle(this,FXSEL(SEL_SESSION_CLOSED,message),ptr);
   close(false);
   return 1;
@@ -1712,21 +1716,21 @@ long FXTopWindow::onFocusRight(FXObject*,FXSelector,void* ptr){
 
 // Handle restore notify
 long FXTopWindow::onRestore(FXObject*,FXSelector,void* ptr){
-  FXTRACE((100,"%s::onRestore %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onRestore %p\n",getClassName(),this));
   return target && target->tryHandle(this,FXSEL(SEL_RESTORE,message),ptr);
   }
 
 
 // Handle maximize notify
 long FXTopWindow::onMaximize(FXObject*,FXSelector,void* ptr){
-  FXTRACE((100,"%s::onMaximize %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onMaximize %p\n",getClassName(),this));
   return target && target->tryHandle(this,FXSEL(SEL_MAXIMIZE,message),ptr);
   }
 
 
 // Handle minimize notify
 long FXTopWindow::onMinimize(FXObject*,FXSelector,void* ptr){
-  FXTRACE((100,"%s::onMinimize %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DETAIL,"%s::onMinimize %p\n",getClassName(),this));
   return target && target->tryHandle(this,FXSEL(SEL_MINIMIZE,message),ptr);
   }
 

@@ -47,9 +47,7 @@
 #include "FXColorList.h"
 
 
-
 /*
-
   Notes:
 */
 
@@ -62,7 +60,6 @@
 #define SWATCH_HEIGHT           12
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

@@ -69,7 +69,7 @@
 */
 
 
-#define TOPIC_KEYBOARD  1009
+#define TOPIC_KEYBOARD   1009
 
 #define MENUGLYPH_WIDTH  10
 #define MENUGLYPH_HEIGHT 5
@@ -631,6 +631,7 @@ long FXOptionMenu::onMotion(FXObject*,FXSelector,void* ptr){
 long FXOptionMenu::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
   if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
     if(ev->code>0)
       setCurrentNo((getCurrentNo()-1+getNumOptions())%getNumOptions(),true);
     else

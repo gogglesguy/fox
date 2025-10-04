@@ -31,7 +31,6 @@
 #include "FXQOIFImage.h"
 
 
-
 /*
   Notes:
   - FXQOIFImage has an alpha channel.

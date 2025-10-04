@@ -148,6 +148,8 @@
 */
 
 #define TOPIC_CONSTRUCT  1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 #define COMMANDLEN   256
 #define EXTENSIONLEN 128
@@ -194,7 +196,7 @@ FXFileAssociations::FXFileAssociations(FXApp* app,FXSettings* sdb):cache(app),se
 
 // Parse binding and populate association from it
 FXFileAssoc* FXFileAssociations::parse(const FXString& assoc){
-  FXTRACE((200,"FXFileAssociations::parse(\"%s\")\n",assoc.text()));
+  FXTRACE((TOPIC_DETAIL,"FXFileAssociations::parse(\"%s\")\n",assoc.text()));
   if(!assoc.empty()){
     FXFileAssoc* result=new FXFileAssoc;
     if(result){
@@ -247,7 +249,7 @@ FXFileAssoc* FXFileAssociations::parse(const FXString& assoc){
       if(string.contains("t")) flags|=2;
       result->flags=flags;
 
-      FXTRACE((300,"FXFileAssociations::parse: command=\"%s\" extension=\"%s\" mimetype=\"%s\" big=\"%s\" bigopen=\"%s\" mini=\"%s\" miniopen=\"%s\" flags=%d\n",result->command.text(),result->extension.text(),result->mimetype.text(),bigname.text(),bignameopen.text(),mininame.text(),mininameopen.text(),flags));
+      FXTRACE((TOPIC_DETAIL,"FXFileAssociations::parse: command=\"%s\" extension=\"%s\" mimetype=\"%s\" big=\"%s\" bigopen=\"%s\" mini=\"%s\" miniopen=\"%s\" flags=%d\n",result->command.text(),result->extension.text(),result->mimetype.text(),bigname.text(),bignameopen.text(),mininame.text(),mininameopen.text(),flags));
 
       // Return it
       return result;
@@ -259,7 +261,7 @@ FXFileAssoc* FXFileAssociations::parse(const FXString& assoc){
 
 // Fetch file association
 FXFileAssoc* FXFileAssociations::fetch(const FXString& ext){
-  FXTRACE((200,"FXFileAssociations::fetch(\"%s\")\n",ext.text()));
+  FXTRACE((TOPIC_DETAIL,"FXFileAssociations::fetch(\"%s\")\n",ext.text()));
   FXFileAssoc* result=bindings[ext];
   if(!result){
     result=parse(getSettings()->readStringEntry("FILETYPES",ext,nullptr));
@@ -273,7 +275,7 @@ FXFileAssoc* FXFileAssociations::fetch(const FXString& ext){
 
 // Find file association from registry
 FXFileAssoc* FXFileAssociations::findFileBinding(const FXString& pathname){
-  FXTRACE((200,"FXFileAssociations::findFileBinding(\"%s\")\n",pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"FXFileAssociations::findFileBinding(\"%s\")\n",pathname.text()));
   const FXchar* filename=pathname.text();
   FXFileAssoc* record;
   for(const FXchar* p=filename; *p; ++p){
@@ -291,7 +293,7 @@ FXFileAssoc* FXFileAssociations::findFileBinding(const FXString& pathname){
 
 // Find directory association from registry
 FXFileAssoc* FXFileAssociations::findDirBinding(const FXString& pathname){
-  FXTRACE((200,"FXFileAssociations::findDirBinding(\"%s\")\n",pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"FXFileAssociations::findDirBinding(\"%s\")\n",pathname.text()));
   const FXchar* path=pathname.text();
   FXFileAssoc* record;
   while(*path){
@@ -305,7 +307,7 @@ FXFileAssoc* FXFileAssociations::findDirBinding(const FXString& pathname){
 
 // Find executable association from registry
 FXFileAssoc* FXFileAssociations::findExecBinding(const FXString& pathname){
-  FXTRACE((200,"FXFileAssociations::findExecBinding(\"%s\")\n",pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"FXFileAssociations::findExecBinding(\"%s\")\n",pathname.text()));
   return fetch(defaultExecBinding);
   }
 

@@ -62,7 +62,6 @@
 #include "FXToolBarShell.h"
 #include "icons.h"
 
-
 /*
   Notes:
   - May want to add support for centered layout mode.

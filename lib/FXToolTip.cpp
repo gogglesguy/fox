@@ -54,6 +54,10 @@
   - Text length dependent tooltip display by leonard@hipgraphics.com.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+#define TOPIC_DEBUG     1002
+
 #define HSPACE  4
 #define VSPACE  2
 
@@ -284,7 +288,7 @@ long FXToolTip::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
 // Pop the tool tip now
 long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
-  FXTRACE((250,"%s::onTipShow %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DEBUG,"%s::onTipShow %p\n",getClassName(),this));
   if(!label.empty()){
     autoplace();
     show();
@@ -302,7 +306,7 @@ long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
 
 // Tip should hide now
 long FXToolTip::onTipHide(FXObject*,FXSelector,void*){
-  FXTRACE((250,"%s::onTipHide %p\n",getClassName(),this));
+  FXTRACE((TOPIC_DEBUG,"%s::onTipHide %p\n",getClassName(),this));
   hide();
   return 1;
   }

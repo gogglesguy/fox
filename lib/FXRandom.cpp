@@ -24,7 +24,6 @@
 #include "fxmath.h"
 #include "FXRandom.h"
 
-
 /*
   Notes:
   - Algorithm based on Numerical Recipes, 3ed, pp. 351-352.
@@ -58,10 +57,9 @@
 
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
-
-/*******************************************************************************/
 
 // Construct random generator with default seed
 FXRandom::FXRandom():state(FXULONG(4101842887655102017)){

@@ -59,6 +59,17 @@ FXMat2f::FXMat2f(FXfloat s){
   }
 
 
+// Initialize matrix from components
+FXMat2f::FXMat2f(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
+#if defined(FOX_HAS_SSE)
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(a11,a10,a01,a00));
+#else
+  m[0][0]=a00; m[0][1]=a01;
+  m[1][0]=a10; m[1][1]=a11;
+#endif
+  }
+
+
 // Initialize matrix from another matrix
 FXMat2f::FXMat2f(const FXMat2f& s){
 #if defined(FOX_HAS_SSE)
@@ -81,13 +92,13 @@ FXMat2f::FXMat2f(const FXMat3f& s){
   }
 
 
-// Initialize matrix from array
-FXMat2f::FXMat2f(const FXfloat s[]){
+// Initialize matrix from two vectors
+FXMat2f::FXMat2f(const FXVec2f& a,const FXVec2f& b){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s));
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(b[1],b[0],a[1],a[0]));
 #else
-  m[0][0]=s[0]; m[0][1]=s[1];
-  m[1][0]=s[2]; m[1][1]=s[3];
+  m[0]=a;
+  m[1]=b;
 #endif
   }
 
@@ -99,24 +110,20 @@ FXMat2f::FXMat2f(FXfloat a,FXfloat b){
   }
 
 
-// Initialize matrix from components
-FXMat2f::FXMat2f(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
-#if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(a11,a10,a01,a00));
-#else
-  m[0][0]=a00; m[0][1]=a01;
-  m[1][0]=a10; m[1][1]=a11;
-#endif
+// Initialize diagonal matrix
+FXMat2f::FXMat2f(const FXVec2f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1];
   }
 
 
-// Initialize matrix from two vectors
-FXMat2f::FXMat2f(const FXVec2f& a,const FXVec2f& b){
+// Initialize matrix from array
+FXMat2f::FXMat2f(const FXfloat s[]){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(b[1],b[0],a[1],a[0]));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s));
 #else
-  m[0]=a;
-  m[1]=b;
+  m[0][0]=s[0]; m[0][1]=s[1];
+  m[1][0]=s[2]; m[1][1]=s[3];
 #endif
   }
 
@@ -181,6 +188,14 @@ FXMat2f& FXMat2f::set(FXfloat s){
   }
 
 
+// Set value from components
+FXMat2f& FXMat2f::set(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
+  m[0][0]=a00; m[0][1]=a01;
+  m[1][0]=a10; m[1][1]=a11;
+  return *this;
+  }
+
+
 // Set value from another matrix
 FXMat2f& FXMat2f::set(const FXMat2f& s){
 #if defined(FOX_HAS_SSE)
@@ -205,13 +220,13 @@ FXMat2f& FXMat2f::set(const FXMat3f& s){
   }
 
 
-// Set value from array
-FXMat2f& FXMat2f::set(const FXfloat s[]){
+// Set value from two vectors
+FXMat2f& FXMat2f::set(const FXVec2f& a,const FXVec2f& b){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s));
+  _mm_storeu_ps(&m[0][0],_mm_set_ps(b[1],b[0],a[1],a[0]));
 #else
-  m[0][0]=s[0]; m[0][1]=s[1];
-  m[1][0]=s[2]; m[1][1]=s[3];
+  m[0]=a;
+  m[1]=b;
 #endif
   return *this;
   }
@@ -225,21 +240,21 @@ FXMat2f& FXMat2f::set(FXfloat a,FXfloat b){
   }
 
 
-// Set value from components
-FXMat2f& FXMat2f::set(FXfloat a00,FXfloat a01,FXfloat a10,FXfloat a11){
-  m[0][0]=a00; m[0][1]=a01;
-  m[1][0]=a10; m[1][1]=a11;
+// Set diagonal matrix
+FXMat2f& FXMat2f::set(const FXVec2f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1];
   return *this;
   }
 
 
-// Set value from two vectors
-FXMat2f& FXMat2f::set(const FXVec2f& a,const FXVec2f& b){
+// Set value from array
+FXMat2f& FXMat2f::set(const FXfloat s[]){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_set_ps(b[1],b[0],a[1],a[0]));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s));
 #else
-  m[0]=a;
-  m[1]=b;
+  m[0][0]=s[0]; m[0][1]=s[1];
+  m[1][0]=s[2]; m[1][1]=s[3];
 #endif
   return *this;
   }

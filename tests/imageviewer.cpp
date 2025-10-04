@@ -444,8 +444,8 @@ FXbool ImageWindow::loadimage(const FXString& file){
     img=new FXRASImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
   else if(FXString::comparecase(ext,"png")==0){
-//    img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP,0,0,PNG_FILTER_BEST|PNG_IMAGE_ANALYZE|PNG_INDEX_COLOR);
-    img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP,0,0,PNG_FILTER_BEST|PNG_IMAGE_ANALYZE);
+    img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP,0,0,PNG_FILTER_BEST|PNG_IMAGE_ANALYZE|PNG_INDEX_COLOR);
+//    img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP,0,0,PNG_FILTER_BEST|PNG_IMAGE_ANALYZE);
 //    img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP,0,0,PNG_FILTER_BEST);
     }
   else if(FXString::comparecase(ext,"jpg")==0 || FXString::comparecase(ext,"jpeg")==0){

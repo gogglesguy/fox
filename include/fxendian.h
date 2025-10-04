@@ -330,6 +330,32 @@ static inline FXulong sar64(FXulong value,FXulong count){
   }
 
 
+/// Saturation int to unsigned char
+static inline FXuchar usatb(FXint x){
+  x&=~sar32(x,31); x|=sar32(0xff-x,31);
+  return (FXuchar)x;
+  }
+
+
+/// Saturation unsigned int to unsigned char
+static inline FXuchar usatb(FXuint x){
+  return (FXuchar)(x|sar32(0xff-x,31));
+  }
+
+
+/// Saturation int to unsigned short
+static inline FXushort usats(FXint x){
+  x&=~sar32(x,31); x|=sar32(0xffff-x,31);
+  return (FXushort)x;
+  }
+
+
+/// Saturation unsigned int to unsigned short
+static inline FXushort usats(FXuint x){
+  return (FXushort)(x|sar32(0xffff-x,31));
+  }
+
+
 /// Hash of 32-bit integer
 static inline FXuint hash32(FXuint x){
   x=((x>>16)^x)*0x21F0AAAD;

@@ -43,7 +43,6 @@
 #include "FXScrollBar.h"
 #include "FXScrollArea.h"
 
-
 /*
   To do:
   - When tabbing, we will never put focus on scrollbar.
@@ -405,13 +404,16 @@ long FXScrollArea::onVScrollerDragged(FXObject*,FXSelector,void* ptr){
 // not allowed, try horizontal scrolling instead.
 // If neither is allowed, return not handled (0).
 long FXScrollArea::onMouseWheel(FXObject* sender,FXSelector sel,void* ptr){
-  if((options&VSCROLLING_OFF)!=VSCROLLING_OFF){
-    vertical->handle(sender,sel,ptr);
-    return 1;
-    }
-  if((options&HSCROLLING_OFF)!=HSCROLLING_OFF){
-    horizontal->handle(sender,sel,ptr);
-    return 1;
+  if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    if((options&VSCROLLING_OFF)!=VSCROLLING_OFF){
+      vertical->handle(sender,sel,ptr);
+      return 1;
+      }
+    if((options&HSCROLLING_OFF)!=HSCROLLING_OFF){
+      horizontal->handle(sender,sel,ptr);
+      return 1;
+      }
     }
   return 0;
   }

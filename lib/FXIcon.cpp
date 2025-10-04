@@ -59,6 +59,7 @@
 
 #define TOPIC_CONSTRUCT 1000
 #define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 
 #define DARKCOLOR(r,g,b) (((r)+(g)+(b))<thresh)
@@ -379,7 +380,7 @@ void FXIcon::render(){
             shminfo.shmaddr=xim->data=(char*)shmat(shminfo.shmid,0,0);
             shminfo.readOnly=false;
             XShmAttach((Display*)getApp()->getDisplay(),&shminfo);
-            FXTRACE((150,"Bitmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+            FXTRACE((TOPIC_DETAIL,"Bitmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
             }
           }
         }
@@ -404,25 +405,25 @@ void FXIcon::render(){
       // Should have succeeded
       FXASSERT(xim);
 
-      FXTRACE((150,"bm width = %d\n",xim->width));
-      FXTRACE((150,"bm height = %d\n",xim->height));
-      FXTRACE((150,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((150,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((150,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((150,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((150,"bm depth = %d\n",xim->depth));
-      FXTRACE((150,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((150,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE((TOPIC_DETAIL,"bm width = %d\n",xim->width));
+      FXTRACE((TOPIC_DETAIL,"bm height = %d\n",xim->height));
+      FXTRACE((TOPIC_DETAIL,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
+      FXTRACE((TOPIC_DETAIL,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_pad = %d\n",xim->bitmap_pad));
+      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
+      FXTRACE((TOPIC_DETAIL,"bm depth = %d\n",xim->depth));
+      FXTRACE((TOPIC_DETAIL,"bm bytes_per_line = %d\n",xim->bytes_per_line));
+      FXTRACE((TOPIC_DETAIL,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
 
       // Fill shape mask
       if(options&IMAGE_OPAQUE){                                 // Opaque image
-        FXTRACE((150,"Shape rectangle\n"));
+        FXTRACE((TOPIC_DETAIL,"Shape rectangle\n"));
         memset(xim->data,0xff,xim->bytes_per_line*height);
         }
       else if(options&(IMAGE_ALPHACOLOR|IMAGE_ALPHAGUESS)){     // Transparent color
-        FXTRACE((150,"Shape from alpha-color\n"));
+        FXTRACE((TOPIC_DETAIL,"Shape from alpha-color\n"));
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
@@ -432,7 +433,7 @@ void FXIcon::render(){
           }
         }
       else{                                                     // Transparency channel
-        FXTRACE((150,"Shape from alpha-channel\n"));
+        FXTRACE((TOPIC_DETAIL,"Shape from alpha-channel\n"));
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
@@ -496,7 +497,7 @@ void FXIcon::render(){
       // Clean up
 #ifdef HAVE_XSHM_H
       if(shmi){
-        FXTRACE((150,"Bitmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+        FXTRACE((TOPIC_DETAIL,"Bitmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
         XShmDetach((Display*)getApp()->getDisplay(),&shminfo);
         xim->data=nullptr;
         XDestroyImage(xim);

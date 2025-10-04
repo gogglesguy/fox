@@ -28,7 +28,6 @@
 #include "FXString.h"
 #include "FXSystem.h"
 
-
 /*
   Notes:
   - Convert FXSystem::Time to a string, similar to UNIX strftime().
@@ -125,7 +124,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Furnish our own version
 extern FXAPI FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);

@@ -149,12 +149,13 @@
 
 */
 
+#define TOPIC_DETAIL 1021
+
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 const FXint RAS_MAGIC = 0x59a66a95;     // Magic number
 
@@ -225,7 +226,7 @@ FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   store >> header.maptype;
   store >> header.maplength;
 
-  FXTRACE((100,"fxloadRAS: magic=%08x width=%d height=%d depth=%d length=%d type=%d maptype=%d maplength=%d\n",header.magic,header.width,header.height,header.depth,header.length,header.type,header.maptype,header.maplength));
+  FXTRACE((TOPIC_DETAIL,"fxloadRAS: magic=%08x width=%d height=%d depth=%d length=%d type=%d maptype=%d maplength=%d\n",header.magic,header.width,header.height,header.depth,header.length,header.type,header.maptype,header.maplength));
 
   // Check magic code
   if(header.magic==RAS_MAGIC){
@@ -244,7 +245,7 @@ FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
             // Read in the colormap
             if(header.maptype==RMT_EQUAL_RGB && header.maplength){
-              FXTRACE((100,"fxloadRAS: RMT_EQUAL_RGB\n"));
+              FXTRACE((TOPIC_DETAIL,"fxloadRAS: RMT_EQUAL_RGB\n"));
               store.load(red,header.maplength/3);
               store.load(green,header.maplength/3);
               store.load(blue,header.maplength/3);
@@ -252,20 +253,20 @@ FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
             // Skip colormap
             else if(header.maptype==RMT_RAW && header.maplength){
-              FXTRACE((100,"fxloadRAS: RMT_RAW\n"));
+              FXTRACE((TOPIC_DETAIL,"fxloadRAS: RMT_RAW\n"));
               store.position(header.maplength,FXFromCurrent);
               }
 
             // Black and white
             else if(header.depth==1){
-              FXTRACE((100,"fxloadRAS: 1 bit\n"));
+              FXTRACE((TOPIC_DETAIL,"fxloadRAS: 1 bit\n"));
               red[0]=green[0]=blue[0]=0;
               red[1]=green[1]=blue[1]=255;
               }
 
             // Gray scale
             else if(header.depth==8){
-              FXTRACE((100,"fxloadRAS: 8 bit\n"));
+              FXTRACE((TOPIC_DETAIL,"fxloadRAS: 8 bit\n"));
               for(i=0; i<256; i++){
                 red[i]=green[i]=blue[i]=i;
                 }
@@ -285,7 +286,7 @@ FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
                 width=header.width;
                 height=header.height;
 
-                FXTRACE((100,"fxloadRAS: header.length=%d linesize=%d 4*npixels=%d\n",header.length,linesize,4*npixels));
+                FXTRACE((TOPIC_DETAIL,"fxloadRAS: header.length=%d linesize=%d 4*npixels=%d\n",header.length,linesize,4*npixels));
 
                 // Now read the image
                 for(y=0,p=(FXuchar*)data,count=c=0; y<height; y++){

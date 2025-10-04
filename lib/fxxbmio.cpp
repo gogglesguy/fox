@@ -28,8 +28,6 @@
 #include "FXElement.h"
 #include "FXStream.h"
 
-
-
 /*
   Notes:
   - Support for black and white images.
@@ -39,7 +37,6 @@
 */
 
 using namespace FX;
-
 
 /*******************************************************************************/
 

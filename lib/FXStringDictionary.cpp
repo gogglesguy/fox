@@ -49,7 +49,6 @@ using namespace FX;
 
 namespace FX {
 
-
 // Empty string dictionary table value
 extern const FXint __string__empty__[];
 extern const FXival __stringdictionary__empty__[];

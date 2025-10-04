@@ -98,6 +98,7 @@
     certain due to poorly defined signature information in the file.
 */
 
+#define TOPIC_DEBUG     1002
 
 using namespace FX;
 
@@ -433,7 +434,7 @@ FXImage *FXIconSource::imageFromStream(FXApp* app,FXStream& store) const {
 // Load from file
 FXIcon *FXIconSource::loadIconFile(FXApp* app,const FXString& filename,const FXString& type) const {
   FXIcon *icon=nullptr;
-  FXTRACE((150,"FXIconSource loadIcon(%s)\n",filename.text()));
+  FXTRACE((TOPIC_DEBUG,"FXIconSource loadIcon(%s)\n",filename.text()));
   if(!filename.empty()){
     FXFileStream store;
     if(store.open(filename,FXStreamLoad,65536)){
@@ -483,7 +484,7 @@ FXIcon *FXIconSource::loadIconStream(FXApp* app,FXStream& store,const FXString& 
 // Load from file
 FXImage *FXIconSource::loadImageFile(FXApp* app,const FXString& filename,const FXString& type) const {
   FXImage *image=nullptr;
-  FXTRACE((150,"FXIconSource loadImage(%s)\n",filename.text()));
+  FXTRACE((TOPIC_DEBUG,"FXIconSource loadImage(%s)\n",filename.text()));
   if(!filename.empty()){
     FXFileStream store;
     if(store.open(filename,FXStreamLoad,65536)){

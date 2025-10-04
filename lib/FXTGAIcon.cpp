@@ -30,7 +30,6 @@
 #include "FXMemoryStream.h"
 #include "FXTGAIcon.h"
 
-
 /*
   Notes:
   - Targa does not support alpha in the file format.
@@ -43,7 +42,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Suggested file extension
 const FXchar FXTGAIcon::fileExt[]="tga";

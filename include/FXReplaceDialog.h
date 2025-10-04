@@ -31,6 +31,7 @@ namespace FX {
 class FXButton;
 class FXLabel;
 class FXTextField;
+class FXArrowButton;
 class FXHorizontalFrame;
 
 
@@ -54,11 +55,15 @@ class FXAPI FXReplaceDialog : public FXDialogBox {
   FXDECLARE(FXReplaceDialog)
 protected:
   FXLabel           *searchlabel;
-  FXTextField       *searchtext;
   FXHorizontalFrame *searchbox;
+  FXTextField       *searchtext;
+  FXArrowButton     *ar1;
+  FXArrowButton     *ar2;
   FXLabel           *replacelabel;
-  FXTextField       *replacetext;
   FXHorizontalFrame *replacebox;
+  FXTextField       *replacetext;
+  FXArrowButton     *ar3;
+  FXArrowButton     *ar4;
   FXButton          *search;
   FXButton          *replace;
   FXButton          *replacesel;

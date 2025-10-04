@@ -842,7 +842,7 @@ public:
   * Translate message for localization; using the current FXTranslator,
   * an attempt is made to translate the given message into the current
   * language.  An optional hint may be passed to break any ties in case
-  * more than one tranlation is possible for the given message text.
+  * more than one translation is possible for the given message text.
   * In addition, the name of the widget is passed as context name so
   * that translations for a single dialog may be grouped together.
   */

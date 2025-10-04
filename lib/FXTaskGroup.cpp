@@ -37,7 +37,6 @@
 #include "FXThreadPool.h"
 #include "FXTaskGroup.h"
 
-
 /*
   Notes:
 
@@ -73,7 +72,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Create new group of tasks
 FXTaskGroup::FXTaskGroup():threadpool(FXThreadPool::instance()){

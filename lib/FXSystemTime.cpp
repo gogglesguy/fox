@@ -28,12 +28,12 @@
 #include "FXString.h"
 #include "FXSystem.h"
 
-
 /*
   Notes:
   - Handy functions for manipulating calendar time.
 */
 
+#define TOPIC_DEBUG     1002
 
 using namespace FX;
 
@@ -435,12 +435,12 @@ FXTime FXSystem::daylightSavingsActive(FXTime utc){
   struct tm tmresult;
   time_t tmp=(time_t)(utc/seconds);
   struct tm* ptm=localtime_r(&tmp,&tmresult);
-  FXTRACE((300,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
+  FXTRACE((TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
   return ptm && ptm->tm_isdst!=0;
 #else
   time_t tmp=(time_t)(utc/seconds);
   struct tm* ptm=localtime(&tmp);
-  FXTRACE((300,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
+  FXTRACE((TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
   return ptm && ptm->tm_isdst!=0;
 #endif
   }

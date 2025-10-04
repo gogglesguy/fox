@@ -37,11 +37,11 @@
 
 /*
   Notes:
+
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
   - Some operations assume last column is (0,0,0,1).
 */
-
 
 using namespace FX;
 
@@ -75,6 +75,15 @@ FXMat4d::FXMat4d(FXdouble s){
   m[2][0]=s; m[2][1]=s; m[2][2]=s; m[2][3]=s;
   m[3][0]=s; m[3][1]=s; m[3][2]=s; m[3][3]=s;
 #endif
+  }
+
+
+// Initialize matrix from components
+FXMat4d::FXMat4d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
+  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
   }
 
 
@@ -128,27 +137,33 @@ FXMat4d::FXMat4d(const FXMat4d& s){
   }
 
 
-// Initialize matrix from array
-FXMat4d::FXMat4d(const FXdouble s[]){
+// Initialize matrix from quaternion
+FXMat4d::FXMat4d(const FXQuatd& quat){
+  set(FXMat3d(quat));
+  }
+
+
+// Initialize matrix from four vectors
+FXMat4d::FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s+0));
-  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(s+4));
-  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(s+8));
-  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(s+12));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(a));
+  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(b));
+  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(c));
+  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(d));
 #elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(s+2));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+4));
-  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(s+6));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(s+8));
-  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(s+10));
-  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(s+12));
-  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(s+14));
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&a[0]));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&a[2]));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&b[0]));
+  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(&b[2]));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&c[0]));
+  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(&c[2]));
+  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(&d[0]));
+  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(&d[2]));
 #else
-  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
-  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
-  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
-  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
+  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
+  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
+  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
+  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
 #endif
   }
 
@@ -178,43 +193,36 @@ FXMat4d::FXMat4d(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
   }
 
 
-// Initialize matrix from components
-FXMat4d::FXMat4d(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
-  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+// Initialize diagonal matrix
+FXMat4d::FXMat4d(const FXVec4d& d){
+  m[0][0]=d[0]; m[0][1]=0.0;  m[0][2]=0.0;  m[0][3]=0.0;
+  m[1][0]=0.0;  m[1][1]=d[1]; m[1][2]=0.0;  m[1][3]=0.0;
+  m[2][0]=0.0;  m[2][1]=0.0;  m[2][2]=d[2]; m[2][3]=0.0;
+  m[3][0]=0.0;  m[3][1]=0.0;  m[3][2]=0.0;  m[3][3]=d[3];
   }
 
-
-// Initialize matrix from four vectors
-FXMat4d::FXMat4d(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
+// Initialize matrix from array
+FXMat4d::FXMat4d(const FXdouble s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(a));
-  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(b));
-  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(c));
-  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(d));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s+0));
+  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(s+4));
+  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(s+8));
+  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(s+12));
 #elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&a[0]));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&a[2]));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&b[0]));
-  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(&b[2]));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&c[0]));
-  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(&c[2]));
-  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(&d[0]));
-  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(&d[2]));
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(s+2));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+4));
+  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(s+6));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(s+8));
+  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(s+10));
+  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(s+12));
+  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(s+14));
 #else
-  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
-  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
-  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
-  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
+  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
+  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
+  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
+  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
 #endif
-  }
-
-
-// Initialize matrix from quaternion
-FXMat4d::FXMat4d(const FXQuatd& quat){
-  set(FXMat3d(quat));
   }
 
 
@@ -354,6 +362,16 @@ FXMat4d& FXMat4d::set(FXdouble s){
   }
 
 
+// Set value from components
+FXMat4d& FXMat4d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
+  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+  return *this;
+  }
+
+
 // Set from 3x3 rotation and scaling matrix
 FXMat4d& FXMat4d::set(const FXMat3d& s){
 #if defined(FOX_HAS_AVX)
@@ -406,27 +424,33 @@ FXMat4d& FXMat4d::set(const FXMat4d& s){
   }
 
 
-// Set value from array
-FXMat4d& FXMat4d::set(const FXdouble s[]){
+// Assignment from quaternion
+FXMat4d& FXMat4d::set(const FXQuatd& quat){
+  return set(FXMat3d(quat));
+  }
+
+
+// Set value from four vectors
+FXMat4d& FXMat4d::set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s+0));
-  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(s+4));
-  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(s+8));
-  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(s+12));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(a));
+  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(b));
+  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(c));
+  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(d));
 #elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(s+2));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+4));
-  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(s+6));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(s+8));
-  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(s+10));
-  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(s+12));
-  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(s+14));
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&a[0]));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&a[2]));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&b[0]));
+  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(&b[2]));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&c[0]));
+  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(&c[2]));
+  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(&d[0]));
+  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(&d[2]));
 #else
-  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
-  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
-  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
-  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
+  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
+  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
+  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
+  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
 #endif
   return *this;
   }
@@ -458,45 +482,39 @@ FXMat4d& FXMat4d::set(FXdouble a,FXdouble b,FXdouble c,FXdouble d){
   }
 
 
-// Set value from components
-FXMat4d& FXMat4d::set(FXdouble a00,FXdouble a01,FXdouble a02,FXdouble a03,FXdouble a10,FXdouble a11,FXdouble a12,FXdouble a13,FXdouble a20,FXdouble a21,FXdouble a22,FXdouble a23,FXdouble a30,FXdouble a31,FXdouble a32,FXdouble a33){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
-  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+// Set diagonal matrix
+FXMat4d& FXMat4d::set(const FXVec4d& d){
+  m[0][0]=d[0]; m[0][1]=0.0;  m[0][2]=0.0;  m[0][3]=0.0;
+  m[1][0]=0.0;  m[1][1]=d[1]; m[1][2]=0.0;  m[1][3]=0.0;
+  m[2][0]=0.0;  m[2][1]=0.0;  m[2][2]=d[2]; m[2][3]=0.0;
+  m[3][0]=0.0;  m[3][1]=0.0;  m[3][2]=0.0;  m[3][3]=d[3];
   return *this;
   }
 
 
-// Set value from four vectors
-FXMat4d& FXMat4d::set(const FXVec4d& a,const FXVec4d& b,const FXVec4d& c,const FXVec4d& d){
+// Set value from array
+FXMat4d& FXMat4d::set(const FXdouble s[]){
 #if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(a));
-  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(b));
-  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(c));
-  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(d));
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s+0));
+  _mm256_storeu_pd(&m[1][0],_mm256_loadu_pd(s+4));
+  _mm256_storeu_pd(&m[2][0],_mm256_loadu_pd(s+8));
+  _mm256_storeu_pd(&m[3][0],_mm256_loadu_pd(s+12));
 #elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(&a[0]));
-  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(&a[2]));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(&b[0]));
-  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(&b[2]));
-  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(&c[0]));
-  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(&c[2]));
-  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(&d[0]));
-  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(&d[2]));
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
+  _mm_storeu_pd(&m[0][2],_mm_loadu_pd(s+2));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+4));
+  _mm_storeu_pd(&m[1][2],_mm_loadu_pd(s+6));
+  _mm_storeu_pd(&m[2][0],_mm_loadu_pd(s+8));
+  _mm_storeu_pd(&m[2][2],_mm_loadu_pd(s+10));
+  _mm_storeu_pd(&m[3][0],_mm_loadu_pd(s+12));
+  _mm_storeu_pd(&m[3][2],_mm_loadu_pd(s+14));
 #else
-  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
-  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
-  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
-  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
+  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
+  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
+  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
+  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
 #endif
   return *this;
-  }
-
-
-// Assignment from quaternion
-FXMat4d& FXMat4d::set(const FXQuatd& quat){
-  return set(FXMat3d(quat));
   }
 
 

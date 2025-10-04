@@ -50,7 +50,6 @@
 #include "FXTreeList.h"
 #include "FXTreeListBox.h"
 
-
 /*
   Notes:
   - Handling typed text:
@@ -71,10 +70,13 @@
   - No reaction to up and down arrow while disabled.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 #define TREELISTBOX_MASK       (0)
 
 using namespace FX;
-
 
 /*******************************************************************************/
 
@@ -262,8 +264,10 @@ long FXTreeListBox::onFocusDown(FXObject*,FXSelector,void*){
 // Mouse wheel
 long FXTreeListBox::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
+  FXTreeItem *item;
   if(isEnabled()){
-    FXTreeItem *item=getCurrentItem();
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    item=getCurrentItem();
     if(event->code<0){
       if(!item){ item=getFirstItem(); }
       else if(item->getBelow()){ item=item->getBelow(); }
@@ -341,7 +345,7 @@ FXTreeItem* FXTreeListBox::getLastItem() const {
 // Change current item
 void FXTreeListBox::setCurrentItem(FXTreeItem* item,FXbool notify){
   FXTreeItem* current=tree->getCurrentItem();
-  FXTRACE((100,"FXTreeListBox::setCurrentItem(%p=%s,%d) current=%p\n",item,item?tree->getItemText(item).text():"",notify,current));
+  FXTRACE((TOPIC_DETAIL,"FXTreeListBox::setCurrentItem(%p=%s,%d) current=%p\n",item,item?tree->getItemText(item).text():"",notify,current));
   if(current!=item){
     tree->setCurrentItem(item,notify);
     tree->makeItemVisible(item);

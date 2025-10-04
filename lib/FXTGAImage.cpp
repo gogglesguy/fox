@@ -30,8 +30,6 @@
 #include "FXMemoryStream.h"
 #include "FXTGAImage.h"
 
-
-
 /*
   Notes:
 */
@@ -41,7 +39,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Suggested file extension
 const FXchar FXTGAImage::fileExt[]="tga";

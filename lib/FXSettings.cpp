@@ -59,6 +59,9 @@
     lost when disk is full.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1001
+#define TOPIC_DEBUG     1002
 
 #define EMPTY     (const_cast<Entry*>((const Entry*)(__settings__empty__+3)))
 #define BSHIFT    5
@@ -248,7 +251,7 @@ const FXStringDictionary& FXSettings::at(const FXchar* ky) const {
 
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
-  FXTRACE((100,"FXSettings::parseFile(%s,%d)\n",filename.text(),mrk));
+  FXTRACE((TOPIC_DETAIL,"FXSettings::parseFile(%s,%d)\n",filename.text(),mrk));
   FXFile file(filename,FXFile::Reading);
   if(file.isOpen()){
     FXString string;
@@ -263,7 +266,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
 
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
-  FXTRACE((100,"FXSettings::unparseFile(%s)\n",filename.text()));
+  FXTRACE((TOPIC_DETAIL,"FXSettings::unparseFile(%s)\n",filename.text()));
   FXFile file(filename,FXFile::Writing);
   if(file.isOpen()){
     FXString string;

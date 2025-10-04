@@ -24,6 +24,9 @@ int main(int argc,char* argv[]){
   FXchar osver[100];
   FXint code;
 
+  FXUNUSED(argc);
+  FXUNUSED(argv);
+
   // Trace
   setTraceLevel(151);
 

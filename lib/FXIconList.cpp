@@ -84,8 +84,6 @@
     of '\t' with '\0'.  This would be significantly more efficient.
 */
 
-
-
 #define SIDE_SPACING             4    // Left or right spacing between items
 #define DETAIL_TEXT_SPACING      2    // Spacing between text and icon in detail icon mode
 #define MINI_TEXT_SPACING        2    // Spacing between text and icon in mini icon mode
@@ -771,11 +769,11 @@ FXint FXIconList::getContentHeight(){
 void FXIconList::layout(){
   FXint hh=(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS)) ? 0 : header->getDefaultHeight();
 
-  // Place scroll bars
-  placeScrollBars(width,height-hh);
-
   // Place header control
   header->position(0,0,width,hh);
+
+  // Place scroll bars
+  placeScrollBars(width,height-hh);
 
   // Set line size
   vertical->setLine(itemHeight);
@@ -1614,7 +1612,6 @@ long FXIconList::onLeave(FXObject* sender,FXSelector sel,void* ptr){
 
 // We timed out, i.e. the user didn't move for a while
 long FXIconList::onTipTimer(FXObject*,FXSelector,void*){
-  FXTRACE((250,"%s::onTipTimer %p\n",getClassName(),this));
   flags|=FLAG_TIP;
   return 1;
   }
@@ -1815,6 +1812,8 @@ void FXIconList::endLasso(){
 long FXIconList::onCmdArrangeByRows(FXObject*,FXSelector,void*){
   options&=~ICONLIST_COLUMNS;
   recalc();
+  setPosition(0,0);
+  makeItemVisible(current);
   return 1;
   }
 
@@ -1831,6 +1830,8 @@ long FXIconList::onUpdArrangeByRows(FXObject* sender,FXSelector,void*){
 long FXIconList::onCmdArrangeByColumns(FXObject*,FXSelector,void*){
   options|=ICONLIST_COLUMNS;
   recalc();
+  setPosition(0,0);
+  makeItemVisible(current);
   return 1;
   }
 
@@ -1848,6 +1849,8 @@ long FXIconList::onCmdShowDetails(FXObject*,FXSelector,void*){
   options&=~ICONLIST_MINI_ICONS;
   options&=~ICONLIST_BIG_ICONS;
   recalc();
+  setPosition(0,0);
+  makeItemVisible(current);
   return 1;
   }
 
@@ -1864,6 +1867,8 @@ long FXIconList::onCmdShowBigIcons(FXObject*,FXSelector,void*){
   options&=~ICONLIST_MINI_ICONS;
   options|=ICONLIST_BIG_ICONS;
   recalc();
+  setPosition(0,0);
+  makeItemVisible(current);
   return 1;
   }
 
@@ -1880,6 +1885,8 @@ long FXIconList::onCmdShowMiniIcons(FXObject*,FXSelector,void*){
   options|=ICONLIST_MINI_ICONS;
   options&=~ICONLIST_BIG_ICONS;
   recalc();
+  setPosition(0,0);
+  makeItemVisible(current);
   return 1;
   }
 
@@ -2263,16 +2270,19 @@ long FXIconList::onAutoScroll(FXObject* sender,FXSelector sel,void* ptr){
 
 // Mouse wheel handling
 long FXIconList::onMouseWheel(FXObject* sender,FXSelector sel,void* ptr){
-  if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
-    if(options&ICONLIST_COLUMNS){
-      return vertical->handle(sender,sel,ptr);
+  if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    if(options&(ICONLIST_BIG_ICONS|ICONLIST_MINI_ICONS)){
+      if(options&ICONLIST_COLUMNS){
+        return vertical->handle(sender,sel,ptr);
+        }
+      else{
+        return horizontal->handle(sender,sel,ptr);
+        }
       }
     else{
-      return horizontal->handle(sender,sel,ptr);
+      return vertical->handle(sender,sel,ptr);
       }
-    }
-  else{
-    return vertical->handle(sender,sel,ptr);
     }
   return 0;
   }

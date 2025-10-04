@@ -57,10 +57,9 @@
 
 using namespace FX;
 
+/*******************************************************************************/
 
 namespace FX {
-
-/*******************************************************************************/
 
 // Generate one for the thread itself
 FXAutoThreadStorageKey FXThread::selfKey;

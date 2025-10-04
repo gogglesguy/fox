@@ -25,7 +25,6 @@
 #include "fxascii.h"
 #include "FXString.h"
 
-
 /*
   Notes:
   - Thread-safe conversion of strings to signed long and int, with extra parameter
@@ -40,7 +39,6 @@
 #ifndef LLONG_MIN
 #define LLONG_MIN  (-LLONG_MAX-FXLONG(1))
 #endif
-
 
 using namespace FX;
 

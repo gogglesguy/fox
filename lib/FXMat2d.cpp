@@ -59,6 +59,18 @@ FXMat2d::FXMat2d(FXdouble s){
   }
 
 
+// Initialize matrix from components
+FXMat2d::FXMat2d(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
+#if defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_set_pd(a00,a01));
+  _mm_storeu_pd(&m[1][0],_mm_set_pd(a10,a11));
+#else
+  m[0][0]=a00; m[0][1]=a01;
+  m[1][0]=a10; m[1][1]=a11;
+#endif
+  }
+
+
 // Initialize matrix from another matrix
 FXMat2d::FXMat2d(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
@@ -85,16 +97,14 @@ FXMat2d::FXMat2d(const FXMat3d& s){
   }
 
 
-// Initialize matrix from array
-FXMat2d::FXMat2d(const FXdouble s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
-#elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
+// Initialize matrix from two vectors
+FXMat2d::FXMat2d(const FXVec2d& a,const FXVec2d& b){
+#if defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(a));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(b));
 #else
-  m[0][0]=s[0]; m[0][1]=s[1];
-  m[1][0]=s[2]; m[1][1]=s[3];
+  m[0]=a;
+  m[1]=b;
 #endif
   }
 
@@ -106,21 +116,23 @@ FXMat2d::FXMat2d(FXdouble a,FXdouble b){
   }
 
 
-// Initialize matrix from components
-FXMat2d::FXMat2d(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
-  m[0][0]=a00; m[0][1]=a01;
-  m[1][0]=a10; m[1][1]=a11;
+// Initialize diagonal matrix
+FXMat2d::FXMat2d(const FXVec2d& a){
+  m[0][0]=a[0]; m[0][1]=0.0;
+  m[1][0]=0.0;  m[1][1]=a[1];
   }
 
 
-// Initialize matrix from two vectors
-FXMat2d::FXMat2d(const FXVec2d& a,const FXVec2d& b){
-#if defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(a));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(b));
+// Initialize matrix from array
+FXMat2d::FXMat2d(const FXdouble s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
+#elif defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
 #else
-  m[0]=a;
-  m[1]=b;
+  m[0][0]=s[0]; m[0][1]=s[1];
+  m[1][0]=s[2]; m[1][1]=s[3];
 #endif
   }
 
@@ -198,6 +210,19 @@ FXMat2d& FXMat2d::set(FXdouble s){
   }
 
 
+// Set value from components
+FXMat2d& FXMat2d::set(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
+#if defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_set_pd(a00,a01));
+  _mm_storeu_pd(&m[1][0],_mm_set_pd(a10,a11));
+#else
+  m[0][0]=a00; m[0][1]=a01;
+  m[1][0]=a10; m[1][1]=a11;
+#endif
+  return *this;
+  }
+
+
 // Set value from another matrix
 FXMat2d& FXMat2d::set(const FXMat2d& s){
 #if defined(FOX_HAS_AVX)
@@ -226,16 +251,14 @@ FXMat2d& FXMat2d::set(const FXMat3d& s){
   }
 
 
-// Set value from array
-FXMat2d& FXMat2d::set(const FXdouble s[]){
-#if defined(FOX_HAS_AVX)
-  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
-#elif defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
+// Set value from two vectors
+FXMat2d& FXMat2d::set(const FXVec2d& a,const FXVec2d& b){
+#if defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(a));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(b));
 #else
-  m[0][0]=s[0]; m[0][1]=s[1];
-  m[1][0]=s[2]; m[1][1]=s[3];
+  m[0]=a;
+  m[1]=b;
 #endif
   return *this;
   }
@@ -249,22 +272,24 @@ FXMat2d& FXMat2d::set(FXdouble a,FXdouble b){
   }
 
 
-// Set value from components
-FXMat2d& FXMat2d::set(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11){
-  m[0][0]=a00; m[0][1]=a01;
-  m[1][0]=a10; m[1][1]=a11;
+// Set diagonal matrix
+FXMat2d& FXMat2d::set(const FXVec2d& d){
+  m[0][0]=d[0]; m[0][1]=0.0;
+  m[1][0]=0.0;  m[1][1]=d[1];
   return *this;
   }
 
 
-// Set value from two vectors
-FXMat2d& FXMat2d::set(const FXVec2d& a,const FXVec2d& b){
-#if defined(FOX_HAS_SSE2)
-  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(a));
-  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(b));
+// Set value from array
+FXMat2d& FXMat2d::set(const FXdouble s[]){
+#if defined(FOX_HAS_AVX)
+  _mm256_storeu_pd(&m[0][0],_mm256_loadu_pd(s));
+#elif defined(FOX_HAS_SSE2)
+  _mm_storeu_pd(&m[0][0],_mm_loadu_pd(s+0));
+  _mm_storeu_pd(&m[1][0],_mm_loadu_pd(s+2));
 #else
-  m[0]=a;
-  m[1]=b;
+  m[0][0]=s[0]; m[0][1]=s[1];
+  m[1][0]=s[2]; m[1][1]=s[3];
 #endif
   return *this;
   }

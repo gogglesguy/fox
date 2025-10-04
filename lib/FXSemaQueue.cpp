@@ -28,7 +28,6 @@
 #include "FXPtrQueue.h"
 #include "FXSemaQueue.h"
 
-
 /*
   Notes:
   - Fixed sized, circular buffer protected by semaphores.

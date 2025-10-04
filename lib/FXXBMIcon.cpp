@@ -29,7 +29,6 @@
 #include "FXMemoryStream.h"
 #include "FXXBMIcon.h"
 
-
 /*
   Notes:
 */

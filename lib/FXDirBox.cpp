@@ -84,6 +84,10 @@
     a single path but a list of paths.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -554,7 +558,7 @@ long FXDirBox::onTreeChanged(FXObject*,FXSelector,void* ptr){
 
 // Set directory
 void FXDirBox::setDirectory(const FXString& pathname,FXbool notify){
-  FXTRACE((100,"FXDirBox::setDirectory(%s,%d)\n",pathname.text(),notify));
+  FXTRACE((TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",pathname.text(),notify));
   setCurrentItem(getPathnameItem(FXPath::absolute(pathname)),notify);
   }
 

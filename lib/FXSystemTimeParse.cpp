@@ -28,7 +28,6 @@
 #include "FXString.h"
 #include "FXSystem.h"
 
-
 /*
   Notes:
   - Convert a string to FXSystem::Time similar to UNIX strptime().
@@ -162,7 +161,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Elements successfully parsed
 enum {

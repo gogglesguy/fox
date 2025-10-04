@@ -69,7 +69,6 @@ extern FXAPI FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint&
 extern FXAPI FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FXbool fast=true);
 #endif
 
-
 // Codes found in the GIF specification
 const FXuchar TAG_EXTENSION   = 0x21;   // Extension block
 const FXuchar TAG_GRAPHIC     = 0xF9;   // Graphic control block
@@ -89,6 +88,10 @@ const FXuchar TAG_NEW         = 0x39;   // New version
 const FXuchar TAG_OLD         = 0x37;   // Old version
 const FXuchar TAG_SUF         = 0x61;   // Version suffix
 
+// For interlacing
+const FXint Yinit[4]={0,4,2,1};
+const FXint Yinc[4]={8,8,4,2};
+
 
 // Check if stream contains a GIF
 FXbool fxcheckGIF(FXStream& store){
@@ -101,11 +104,8 @@ FXbool fxcheckGIF(FXStream& store){
 
 // Load image from stream
 FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXbool flag){
-  const   FXint Yinit[4]={0,4,2,1};
-  const   FXint Yinc[4]={8,8,4,2};
   FXint   imwidth,imheight,interlace,ncolors,npixels,maxpixels,i;
   FXuchar c1,c2,c3,sbsize,flagbits,background,index,*ptr,*buf,*pix;
-  FXColor colormap[256];
   FXint   BitOffset;                  // Bit Offset of next code
   FXint   ByteOffset;                 // Byte offset of next code
   FXint   XC,YC;                      // Output X and Y coords of current pixel
@@ -123,6 +123,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
   FXint   FinChar;                    // Decompressor variable
   FXint   BitMask;                    // AND mask for data size
   FXint   ReadMask;                   // Code AND mask for current code size
+  FXColor colormap[256];              // Color map
   FXint   Prefix[4096];               // The hash table used by the decompressor
   FXint   Suffix[4096];               // The hash table used by the decompressor
   FXint   OutCode[4097];              // An output array used by the decompressor
@@ -166,10 +167,14 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
   // Read global map if there is one
   if(flagbits&0x80){
     for(i=0; i<ncolors; i++){
-      store >> ((FXuchar*)(colormap+i))[2];     // Red
-      store >> ((FXuchar*)(colormap+i))[1];     // Green
-      store >> ((FXuchar*)(colormap+i))[0];     // Blue
-      ((FXuchar*)(colormap+i))[3]=255;          // Alpha
+      store >> c1;                   // Red
+      store >> c2;                   // Green
+      store >> c3;                   // Blue
+      colormap[i]=FXRGB(c1,c2,c3);
+//      store >> ((FXuchar*)(colormap+i))[2];     // Red
+//      store >> ((FXuchar*)(colormap+i))[1];     // Green
+//      store >> ((FXuchar*)(colormap+i))[0];     // Blue
+//      ((FXuchar*)(colormap+i))[3]=255;          // Alpha
       }
     }
 
@@ -189,7 +194,7 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
         store >> c3 >> c3;      // Delay time
         store >> index;         // Alpha color index; we suspect alpha<ncolors not always true...
         store >> c3;
-        if(flagbits&1){            // Clear alpha channel of alpha color
+        if(flagbits&1){         // Clear alpha channel of alpha color
           background=index;
           flag=true;
           }
@@ -224,11 +229,16 @@ FXbool fxloadGIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXboo
       // Read local map if there is one
       if(flagbits&0x80){
         ncolors=2<<(flagbits&7);
+        BitMask=ncolors-1;
         for(i=0; i<ncolors; i++){
-          store >> ((FXuchar*)(colormap+i))[2]; // Red
-          store >> ((FXuchar*)(colormap+i))[1]; // Green
-          store >> ((FXuchar*)(colormap+i))[0]; // Blue
-          ((FXuchar*)(colormap+i))[3]=255;      // Alpha
+          store >> c1;                   // Red
+          store >> c2;                   // Green
+          store >> c3;                   // Blue
+          colormap[i]=FXRGB(c1,c2,c3);
+//          store >> ((FXuchar*)(colormap+i))[2]; // Red
+//          store >> ((FXuchar*)(colormap+i))[1]; // Green
+//          store >> ((FXuchar*)(colormap+i))[0]; // Blue
+//          ((FXuchar*)(colormap+i))[3]=255;      // Alpha
           }
         }
 
@@ -522,9 +532,9 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
 
   // Output colormap
   for(i=0; i<colormapsize; i++){
-    store << ((FXuchar*)(colormap+i))[2]; // Blue
+    store << ((FXuchar*)(colormap+i))[2]; // Red
     store << ((FXuchar*)(colormap+i))[1]; // Green
-    store << ((FXuchar*)(colormap+i))[0]; // Red
+    store << ((FXuchar*)(colormap+i))[0]; // Blue
     }
 
   // Output Graphics Control Extension, if alpha is present

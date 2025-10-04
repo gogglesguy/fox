@@ -30,7 +30,6 @@
 #include "FXMemoryStream.h"
 #include "FXRGBIcon.h"
 
-
 /*
   Notes:
 */

@@ -28,13 +28,17 @@
 #include "FXArray.h"
 #include "FXString.h"
 #include "FXException.h"
+#include "FXRunnable.h"
+#include "FXAutoThreadStorageKey.h"
+#include "FXThread.h"
+#include "FXPerformance.h"
 #include "FXVariant.h"
 #include "FXVariantArray.h"
 #include "FXVariantMap.h"
 
 /*
   Notes:
-  
+
   - Variant is a "discriminated union" type that may hold a integer, floating
     point number, string, or respectively an array or key/value collection of
     variants.  Thus, a single Variant can hold an arbitrarily complex collection
@@ -70,7 +74,7 @@
     reference to newly created variant object.
     The const operators will return default Null variant if referencing non-existing
     members.
-    
+
   - When conversions take place, ok-flag is set to false if an overflow occurred.
     The returned value will be clamped to the legal range.
     For other conversion errors, 0, 0.0, false, or empty-string will be returned,
@@ -758,8 +762,12 @@ FXbool FXVariant::erase(FXival idx){
 
 /*******************************************************************************/
 
+PERFORMANCE_RECORDER(FXVariant_at_key);
+PERFORMANCE_RECORDER(FXVariant_at_key_const);
+
 // Return value of object member
 FXVariant& FXVariant::at(const FXchar* key){
+  PERFORMANCE_COUNTER(FXVariant_at_key);
   if(!isMap()){ clear(); init(MapType); }
   return asMap().at(key);
   }
@@ -767,12 +775,14 @@ FXVariant& FXVariant::at(const FXchar* key){
 
 // Return value of object member
 const FXVariant& FXVariant::at(const FXchar* key) const {
+  PERFORMANCE_COUNTER(FXVariant_at_key_const);
   return isMap() ? asMap().at(key) : FXVariant::null;
   }
 
 
 // Return value of object member
 FXVariant& FXVariant::at(const FXString& key){
+  PERFORMANCE_COUNTER(FXVariant_at_key);
   if(!isMap()){ clear(); init(MapType); }
   return asMap().at(key);
   }
@@ -780,13 +790,18 @@ FXVariant& FXVariant::at(const FXString& key){
 
 // Return value of object member
 const FXVariant& FXVariant::at(const FXString& key) const {
+  PERFORMANCE_COUNTER(FXVariant_at_key_const);
   return isMap() ? asMap().at(key) : FXVariant::null;
   }
 
 /*******************************************************************************/
 
+PERFORMANCE_RECORDER(FXVariant_at_idx);
+PERFORMANCE_RECORDER(FXVariant_at_idx_const);
+
 // Return value of array member
 FXVariant& FXVariant::at(FXival idx){
+  PERFORMANCE_COUNTER(FXVariant_at_idx);
   if(__unlikely(idx<0)){ throw FXRangeException("FXVariant: index out of range\n"); }
   if(!isArray()){ clear(); init(ArrayType); }
   if(idx>=asArray().no()){
@@ -800,6 +815,7 @@ FXVariant& FXVariant::at(FXival idx){
 
 // Return value of array member
 const FXVariant& FXVariant::at(FXival idx) const {
+  PERFORMANCE_COUNTER(FXVariant_at_idx_const);
   if(__unlikely(idx<0)){ throw FXRangeException("FXVariant: index out of range\n"); }
   return isArray() && idx<asArray().no() ? asArray().at(idx) : FXVariant::null;
   }

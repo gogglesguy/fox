@@ -37,7 +37,11 @@ public:
   FXMat2d(){}
 
   /// Initialize matrix from scalar
-  FXMat2d(FXdouble s);
+  explicit FXMat2d(FXdouble s);
+
+  /// Initialize matrix from components
+  FXMat2d(FXdouble a00,FXdouble a01,
+          FXdouble a10,FXdouble a11);
 
   /// Initialize matrix from another matrix
   FXMat2d(const FXMat2d& s);
@@ -45,17 +49,17 @@ public:
   /// Initialize from rotation and scaling part of 3x3 matrix
   FXMat2d(const FXMat3d& s);
 
-  /// Initialize matrix from array
-  FXMat2d(const FXdouble s[]);
+  /// Initialize matrix from two vectors
+  FXMat2d(const FXVec2d& a,const FXVec2d& b);
 
   /// Initialize diagonal matrix
   FXMat2d(FXdouble a,FXdouble b);
 
-  /// Initialize matrix from components
-  FXMat2d(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11);
+  /// Initialize diagonal matrix
+  explicit FXMat2d(const FXVec2d& d);
 
-  /// Initialize matrix from two vectors
-  FXMat2d(const FXVec2d& a,const FXVec2d& b);
+  /// Initialize matrix from array
+  explicit FXMat2d(const FXdouble s[]);
 
   /// Assignment from scalar
   FXMat2d& operator=(FXdouble s);
@@ -70,23 +74,27 @@ public:
   /// Set value from scalar
   FXMat2d& set(FXdouble s);
 
+  /// Set value from components
+  FXMat2d& set(FXdouble a00,FXdouble a01,
+               FXdouble a10,FXdouble a11);
+
   /// Set value from another matrix
   FXMat2d& set(const FXMat2d& s);
 
   /// Set from rotation and scaling part of 3x3 matrix
   FXMat2d& set(const FXMat3d& s);
 
-  /// Set value from array
-  FXMat2d& set(const FXdouble s[]);
+  /// Set value from two vectors
+  FXMat2d& set(const FXVec2d& a,const FXVec2d& b);
 
   /// Set diagonal matrix
   FXMat2d& set(FXdouble a,FXdouble b);
 
-  /// Set value from components
-  FXMat2d& set(FXdouble a00,FXdouble a01,FXdouble a10,FXdouble a11);
+  /// Initialize diagonal matrix
+  FXMat2d& set(const FXVec2d& d);
 
-  /// Set value from two vectors
-  FXMat2d& set(const FXVec2d& a,const FXVec2d& b);
+  /// Set value from array
+  FXMat2d& set(const FXdouble s[]);
 
   /// Assignment operators
   FXMat2d& operator+=(const FXMat2d& s);

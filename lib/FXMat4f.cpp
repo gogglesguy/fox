@@ -37,11 +37,11 @@
 
 /*
   Notes:
+
   - Transformations pre-multiply.
   - Goal is same effect as OpenGL.
   - Some operations assume last column is (0,0,0,1).
 */
-
 
 using namespace FX;
 
@@ -63,6 +63,15 @@ FXMat4f::FXMat4f(FXfloat s){
   m[2][0]=s; m[2][1]=s; m[2][2]=s; m[2][3]=s;
   m[3][0]=s; m[3][1]=s; m[3][2]=s; m[3][3]=s;
 #endif
+  }
+
+
+// Initialize matrix from components
+FXMat4f::FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
+  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
   }
 
 
@@ -98,18 +107,24 @@ FXMat4f::FXMat4f(const FXMat4f& s){
   }
 
 
-// Initialize matrix from array
-FXMat4f::FXMat4f(const FXfloat s[]){
+// Initialize matrix from quaternion
+FXMat4f::FXMat4f(const FXQuatf& quat){
+  set(FXMat3f(quat));
+  }
+
+
+// Initialize matrix from four vectors
+FXMat4f::FXMat4f(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
-  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(s+4));
-  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(s+8));
-  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(s+12));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(a));
+  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(b));
+  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(c));
+  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(d));
 #else
-  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
-  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
-  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
-  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
+  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
+  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
+  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
+  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
 #endif
   }
 
@@ -130,34 +145,28 @@ FXMat4f::FXMat4f(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
   }
 
 
-// Initialize matrix from components
-FXMat4f::FXMat4f(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
-  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+// Initialize diagonal matrix
+FXMat4f::FXMat4f(const FXVec4f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f; m[0][2]=0.0f; m[0][3]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1]; m[1][2]=0.0f; m[1][3]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=d[2]; m[2][3]=0.0f;
+  m[3][0]=0.0f; m[3][1]=0.0f; m[3][2]=0.0f; m[3][3]=d[3];
   }
 
 
-// Initialize matrix from four vectors
-FXMat4f::FXMat4f(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d){
+// Initialize matrix from array
+FXMat4f::FXMat4f(const FXfloat s[]){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(a));
-  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(b));
-  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(c));
-  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(d));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(s+4));
+  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(s+8));
+  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(s+12));
 #else
-  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
-  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
-  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
-  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
+  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
+  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
+  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
+  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
 #endif
-  }
-
-
-// Initialize matrix from quaternion
-FXMat4f::FXMat4f(const FXQuatf& quat){
-  set(FXMat3f(quat));
   }
 
 
@@ -252,6 +261,16 @@ FXMat4f& FXMat4f::set(FXfloat s){
   }
 
 
+// Set value from components
+FXMat4f& FXMat4f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
+  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
+  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
+  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
+  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+  return *this;
+  }
+
+
 // Set from 3x3 rotation and scaling matrix
 FXMat4f& FXMat4f::set(const FXMat3f& s){
 #if defined(FOX_HAS_SSE)
@@ -286,18 +305,24 @@ FXMat4f& FXMat4f::set(const FXMat4f& s){
   }
 
 
-// Set value from array
-FXMat4f& FXMat4f::set(const FXfloat s[]){
+// Set value from quaternion
+FXMat4f& FXMat4f::set(const FXQuatf& quat){
+  return set(FXMat3f(quat));
+  }
+
+
+// Set value from four vectors
+FXMat4f& FXMat4f::set(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
-  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(s+4));
-  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(s+8));
-  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(s+12));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(a));
+  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(b));
+  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(c));
+  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(d));
 #else
-  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
-  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
-  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
-  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
+  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
+  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
+  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
+  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
 #endif
   return *this;
   }
@@ -320,36 +345,30 @@ FXMat4f& FXMat4f::set(FXfloat a,FXfloat b,FXfloat c,FXfloat d){
   }
 
 
-// Set value from components
-FXMat4f& FXMat4f::set(FXfloat a00,FXfloat a01,FXfloat a02,FXfloat a03,FXfloat a10,FXfloat a11,FXfloat a12,FXfloat a13,FXfloat a20,FXfloat a21,FXfloat a22,FXfloat a23,FXfloat a30,FXfloat a31,FXfloat a32,FXfloat a33){
-  m[0][0]=a00; m[0][1]=a01; m[0][2]=a02; m[0][3]=a03;
-  m[1][0]=a10; m[1][1]=a11; m[1][2]=a12; m[1][3]=a13;
-  m[2][0]=a20; m[2][1]=a21; m[2][2]=a22; m[2][3]=a23;
-  m[3][0]=a30; m[3][1]=a31; m[3][2]=a32; m[3][3]=a33;
+// Set diagonal matrix
+FXMat4f& FXMat4f::set(const FXVec4f& d){
+  m[0][0]=d[0]; m[0][1]=0.0f; m[0][2]=0.0f; m[0][3]=0.0f;
+  m[1][0]=0.0f; m[1][1]=d[1]; m[1][2]=0.0f; m[1][3]=0.0f;
+  m[2][0]=0.0f; m[2][1]=0.0f; m[2][2]=d[2]; m[2][3]=0.0f;
+  m[3][0]=0.0f; m[3][1]=0.0f; m[3][2]=0.0f; m[3][3]=d[3];
   return *this;
   }
 
 
-// Set value from four vectors
-FXMat4f& FXMat4f::set(const FXVec4f& a,const FXVec4f& b,const FXVec4f& c,const FXVec4f& d){
+// Set value from array
+FXMat4f& FXMat4f::set(const FXfloat s[]){
 #if defined(FOX_HAS_SSE)
-  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(a));
-  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(b));
-  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(c));
-  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(d));
+  _mm_storeu_ps(&m[0][0],_mm_loadu_ps(s+0));
+  _mm_storeu_ps(&m[1][0],_mm_loadu_ps(s+4));
+  _mm_storeu_ps(&m[2][0],_mm_loadu_ps(s+8));
+  _mm_storeu_ps(&m[3][0],_mm_loadu_ps(s+12));
 #else
-  m[0][0]=a[0]; m[0][1]=a[1]; m[0][2]=a[2]; m[0][3]=a[3];
-  m[1][0]=b[0]; m[1][1]=b[1]; m[1][2]=b[2]; m[1][3]=b[3];
-  m[2][0]=c[0]; m[2][1]=c[1]; m[2][2]=c[2]; m[2][3]=c[3];
-  m[3][0]=d[0]; m[3][1]=d[1]; m[3][2]=d[2]; m[3][3]=d[3];
+  m[0][0]=s[0];  m[0][1]=s[1];  m[0][2]=s[2];  m[0][3]=s[3];
+  m[1][0]=s[4];  m[1][1]=s[5];  m[1][2]=s[6];  m[1][3]=s[7];
+  m[2][0]=s[8];  m[2][1]=s[9];  m[2][2]=s[10]; m[2][3]=s[11];
+  m[3][0]=s[12]; m[3][1]=s[13]; m[3][2]=s[14]; m[3][3]=s[15];
 #endif
   return *this;
-  }
-
-
-// Set value from quaternion
-FXMat4f& FXMat4f::set(const FXQuatf& quat){
-  return set(FXMat3f(quat));
   }
 
 

@@ -43,13 +43,12 @@
 
 using namespace FX;
 
-namespace FX {
-
 /*******************************************************************************/
+
+namespace FX {
 
 /// EXPERIMENT ///
 #if defined(NEWMAP)
-
 
 
 static const NewMapEntry messagemap[]={

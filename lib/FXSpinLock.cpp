@@ -33,6 +33,8 @@
   - Ticket spinlock flavor does not support more than 256 simultaneous threads.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -49,7 +51,7 @@ FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(OSSpinLock));
   data[0]=data[1]=data[2]=data[3]=0;
   *((OSSpinLock*)data)=OS_SPINLOCK_INIT;
@@ -57,7 +59,7 @@ FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_spinlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_spinlock_t));
   data[0]=data[1]=data[2]=data[3]=0;
   pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);

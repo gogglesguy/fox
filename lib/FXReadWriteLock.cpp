@@ -29,6 +29,8 @@
   - Read/write lock variable.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -50,14 +52,14 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(RWLOCK) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(SRWLOCK)=%d\n",sizeof(SRWLOCK)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(SRWLOCK)=%d\n",sizeof(SRWLOCK)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(SRWLOCK));
   InitializeSRWLock((SRWLOCK*)data);
 #elif defined(WIN32)
   // If this fails on your machine, determine what value
   // of sizeof(RWLOCK) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(RWLOCK));
   InitializeCriticalSection(((RWLOCK*)data)->mutex);
   InitializeCriticalSection(((RWLOCK*)data)->access);
@@ -66,7 +68,7 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlockattr_t rwlockatt;
   pthread_rwlockattr_init(&rwlockatt);
@@ -77,7 +79,7 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((150,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
+  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
   FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlock_init((pthread_rwlock_t*)data,nullptr);
 #endif

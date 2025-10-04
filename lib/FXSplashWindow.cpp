@@ -57,11 +57,9 @@
 
 using namespace FX;
 
-
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Map
 FXDEFMAP(FXSplashWindow) FXSplashWindowMap[]={

@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -146,17 +146,17 @@ FXuint SearchVisitor::visit(const FXString& path){
 
 // Search file contents for pattern
 FXint SearchVisitor::searchFile(const FXString& path) const {
+  FXString relpath=FXPath::relative(dlg->getDirectory(),path);
   FXString text;
   FXTRACE((1,"searchFile(path=%s)\n",path.text()));
+  dlg->setSearchingText(relpath);
   if(loadFile(path,text)){
-    FXString relpath=FXPath::relative(dlg->getDirectory(),path);
     FXString hit;
     FXint beg[10],end[10],ls,le,p;
     FXint lineno=1;
     FXint column=0;
     FXint pos=0;
     FXTRACE((1,"loadFile(path=%s) -> %d bytes\n",relpath.text(),text.length()));
-    dlg->setSearchingText(relpath);
     while(pos<text.length()){
       if(rex.amatch(text,pos,FXRex::Normal,beg,end,10)){
         for(ls=beg[0]; 0<ls && text[ls-1]!='\n'; --ls){ }               // Back up to line start
@@ -582,6 +582,7 @@ long FindInFiles::onCmdSearch(FXObject*,FXSelector,void*){
   if(!(getSearchMode()&SearchRecurse)) limit=2;                                 // Don't recurse
   appendHistory(getSearchText(),getDirectory(),getCurrentPattern(),getSearchMode());
   proceed=1;
+  setSearchingText(tr("<searching>"));
   visitor.traverse(getDirectory(),getSearchText(),getPattern(),rexmode,opts,limit);
   setSearchingText(tr("<stopped>"));
   getApp()->refresh();

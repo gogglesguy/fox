@@ -42,7 +42,6 @@
 #include "FXApp.h"
 #include "FXToolBarTab.h"
 
-
 /*
   To do:
 */

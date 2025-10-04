@@ -252,7 +252,7 @@ match:XFree(ximstyles);
 FXbool isIMRunning(Display *display){
   const FXchar *p=XSetLocaleModifiers(nullptr);
   if(p){
-    FXTRACE((100,"XSetLocaleModifiers=%s\n",p));
+    FXTRACE((TOPIC_DETAIL,"XSetLocaleModifiers=%s\n",p));
     FXString server("@server=");
     server.append(p+4);         // skip "@im="
     FXint pos=server.find('@',1);

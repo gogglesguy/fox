@@ -51,112 +51,7 @@
     <Image Include="..\..\pathfinder\bigicons.bmp">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\closepanel.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\config_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\copyit.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\desktop.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\details.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\dirup2.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\enter.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\execute.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\file_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\filehidden.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\fileshown.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\foldernew.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\foxbig.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\foxmini.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\gotodir.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\hosts.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\iconpath.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\linkit.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\location.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\maphost.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\miscellaneous_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\moveit.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\newfolder.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\pattern_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\properties.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\quit_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\renameit.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\rotateleft.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\rotateright.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\run_bmp.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\setdir.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\smallicons.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\sorting.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\unmaphost.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\warningicon_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\work.gif">
+    <Image Include="..\..\pathfinder\blocks_gif.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\bookclr_gif.gif">
@@ -177,25 +72,49 @@
     <Image Include="..\..\pathfinder\bookset_gif.gif">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\copy.gif">
+    <Image Include="..\..\pathfinder\closepanel.gif">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\cut.gif">
+    <Image Include="..\..\pathfinder\config_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\copy_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\cut_gif.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\delete_gif.gif">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\paste.gif">
+    <Image Include="..\..\pathfinder\desktop.bmp">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\search.gif">
+    <Image Include="..\..\pathfinder\details.bmp">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\dirup_gif.gif">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\dirup2_gif.gif">
+    <Image Include="..\..\pathfinder\enter.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\file_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\filehidden.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\fileshown.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\foldernew_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\foxbig.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\foxmini.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\goback_gif.gif">
@@ -207,37 +126,85 @@
     <Image Include="..\..\pathfinder\goforw_gif.gif">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="..\..\pathfinder\gotodir.bmp">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="..\..\pathfinder\goup_gif.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\home_gif.gif">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\work_gif.gif">
+    <Image Include="..\..\pathfinder\hosts.bmp">
       <Filter>Icons</Filter>
     </Image>
-    <Image Include="..\..\pathfinder\blocks_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\copy_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\cut_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\pathfinder\foldernew_gif.gif">
+    <Image Include="..\..\pathfinder\iconpath.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\link_gif.gif">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="..\..\pathfinder\location.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\maphost.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\miscellaneous_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="..\..\pathfinder\move_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\newfolder.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\paste.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\pattern_gif.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\pathfinder\property_gif.gif">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="..\..\pathfinder\quit_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
     <Image Include="..\..\pathfinder\rename_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\rotateleft.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\rotateright.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\run_bmp.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\search.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\setdir.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\smallicons.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\sorting.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\unmaphost.bmp">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\warningicon_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\work.gif">
+      <Filter>Icons</Filter>
+    </Image>
+    <Image Include="..\..\pathfinder\work_gif.gif">
       <Filter>Icons</Filter>
     </Image>
   </ItemGroup>

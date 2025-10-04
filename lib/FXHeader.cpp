@@ -44,8 +44,6 @@
 #include "FXHeader.h"
 
 
-
-
 /*
   Notes:
   - Perhaps, some way to drive via keyboard?
@@ -1141,7 +1139,6 @@ long FXHeader::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 // We timed out, i.e. the user didn't move for a while
 long FXHeader::onTipTimer(FXObject*,FXSelector,void*){
-  FXTRACE((250,"%s::onTipTimer %p\n",getClassName(),this));
   flags|=FLAG_TIP;
   return 1;
   }

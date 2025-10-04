@@ -1110,6 +1110,12 @@
     <ClInclude Include="..\..\include\FXQOIFImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\fxadler32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\FXPerformance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\lib\FX4Splitter.cpp">
@@ -2264,6 +2270,9 @@
     <ClCompile Include="..\..\lib\fxqoifio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\lib\FXPerformance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\lib\arrownext.gif">
@@ -2524,10 +2533,186 @@
     <Image Include="..\..\lib\icons.cpparrownext.gif">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="..\..\lib\icons.harrownext.gif">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\include\Makefile.am">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\..\lib\blank.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\blank_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\crosshair.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\crosshair_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndask_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndcopy.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndcopy_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndlink.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndlink_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndmove.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dndmove_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dontdrop.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\dontdrop_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\drag.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\drag_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\gray.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\hand.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\hand_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\helparrow.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\helparrow_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\hsplit.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\hsplit_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\move.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\move_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\ne.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\ne_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\nw.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\nw_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resize.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resize_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizeleft.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizeleft_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetop.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetop_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetopleft.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetopleft_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetopright.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\resizetopright_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\rotate.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\rotate_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\se.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\se_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\sw.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\sw_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\swatch.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\swatch_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\translate.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\translate_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\version.rc.in">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\vsplit.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\vsplit_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\xsplit.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\xsplit_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\zoom.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\lib\zoom_mask.xbm">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\lib\version.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

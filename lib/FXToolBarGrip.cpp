@@ -42,7 +42,6 @@
 #include "FXToolBar.h"
 #include "FXToolBarGrip.h"
 
-
 /*
   Notes:
   - Tool bar grip is a small grabber contained in the toolbar which lets

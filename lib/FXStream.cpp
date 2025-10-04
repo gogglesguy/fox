@@ -31,7 +31,6 @@
 #include "FXObject.h"
 #include "FXDLL.h"
 
-
 /*
   Notes:
   - Defer malloc in FXStream::open till object is actually being saved/loaded!
@@ -49,17 +48,16 @@
     transferred (not bytes but whole numbers of elements!).
 */
 
-
 #define MAXCLASSNAME       256          // Maximum class name length
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1002
 
 using namespace FX;
-
 
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Create PersistentStore object
 FXStream::FXStream(const FXObject *cont){
@@ -906,7 +904,7 @@ FXStream& FXStream::saveObject(const FXObject* v){
     *this << tag;                               // Save tag
     *this << zero;                              // Save escape code
     save(name,tag);                             // Save class name
-    FXTRACE((100,"%08ld: saveObject(%s)\n",(FXuval)pos,v->getClassName()));
+    FXTRACE((TOPIC_DETAIL,"%08ld: saveObject(%s)\n",(FXuval)pos,v->getClassName()));
     v->save(*this);                             // Save object
     }
   return *this;
@@ -955,7 +953,7 @@ FXStream& FXStream::loadObject(FXObject*& v){
     ref=(void*)(FXuval)seq++;                   // New reference
     v=cls->makeInstance();                      // Make instance of class
     hash.insert(ref,v);                         // Map reference to object
-    FXTRACE((100,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName()));
+    FXTRACE((TOPIC_DETAIL,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName()));
     v->load(*this);
     }
   return *this;

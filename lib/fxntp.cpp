@@ -33,7 +33,6 @@
   - Conversions between Network Time Protocol (NTP) time and Unix Epoch Time.
 */
 
-
 using namespace FX;
 
 /*******************************************************************************/

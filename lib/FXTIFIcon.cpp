@@ -30,7 +30,6 @@
 #include "FXMemoryStream.h"
 #include "FXTIFIcon.h"
 
-
 /*
   Notes:
   - FXTIFIcon has an alpha channel.
@@ -41,7 +40,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Suggested file extension
 const FXchar FXTIFIcon::fileExt[]="tif";

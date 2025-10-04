@@ -41,8 +41,6 @@
 #include "FXApp.h"
 #include "FXSeparator.h"
 
-
-
 /*
   Notes:
   - When changing icon/font/etc, we should only recalc and update when it's different.
@@ -57,14 +55,11 @@
 
 #define SEPARATOR_MASK  (SEPARATOR_NONE|SEPARATOR_GROOVE|SEPARATOR_RIDGE|SEPARATOR_LINE)
 
-
 using namespace FX;
 
 /*******************************************************************************/
 
-
 namespace FX {
-
 
 // Map
 FXDEFMAP(FXSeparator) FXSeparatorMap[]={

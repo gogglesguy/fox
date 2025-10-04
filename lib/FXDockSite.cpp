@@ -60,6 +60,10 @@
     extra galleys, except when unavoidable.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+
 #define FUDGE 20        // Amount to move down/up before jumping into next galley
 
 using namespace FX;
@@ -783,7 +787,7 @@ void FXDockSite::resizeToolBar(FXDockBar* bar,FXint barx,FXint bary,FXint barw,F
     FXint top,bottom,left,right,expand,require,w,h,mbw,mbh,t;
     FXWindow *begin,*end,*c;
 
-    //FXTRACE((100,"barx=%d bary=%d barw=%d barh=%d\n",barx,bary,barw,barh));
+    //FXTRACE((TOPIC_DETAIL,"barx=%d bary=%d barw=%d barh=%d\n",barx,bary,barw,barh));
 
     // Interior
     top=border+padtop;

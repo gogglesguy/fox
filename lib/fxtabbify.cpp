@@ -29,7 +29,6 @@
 #include "FXStream.h"
 #include "FXString.h"
 
-
 /*
   Notes:
   - Expand tabs to spaces, or compress runs of spaces to tabs, given tab stops
@@ -44,43 +43,58 @@ using namespace FX;
 
 namespace FX {
 
+
 // Expand tabs with the equivalent amount of spaces
 FXString FXString::detab(const FXchar* str,FXint num,FXint tabcols){
   FXString result;
-  FXint is,d,s;
+  FXint is,d,s,n;
   FXuchar c;
   is=d=s=0;
   while(s<num){
     c=str[s++];
     if(c=='\n'){
-      d++; is=0;
+      is=0;
+      d++;
       continue;
       }
     if(c=='\t'){
-      do{ d++; }while(++is%tabcols);
+      n=tabcols-is%tabcols;
+      is+=n;
+      d+=n;
       continue;
       }
-    d++; is++;
+    is++;
+    d++;
     if(c<0xC0) continue;
-    d++; s++;
+    d++;
+    s++;
     if(c<0xE0) continue;
-    d++; s++;
+    d++;
+    s++;
     if(c<0xF0) continue;
-    d++; s++;
+    d++;
+    s++;
     }
   result.length(d);
   is=d=s=0;
   while(s<num){
     c=str[s++];
     if(c=='\n'){
-      result[d++]=c; is=0;
+      is=0;
+      result[d++]=c;
       continue;
       }
     if(c=='\t'){
-      do{ result[d++]=' '; }while(++is%tabcols);
+      n=tabcols-is%tabcols;
+      is+=n;
+      do{
+        result[d++]=' ';
+        }
+      while(--n);
       continue;
       }
-    result[d++]=c; is++;
+    is++;
+    result[d++]=c;
     if(c<0xC0) continue;
     result[d++]=str[s++];
     if(c<0xE0) continue;
@@ -112,7 +126,9 @@ FXString FXString::entab(const FXchar* str,FXint num,FXint tabcols){
   FXuchar c;
   is=ie=d=s=0;
   while(s<num){
-    c=str[s++]; d++; ie++;
+    c=str[s++];
+    ie++;
+    d++;
     if(c==' '){                                 // Accumulate spaces
       if((ie-is)<3) continue;                   // Run of less than 3
       ts=is+tabcols-is%tabcols;
@@ -133,22 +149,26 @@ FXString FXString::entab(const FXchar* str,FXint num,FXint tabcols){
       continue;
       }
     if(c=='\n'){                                // Reset columns
-      is=0;
       ie=0;
+      is=0;
       continue;
       }
     is=ie;                                      // One UTF8 character
     if(c<0xC0) continue;
-    d++; s++;
+    d++;
+    s++;
     if(c<0xE0) continue;
-    d++; s++;
+    d++;
+    s++;
     if(c<0xF0) continue;
-    d++; s++;
+    d++;
+    s++;
     }
   result.length(d);
   is=ie=d=s=0;
   while(s<num){
-    c=result[d++]=str[s++]; ie++;
+    c=result[d++]=str[s++];
+    ie++;
     if(c==' '){                                 // Accumulate spaces
       if((ie-is)<3) continue;                   // Run of less than 3
       ts=is+tabcols-is%tabcols;
@@ -170,8 +190,8 @@ FXString FXString::entab(const FXchar* str,FXint num,FXint tabcols){
       continue;
       }
     if(c=='\n'){                                // Reset columns
-      is=0;
       ie=0;
+      is=0;
       continue;
       }
     is=ie;                                      // One UTF8 character
@@ -204,13 +224,13 @@ FXint FXString::columns(const FXchar* str,FXint num,FXint tabcols){
   FXuchar c;
   while(p<num){
     c=str[p++];
+    if(c=='\t'){                                // Advance by number of tab columns
+      cols+=tabcols-cols%tabcols;
+      continue;
+      }
     if(c=='\n'){                                // End of the line; keep track of the longest
       result=Math::imax(result,cols);
       cols=0;
-      continue;
-      }
-    if(c=='\t'){                                // Advance by number of tab columns
-      cols+=tabcols-cols%tabcols;
       continue;
       }
     cols++;
@@ -248,8 +268,8 @@ FXint FXString::columns(const FXString& str,FXint tabcols){
 // For now, we assume all unicode characters to be one column.
 FXString FXString::tabbify(const FXchar* str,FXint num,FXint tabcols,FXint indent,FXint outdent,FXint shift,FXbool tabs){
   FXString result;
-  FXint oec=outdent+shift;
   FXint osc=outdent;
+  FXint oec=outdent+shift;
   FXint isc=indent;
   FXint iec=indent;
   FXint s=0;
@@ -258,23 +278,32 @@ FXString FXString::tabbify(const FXchar* str,FXint num,FXint tabcols,FXint inden
   FXuchar c;
   while(s<num){
     c=str[s++];
-    if(c==' '){ iec++; continue; }                              // Space is one column
-    if(c=='\t'){ iec+=tabcols-iec%tabcols; continue; }          // Tabs is multiple columns
+    if(c==' '){                                                 // Space is one column
+      iec++;
+      continue;
+      }
+    if(c=='\t'){                                                // Tabs is multiple columns
+      iec+=tabcols-iec%tabcols;
+      continue;
+      }
     oec+=(iec-isc);
     if(osc<oec){                                                // Owe some spaces
       if(tabs && 2<(oec-osc)){
         ntabs=oec/tabcols-osc/tabcols;                          // How many tabs to emit
-        if(ntabs){ d+=ntabs; osc=(oec/tabcols)*tabcols; }
+        if(ntabs){
+          d+=ntabs;
+          osc=(oec/tabcols)*tabcols;
+          }
         }
       d+=oec-osc;
       osc=oec;
       }
     if(c=='\n'){                                                // Emit a newline and reset columns
-      d++;
-      isc=indent;
-      iec=indent;
       osc=outdent;
       oec=outdent+shift;
+      isc=indent;
+      iec=indent;
+      d++;
       continue;
       }
     isc=++iec;                                                  // Advance input columns
@@ -291,33 +320,45 @@ FXString FXString::tabbify(const FXchar* str,FXint num,FXint tabcols,FXint inden
     s++;
     }
   result.length(d);
-  oec=outdent+shift;
   osc=outdent;
+  oec=outdent+shift;
   isc=indent;
   iec=indent;
   s=0;
   d=0;
   while(s<num){
     c=str[s++];
-    if(c==' '){ iec++; continue; }                              // Space is one column
-    if(c=='\t'){ iec+=tabcols-iec%tabcols; continue; }          // Tabs is multiple columns
+    if(c==' '){                                                 // Space is one column
+      iec++;
+      continue;
+      }
+    if(c=='\t'){                                                // Tabs is multiple columns
+      iec+=tabcols-iec%tabcols;
+      continue;
+      }
     oec+=(iec-isc);
     if(osc<oec){                                                // Owe some spaces
       if(tabs && 2<(oec-osc)){
         ntabs=oec/tabcols-osc/tabcols;                          // How many tabs to emit
         if(ntabs){
-          do{ result[d++]='\t'; }while(--ntabs);
+          do{
+            result[d++]='\t';
+            }
+          while(--ntabs);
           osc=(oec/tabcols)*tabcols;                            // Advance starting column to the last tabstop
           }
         }
-      while(osc<oec){ result[d++]=' '; osc++; }                 // Emit spaces to reach current column
+      while(osc<oec){                                           // Emit spaces to reach current column
+        result[d++]=' ';
+        osc++;
+        }
       }
     if(c=='\n'){                                                // Emit a newline and reset columns
-      result[d++]='\n';
-      isc=indent;
-      iec=indent;
       osc=outdent;
       oec=outdent+shift;
+      isc=indent;
+      iec=indent;
+      result[d++]='\n';
       continue;
       }
     isc=++iec;                                                  // Advance input columns

@@ -40,7 +40,6 @@
 #include "FXWindow.h"
 #include "FXApp.h"
 
-
 /*
   Notes:
 
@@ -93,6 +92,8 @@
 
 #define TOPIC_CONSTRUCT 1000
 #define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
+#define TOPIC_DEBUG     1003
 
 // Maximum size of the colormap; for high-end graphics systems
 // you may want to define HIGHENDGRAPHICS to allow large colormaps
@@ -237,9 +238,9 @@ void FXVisual::create(){
           redmask=bmi.bmiColors[0];
           greenmask=bmi.bmiColors[1];
           bluemask=bmi.bmiColors[2];
-          FXTRACE((150,"redmask   = %08x\n",redmask));
-          FXTRACE((150,"greenmask = %08x\n",greenmask));
-          FXTRACE((150,"bluemask  = %08x\n",bluemask));
+          FXTRACE((TOPIC_DEBUG,"redmask   = %08x\n",redmask));
+          FXTRACE((TOPIC_DEBUG,"greenmask = %08x\n",greenmask));
+          FXTRACE((TOPIC_DEBUG,"bluemask  = %08x\n",bluemask));
           redbits=findnbits(redmask);
           greenbits=findnbits(greenmask);
           bluebits=findnbits(bluemask);
@@ -256,12 +257,12 @@ void FXVisual::create(){
         }
       ReleaseDC(GetDesktopWindow(),hdc);
 
-      FXTRACE((150,"numred          = %d\n",numred));
-      FXTRACE((150,"numgreen        = %d\n",numgreen));
-      FXTRACE((150,"numblue         = %d\n",numblue));
-      FXTRACE((150,"numcolors       = %d\n",numcolors));
-      FXTRACE((150,"depth           = %d\n",depth));
-      FXTRACE((150,"type            = %d\n",type));
+      FXTRACE((TOPIC_DEBUG,"numred          = %d\n",numred));
+      FXTRACE((TOPIC_DEBUG,"numgreen        = %d\n",numgreen));
+      FXTRACE((TOPIC_DEBUG,"numblue         = %d\n",numblue));
+      FXTRACE((TOPIC_DEBUG,"numcolors       = %d\n",numcolors));
+      FXTRACE((TOPIC_DEBUG,"depth           = %d\n",depth));
+      FXTRACE((TOPIC_DEBUG,"type            = %d\n",type));
 
       // Visual is realized
       xid=(FXID)1L;
@@ -338,18 +339,18 @@ void FXVisual::setuptruecolor(){
     }
 
   // What did we get
-  FXTRACE((150,"True color:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",((Visual*)visual)->map_entries));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  BitOrder     = %s\n",(BitmapBitOrder((Display*)getApp()->getDisplay())==MSBFirst)?"MSBFirst":"LSBFirst"));
-  FXTRACE((150,"  ByteOrder    = %s\n",(ImageByteOrder((Display*)getApp()->getDisplay())==MSBFirst)?"MSBFirst":"LSBFirst"));
-  FXTRACE((150,"  Padding      = %d\n",BitmapPad((Display*)getApp()->getDisplay())));
-  FXTRACE((150,"  redmax       = %3ld; redmask   =%08lx; redshift   = %-2d\n",redmax,redmask,redshift));
-  FXTRACE((150,"  greenmax     = %3ld; greenmask =%08lx; greenshift = %-2d\n",greenmax,greenmask,greenshift));
-  FXTRACE((150,"  bluemax      = %3ld; bluemask  =%08lx; blueshift  = %-2d\n",bluemax,bluemask,blueshift));
+  FXTRACE((TOPIC_DEBUG,"True color:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",((Visual*)visual)->map_entries));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  BitOrder     = %s\n",(BitmapBitOrder((Display*)getApp()->getDisplay())==MSBFirst)?"MSBFirst":"LSBFirst"));
+  FXTRACE((TOPIC_DEBUG,"  ByteOrder    = %s\n",(ImageByteOrder((Display*)getApp()->getDisplay())==MSBFirst)?"MSBFirst":"LSBFirst"));
+  FXTRACE((TOPIC_DEBUG,"  Padding      = %d\n",BitmapPad((Display*)getApp()->getDisplay())));
+  FXTRACE((TOPIC_DEBUG,"  redmax       = %3ld; redmask   =%08lx; redshift   = %-2d\n",redmax,redmask,redshift));
+  FXTRACE((TOPIC_DEBUG,"  greenmax     = %3ld; greenmask =%08lx; greenshift = %-2d\n",greenmax,greenmask,greenshift));
+  FXTRACE((TOPIC_DEBUG,"  bluemax      = %3ld; bluemask  =%08lx; blueshift  = %-2d\n",bluemax,bluemask,blueshift));
 
   // Set type
   type=Color;
@@ -468,7 +469,7 @@ void FXVisual::setupdirectcolor(){
         }
       }
 
-    FXTRACE((200,"Alloc %3d %3d %3d (%6d %6d %6d) pixel=%08lx\n",r,g,b,color.red,color.green,color.blue,color.pixel));
+    FXTRACE((TOPIC_DEBUG,"Alloc %3d %3d %3d (%6d %6d %6d) pixel=%08lx\n",r,g,b,color.red,color.green,color.blue,color.pixel));
 
     alloced[i]=color.pixel;
 
@@ -487,15 +488,15 @@ void FXVisual::setupdirectcolor(){
     }
 
   // What did we get
-  FXTRACE((150,"Direct color:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",mapsize));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  redmax       = %3ld; redmask   =%08lx; redshift   = %-2d\n",redmax,redmask,redshift));
-  FXTRACE((150,"  greenmax     = %3ld; greenmask =%08lx; greenshift = %-2d\n",greenmax,greenmask,greenshift));
-  FXTRACE((150,"  bluemax      = %3ld; bluemask  =%08lx; blueshift  = %-2d\n",bluemax,bluemask,blueshift));
+  FXTRACE((TOPIC_DEBUG,"Direct color:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",mapsize));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  redmax       = %3ld; redmask   =%08lx; redshift   = %-2d\n",redmax,redmask,redshift));
+  FXTRACE((TOPIC_DEBUG,"  greenmax     = %3ld; greenmask =%08lx; greenshift = %-2d\n",greenmax,greenmask,greenshift));
+  FXTRACE((TOPIC_DEBUG,"  bluemax      = %3ld; bluemask  =%08lx; blueshift  = %-2d\n",bluemax,bluemask,blueshift));
 
   // Set type
   type=Color;
@@ -618,15 +619,15 @@ void FXVisual::setuppseudocolor(){
     }
 
   // What did we get
-  FXTRACE((150,"Pseudo color display:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",mapsize));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  redmax       = %ld\n",redmax));
-  FXTRACE((150,"  greenmax     = %ld\n",greenmax));
-  FXTRACE((150,"  bluemax      = %ld\n",bluemax));
+  FXTRACE((TOPIC_DEBUG,"Pseudo color display:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",mapsize));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  redmax       = %ld\n",redmax));
+  FXTRACE((TOPIC_DEBUG,"  greenmax     = %ld\n",greenmax));
+  FXTRACE((TOPIC_DEBUG,"  bluemax      = %ld\n",bluemax));
 
   // Set type
   type=Index;
@@ -667,7 +668,7 @@ void FXVisual::setupstaticcolor(){
     if(gcnt[i]) ng++;
     if(bcnt[i]) nb++;
     }
-  FXTRACE((200,"nr=%3d ng=%3d nb=%3d\n",nr,ng,nb));
+  FXTRACE((TOPIC_DEBUG,"nr=%3d ng=%3d nb=%3d\n",nr,ng,nb));
 
   // Limit to a reasonable table size
   if(nr*ng*nb>4096){
@@ -728,15 +729,15 @@ void FXVisual::setupstaticcolor(){
     }
 
   // What did we get
-  FXTRACE((150,"Static color:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",mapsize));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  redmax       = %ld\n",redmax));
-  FXTRACE((150,"  greenmax     = %ld\n",greenmax));
-  FXTRACE((150,"  bluemax      = %ld\n",bluemax));
+  FXTRACE((TOPIC_DEBUG,"Static color:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",mapsize));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  redmax       = %ld\n",redmax));
+  FXTRACE((TOPIC_DEBUG,"  greenmax     = %ld\n",greenmax));
+  FXTRACE((TOPIC_DEBUG,"  bluemax      = %ld\n",bluemax));
 
   // Set type
   type=Index;
@@ -835,13 +836,13 @@ void FXVisual::setupgrayscale(){
     }
 
   // What did we get
-  FXTRACE((150,"Gray Scale:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",mapsize));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  graymax      = %d\n",graymax));
+  FXTRACE((TOPIC_DEBUG,"Gray Scale:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",mapsize));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  graymax      = %d\n",graymax));
 
   // Set type
   type=Gray;
@@ -869,13 +870,13 @@ void FXVisual::setupstaticgray(){
     }
 
   // What did we get
-  FXTRACE((150,"Static Gray:\n"));
-  FXTRACE((150,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",((Visual*)visual)->map_entries));
-  FXTRACE((150,"  numcolors    = %d\n",numcolors));
-  FXTRACE((150,"  graymax      = %d\n",graymax));
+  FXTRACE((TOPIC_DEBUG,"Static Gray:\n"));
+  FXTRACE((TOPIC_DEBUG,"  visual id    = 0x%02lx\n",((Visual*)visual)->visualid));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",((Visual*)visual)->map_entries));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",numcolors));
+  FXTRACE((TOPIC_DEBUG,"  graymax      = %d\n",graymax));
 
   type=Gray;
   }
@@ -901,13 +902,13 @@ void FXVisual::setuppixmapmono(){
     }
 
   // What did we get
-  FXTRACE((150,"Pixmap monochrome:\n"));
-  FXTRACE((150,"  depth        = %d\n",depth));
-  FXTRACE((150,"  gamma        = %6f\n",gamma));
-  FXTRACE((150,"  map_entries  = %d\n",2));
-  FXTRACE((150,"  numcolors    = %d\n",2));
-  FXTRACE((150,"  black        = 0\n"));
-  FXTRACE((150,"  white        = 1\n"));
+  FXTRACE((TOPIC_DEBUG,"Pixmap monochrome:\n"));
+  FXTRACE((TOPIC_DEBUG,"  depth        = %d\n",depth));
+  FXTRACE((TOPIC_DEBUG,"  gamma        = %6f\n",gamma));
+  FXTRACE((TOPIC_DEBUG,"  map_entries  = %d\n",2));
+  FXTRACE((TOPIC_DEBUG,"  numcolors    = %d\n",2));
+  FXTRACE((TOPIC_DEBUG,"  black        = 0\n"));
+  FXTRACE((TOPIC_DEBUG,"  white        = 1\n"));
 
   // Set type
   type=Mono;
@@ -922,16 +923,16 @@ static FXbool getstdcolormap(Display *dpy,VisualID visualid,XStandardColormap& m
   int count;
   if(XGetRGBColormaps(dpy,RootWindow(dpy,DefaultScreen(dpy)),&stdmaps,&count,XA_RGB_DEFAULT_MAP)){
     for(int i=0; i<count; i++){
-      FXTRACE((150,"Standarn XA_RGB_DEFAULT_MAP map #%d:\n",i));
-      FXTRACE((150,"  colormap   = %ld\n",stdmaps[i].colormap));
-      FXTRACE((150,"  red_max    = %ld  red_mult   = %ld\n",stdmaps[i].red_max,stdmaps[i].red_mult));
-      FXTRACE((150,"  green_max  = %ld  green_mult = %ld\n",stdmaps[i].green_max,stdmaps[i].green_mult));
-      FXTRACE((150,"  blue_max   = %ld  blue_mult  = %ld\n",stdmaps[i].blue_max,stdmaps[i].blue_mult));
-      FXTRACE((150,"  base pixel = %ld\n",stdmaps[i].base_pixel));
-      FXTRACE((150,"  visualid   = 0x%02lx\n",stdmaps[i].visualid));
-      FXTRACE((150,"  killid     = %ld\n",stdmaps[i].killid));
+      FXTRACE((TOPIC_DEBUG,"Standard XA_RGB_DEFAULT_MAP map #%d:\n",i));
+      FXTRACE((TOPIC_DEBUG,"  colormap   = %ld\n",stdmaps[i].colormap));
+      FXTRACE((TOPIC_DEBUG,"  red_max    = %ld  red_mult   = %ld\n",stdmaps[i].red_max,stdmaps[i].red_mult));
+      FXTRACE((TOPIC_DEBUG,"  green_max  = %ld  green_mult = %ld\n",stdmaps[i].green_max,stdmaps[i].green_mult));
+      FXTRACE((TOPIC_DEBUG,"  blue_max   = %ld  blue_mult  = %ld\n",stdmaps[i].blue_max,stdmaps[i].blue_mult));
+      FXTRACE((TOPIC_DEBUG,"  base pixel = %ld\n",stdmaps[i].base_pixel));
+      FXTRACE((TOPIC_DEBUG,"  visualid   = 0x%02lx\n",stdmaps[i].visualid));
+      FXTRACE((TOPIC_DEBUG,"  killid     = %ld\n",stdmaps[i].killid));
       if(stdmaps[i].visualid==visualid){
-        FXTRACE((150,"  Matched\n"));
+        FXTRACE((TOPIC_DEBUG,"  Matched\n"));
         map=stdmaps[i];
         status=true;
         break;
@@ -949,19 +950,19 @@ void FXVisual::setupcolormap(){
   //XStandardColormap stdmap;
   if(flags&VISUAL_MONO){
     colormap=None;
-    FXTRACE((150,"%s::create: need no colormap\n",getClassName()));
+    FXTRACE((TOPIC_DEBUG,"%s::create: need no colormap\n",getClassName()));
     setuppixmapmono();
     }
   else{
     if((flags&VISUAL_OWN_COLORMAP) || (visual!=DefaultVisual((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())))){
       colormap=XCreateColormap((Display*)getApp()->getDisplay(),RootWindow((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay())),((Visual*)visual),AllocNone);
-      FXTRACE((150,"%s::create: allocate colormap\n",getClassName()));
+      FXTRACE((TOPIC_DEBUG,"%s::create: allocate colormap\n",getClassName()));
       freemap=true;
       }
     else{
       //getstdcolormap(DISPLAY(getApp()),((Visual*)visual)->visualid,stdmap);
       colormap=DefaultColormap((Display*)getApp()->getDisplay(),DefaultScreen((Display*)getApp()->getDisplay()));
-      FXTRACE((150,"%s::create: use default colormap\n",getClassName()));
+      FXTRACE((TOPIC_DEBUG,"%s::create: use default colormap\n",getClassName()));
       }
     switch(((Visual*)visual)->c_class){
       case TrueColor:   setuptruecolor(); break;
@@ -1123,18 +1124,18 @@ void FXVisual::create(){
 #ifdef HAVE_XRENDER_H
       XRenderPictFormat *pf=XRenderFindVisualFormat(DISPLAY(getApp()),(Visual*)visual);
       if(pf){
-        FXTRACE((100,"pf->id              = %d\n",pf->id));
-        FXTRACE((100,"pf->type            = %d\n",pf->type));
-        FXTRACE((100,"pf->depth           = %d\n",pf->depth));
-        FXTRACE((100,"pf->direct.red      = %d\n",pf->direct.red));
-        FXTRACE((100,"pf->direct.redMask  = 0x%x\n",pf->direct.redMask));
-        FXTRACE((100,"pf->direct.green    = %d\n",pf->direct.green));
-        FXTRACE((100,"pf->direct.greenMask= 0x%x\n",pf->direct.greenMask));
-        FXTRACE((100,"pf->direct.blue     = %d\n",pf->direct.blue));
-        FXTRACE((100,"pf->direct.blueMask = 0x%x\n",pf->direct.blueMask));
-        FXTRACE((100,"pf->direct.alpha    = %d\n",pf->direct.alpha));
-        FXTRACE((100,"pf->direct.alphaMask= 0x%x\n",pf->direct.alphaMask));
-        FXTRACE((100,"pf->colormap        = %d (colormap=%d)\n",pf->colormap,colormap));
+        FXTRACE((TOPIC_DEBUG,"pf->id              = %d\n",pf->id));
+        FXTRACE((TOPIC_DEBUG,"pf->type            = %d\n",pf->type));
+        FXTRACE((TOPIC_DEBUG,"pf->depth           = %d\n",pf->depth));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.red      = %d\n",pf->direct.red));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.redMask  = 0x%x\n",pf->direct.redMask));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.green    = %d\n",pf->direct.green));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.greenMask= 0x%x\n",pf->direct.greenMask));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.blue     = %d\n",pf->direct.blue));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.blueMask = 0x%x\n",pf->direct.blueMask));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.alpha    = %d\n",pf->direct.alpha));
+        FXTRACE((TOPIC_DEBUG,"pf->direct.alphaMask= 0x%x\n",pf->direct.alphaMask));
+        FXTRACE((TOPIC_DEBUG,"pf->colormap        = %d (colormap=%d)\n",pf->colormap,colormap));
         }
 #endif
 */

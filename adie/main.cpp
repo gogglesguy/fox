@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -35,9 +35,16 @@ int main(int argc,char *argv[]){
   if(fxversion[0]!=FOX_MAJOR || fxversion[1]!=FOX_MINOR || fxversion[2]!=FOX_LEVEL){
     fxerror("FOX Library mismatch; expected version: %d.%d.%d, but found version: %d.%d.%d.\n",FOX_MAJOR,FOX_MINOR,FOX_LEVEL,fxversion[0],fxversion[1],fxversion[2]);
     }
-
-  // Make application
-  Adie application("Adie");
+    
+  // Set mmap() threshold
+#if defined(M_MMAP_THRESHOLD)  
+  if(mallopt(M_MMAP_THRESHOLD,512*1024)!=1){
+    fxerror{"%s: error: %s.\n",argv[0],strerror(errno)};
+    }
+#endif
+  
+  // Make application, with given application name
+  Adie application(FXPath::stem(argv[0]));
 
   // Start application
   return application.start(argc,argv);

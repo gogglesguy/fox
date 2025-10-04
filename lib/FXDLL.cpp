@@ -64,6 +64,8 @@
 
 */
 
+#define TOPIC_DETAIL    1002
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -229,13 +231,13 @@ FXDLL FXDLL::dll(void* addr){
 #if defined(WIN32)              // WIN32
   MEMORY_BASIC_INFORMATION mbi;
   if(VirtualQuery((const void*)addr,&mbi,sizeof(mbi))){
-    //FXTRACE((1,"BaseAddress       = %p\n",mbi.BaseAddress));
-    //FXTRACE((1,"AllocationBase    = %p\n",mbi.AllocationBase));
-    //FXTRACE((1,"AllocationProtect = 0x%x\n",mbi.AllocationProtect));
-    //FXTRACE((1,"RegionSize        = %d\n",mbi.RegionSize));
-    //FXTRACE((1,"State             = 0x%x\n",mbi.State));
-    //FXTRACE((1,"Protect           = 0x%x\n",mbi.Protect));
-    //FXTRACE((1,"Type              = 0x%x\n",mbi.Type));
+    //FXTRACE((TOPIC_DETAIL,"BaseAddress       = %p\n",mbi.BaseAddress));
+    //FXTRACE((TOPIC_DETAIL,"AllocationBase    = %p\n",mbi.AllocationBase));
+    //FXTRACE((TOPIC_DETAIL,"AllocationProtect = 0x%x\n",mbi.AllocationProtect));
+    //FXTRACE((TOPIC_DETAIL,"RegionSize        = %d\n",mbi.RegionSize));
+    //FXTRACE((TOPIC_DETAIL,"State             = 0x%x\n",mbi.State));
+    //FXTRACE((TOPIC_DETAIL,"Protect           = 0x%x\n",mbi.Protect));
+    //FXTRACE((TOPIC_DETAIL,"Type              = 0x%x\n",mbi.Type));
     return FXDLL(mbi.AllocationBase);
     }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
@@ -245,10 +247,10 @@ FXDLL FXDLL::dll(void* addr){
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
-    //FXTRACE((1,"dli_fname = %s\n",info.dli_fname));
-    //FXTRACE((1,"dli_fbase = %p\n",info.dli_fbase));
-    //FXTRACE((1,"dli_sname = %s\n",info.dli_sname));
-    //FXTRACE((1,"dli_saddr = %p\n",info.dli_saddr));
+    //FXTRACE((TOPIC_DETAIL,"dli_fname = %s\n",info.dli_fname));
+    //FXTRACE((TOPIC_DETAIL,"dli_fbase = %p\n",info.dli_fbase));
+    //FXTRACE((TOPIC_DETAIL,"dli_sname = %s\n",info.dli_sname));
+    //FXTRACE((TOPIC_DETAIL,"dli_saddr = %p\n",info.dli_saddr));
     return FXDLL(dlopen(info.dli_fname,RTLD_NOLOAD|RTLD_NOW|RTLD_GLOBAL));
     }
 #endif

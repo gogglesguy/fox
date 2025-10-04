@@ -57,8 +57,6 @@
 #include "FXHorizontalFrame.h"
 #include "FXReplaceDialog.h"
 
-
-
 /*
   Notes:
 
@@ -79,7 +77,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Search and replace dialog registry section name
 const FXchar FXReplaceDialog::sectionName[]="SearchReplace";
@@ -143,18 +140,22 @@ FXReplaceDialog::FXReplaceDialog(FXWindow* own,const FXString& caption,FXIcon* i
   searchbox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
   searchtext=new FXTextField(searchbox,26,this,ID_SEARCH_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,4,4,2,2);
   FXVerticalFrame* searcharrows=new FXVerticalFrame(searchbox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
-  FXArrowButton* ar1=new FXArrowButton(searcharrows,this,ID_SEARCH_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
-  FXArrowButton* ar2=new FXArrowButton(searcharrows,this,ID_SEARCH_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
+  ar1=new FXArrowButton(searcharrows,this,ID_SEARCH_UP,ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  ar2=new FXArrowButton(searcharrows,this,ID_SEARCH_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
   ar1->setArrowSize(3);
   ar2->setArrowSize(3);
+  ar1->setBackColor(searchtext->getBackColor());
+  ar2->setBackColor(searchtext->getBackColor());
   replacelabel=new FXLabel(entry,tr("Replace &With:"),nullptr,LAYOUT_LEFT);
   replacebox=new FXHorizontalFrame(entry,FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0, 0,0);
   replacetext=new FXTextField(replacebox,26,this,ID_REPLACE_TEXT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0,4,4,2,2);
   FXVerticalFrame* replacearrows=new FXVerticalFrame(replacebox,LAYOUT_RIGHT|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0, 0,0);
-  FXArrowButton* ar3=new FXArrowButton(replacearrows,this,ID_REPLACE_UP,FRAME_RAISED|FRAME_THICK|ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
-  FXArrowButton* ar4=new FXArrowButton(replacearrows,this,ID_REPLACE_DN,FRAME_RAISED|FRAME_THICK|ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 1,1,1,1);
+  ar3=new FXArrowButton(replacearrows,this,ID_REPLACE_UP,ARROW_UP|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
+  ar4=new FXArrowButton(replacearrows,this,ID_REPLACE_DN,ARROW_DOWN|ARROW_REPEAT|LAYOUT_FILL_Y|LAYOUT_FIX_WIDTH, 0,0,16,0, 3,3,2,2);
   ar3->setArrowSize(3);
   ar4->setArrowSize(3);
+  ar3->setBackColor(replacetext->getBackColor());
+  ar4->setBackColor(replacetext->getBackColor());
   FXHorizontalFrame* options1=new FXHorizontalFrame(entry,LAYOUT_FILL_X,0,0,0,0, 0,0,0,0);
   new FXCheckButton(options1,tr("E&xpression\tRegular Expression\tPerform regular-expression match."),this,ID_REGEX,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
   new FXCheckButton(options1,tr("W&ords\tWhole Words\tPerform whole-word match."),this,ID_WORDS,ICON_BEFORE_TEXT|LAYOUT_CENTER_X);
@@ -195,6 +196,8 @@ FXString FXReplaceDialog::getReplaceText() const {
 // Change search text color
 void FXReplaceDialog::setSearchTextColor(FXColor clr){
   searchtext->setBackColor(clr);
+  ar1->setBackColor(clr);
+  ar2->setBackColor(clr);
   }
 
 
@@ -207,6 +210,8 @@ FXColor FXReplaceDialog::getSearchTextColor() const {
 // Change replace text color
 void FXReplaceDialog::setReplaceTextColor(FXColor clr){
   replacetext->setBackColor(clr);
+  ar3->setBackColor(clr);
+  ar4->setBackColor(clr);
   }
 
 
@@ -563,11 +568,15 @@ void FXReplaceDialog::load(FXStream& store){
 FXReplaceDialog::~FXReplaceDialog(){
   saveHistory();
   searchlabel=(FXLabel*)-1L;
-  searchtext=(FXTextField*)-1L;
   searchbox=(FXHorizontalFrame*)-1L;
+  searchtext=(FXTextField*)-1L;
+  ar1=(FXArrowButton*)-1L;
+  ar2=(FXArrowButton*)-1L;
   replacelabel=(FXLabel*)-1L;
-  replacetext=(FXTextField*)-1L;
   replacebox=(FXHorizontalFrame*)-1L;
+  replacetext=(FXTextField*)-1L;
+  ar3=(FXArrowButton*)-1L;
+  ar4=(FXArrowButton*)-1L;
   search=(FXButton*)-1L;
   replace=(FXButton*)-1L;
   replacesel=(FXButton*)-1L;

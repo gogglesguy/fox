@@ -30,7 +30,6 @@
 #include "FXMemoryStream.h"
 #include "FXTIFImage.h"
 
-
 /*
   Notes:
   - FXTIFImage has an alpha channel.

@@ -48,7 +48,6 @@
 #include "FXTextField.h"
 #include "FXComposeContext.h"
 
-
 /*
   Notes:
 

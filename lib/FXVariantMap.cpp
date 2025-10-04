@@ -28,7 +28,6 @@
 #include "FXVariant.h"
 #include "FXVariantMap.h"
 
-
 /*
   Notes:
   - We store the hash key, so that 99.999% of the time we can compare hash numbers;
@@ -70,7 +69,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 // Empty dictionary table value
 extern const FXint __string__empty__[];

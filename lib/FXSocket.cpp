@@ -33,14 +33,11 @@
 #include "FXIODevice.h"
 #include "FXSocket.h"
 
-
-
 /*
   Notes:
 
   - Obviously this will get fleshed out some more...
 */
-
 
 #ifdef WIN32
 #define BadHandle INVALID_HANDLE_VALUE
@@ -48,14 +45,11 @@
 #define BadHandle -1
 #endif
 
-
 using namespace FX;
 
 /*******************************************************************************/
 
 namespace FX {
-
-
 
 // Construct file and attach existing handle h
 FXSocket::FXSocket(FXInputHandle h){

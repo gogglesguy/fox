@@ -46,7 +46,6 @@
 #include "FXTabBar.h"
 #include "FXTabItem.h"
 
-
 /*
   Notes:
   - Should focus go to tab items?

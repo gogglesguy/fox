@@ -34,7 +34,6 @@
 #include "FXException.h"
 #include "FXRex.h"
 
-
 /*
   The Story:
   ==========
@@ -296,8 +295,8 @@
       \>        End of word
       \b        Word boundary
       \B        Word interior
-      \A        Match only beginning of string
-      \Z        Match only and end of string
+      \A        Match only begin of string
+      \Z        Match only end of string
 
       Character Classes
       =================
@@ -555,7 +554,6 @@ using namespace FX;
 /*******************************************************************************/
 
 namespace FX {
-
 
 namespace {
 

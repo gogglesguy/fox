@@ -89,7 +89,9 @@
     need to speed this up some how.
 */
 
-#define TOPIC_FILELIST 1002
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 
 #define OPENDIRDELAY        700000000   // Delay before opening directory
@@ -583,13 +585,13 @@ long FXFileList::onCmdPasteSel(FXObject*,FXSelector,void*){
   FXString files,action;
   if(getDNDData(FROM_CLIPBOARD,urilistType,files)){
     if(getDNDData(FROM_CLIPBOARD,actionType,action)){
-      FXTRACE((TOPIC_FILELIST,"%s::onCmdPasteSel(): Action: %s Files: %s\n",getClassName(),action.text(),files.text()));
+      FXTRACE((TOPIC_DETAIL,"%s::onCmdPasteSel(): Action: %s Files: %s\n",getClassName(),action.text(),files.text()));
       if(action[0]=='1'){
         move_files(directory,files);
         }
       else{
 //        FXint count=files.contains("\r\n");
-//        FXTRACE((1,"number of files=%d\n",count));
+//        FXTRACE((TOPIC_DETAIL,"number of files=%d\n",count));
 //FXFileProgressDialog fileprogress(this,"Copying Files","Copying 10 files (100MB)",big_folder,DECOR_TITLE|DECOR_BORDER|DECOR_RESIZE,0,0,600,0);
 //fileprogress.execute();
         copy_files(directory,files);
@@ -627,7 +629,7 @@ long FXFileList::onCmdCopySel(FXObject*,FXSelector,void*){
 // We lost the selection somehow
 long FXFileList::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXIconList::onClipboardLost(sender,sel,ptr);
-  FXTRACE((TOPIC_FILELIST,"deleting clipfiles\n"));
+  FXTRACE((TOPIC_DETAIL,"deleting clipfiles\n"));
   clipfiles=FXString::null;
   clipcut=false;
   return 1;
@@ -642,14 +644,14 @@ long FXFileList::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Return list of filenames as a uri-list
   if(((FXEvent*)ptr)->target==urilistType){
-    FXTRACE((TOPIC_FILELIST,"Returning urilistType\n"));
+    FXTRACE((TOPIC_DETAIL,"Returning urilistType\n"));
     setDNDData(FROM_CLIPBOARD,urilistType,clipfiles);
     return 1;
     }
 
   // Return type of clipboard action
   if(((FXEvent*)ptr)->target==actionType){
-    FXTRACE((TOPIC_FILELIST,"Returning actionType\n"));
+    FXTRACE((TOPIC_DETAIL,"Returning actionType\n"));
     setDNDData(FROM_CLIPBOARD,actionType,clipcut?"1":"0");
     return 1;
     }
@@ -971,7 +973,7 @@ long FXFileList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Delete selected files
   if(((FXEvent*)ptr)->target==deleteType){
-    FXTRACE((TOPIC_FILELIST,"Delete files not yet implemented\n"));
+    FXTRACE((TOPIC_DETAIL,"Delete files not yet implemented\n"));
     return 1;
     }
 
@@ -1386,7 +1388,7 @@ static FXbool fileequal(const FXchar* p1,const FXchar* p2){
 FXbool FXFileList::listItems(FXbool force,FXbool notify){
   FXStat info;
 
-  FXTRACE((TOPIC_FILELIST,"%s::listItems(%d,%d)\n",getClassName(),force,notify));
+  FXTRACE((TOPIC_DETAIL,"%s::listItems(%d,%d)\n",getClassName(),force,notify));
 
   // See if directory still there
   if(FXStat::statFile(directory,info)){
@@ -1601,7 +1603,7 @@ FXbool FXFileList::listItems(FXbool force,FXbool notify){
 
 // Set current file; return true if success
 FXbool FXFileList::setCurrentFile(const FXString& file,FXbool notify){
-  FXTRACE((TOPIC_FILELIST,"%s::setCurrentFile(%s)\n",getClassName(),file.text()));
+  FXTRACE((TOPIC_DETAIL,"%s::setCurrentFile(%s)\n",getClassName(),file.text()));
   if(setDirectory(FXPath::directory(file),notify)){
     FXint index=findItem(FXPath::name(file));
     if(0<=index){
@@ -1627,7 +1629,7 @@ FXString FXFileList::getCurrentFile() const {
 
 // Set current directory; return true if success
 FXbool FXFileList::setDirectory(const FXString& pathname,FXbool notify){
-  FXTRACE((TOPIC_FILELIST,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
+  FXTRACE((TOPIC_DETAIL,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
   FXString path(FXPath::absolute(directory,pathname));
   if(FXStat::isDirectory(path)){
     if(directory==path) return true;

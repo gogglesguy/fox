@@ -591,6 +591,7 @@ FXbool FXEventDispatcher::dispatch(FXTime blocking,FXuint flags){
 
 // Dispatch platform-dependent event
 FXbool FXEventDispatcher::dispatchEvent(FXRawEvent& event){
+  FXUNUSED(event);
   return true;
   }
 

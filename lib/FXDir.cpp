@@ -38,6 +38,9 @@
   - Maybe add positioning for seek and tell type functions.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_CREATION  1001
+#define TOPIC_DETAIL    1002
 
 using namespace FX;
 
@@ -64,7 +67,7 @@ struct SPACE {
 FXDir::FXDir(){
   // If this fails on your machine, determine what sizeof(SPACE) is
   // on your machine and mail it to: jeroen@fox-toolkit.net!
-  //FXTRACE((150,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
+  //FXTRACE((TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32
   alias_cast<SPACE>(space)->handle=INVALID_HANDLE_VALUE;
@@ -78,7 +81,7 @@ FXDir::FXDir(){
 FXDir::FXDir(const FXString& path){
   // If this fails on your machine, determine what sizeof(SPACE) is
   // on your machine and mail it to: jeroen@fox-toolkit.net!
-  //FXTRACE((150,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
+  //FXTRACE((TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32
   alias_cast<SPACE>(space)->handle=INVALID_HANDLE_VALUE;
@@ -377,7 +380,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
     // Open network enumeration
     if(WNetOpenEnum((path[2]?RESOURCE_GLOBALNET:RESOURCE_CONTEXT),RESOURCETYPE_DISK,0,(path[2]?&host:nullptr),&hEnum)==NO_ERROR){
       NETRESOURCE resource[16384/sizeof(NETRESOURCE)];
-      FXTRACE((1,"Enumerating=%s\n",path.text()));
+      FXTRACE((TOPIC_DETAIL,"Enumerating=%s\n",path.text()));
       while(1){
         nCount=-1;    // Read as many as will fit
         nSize=sizeof(resource);
@@ -385,14 +388,14 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
         for(i=0; i<nCount; i++){
 
           // Dump what we found
-          FXTRACE((1,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?"));
-          FXTRACE((1,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?"));
-          FXTRACE((1,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?"));
-          FXTRACE((1,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?"));
-          FXTRACE((1,"lpLocalName=%s\n",resource[i].lpLocalName));
-          FXTRACE((1,"lpRemoteName=%s\n",resource[i].lpRemoteName));
-          FXTRACE((1,"lpComment=%s\n",resource[i].lpComment));
-          FXTRACE((1,"lpProvider=%s\n\n",resource[i].lpProvider));
+          FXTRACE((TOPIC_DETAIL,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?"));
+          FXTRACE((TOPIC_DETAIL,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?"));
+          FXTRACE((TOPIC_DETAIL,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?"));
+          FXTRACE((TOPIC_DETAIL,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?"));
+          FXTRACE((TOPIC_DETAIL,"lpLocalName=%s\n",resource[i].lpLocalName));
+          FXTRACE((TOPIC_DETAIL,"lpRemoteName=%s\n",resource[i].lpRemoteName));
+          FXTRACE((TOPIC_DETAIL,"lpComment=%s\n",resource[i].lpComment));
+          FXTRACE((TOPIC_DETAIL,"lpProvider=%s\n\n",resource[i].lpProvider));
 
           // Grow list
           if(count+1>=size){
@@ -487,14 +490,14 @@ void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStrin
   //  reported (I also get a printer container in the list).
   if((retVal=WNetOpenEnum(openEnumScope,RESOURCETYPE_DISK,0,netResource,&handle))!=NO_ERROR){
     // we get here also if access was denied to enumerate the container
-    FXTRACE((1,"ERROR: WNetOpenEnum() (%d)\n", retVal));
+    FXTRACE((TOPIC_DETAIL,"ERROR: WNetOpenEnum() (%d)\n", retVal));
     return;
     }
 
   NETRESOURCE *netResources;
   DWORD netResourcesSize=16*1024;               // 16 kB is a good size, according to MSDN
   if ((netResources=(NETRESOURCE *)malloc(netResourcesSize))==nullptr){
-    FXTRACE((1,"ERROR: Not enough memory for NETRESOURCE structures\n"));
+    FXTRACE((TOPIC_DETAIL,"ERROR: Not enough memory for NETRESOURCE structures\n"));
     WNetCloseEnum(handle);
     return;
     }
@@ -510,7 +513,7 @@ void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStrin
       //  small for a _single_ entry
       // netResourcesSize (now) contains required size
       if((netResources=(NETRESOURCE *)realloc(netResources,netResourcesSize))==nullptr){
-        FXTRACE((1,"ERROR: Reallocation for NETRESOURCE structures failed\n"));
+        FXTRACE((TOPIC_DETAIL,"ERROR: Reallocation for NETRESOURCE structures failed\n"));
         WNetCloseEnum(handle);
         return;
         }
@@ -527,7 +530,7 @@ void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStrin
         case ERROR_EXTENDED_ERROR: str="extended error"; break;
         default: str="unknown";
         }
-      FXTRACE((1,"ERROR: Network enum error: %s (%d)\n",str,retVal));
+      FXTRACE((TOPIC_DETAIL,"ERROR: Network enum error: %s (%d)\n",str,retVal));
       free(netResources);
       WNetCloseEnum(handle);
       return;

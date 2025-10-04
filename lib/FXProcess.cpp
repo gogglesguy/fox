@@ -123,6 +123,8 @@
   - Maybe pidfd_open() is useful to obtain waitable handle to process.
 */
 
+#define TOPIC_CONSTRUCT 1000
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -131,7 +133,7 @@ namespace FX {
 
 // Initialize process
 FXProcess::FXProcess():pid(0),input(nullptr),output(nullptr),errors(nullptr){
-  FXTRACE((100,"FXProcess::FXProcess\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXProcess::FXProcess\n"));
   }
 
 
@@ -704,7 +706,7 @@ FXbool FXProcess::wait(FXint& code){
 
 // Delete
 FXProcess::~FXProcess(){
-  FXTRACE((100,"FXProcess::~FXProcess\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXProcess::~FXProcess\n"));
   if(pid){
 #if defined(WIN32)
     ::CloseHandle((HANDLE)pid);

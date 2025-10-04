@@ -45,6 +45,9 @@
   - JSON Serialization to a file.
 */
 
+#define TOPIC_CONSTRUCT 1000
+#define TOPIC_DETAIL    1002
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -53,20 +56,20 @@ namespace FX {
 
 // Create JSON file i/o object
 FXJSONFile::FXJSONFile(){
-  FXTRACE((100,"FXJSONFile::FXJSONFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONFile::FXJSONFile\n"));
   }
 
 
 // Create JSON file i/o object and open it
 FXJSONFile::FXJSONFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((100,"FXJSONFile::FXJSONFile(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONFile::FXJSONFile(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   open(filename,d,sz);
   }
 
 
 // Open JSON file for load or save
 FXbool FXJSONFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((101,"FXJSONFile::open(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE((TOPIC_DETAIL,"FXJSONFile::open(\"%s\",%s,%ld)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
   if(dir==Stop){
     FXchar *buffer;
     if(allocElms(buffer,sz)){
@@ -95,7 +98,7 @@ FXival FXJSONFile::fill(FXival){
     sptr=begptr+(sptr-rptr);
     rptr=begptr;
     nbytes=file.readBlock(wptr,endptr-wptr);
-    FXTRACE((104,"FXJSONFile::fill() = %ld\n",nbytes));
+    FXTRACE((TOPIC_DETAIL,"FXJSONFile::fill() = %ld\n",nbytes));
     if(0<=nbytes){
       wptr+=nbytes;
       if(wptr<endptr){ wptr[0]='\0'; }
@@ -111,7 +114,7 @@ FXival FXJSONFile::flush(FXival){
   if(dir==Save){
     FXival nbytes;
     nbytes=file.writeBlock(rptr,wptr-rptr);
-    FXTRACE((104,"FXJSONFile::flush() = %ld\n",nbytes));
+    FXTRACE((TOPIC_DETAIL,"FXJSONFile::flush() = %ld\n",nbytes));
     if(0<=nbytes){
       rptr+=nbytes;
       moveElms(begptr,rptr,wptr-rptr);
@@ -126,7 +129,7 @@ FXival FXJSONFile::flush(FXival){
 
 // Close stream and delete buffers
 FXbool FXJSONFile::close(){
-  FXTRACE((101,"FXJSONFile::close()\n"));
+  FXTRACE((TOPIC_DETAIL,"FXJSONFile::close()\n"));
   FXchar *buffer=begptr;
   if(FXJSON::close()){
     freeElms(buffer);
@@ -138,7 +141,7 @@ FXbool FXJSONFile::close(){
 
 // Close JSON file
 FXJSONFile::~FXJSONFile(){
-  FXTRACE((100,"FXJSONFile::~FXJSONFile\n"));
+  FXTRACE((TOPIC_CONSTRUCT,"FXJSONFile::~FXJSONFile\n"));
   close();
   }
 

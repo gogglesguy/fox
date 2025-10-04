@@ -35,11 +35,11 @@ extern FXAPI const FXuint crctab[256];
 *
 *  2) Divide bitstream by P, collection remainder:
 *
-*       crc=CRC32(crc,byte),
-*       crc=CRC32(crc,short),
-*       crc=CRC32(crc,int),                    (in any order)
-*       crc=CRC32(crc,long),
-*       crc=CRC32(crc,buffer,length),
+*       crc=CRC32::CRC(crc,byte),
+*       crc=CRC32::CRC(crc,short),
+*       crc=CRC32::CRC(crc,int),                    (in any order)
+*       crc=CRC32::CRC(crc,long),
+*       crc=CRC32::CRC(crc,buffer,length),
 *
 *  3) Complement with: crc^=~0; (xor with 0xFFFFFFFF).
 *

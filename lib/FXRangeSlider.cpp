@@ -565,15 +565,20 @@ long FXRangeSlider::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
 // Mouse wheel
 long FXRangeSlider::onMouseWheel(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXint a=(options&RANGESLIDER_VERTICAL) ? (event->win_y<=(headPos[0]+headSize+headPos[1])/2) : (event->win_x>=(headPos[0]+headSize+headPos[1])/2);
-  FXint p=values[a+1]+(((FXEvent*)ptr)->code*incr)/120;
-  if(p<values[a+0]) p=values[a+0];
-  if(p>values[a+2]) p=values[a+2];
-  if(p!=values[a+1]){
-    setValue(a,p);
-    if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&values[1]);
+  FXint a,p;
+  if(isEnabled()){
+    if(target && target->tryHandle(this,FXSEL(SEL_MOUSEWHEEL,message),ptr)) return 1;
+    a=(options&RANGESLIDER_VERTICAL) ? (event->win_y<=(headPos[0]+headSize+headPos[1])/2) : (event->win_x>=(headPos[0]+headSize+headPos[1])/2);
+    p=values[a+1]+(((FXEvent*)ptr)->code*incr)/120;
+    if(p<values[a+0]) p=values[a+0];
+    if(p>values[a+2]) p=values[a+2];
+    if(p!=values[a+1]){
+      setValue(a,p);
+      if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),(void*)&values[1]);
+      }
+    return 1;
     }
-  return 1;
+  return 0;
   }
 
 
