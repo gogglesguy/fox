@@ -3,9 +3,11 @@ Commands.cpp
 Commands.h
 FindInFiles.cpp
 FindInFiles.h
-help.cpp
+${CMAKE_CURRENT_BINARY_DIR}/help.cpp
+${CMAKE_CURRENT_BINARY_DIR}/help.h
 HelpWindow.cpp
-icons.cpp
+${CMAKE_CURRENT_BINARY_DIR}/icons.cpp
+${CMAKE_CURRENT_BINARY_DIR}/icons.h
 main.cpp
 Modeline.cpp
 Modeline.h
@@ -74,6 +76,7 @@ quit_gif.gif
 redo_gif.gif
 reload_gif.gif
 replace_gif.gif
+revert_gif.gif
 save_gif.gif
 saveall_gif.gif
 saveas_gif.gif
@@ -85,9 +88,11 @@ search_gif.gif
 search_nocase.gif
 search_norex.gif
 search_noword.gif
+search_noword2.gif
 search_rex.gif
 search_up.gif
 search_word.gif
+search_word2.gif
 searchfiles_gif.gif
 searchicon_gif.gif
 searchnext_gif.gif
@@ -107,24 +112,24 @@ wordwrap_gif.gif
 
 
 add_executable(adie ${SOURCES})
-target_link_libraries(adie FOX)
+target_link_libraries(adie PRIVATE FX::FOX FX::FOX_XINCS)
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
-  COMMAND reswrap -h -o icons.h ${ICONS}
-  COMMAND reswrap -i icons.h -o icons.cpp ${ICONS}
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${CMAKE_CURRENT_BINARY_DIR}/icons.h
+  COMMAND reswrap -h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.h ${ICONS}
+  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/icons.h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${ICONS}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap
+  DEPENDS reswrap ${ICONS}
   VERBATIM
   )
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/help.cpp ${CMAKE_CURRENT_SOURCE_DIR}/help.h
-  COMMAND reswrap -h -a -o help.h help.txt
-  COMMAND reswrap -i help.h -a -o help.cpp help.txt
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/help.cpp ${CMAKE_CURRENT_BINARY_DIR}/help.h
+  COMMAND reswrap -h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.h help.txt
+  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/help.h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.cpp help.txt
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap
+  DEPENDS reswrap help.txt
   VERBATIM
   )
 
-install(TARGETS adie RUNTIME DESTINATION bin)
+install(TARGETS adie RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)

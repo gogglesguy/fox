@@ -1,0 +1,116 @@
+# fox-config.cmake.in
+# Config file for the FOX package
+# Provides targets: FX::FOX (main library), FX::FOX_XINCS (platform definitions)
+# Note: FX::FOX_DEPS is also exported but is an internal target - link to FX::FOX instead
+
+@PACKAGE_INIT@
+
+# Find dependencies first so targets like Cups::Cups exist when loading the targets file
+# This is needed for both STATIC and SHARED libraries:
+# - STATIC: consumers need to link all transitive dependencies
+# - SHARED: FOX_DEPS is PUBLIC and references external targets
+include(CMakeFindDependencyMacro)
+
+# Find dependencies that were actually linked when FOX was built
+# This list is automatically generated from what was actually linked
+set(_fox_dependencies "@FOX_LINKED_DEPENDENCIES@")
+
+foreach(_dep IN LISTS _fox_dependencies)
+  find_dependency(${_dep})
+endforeach()
+
+unset(_fox_dependencies)
+
+# Load the exported targets file
+# This creates: FX::FOX (shared or static library)
+#               FX::FOX_XINCS (INTERFACE library with platform-specific definitions)
+#               FX::FOX_DEPS (INTERFACE library with dependencies - internal use only)
+include("${CMAKE_CURRENT_LIST_DIR}/fox-@FOX_VERSION_MAJOR@.@FOX_VERSION_MINOR@-targets.cmake")
+
+# Verify the main targets were loaded
+if(NOT TARGET FX::FOX)
+  message(FATAL_ERROR "FOX package found but FX::FOX target not available")
+endif()
+if(NOT TARGET FX::FOX_XINCS)
+  message(FATAL_ERROR "FOX package found but FX::FOX_XINCS target not available")
+endif()
+
+# Determine library type
+get_target_property(_fox_type FX::FOX TYPE)
+
+# Create type-specific aliases - the matching one works, the wrong one errors clearly
+if(_fox_type STREQUAL "SHARED_LIBRARY")
+  # Shared library available - create alias
+  if(NOT TARGET FX::FOX_SHARED)
+    add_library(FX::FOX_SHARED ALIAS FX::FOX)
+  endif()
+
+  # Static NOT available - create error target with helpful library name
+  if(NOT TARGET FX::FOX_STATIC)
+    add_library(FX::FOX_STATIC INTERFACE IMPORTED)
+    set_target_properties(FX::FOX_STATIC PROPERTIES
+      INTERFACE_LINK_LIBRARIES "ERROR::FOX_was_built_SHARED_not_STATIC__Use_FX::FOX_or_rebuild_with_-DBUILD_SHARED_LIBS=OFF"
+    )
+  endif()
+
+elseif(_fox_type STREQUAL "STATIC_LIBRARY")
+  # Static library available - create alias
+  if(NOT TARGET FX::FOX_STATIC)
+    add_library(FX::FOX_STATIC ALIAS FX::FOX)
+  endif()
+
+  # Shared NOT available - create error target with helpful library name
+  if(NOT TARGET FX::FOX_SHARED)
+    add_library(FX::FOX_SHARED INTERFACE IMPORTED)
+    set_target_properties(FX::FOX_SHARED PROPERTIES
+      INTERFACE_LINK_LIBRARIES "ERROR::FOX_was_built_STATIC_not_SHARED__Use_FX::FOX_or_rebuild_with_-DBUILD_SHARED_LIBS=ON"
+    )
+  endif()
+endif()
+
+unset(_fox_type)
+
+# Mark package as found
+set(FOX_FOUND TRUE)
+
+# Set version variables for compatibility
+set(FOX_VERSION "@FOX_VERSION@")
+set(FOX_VERSION_MAJOR "@FOX_VERSION_MAJOR@")
+set(FOX_VERSION_MINOR "@FOX_VERSION_MINOR@")
+set(FOX_VERSION_PATCH "@FOX_VERSION_PATCH@")
+
+# ============================================================================
+# Locate utility programs
+# ============================================================================
+
+# Find reswrap utility (resource to C++ converter)
+# The config file can be used from either build tree or install tree:
+#   Build tree:   build/lib/fox-config.cmake → reswrap at build/utils/reswrap
+#   Install tree: lib/cmake/fox-1.7/fox-config.cmake → reswrap at bin/reswrap
+find_program(FOX_RESWRAP_EXECUTABLE
+    NAMES reswrap
+    PATHS
+        "${CMAKE_CURRENT_LIST_DIR}/../utils"        # Build tree: lib → utils
+        "${CMAKE_CURRENT_LIST_DIR}/../../../bin"    # Install tree: lib/cmake/fox-1.7 → bin
+        "${PACKAGE_PREFIX_DIR}/bin"                 # Install tree using prefix
+    NO_DEFAULT_PATH
+)
+
+# Fallback to system PATH if not found in expected locations
+if(NOT FOX_RESWRAP_EXECUTABLE)
+    find_program(FOX_RESWRAP_EXECUTABLE reswrap)
+endif()
+
+if(FOX_RESWRAP_EXECUTABLE)
+    message(STATUS "FOX: Found reswrap utility: ${FOX_RESWRAP_EXECUTABLE}")
+
+    # Create an imported executable target for reswrap (optional, for advanced users)
+    if(NOT TARGET FX::reswrap)
+        add_executable(FX::reswrap IMPORTED)
+        set_target_properties(FX::reswrap PROPERTIES
+            IMPORTED_LOCATION "${FOX_RESWRAP_EXECUTABLE}"
+        )
+    endif()
+else()
+    message(WARNING "FOX: reswrap utility not found. Resource conversion features will not be available.")
+endif()
