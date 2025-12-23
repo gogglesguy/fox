@@ -1,140 +1,64 @@
-cmake_minimum_required(VERSION 3.3.1)
+cmake_minimum_required(VERSION 4.0)
 
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
+project(FOX VERSION 1.7.86 LANGUAGES CXX)
 
-project(FOX VERSION 1.7.83)
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Set default build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build" FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
 option(WITH_NATIVE "Compile for native architecture" OFF)
 
-include(CheckCXXCompilerFlag)
+# Standard CMake option for shared/static libraries
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(BUILD_STATIC_PIC "Build static libraries with Position Independent Code" ON)
 
-check_cxx_compiler_flag(-Wall                HAS_CXX_WALL)
-check_cxx_compiler_flag(-Wextra              HAS_CXX_WEXTRA)
-check_cxx_compiler_flag(-Wno-format          HAS_CXX_WFORMAT)
-check_cxx_compiler_flag(-Woverloaded-virtual HAS_CXX_WOVERLOADED_VIRTUAL)
-check_cxx_compiler_flag(-Wshadow             HAS_CXX_WSHADOW)
-check_cxx_compiler_flag(-Wstrict-aliasing    HAS_CXX_WSTRICT_ALIASING)
-check_cxx_compiler_flag(-Wstrict-overflow    HAS_CXX_WSTRICT_OVERFLOW)
-check_cxx_compiler_flag(-Wcast-qual          HAS_CXX_WCAST_QUAL)
-check_cxx_compiler_flag(-Wcast-align         HAS_CXX_WCAST_ALIGN)
-check_cxx_compiler_flag(-Wdouble-promotion   HAS_CXX_WDOUBLE_PROMOTION)
-check_cxx_compiler_flag(-Wno-implicit-fallthrough HAX_CXX_IMPLICIT_FALLTHROUGH)
+# Build components
+option(FOX_BUILD_APPS "Build FOX applications (adie, pathfinder, etc.)" ON)
+option(FOX_BUILD_TESTS "Build FOX test programs" ON)
+option(FOX_BUILD_CHART "Build FOX chart library" ON)
 
-check_cxx_compiler_flag(-Wfatal-errors  HAS_CXX_WFATAL)
-check_cxx_compiler_flag(-Og             HAS_CXX_OPTIMIZE_DEBUG)
-check_cxx_compiler_flag(-ffast-math     HAS_CXX_FASTMATH)
-check_cxx_compiler_flag(-fstrict-aliasing HAS_CXX_STRICTALIASING)
-check_cxx_compiler_flag(-finline-functions HAS_CXX_INLINEFUNCTIONS)
-check_cxx_compiler_flag(-fomit-frame-pointer HAS_CXX_OMITFRAMEPOINTER)
-check_cxx_compiler_flag(-fstrict-overflow HAS_CXX_STRICT_OVERFLOW)
-check_cxx_compiler_flag(-fstrict-aliasing HAS_CXX_STRICT_ALIASING)
-check_cxx_compiler_flag(-fcf-protection=none HAS_CXX_CF_PROTECTION)
-check_cxx_compiler_flag(-fno-stack-protector HAS_CXX_STACK_PROTECTOR)
-
-
-if(HAS_CXX_FASTMATH)
-  add_compile_options("$<$<CONFIG:Release>:-ffast-math>")
-endif()
-
-if(HAS_CXX_STRICTALIASING)
-  add_compile_options("$<$<CONFIG:Release>:-fstrict-aliasing>")
-endif()
-
-if(HAS_CXX_INLINEFUNCTIONS)
-  add_compile_options("$<$<CONFIG:Release>:-finline-functions>")
-endif()
-
-if(HAS_CXX_OMITFRAMEPOINTER)
-  add_compile_options("$<$<CONFIG:Release>:-fomit-frame-pointer>")
-endif()
-
-if(HAS_CXX_STRICT_OVERFLOW)
-  add_compile_options("$<$<CONFIG:Release>:-fstrict-overflow>")
-endif()
-
-if(HAS_CXX_STRICT_ALIASING)
-  add_compile_options("$<$<CONFIG:Release>:-fstrict-aliasing>")
-endif()
-
-if(HAS_CXX_CF_PROTECTION)
-  add_compile_options("$<$<CONFIG:Release>:-fcf-protection=none>")
-endif()
-
-if(HAS_CXX_STACK_PROTECTOR)
-  add_compile_options("$<$<CONFIG:Release>:-fno-stack-protector>")
+if(BUILD_SHARED_LIBS)
+  message(STATUS "Building FOX as SHARED library")
+else()
+  message(STATUS "Building FOX as STATIC library (Position Independent Code: ${BUILD_STATIC_PIC})")
+  set(CMAKE_POSITION_INDEPENDENT_CODE ${BUILD_STATIC_PIC})
 endif()
 
 
-
-if(HAS_CXX_WALL)
-    add_compile_options(-Wall)
-endif()
-
-if(HAS_CXX_WEXTRA)
-    add_compile_options(-Wextra)
-endif()
-
-if(HAS_CXX_WFORMAT)
-    add_compile_options(-Wno-format)
-endif()
-
-if(HAS_CXX_WFATAL)
-    add_compile_options(-Wfatal-errors)
-endif()
-
-if(HAS_CXX_WSHADOW)
-    add_compile_options(-Wshadow)
-endif()
-
-if(HAS_CXX_WOVERLOADED_VIRTUAL)
-    add_compile_options(-Woverloaded-virtual)
-endif()
-
-if(HAX_CXX_IMPLICIT_FALLTHROUGH)
-    add_compile_options(-Wno-implicit-fallthrough)
-endif()
-
-if(HAS_CXX_WSTRICT_ALIASING)
-    add_compile_options(-Wstrict-aliasing)
-endif()
-
-if(HAS_CXX_WSTRICT_OVERFLOW)
-    add_compile_options(-Wstrict-overflow)
-endif()
-
-if(HAS_CXX_WCAST_QUAL)
-    add_compile_options(-Wcast-qual)
-endif()
-
-if(HAS_CXX_WCAST_ALIGN)
-    add_compile_options(-Wcast-align)
-endif()
-
-if(HAS_CXX_WDOUBLE_PROMOTION)
-    add_compile_options(-Wdouble-promotion)
-endif()
+# Set project-wide compiler flags
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(CompilerFlags)
 
 
-if(WITH_NATIVE)
-  check_cxx_compiler_flag(-march=native HAS_CXX_OPTIMIZE_NATIVE)
-  if(HAS_CXX_OPTIMIZE_NATIVE)
-    add_compile_options(-march=native)
-  endif()
-endif()
-
-
-# Libraries
+# Core libraries (always built)
 add_subdirectory(utils)
 add_subdirectory(lib)
-add_subdirectory(chart)
 
-# Tests
-add_subdirectory(tests)
-add_subdirectory(glviewer)
+# Optional chart library
+if(FOX_BUILD_CHART)
+  add_subdirectory(chart)
+endif()
 
-# Programs
-add_subdirectory(adie)
-add_subdirectory(calculator)
-add_subdirectory(controlpanel)
-add_subdirectory(pathfinder)
-add_subdirectory(shutterbug)
+# Optional tests
+if(FOX_BUILD_TESTS)
+  add_subdirectory(tests)
+  add_subdirectory(glviewer)
+endif()
+
+# Optional applications
+if(FOX_BUILD_APPS)
+  add_subdirectory(adie)
+  add_subdirectory(calculator)
+  add_subdirectory(controlpanel)
+  add_subdirectory(pathfinder)
+  add_subdirectory(shutterbug)
+endif()
