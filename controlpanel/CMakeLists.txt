@@ -1,7 +1,7 @@
 set(SOURCES ControlPanel.cpp
 ControlPanel.h
-icons.cpp
-icons.h
+${CMAKE_CURRENT_BINARY_DIR}/icons.cpp
+${CMAKE_CURRENT_BINARY_DIR}/icons.h
 )
 
 
@@ -12,15 +12,15 @@ settings_gif.gif
 )
 
 add_executable(ControlPanel ${SOURCES})
-target_link_libraries(ControlPanel FOX)
+target_link_libraries(ControlPanel FX::FOX)
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
-  COMMAND reswrap -h -o icons.h ${ICONS}
-  COMMAND reswrap -i icons.h -o icons.cpp ${ICONS}
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${CMAKE_CURRENT_BINARY_DIR}/icons.h
+  COMMAND reswrap -h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.h ${ICONS}
+  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/icons.h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${ICONS}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap
+  DEPENDS reswrap ${ICONS}
   VERBATIM
   )
 
-install(TARGETS ControlPanel RUNTIME DESTINATION bin)
+install(TARGETS ControlPanel RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)

@@ -1,0 +1,272 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "dev",
+      "displayName": "Development Build",
+      "description": "Static library, debug symbols, verbose output, compile commands for IDE",
+      "binaryDir": "${sourceDir}/build/dev",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "library-only",
+      "displayName": "Library Only (Fast Build)",
+      "description": "Build only FOX library and reswrap, skip apps/tests/chart for faster builds",
+      "binaryDir": "${sourceDir}/build/library-only",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "FOX_BUILD_APPS": "OFF",
+        "FOX_BUILD_TESTS": "OFF",
+        "FOX_BUILD_CHART": "OFF"
+      }
+    },
+    {
+      "name": "release-static",
+      "displayName": "Release Static Library",
+      "description": "Static library with position-independent code for distribution",
+      "binaryDir": "${sourceDir}/build/release-static",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON"
+      }
+    },
+    {
+      "name": "release-shared",
+      "displayName": "Release Shared Library",
+      "description": "Shared library (.so/.dylib/.dll) for system-wide installation",
+      "binaryDir": "${sourceDir}/build/release-shared",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "release-native",
+      "displayName": "Release Shared Library with Native Optimizations",
+      "description": "Shared library optimized for the current CPU architecture (-march=native)",
+      "binaryDir": "${sourceDir}/build/release-native",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON",
+        "WITH_NATIVE": "ON"
+      }
+    },
+    {
+      "name": "relwithdebinfo-static",
+      "displayName": "Release with Debug Info (Static)",
+      "description": "Optimized build with debug symbols for profiling and debugging",
+      "binaryDir": "${sourceDir}/build/relwithdebinfo-static",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON"
+      }
+    },
+    {
+      "name": "minimal",
+      "displayName": "Minimal Build (No Optional Dependencies)",
+      "description": "Bare-bones build with only required dependencies (X11), no image formats or OpenGL",
+      "binaryDir": "${sourceDir}/build/minimal",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "WITH_JPEG": "OFF",
+        "WITH_TIFF": "OFF",
+        "WITH_ZLIB": "OFF",
+        "WITH_BZ2LIB": "OFF",
+        "WITH_WEBP": "OFF",
+        "WITH_OPENJPEG": "OFF",
+        "WITH_OPENGL": "OFF",
+        "WITH_CUPS": "OFF"
+      }
+    },
+    {
+      "name": "full",
+      "displayName": "Full Build (All Features)",
+      "description": "Enable all optional features and dependencies",
+      "binaryDir": "${sourceDir}/build/full",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "WITH_JPEG": "ON",
+        "WITH_TIFF": "ON",
+        "WITH_ZLIB": "ON",
+        "WITH_BZ2LIB": "ON",
+        "WITH_WEBP": "ON",
+        "WITH_OPENJPEG": "ON",
+        "WITH_OPENGL": "ON",
+        "WITH_CUPS": "ON"
+      }
+    },
+    {
+      "name": "asan",
+      "displayName": "AddressSanitizer Build",
+      "description": "Debug build with AddressSanitizer for detecting memory errors",
+      "binaryDir": "${sourceDir}/build/asan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address -fno-omit-frame-pointer -g",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address"
+      }
+    },
+    {
+      "name": "ubsan",
+      "displayName": "UndefinedBehaviorSanitizer Build",
+      "description": "Debug build with UndefinedBehaviorSanitizer for detecting undefined behavior",
+      "binaryDir": "${sourceDir}/build/ubsan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "CMAKE_CXX_FLAGS": "-fsanitize=undefined -fno-omit-frame-pointer -g",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=undefined",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=undefined"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "GCC Release Build",
+      "description": "Release build explicitly using GCC compiler",
+      "binaryDir": "${sourceDir}/build/gcc-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Clang Release Build",
+      "description": "Release build explicitly using Clang compiler",
+      "binaryDir": "${sourceDir}/build/clang-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "OFF",
+        "BUILD_STATIC_PIC": "ON",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "install-test",
+      "displayName": "Installation Test Build",
+      "description": "Build for testing installation to a custom prefix",
+      "binaryDir": "${sourceDir}/build/install-test",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install-test/installed"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev",
+      "displayName": "Build Development",
+      "configurePreset": "dev",
+      "description": "Build the development configuration"
+    },
+    {
+      "name": "library-only",
+      "displayName": "Build Library Only",
+      "configurePreset": "library-only",
+      "description": "Build only FOX library and reswrap (fast)",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-static",
+      "displayName": "Build Release Static",
+      "configurePreset": "release-static",
+      "description": "Build the release static library",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-shared",
+      "displayName": "Build Release Shared",
+      "configurePreset": "release-shared",
+      "description": "Build the release shared library",
+      "configuration": "Release"
+    },
+    {
+      "name": "release-native",
+      "displayName": "Build Release Native",
+      "configurePreset": "release-native",
+      "description": "Build the release shared library with native optimizations",
+      "configuration": "Release"
+    },
+    {
+      "name": "relwithdebinfo-static",
+      "displayName": "Build Release with Debug Info",
+      "configurePreset": "relwithdebinfo-static",
+      "description": "Build release with debug symbols",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "minimal",
+      "displayName": "Build Minimal",
+      "configurePreset": "minimal",
+      "description": "Build minimal configuration",
+      "configuration": "Release"
+    },
+    {
+      "name": "full",
+      "displayName": "Build Full",
+      "configurePreset": "full",
+      "description": "Build with all features",
+      "configuration": "Release"
+    },
+    {
+      "name": "asan",
+      "displayName": "Build AddressSanitizer",
+      "configurePreset": "asan",
+      "description": "Build with AddressSanitizer"
+    },
+    {
+      "name": "ubsan",
+      "displayName": "Build UndefinedBehaviorSanitizer",
+      "configurePreset": "ubsan",
+      "description": "Build with UndefinedBehaviorSanitizer"
+    },
+    {
+      "name": "gcc-release",
+      "displayName": "Build GCC Release",
+      "configurePreset": "gcc-release",
+      "description": "Build with GCC",
+      "configuration": "Release"
+    },
+    {
+      "name": "clang-release",
+      "displayName": "Build Clang Release",
+      "configurePreset": "clang-release",
+      "description": "Build with Clang",
+      "configuration": "Release"
+    },
+    {
+      "name": "install-test",
+      "displayName": "Build Installation Test",
+      "configurePreset": "install-test",
+      "description": "Build for installation testing",
+      "configuration": "Release"
+    }
+  ]
+}

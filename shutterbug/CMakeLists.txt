@@ -1,5 +1,5 @@
-set(SOURCES icons.cpp
-icons.h
+set(SOURCES ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp
+${CMAKE_CURRENT_BINARY_DIR}/icons.h
 ShutterBug.cpp
 ShutterBug.h
 Snapper.cpp
@@ -19,15 +19,15 @@ shutterbug.gif
 tinyshutterbug.gif)
 
 add_executable(shutterbug ${SOURCES})
-target_link_libraries(shutterbug FOX)
+target_link_libraries(shutterbug FX::FOX)
 
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/icons.cpp ${CMAKE_CURRENT_SOURCE_DIR}/icons.h
-  COMMAND reswrap -h -o icons.h ${ICONS}
-  COMMAND reswrap -i icons.h -o icons.cpp ${ICONS}
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${CMAKE_CURRENT_BINARY_DIR}/icons.h
+  COMMAND reswrap -h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.h ${ICONS}
+  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/icons.h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${ICONS}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap
+  DEPENDS reswrap ${ICONS}
   VERBATIM
   )
 
-install(TARGETS shutterbug RUNTIME DESTINATION bin)
+install(TARGETS shutterbug RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Applications)
