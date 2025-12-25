@@ -150,6 +150,23 @@ target_sources(FOX PUBLIC
               BASE_DIRS ../include
               FILES ${FOX_HEADERS})
 
+#-------------------------------------------------------------------------------
+# Precompiled Headers - every FOX source file includes these
+#-------------------------------------------------------------------------------
+
+# Every FOX source file starts with:
+#   #include "xincs.h"   (79 system/X11 headers)
+#   #include "fxver.h"
+#   #include "fxdefs.h"
+#   #include "fxmath.h"
+# Precompiling saves ~30,000 redundant header parses (79 headers × 385 files)
+target_precompile_headers(FOX PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include/xincs.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include/fxver.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include/fxdefs.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include/fxmath.h
+)
+
 # Create namespaced aliases for use in build tree
 add_library(FX::FOX ALIAS FOX)
 add_library(FX::FOX_XINCS ALIAS FOX_XINCS)
