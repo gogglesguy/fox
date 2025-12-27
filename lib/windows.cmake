@@ -2,11 +2,31 @@
 # Based on Visual Studio project settings from windows/foxlib and windows/foxdll
 
 # Windows-specific compile definitions
-target_compile_definitions(FOX_XINCS INTERFACE
+# WIN32 must be PUBLIC because it affects ABI (FXID type, vtable layouts)
+# UNICODE and _CRT_SECURE_NO_WARNINGS are also ABI-affecting
+target_compile_definitions(FOX PUBLIC
     UNICODE
     WIN32
     _CRT_SECURE_NO_WARNINGS
 )
+
+# MSVC-specific configuration
+if(MSVC)
+  # MSVC Runtime Library selection
+  # Default to dynamic runtime (/MD or /MDd) to match typical Windows DLL usage
+  # Users can override with -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded for static runtime
+  if(NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "MSVC runtime library")
+  endif()
+
+  # FOX applications use main() entry point, not WinMain()
+  # Set console subsystem and correct entry point for all executables linking to FOX
+  # These options are ignored for library targets, only applied to executables
+  target_link_options(FOX INTERFACE
+    /SUBSYSTEM:CONSOLE
+    /ENTRY:mainCRTStartup
+  )
+endif()
 
 # Note: BUILD_WINDOWS was in VS projects but appears unused in source code
 # Omitting it unless Windows developers report issues
@@ -30,9 +50,9 @@ target_link_libraries(FOX_DEPS INTERFACE
     uuid        # UUID functions
     odbc32      # ODBC database
     odbccp32    # ODBC control panel
-    Imm32       # Input Method Manager
-    Msimg32     # Image manipulation
-    Ws2_32      # Winsock 2 (networking)
+    imm32       # Input Method Manager
+    msimg32     # Image manipulation
+    ws2_32      # Winsock 2 (networking)
 )
 
 # OpenGL support (always enabled on Windows in VS projects)
