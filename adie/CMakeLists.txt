@@ -114,21 +114,22 @@ wordwrap_gif.gif
 add_executable(adie ${SOURCES})
 target_link_libraries(adie PRIVATE FX::FOX FX::FOX_XINCS)
 
+# Icon and help file generation
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${CMAKE_CURRENT_BINARY_DIR}/icons.h
-  COMMAND reswrap -h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.h ${ICONS}
-  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/icons.h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${ICONS}
+  COMMAND ${RESWRAP_CMD} -h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.h ${ICONS}
+  COMMAND ${RESWRAP_CMD} -i ${CMAKE_CURRENT_BINARY_DIR}/icons.h -o ${CMAKE_CURRENT_BINARY_DIR}/icons.cpp ${ICONS}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap ${ICONS}
+  DEPENDS ${RESWRAP_DEPENDS} ${ICONS}
   VERBATIM
   )
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/help.cpp ${CMAKE_CURRENT_BINARY_DIR}/help.h
-  COMMAND reswrap -h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.h help.txt
-  COMMAND reswrap -i ${CMAKE_CURRENT_BINARY_DIR}/help.h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.cpp help.txt
+  COMMAND ${RESWRAP_CMD} -h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.h help.txt
+  COMMAND ${RESWRAP_CMD} -i ${CMAKE_CURRENT_BINARY_DIR}/help.h -a -o ${CMAKE_CURRENT_BINARY_DIR}/help.cpp help.txt
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS reswrap help.txt
+  DEPENDS ${RESWRAP_DEPENDS} help.txt
   VERBATIM
   )
 
