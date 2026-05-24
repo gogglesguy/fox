@@ -142,6 +142,7 @@ set(FOX_SOURCES
     FXFrame.cpp
     fxfsquantize.cpp
     FXGauge.cpp
+    FXGlobVisitor.cpp
     FXGIFCursor.cpp
     FXGIFIcon.cpp
     FXGIFImage.cpp
@@ -233,6 +234,7 @@ set(FOX_SOURCES
     FXParseBuffer.cpp
     fxparsegeometry.cpp
     FXPath.cpp
+    FXPathBox.cpp
     FXPCXIcon.cpp
     FXPCXImage.cpp
     fxpcxio.cpp
@@ -352,6 +354,7 @@ set(FOX_SOURCES
     FXTriStateButton.cpp
     FXUndoList.cpp
     fxunicode.cpp
+    FXUnits.cpp
     FXURL.cpp
     FXUTF16Codec.cpp
     FXUTF32Codec.cpp

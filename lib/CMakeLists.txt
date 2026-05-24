@@ -46,9 +46,14 @@ bigfolderopen.gif
 bigharddisk.gif
 bignetdrive.gif
 bignethood.gif
+bookadd.bmp
+bookclr.gif
 bookclr_gif.gif
 bookdel_gif.gif
 bookmrk_gif.gif
+booknxt_gif.gif
+bookprv_gif.gif
+bookset.gif
 bookset_gif.gif
 clearentry.gif
 cmymode.gif

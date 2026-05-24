@@ -146,6 +146,7 @@ set(FOX_HEADERS
     ${FOX_HEADERS_DIR}/FXGLVisual.h
     ${FOX_HEADERS_DIR}/FXGZFileStream.h
     ${FOX_HEADERS_DIR}/FXGauge.h
+    ${FOX_HEADERS_DIR}/FXGlobVisitor.h
     ${FOX_HEADERS_DIR}/FXGradientBar.h
     ${FOX_HEADERS_DIR}/FXGroupBox.h
     ${FOX_HEADERS_DIR}/FXHash.h
@@ -225,6 +226,7 @@ set(FOX_HEADERS
     ${FOX_HEADERS_DIR}/FXParallel.h
     ${FOX_HEADERS_DIR}/FXParseBuffer.h
     ${FOX_HEADERS_DIR}/FXPath.h
+    ${FOX_HEADERS_DIR}/FXPathBox.h
     ${FOX_HEADERS_DIR}/FXPerformance.h
     ${FOX_HEADERS_DIR}/FXPicker.h
     ${FOX_HEADERS_DIR}/FXPipe.h
@@ -321,6 +323,7 @@ set(FOX_HEADERS
     ${FOX_HEADERS_DIR}/FXTreeList.h
     ${FOX_HEADERS_DIR}/FXTreeListBox.h
     ${FOX_HEADERS_DIR}/FXTriStateButton.h
+    ${FOX_HEADERS_DIR}/FXUnits.h
     ${FOX_HEADERS_DIR}/FXURL.h
     ${FOX_HEADERS_DIR}/FXUTF16Codec.h
     ${FOX_HEADERS_DIR}/FXUTF32Codec.h
