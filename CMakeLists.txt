@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.0)
 
-project(FOX VERSION 1.7.86 LANGUAGES CXX)
+project(FOX VERSION 1.7.90 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
