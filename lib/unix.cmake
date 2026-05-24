@@ -121,12 +121,6 @@ if(HAVE_GMTIME_R)
   target_compile_definitions(FOX PRIVATE HAVE_GMTIME_R)
 endif()
 
-# Not used anymore
-# check_cxx_symbol_exists(readdir_r "dirent.h" HAVE_READDIR_R)
-# if(HAVE_READDIR_R)
-#   add_definitions(-DHAVE_READDIR_R)
-# endif()
-
 check_cxx_symbol_exists(getpwuid_r "sys/types.h;pwd.h" HAVE_GETPWUID_R)
 if(HAVE_GETPWUID_R)
   target_compile_definitions(FOX PRIVATE HAVE_GETPWUID_R)
@@ -204,23 +198,6 @@ if(HAVE_DIRENT_H)
   target_compile_definitions(FOX_XINCS INTERFACE HAVE_DIRENT_H)
 endif()
 
-#
-# AC_HEADER_TIME
-#
-# This macro is obsolescent, as current systems can include both files when they exist.
-# New programs need not use this macro.
-#
-check_include_file_cxx(sys/time.h HAVE_SYS_TIME_H)
-if(HAVE_SYS_TIME_H)
-  target_compile_definitions(FOX_XINCS INTERFACE HAVE_SYS_TIME_H)
-  check_cxx_source_compiles("#include <sys/time.h>\n#include <time.h>\nint main(int arc,char * argv[]) { return 0; }" TIME_WITH_SYS_TIME)
-  if(TIME_WITH_SYS_TIME)
-    target_compile_definitions(FOX_XINCS INTERFACE TIME_WITH_SYS_TIME)
-  endif()
-endif()
-
-
-
 
 #
 # AC_HEADER_SYS_WAIT
@@ -243,11 +220,6 @@ endif()
 check_include_file_cxx(unistd.h HAVE_UNISTD_H)
 if(HAVE_UNISTD_H)
   target_compile_definitions(FOX_XINCS INTERFACE HAVE_UNISTD_H)
-endif()
-
-check_include_file_cxx(sys/dir.h HAVE_SYS_DIR_H)
-if(HAVE_SYS_DIR_H)
-  target_compile_definitions(FOX_XINCS INTERFACE HAVE_SYS_DIR_H)
 endif()
 
 check_include_file_cxx(sys/filio.h HAVE_SYS_FILIO_H)
