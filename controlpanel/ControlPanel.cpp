@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2026 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -530,6 +530,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,nullptr
   // Miscellaneous
   fontspec=getApp()->getNormalFont()->getFont();
   iconpath=FXIconCache::defaultIconPath;
+  screenres=100;
   dragDelta=getApp()->getDragDelta();
   wheelLines=getApp()->getWheelLines();
   barSize=getApp()->getScrollBarSize();
@@ -1378,7 +1379,6 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
   desktopsettings.writeBoolEntry("Xft","hinting",hinting);
   desktopsettings.writeBoolEntry("Xft","autohint",autohint);
   desktopsettings.writeBoolEntry("Xft","antialias",antialias);
-
 
   // Write file
   if(FXDir::createDirectories(FXPath::upLevel(file))){

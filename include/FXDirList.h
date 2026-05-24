@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -149,7 +149,7 @@ protected:
   void listRootItems(FXbool force,FXbool notify);
   FXbool listChildItems(FXDirItem *par,FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
-  virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr);
+  virtual FXTreeItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,void* ptr) override;
   FXTreeItem* expandPath(const FXString& path,FXbool notify);
 private:
   FXDirList(const FXDirList&);
@@ -223,13 +223,13 @@ public:
   FXDirList(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Set current file; return true if success
   FXbool setCurrentFile(const FXString& file,FXbool notify=false);
@@ -274,10 +274,10 @@ public:
   FXuint getItemMode(const FXTreeItem* item) const;
 
   /// Collapse tree
-  virtual FXbool collapseTree(FXTreeItem* tree,FXbool notify=false);
+  virtual FXbool collapseTree(FXTreeItem* tree,FXbool notify=false) override;
 
   /// Expand tree
-  virtual FXbool expandTree(FXTreeItem* tree,FXbool notify=false);
+  virtual FXbool expandTree(FXTreeItem* tree,FXbool notify=false) override;
 
   /// Change wildcard matching pattern
   FXbool selectMatching(const FXString& ptrn="*",FXuint mode=FXPath::PathName|FXPath::NoEscape,FXbool notify=false);
@@ -319,10 +319,10 @@ public:
   FXbool getDraggableFiles() const { return draggable; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXDirList();

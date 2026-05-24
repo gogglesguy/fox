@@ -3,7 +3,7 @@
 *                            T a b l e   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -207,10 +207,10 @@ public:
   virtual void destroy();
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Delete item and free icon if owned
   virtual ~FXTableItem();
@@ -233,10 +233,10 @@ public:
   FXComboTableItem(const FXString& text,FXIcon* ic=nullptr,void* ptr=nullptr);
 
   /// Create input control for editing this item
-  virtual FXWindow *getControlFor(FXTable* table);
+  virtual FXWindow *getControlFor(FXTable* table) override;
 
   /// Set value from input control
-  virtual void setFromControl(FXWindow *control);
+  virtual void setFromControl(FXWindow *control) override;
 
   /// Set selections as newline-separated strings
   void setSelections(const FXString& strings);
@@ -333,7 +333,7 @@ public:
   static const FXchar csvTypeName[];
 protected:
   FXTable();
-  virtual void moveContents(FXint x,FXint y);
+  virtual void moveContents(FXint x,FXint y) override;
   virtual void drawCell(FXDC& dc,FXint sr,FXint er,FXint sc,FXint ec);
   virtual void drawRange(FXDC& dc,FXint rlo,FXint rhi,FXint clo,FXint chi);
   virtual void drawHGrid(FXDC& dc,FXint rlo,FXint rhi,FXint clo,FXint chi);
@@ -490,49 +490,49 @@ public:
   FXTable(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_MARGIN,FXint pr=DEFAULT_MARGIN,FXint pt=DEFAULT_MARGIN,FXint pb=DEFAULT_MARGIN);
 
   /// Create the server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach the server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Computes content width
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Computes content height
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
 
   /// Return visible area x position
-  virtual FXint getVisibleX() const;
+  virtual FXint getVisibleX() const override;
 
   /// Return visible area y position
-  virtual FXint getVisibleY() const;
+  virtual FXint getVisibleY() const override;
 
   /// Return visible area width
-  virtual FXint getVisibleWidth() const;
+  virtual FXint getVisibleWidth() const override;
 
   /// Return visible area height
-  virtual FXint getVisibleHeight() const;
+  virtual FXint getVisibleHeight() const override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Mark this window's layout as dirty
-  virtual void recalc();
+  virtual void recalc() override;
 
   /// Table widget can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Return button in the top/left corner
   FXButton* getCornerButton() const { return cornerButton; }
@@ -1083,8 +1083,8 @@ public:
   const FXString& getHelpText() const { return help; }
 
   /// Serialize
-  virtual void save(FXStream& store) const;
-  virtual void load(FXStream& store);
+  virtual void save(FXStream& store) const override;
+  virtual void load(FXStream& store) override;
 
   virtual ~FXTable();
   };

@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -200,11 +200,7 @@ PathFinderMain::PathFinderMain(){
 
 
 // Make some windows
-PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",nullptr,nullptr,DECOR_ALL,0,0,800,600,0,0),bookmarkeddirs(a,"Bookmarked Directories")
-#if defined(DIRWATCH)
-  ,dirwatch(a) // FIXME
-#endif
-{
+PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",nullptr,nullptr,DECOR_ALL,0,0,800,600,0,0),bookmarkeddirs(a,"Bookmarked Directories"){
 
   // Totals
   totalCount=0;
@@ -622,7 +618,7 @@ FXbool PathFinderMain::close(FXbool notify){
 
 // Change file name
 void PathFinderMain::setFilename(const FXString& path){
-  FXTRACE((10,"PathFinderMain::setFilename(%s)\n",path.text()));
+  FXTRACE(10,"PathFinderMain::setFilename(%s)\n",path.text());
   filelist->setCurrentFile(path,true);
   dirlist->setDirectory(filelist->getDirectory());
   dirbox->setDirectory(filelist->getDirectory());
@@ -638,7 +634,7 @@ FXString PathFinderMain::getFilename() const {
 
 // Switch to given directory
 void PathFinderMain::setDirectory(const FXString& path){
-  FXTRACE((10,"PathFinderMain::setDirectory(%s)\n",path.text()));
+  FXTRACE(10,"PathFinderMain::setDirectory(%s)\n",path.text());
   filelist->setDirectory(path,true);
   dirlist->setDirectory(filelist->getDirectory());
   dirbox->setDirectory(filelist->getDirectory());
@@ -1005,7 +1001,7 @@ long PathFinderMain::onUpdSelectedVisible(FXObject* sender,FXSelector,void*){
 FXbool PathFinderMain::executeCommandline(const FXString& commandline){
   FXchar **argv=nullptr;
 
-  FXTRACE((10,"PathFinderMain::executeCommandline(%s)\n",commandline.text()));
+  FXTRACE(10,"PathFinderMain::executeCommandline(%s)\n",commandline.text());
 
   // Parse commandline into argv
   if(FXPath::parseArgs(argv,commandline)){
@@ -1244,7 +1240,7 @@ long PathFinderMain::onFileSelected(FXObject*,FXSelector,void* ptr){
   selectedModeBits[15]+=FXBIT(mode,15); // SVTX
   selectedSpace+=size;
   selectedCount+=1;
-  FXTRACE((10,"selected  : %3d %7lld [%3u %7lld] %s\n",index,size,selectedCount,selectedSpace,filelist->getItemFilename(index).text()));
+  FXTRACE(10,"selected  : %3d %7lld [%3u %7lld] %s\n",index,size,selectedCount,selectedSpace,filelist->getItemFilename(index).text());
   return 1;
   }
 
@@ -1268,7 +1264,7 @@ long PathFinderMain::onFileDeselected(FXObject*,FXSelector,void* ptr){
   selectedModeBits[15]-=FXBIT(mode,15); // SVTX
   selectedSpace-=size;
   selectedCount-=1;
-  FXTRACE((10,"deselected: %3d %7lld [%3d %7lld] %s\n",index,size,selectedCount,selectedSpace,filelist->getItemFilename(index).text()));
+  FXTRACE(10,"deselected: %3d %7lld [%3d %7lld] %s\n",index,size,selectedCount,selectedSpace,filelist->getItemFilename(index).text());
   return 1;
   }
 
@@ -1281,7 +1277,7 @@ long PathFinderMain::onFileInserted(FXObject* sender,FXSelector sel,void* ptr){
     }
   totalSpace+=filelist->getItemSize(index);
   totalCount+=1;
-  FXTRACE((10,"inserted  : %3d %7lld [%3d %7lld] %s\n",index,filelist->getItemSize(index),totalCount,totalSpace,filelist->getItemFilename(index).text()));
+  FXTRACE(10,"inserted  : %3d %7lld [%3d %7lld] %s\n",index,filelist->getItemSize(index),totalCount,totalSpace,filelist->getItemFilename(index).text());
   return 1;
   }
 
@@ -1294,7 +1290,7 @@ long PathFinderMain::onFileDeleted(FXObject* sender,FXSelector sel,void* ptr){
     }
   totalSpace-=filelist->getItemSize(index);
   totalCount-=1;
-  FXTRACE((10,"deleted   : %3d %7lld [%3d %7lld] %s\n",index,filelist->getItemSize(index),totalCount,totalSpace,filelist->getItemFilename(index).text()));
+  FXTRACE(10,"deleted   : %3d %7lld [%3d %7lld] %s\n",index,filelist->getItemSize(index),totalCount,totalSpace,filelist->getItemFilename(index).text());
   return 1;
   }
 
@@ -1367,7 +1363,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"PathFinder",nullptr,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s %s).\nCopyright (C) 2000,2025 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__,__TIME__),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s %s).\nCopyright (C) 2000,2026 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__,__TIME__),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),nullptr,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1379,17 +1375,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
 long PathFinderMain::onCmdDirectory(FXObject*,FXSelector,void* ptr){
   FXTreeItem *item=(FXTreeItem*)ptr;
   FXString path=dirlist->getItemPathname(item);
-
-#if defined(DIRWATCH)
-dirwatch.remWatch(filelist->getDirectory());           // FIXME
-#endif
-
   filelist->setDirectory(path,true);
-
-#if defined(DIRWATCH)
-dirwatch.addWatch(filelist->getDirectory());           // FIXME
-#endif
-
   dirbox->setDirectory(filelist->getDirectory());
   address->setText(filelist->getDirectory());
   visitDirectory(filelist->getDirectory());
@@ -1732,7 +1718,7 @@ long PathFinderMain::onCmdDelete(FXObject*,FXSelector,void*){
       for(FXint i=0; i<list->getNumItems(); i++){
         if(list->isItemSelected(i)){
           filename=list->getItemText(i);
-          FXTRACE((10,"filetoremove=%s\n",filename.text()));
+          FXTRACE(10,"filetoremove=%s\n",filename.text());
           if(!FXFile::removeFiles(filename,true)){
             if(MBOX_CLICKED_NO==FXMessageBox::error(this,MBOX_YES_NO,tr("Error Deleting File"),tr("Unable to delete file: %s\nContinue with operation?"),filename.text())){
               break;
@@ -1809,7 +1795,7 @@ long PathFinderMain::onCmdTerminal(FXObject*,FXSelector,void*){
 // Harvest the zombies :-)
 long PathFinderMain::onSigHarvest(FXObject*,FXSelector,void*){
 #ifndef WIN32
-  FXTRACE((10,"onSigHarvest\n"));
+  FXTRACE(10,"onSigHarvest\n");
   while(waitpid(-1,nullptr,WNOHANG)>0){ }
 #endif
   return 1;
@@ -2300,7 +2286,7 @@ static void printusage(){
 // Print verson info
 static void printversion(){
   fxmessage("PathFinder file manager version %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 1998,2024 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 1998,2026 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");

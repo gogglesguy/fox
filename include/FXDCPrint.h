@@ -3,7 +3,7 @@
 *           D e v i c e   C o n t e x t   F o r   P r i n t i n g               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -139,143 +139,143 @@ public:
   FXbool setContentRange(FXint pxmin,FXint pymin,FXint pxmax,FXint pymax);
 
   /// Draw points
-  virtual void drawPoint(FXint x,FXint y);
-  virtual void drawPoints(const FXPoint* points,FXuint npoints);
-  virtual void drawPointsRel(const FXPoint* points,FXuint npoints);
+  virtual void drawPoint(FXint x,FXint y) override;
+  virtual void drawPoints(const FXPoint* points,FXuint npoints) override;
+  virtual void drawPointsRel(const FXPoint* points,FXuint npoints) override;
 
   /// Draw lines
-  virtual void drawLine(FXint x1,FXint y1,FXint x2,FXint y2);
-  virtual void drawLines(const FXPoint* points,FXuint npoints);
-  virtual void drawLinesRel(const FXPoint* points,FXuint npoints);
-  virtual void drawLineSegments(const FXSegment* segments,FXuint nsegments);
+  virtual void drawLine(FXint x1,FXint y1,FXint x2,FXint y2) override;
+  virtual void drawLines(const FXPoint* points,FXuint npoints) override;
+  virtual void drawLinesRel(const FXPoint* points,FXuint npoints) override;
+  virtual void drawLineSegments(const FXSegment* segments,FXuint nsegments) override;
 
   /// Draw rectangles
-  virtual void drawRectangle(FXint x,FXint y,FXint w,FXint h);
-  virtual void drawRectangles(const FXRectangle* rectangles,FXuint nrectangles);
+  virtual void drawRectangle(FXint x,FXint y,FXint w,FXint h) override;
+  virtual void drawRectangles(const FXRectangle* rectangles,FXuint nrectangles) override;
 
   /// Draw rounded rectangle with ellipse with ew and ellips height eh
-  virtual void drawRoundRectangle(FXint x,FXint y,FXint w,FXint h,FXint ew,FXint eh);
+  virtual void drawRoundRectangle(FXint x,FXint y,FXint w,FXint h,FXint ew,FXint eh) override;
 
   /// Draw arcs
-  virtual void drawArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2);
-  virtual void drawArcs(const FXArc* arcs,FXuint narcs);
+  virtual void drawArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2) override;
+  virtual void drawArcs(const FXArc* arcs,FXuint narcs) override;
 
   /// Draw ellipse
-  virtual void drawEllipse(FXint x,FXint y,FXint w,FXint h);
+  virtual void drawEllipse(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Filled rectangles
-  virtual void fillRectangle(FXint x,FXint y,FXint w,FXint h);
-  virtual void fillRectangles(const FXRectangle* rectangles,FXuint nrectangles);
+  virtual void fillRectangle(FXint x,FXint y,FXint w,FXint h) override;
+  virtual void fillRectangles(const FXRectangle* rectangles,FXuint nrectangles) override;
 
   /// Filled rounded rectangle with ellipse with ew and ellips height eh
-  virtual void fillRoundRectangle(FXint x,FXint y,FXint w,FXint h,FXint ew,FXint eh);
+  virtual void fillRoundRectangle(FXint x,FXint y,FXint w,FXint h,FXint ew,FXint eh) override;
 
   /// Fill chord
-  virtual void fillChord(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2);
-  virtual void fillChords(const FXArc* chords,FXuint nchords);
+  virtual void fillChord(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2) override;
+  virtual void fillChords(const FXArc* chords,FXuint nchords) override;
 
   /// Draw arcs
-  virtual void fillArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2);
-  virtual void fillArcs(const FXArc* arcs,FXuint narcs);
+  virtual void fillArc(FXint x,FXint y,FXint w,FXint h,FXint ang1,FXint ang2) override;
+  virtual void fillArcs(const FXArc* arcs,FXuint narcs) override;
 
   /// Fill ellipse
-  virtual void fillEllipse(FXint x,FXint y,FXint w,FXint h);
+  virtual void fillEllipse(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Filled polygon
-  virtual void fillPolygon(const FXPoint* points,FXuint npoints);
-  virtual void fillConcavePolygon(const FXPoint* points,FXuint npoints);
-  virtual void fillComplexPolygon(const FXPoint* points,FXuint npoints);
+  virtual void fillPolygon(const FXPoint* points,FXuint npoints) override;
+  virtual void fillConcavePolygon(const FXPoint* points,FXuint npoints) override;
+  virtual void fillComplexPolygon(const FXPoint* points,FXuint npoints) override;
 
   /// Filled polygon with relative points
-  virtual void fillPolygonRel(const FXPoint* points,FXuint npoints);
-  virtual void fillConcavePolygonRel(const FXPoint* points,FXuint npoints);
-  virtual void fillComplexPolygonRel(const FXPoint* points,FXuint npoints);
+  virtual void fillPolygonRel(const FXPoint* points,FXuint npoints) override;
+  virtual void fillConcavePolygonRel(const FXPoint* points,FXuint npoints) override;
+  virtual void fillComplexPolygonRel(const FXPoint* points,FXuint npoints) override;
 
   /// Draw hashed box
-  virtual void drawHashBox(FXint x,FXint y,FXint w,FXint h,FXint b=1);
+  virtual void drawHashBox(FXint x,FXint y,FXint w,FXint h,FXint b=1) override;
 
   /// Draw area from source
-  virtual void drawArea(const FXDrawable* source,FXint sx,FXint sy,FXint sw,FXint sh,FXint dx,FXint dy);
+  virtual void drawArea(const FXDrawable* source,FXint sx,FXint sy,FXint sw,FXint sh,FXint dx,FXint dy) override;
 
   /// Draw area stretched area from source
-  virtual void drawArea(const FXDrawable* source,FXint sx,FXint sy,FXint sw,FXint sh,FXint dx,FXint dy,FXint dw,FXint dh);
+  virtual void drawArea(const FXDrawable* source,FXint sx,FXint sy,FXint sw,FXint sh,FXint dx,FXint dy,FXint dw,FXint dh) override;
 
   /// Draw image
-  virtual void drawImage(const FXImage* image,FXint dx,FXint dy);
+  virtual void drawImage(const FXImage* image,FXint dx,FXint dy) override;
 
   /// Draw bitmap
-  virtual void drawBitmap(const FXBitmap* bitmap,FXint dx,FXint dy);
+  virtual void drawBitmap(const FXBitmap* bitmap,FXint dx,FXint dy) override;
 
   /// Draw icon
-  virtual void drawIcon(const FXIcon* icon,FXint dx,FXint dy);
-  virtual void drawIconShaded(const FXIcon* icon,FXint dx,FXint dy);
-  virtual void drawIconSunken(const FXIcon* icon,FXint dx,FXint dy);
+  virtual void drawIcon(const FXIcon* icon,FXint dx,FXint dy) override;
+  virtual void drawIconShaded(const FXIcon* icon,FXint dx,FXint dy) override;
+  virtual void drawIconSunken(const FXIcon* icon,FXint dx,FXint dy) override;
 
   /// Draw string with base line starting at x, y
-  virtual void drawText(FXint x,FXint y,const FXString& string);
-  virtual void drawText(FXint x,FXint y,const FXchar* string,FXuint length);
+  virtual void drawText(FXint x,FXint y,const FXString& string) override;
+  virtual void drawText(FXint x,FXint y,const FXchar* string,FXuint length) override;
 
   /// Draw text starting at x, y over filled background
-  virtual void drawImageText(FXint x,FXint y,const FXString& string);
-  virtual void drawImageText(FXint x,FXint y,const FXchar* string,FXuint length);
+  virtual void drawImageText(FXint x,FXint y,const FXString& string) override;
+  virtual void drawImageText(FXint x,FXint y,const FXchar* string,FXuint length) override;
 
   /// Set foreground/background drawing color
-  virtual void setForeground(FXColor clr);
-  virtual void setBackground(FXColor clr);
+  virtual void setForeground(FXColor clr) override;
+  virtual void setBackground(FXColor clr) override;
 
   /// Set dash pattern
-  virtual void setDashes(FXuint dashoffset,const FXuchar *dashlist,FXuint n);
+  virtual void setDashes(FXuint dashoffset,const FXuchar *dashlist,FXuint n) override;
 
   /// Set line width
-  virtual void setLineWidth(FXuint linewidth=0);
+  virtual void setLineWidth(FXuint linewidth=0) override;
 
   /// Set line cap style
-  virtual void setLineCap(FXCapStyle capstyle=CAP_BUTT);
+  virtual void setLineCap(FXCapStyle capstyle=CAP_BUTT) override;
 
   /// Set line join style
-  virtual void setLineJoin(FXJoinStyle joinstyle=JOIN_MITER);
+  virtual void setLineJoin(FXJoinStyle joinstyle=JOIN_MITER) override;
 
   /// Set line style
-  virtual void setLineStyle(FXLineStyle linestyle=LINE_SOLID);
+  virtual void setLineStyle(FXLineStyle linestyle=LINE_SOLID) override;
 
   /// Set fill style
-  virtual void setFillStyle(FXFillStyle fillstyle=FILL_SOLID);
+  virtual void setFillStyle(FXFillStyle fillstyle=FILL_SOLID) override;
 
   /// Set fill rule
-  virtual void setFillRule(FXFillRule fillrule=RULE_EVEN_ODD);
+  virtual void setFillRule(FXFillRule fillrule=RULE_EVEN_ODD) override;
 
   /// Set blit function
-  virtual void setFunction(FXFunction func=BLT_SRC);
+  virtual void setFunction(FXFunction func=BLT_SRC) override;
 
   /// Set the tile
-  virtual void setTile(FXImage* tile,FXint dx=0,FXint dy=0);
+  virtual void setTile(FXImage* tile,FXint dx=0,FXint dy=0) override;
 
   /// Set the stipple pattern
-  virtual void setStipple(FXBitmap *stipple,FXint dx=0,FXint dy=0);
+  virtual void setStipple(FXBitmap *stipple,FXint dx=0,FXint dy=0) override;
 
   /// Set the stipple pattern
-  virtual void setStipple(FXStipplePattern stipple,FXint dx=0,FXint dy=0);
+  virtual void setStipple(FXStipplePattern stipple,FXint dx=0,FXint dy=0) override;
 
   /// Set clip rectangle
-  virtual void setClipRectangle(FXint x,FXint y,FXint w,FXint h);
+  virtual void setClipRectangle(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Set clip rectangle
-  virtual void setClipRectangle(const FXRectangle& rectangle);
+  virtual void setClipRectangle(const FXRectangle& rectangle) override;
 
   /// Clear clipping
-  virtual void clearClipRectangle();
+  virtual void clearClipRectangle() override;
 
   /// Set clip mask
-  virtual void setClipMask(FXBitmap* mask,FXint dx=0,FXint dy=0);
+  virtual void setClipMask(FXBitmap* mask,FXint dx=0,FXint dy=0) override;
 
   /// Clear clip mask
-  virtual void clearClipMask();
+  virtual void clearClipMask() override;
 
   /// Set font to draw text with
-  virtual void setFont(FXFont *fnt);
+  virtual void setFont(FXFont *fnt) override;
 
   /// Clip drawing by child windows
-  virtual void clipChildren(FXbool yes);
+  virtual void clipChildren(FXbool yes) override;
 
   /// Temporarily public; do not rely on this!!
   void outhex(FXuint hex);

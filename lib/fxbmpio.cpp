@@ -3,7 +3,7 @@
 *                          B M P   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -526,7 +526,7 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       store.position(bmi.biSize-WIN_NEW,FXFromCurrent);
       }
 
-    FXTRACE((TOPIC_DETAIL,"fxloadBMP: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant));
+    FXTRACE(TOPIC_DETAIL,"fxloadBMP: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant);
 
     // Check for sensible inputs
     if(bmi.biPlanes==1 && 0<bmi.biWidth && 0<bmi.biHeight && bmi.biClrUsed<=256 && bmi.biCompression<=BIH_RLE4){
@@ -577,7 +577,7 @@ FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   store >> bmi.biClrUsed;
   store >> bmi.biClrImportant;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadBMPStream: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant));
+  FXTRACE(TOPIC_DETAIL,"fxloadBMPStream: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant);
 
   // Check for sensible inputs
   if(bmi.biPlanes==1 && 0<bmi.biWidth && 0<bmi.biHeight && bmi.biClrUsed<=256 && bmi.biCompression<=BIH_RLE4){
@@ -753,8 +753,8 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
     // Skip rest of header
     store.position(bmi.biSize-WIN_NEW,FXFromCurrent);
 
-    FXTRACE((TOPIC_DETAIL,"fxloadICO: idCount=%d idType=%d wXHotspot=%d wYHotspot=%d\n",icd.idCount,icd.idType,ice.wXHotspot,ice.wYHotspot));
-    FXTRACE((TOPIC_DETAIL,"fxloadICO: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant));
+    FXTRACE(TOPIC_DETAIL,"fxloadICO: idCount=%d idType=%d wXHotspot=%d wYHotspot=%d\n",icd.idCount,icd.idType,ice.wXHotspot,ice.wYHotspot);
+    FXTRACE(TOPIC_DETAIL,"fxloadICO: biSize=%d biWidth=%d biHeight=%d biPlanes=%d biBitCount=%d biCompression=%d biSizeImage=%u biClrUsed=%u biClrImportant=%u\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biPlanes,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed,bmi.biClrImportant);
 
     // Check for sensible inputs
     if(bmi.biPlanes==1 && 0<bmi.biWidth && 0<bmi.biHeight && bmi.biClrUsed<=256){
@@ -812,7 +812,7 @@ FXbool fxloadICOStream(FXStream& store,FXColor*& data,FXint& width,FXint& height
   // Skip rest of header
   store.position(bmi.biSize-WIN_NEW,FXFromCurrent);
 
-  FXTRACE((TOPIC_DETAIL,"fxloadICOStream: biSize=%d biWidth=%d biHeight=%d biBitCount=%d biCompression=%d biSizeImage=%d biClrUsed=%d\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed));
+  FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biSize=%d biWidth=%d biHeight=%d biBitCount=%d biCompression=%d biSizeImage=%d biClrUsed=%d\n",bmi.biSize,bmi.biWidth,bmi.biHeight,bmi.biBitCount,bmi.biCompression,bmi.biSizeImage,bmi.biClrUsed);
 
   // Check for sensible inputs
   if(bmi.biPlanes==1 && 0<bmi.biWidth && 0<bmi.biHeight && bmi.biClrUsed<=256 && bmi.biCompression<=BIH_RLE4){

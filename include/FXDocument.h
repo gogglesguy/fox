@@ -3,7 +3,7 @@
 *                         D o c u m e n t   O b j e c t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,10 +72,10 @@ public:
   const FXString& getFilename() const { return filename; }
 
   /// Save document to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load document from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXDocument();

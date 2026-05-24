@@ -3,7 +3,7 @@
 *                       F r a m e   W i n d o w   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -88,10 +88,10 @@ public:
   FXFrame(FXComposite* p,FXuint opts=FRAME_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change frame style
   void setFrameStyle(FXuint style);
@@ -151,10 +151,10 @@ public:
   FXColor getBaseColor() const { return baseColor; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 }

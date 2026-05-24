@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -53,7 +53,7 @@ namespace FX {
 * are rarely modified.  Typically, system-wide settings are set when an
 * application is installed, while common per-user settings tend to be changed
 * by specialized applications (e.g. ControlPanel) or through installation scripts.
-* The Rregistry is automatically read when FXApp::init() is called, and written
+* The Registry is automatically read when FXApp::init() is called, and written
 * back to the system when FXApp::exit() is called.
 */
 class FXAPI FXRegistry : public FXSettings {
@@ -62,14 +62,6 @@ protected:
   FXString vendorkey;       // Vendor key
   FXString systemdirs;      // System-wide settings directories
   FXString userdir;         // User settings directory
-  FXbool   ascii;           // ASCII file-based registry
-protected:
-#if defined(WIN32)
-  FXbool readFromRegistry(FXptr hroot,FXbool mark=false);
-  FXbool writeToRegistry(FXptr hroot);
-  FXbool readFromRegistryGroup(const FXString& group,FXptr hbase,FXbool mark=false);
-  FXbool writeToRegistryGroup(const FXString& group,FXptr hbase);
-#endif
 private:
   FXRegistry(const FXRegistry&);
   FXRegistry &operator=(const FXRegistry&);
@@ -80,15 +72,6 @@ public:
   * Regular applications SHOULD set a vendor key!
   */
   FXRegistry(const FXString& akey=FXString::null,const FXString& vkey=FXString::null);
-
-  /**
-  * Set ASCII mode; under MS-Windows, this will switch the system to a
-  * file-based registry system, instead of using the System Registry API.
-  */
-  void setAsciiMode(FXbool asciiMode){ ascii=asciiMode; }
-
-  /// Get ASCII mode
-  FXbool getAsciiMode() const { return ascii; }
 
   /// Change application key name
   void setAppKey(const FXString& name){ applicationkey=name; }

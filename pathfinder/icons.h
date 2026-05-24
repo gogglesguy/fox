@@ -1,4 +1,4 @@
-/*********** Generated on 2025/12/31 09:55:34 by reswrap version 6.0.0 *********/
+/*********** Generated on 2026/05/21 22:26:29 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../pathfinder/bigicons.bmp */
 extern const unsigned char bigicons[];
@@ -155,4 +155,7 @@ extern const unsigned char warningicon_gif[];
 
 /* Created by reswrap from file ../pathfinder/work_gif.gif */
 extern const unsigned char work_gif[];
+
+/* Created by reswrap from file ../pathfinder/work.gif */
+extern const unsigned char work[];
 

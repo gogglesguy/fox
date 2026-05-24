@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -135,7 +135,7 @@ FXGLVisual::FXGLVisual(){
 
 // Construct
 FXGLVisual::FXGLVisual(FXApp* a,FXuint flgs):FXVisual(a,flgs,0){
-  FXTRACE((TOPIC_CONSTRUCT,"FXGLVisual::FXGLVisual %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXGLVisual::FXGLVisual %p\n",this);
   redSize=8;
   greenSize=8;
   blueSize=8;
@@ -406,7 +406,7 @@ static HPALETTE makeOpenGLPalette(PIXELFORMATDESCRIPTOR* info){
 void FXGLVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 #ifdef HAVE_GL_H
       PIXELFORMATDESCRIPTOR pfd;
       int bestmatch=1000000000;
@@ -425,7 +425,7 @@ void FXGLVisual::create(){
       // Get number of supported pixel formats
       if(0<(npf=DescribePixelFormat(hdc,1,sizeof(PIXELFORMATDESCRIPTOR),&pfd))){
 
-        FXTRACE((TOPIC_DETAIL,"Found %d OpenGL configs\n",npf));
+        FXTRACE(TOPIC_DETAIL,"Found %d OpenGL configs\n",npf);
 
         // Try to find the best
         for(int v=1; v<=npf; v++){
@@ -483,23 +483,23 @@ void FXGLVisual::create(){
           match=matchSpecs(specs);
 
           // Trace
-          FXTRACE((TOPIC_DEBUG,"Config: #%d: match=%d\n",v,match));
-          FXTRACE((TOPIC_DEBUG,"  drawables  = %s%s\n",(pfd.dwFlags&PFD_DRAW_TO_WINDOW)?"PFD_DRAW_TO_WINDOW ":"",(pfd.dwFlags&PFD_DRAW_TO_BITMAP)?"PFD_DRAW_TO_BITMAP ":""));
-          FXTRACE((TOPIC_DEBUG,"  render     = %s\n",(pfd.iPixelType==PFD_TYPE_COLORINDEX)?"PFD_TYPE_COLORINDEX":(pfd.iPixelType==PFD_TYPE_RGBA)?"PFD_TYPE_RGBA":""));
-          FXTRACE((TOPIC_DEBUG,"  red size   = %d\n",specs.redsize));
-          FXTRACE((TOPIC_DEBUG,"  green size = %d\n",specs.greensize));
-          FXTRACE((TOPIC_DEBUG,"  blue size  = %d\n",specs.bluesize));
-          FXTRACE((TOPIC_DEBUG,"  alpha size = %d\n",specs.alphasize));
-          FXTRACE((TOPIC_DEBUG,"  depth size = %d\n",specs.depthsize));
-          FXTRACE((TOPIC_DEBUG,"  stencil    = %d\n",specs.stencilsize));
-          FXTRACE((TOPIC_DEBUG,"  acc red    = %d\n",specs.accumredsize));
-          FXTRACE((TOPIC_DEBUG,"  acc green  = %d\n",specs.accumgreensize));
-          FXTRACE((TOPIC_DEBUG,"  acc blue   = %d\n",specs.accumbluesize));
-          FXTRACE((TOPIC_DEBUG,"  acc alpha  = %d\n",specs.accumalphasize));
-          FXTRACE((TOPIC_DEBUG,"  double buf = %d\n",specs.doublebuffer));
-          FXTRACE((TOPIC_DEBUG,"  stereo buf = %d\n",specs.stereobuffer));
-          FXTRACE((TOPIC_DEBUG,"  samples    = %d\n",specs.multisamples));
-          FXTRACE((TOPIC_DEBUG,"  accel      = %d\n",specs.accel));
+          FXTRACE(TOPIC_DEBUG,"Config: #%d: match=%d\n",v,match);
+          FXTRACE(TOPIC_DEBUG,"  drawables  = %s%s\n",(pfd.dwFlags&PFD_DRAW_TO_WINDOW)?"PFD_DRAW_TO_WINDOW ":"",(pfd.dwFlags&PFD_DRAW_TO_BITMAP)?"PFD_DRAW_TO_BITMAP ":"");
+          FXTRACE(TOPIC_DEBUG,"  render     = %s\n",(pfd.iPixelType==PFD_TYPE_COLORINDEX)?"PFD_TYPE_COLORINDEX":(pfd.iPixelType==PFD_TYPE_RGBA)?"PFD_TYPE_RGBA":"");
+          FXTRACE(TOPIC_DEBUG,"  red size   = %d\n",specs.redsize);
+          FXTRACE(TOPIC_DEBUG,"  green size = %d\n",specs.greensize);
+          FXTRACE(TOPIC_DEBUG,"  blue size  = %d\n",specs.bluesize);
+          FXTRACE(TOPIC_DEBUG,"  alpha size = %d\n",specs.alphasize);
+          FXTRACE(TOPIC_DEBUG,"  depth size = %d\n",specs.depthsize);
+          FXTRACE(TOPIC_DEBUG,"  stencil    = %d\n",specs.stencilsize);
+          FXTRACE(TOPIC_DEBUG,"  acc red    = %d\n",specs.accumredsize);
+          FXTRACE(TOPIC_DEBUG,"  acc green  = %d\n",specs.accumgreensize);
+          FXTRACE(TOPIC_DEBUG,"  acc blue   = %d\n",specs.accumbluesize);
+          FXTRACE(TOPIC_DEBUG,"  acc alpha  = %d\n",specs.accumalphasize);
+          FXTRACE(TOPIC_DEBUG,"  double buf = %d\n",specs.doublebuffer);
+          FXTRACE(TOPIC_DEBUG,"  stereo buf = %d\n",specs.stereobuffer);
+          FXTRACE(TOPIC_DEBUG,"  samples    = %d\n",specs.multisamples);
+          FXTRACE(TOPIC_DEBUG,"  accel      = %d\n",specs.accel);
 
           // May the best visual win
           if(match<=bestmatch){
@@ -526,7 +526,7 @@ void FXGLVisual::create(){
 
       // Hopefully, we got one
       if(0<=best){
-        FXTRACE((TOPIC_DETAIL,"Best Config: #%d: match=%d\n",best,bestmatch));
+        FXTRACE(TOPIC_DETAIL,"Best Config: #%d: match=%d\n",best,bestmatch);
 
         // Fill in visual data
         depth=actualRedSize+actualGreenSize+actualBlueSize;
@@ -579,7 +579,7 @@ void FXGLVisual::create(){
 void FXGLVisual::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 #ifdef HAVE_GL_H
       int majoropcode,errorbase,eventbase;
 
@@ -597,7 +597,7 @@ void FXGLVisual::create(){
             XVisualInfo vitemplate,*vi; int nvi;
 
             // Report version found
-            FXTRACE((TOPIC_DETAIL,"Found GLX version: %d.%d (Major: %d, Error: %d, Event: %d)\n",major,minor,majoropcode,errorbase,eventbase));
+            FXTRACE(TOPIC_DETAIL,"Found GLX version: %d.%d (Major: %d, Error: %d, Event: %d)\n",major,minor,majoropcode,errorbase,eventbase);
 
             // Scan for all visuals of given screen
             vitemplate.screen=DefaultScreen((Display*)getApp()->getDisplay());
@@ -610,8 +610,8 @@ void FXGLVisual::create(){
               int value;
               int match;
 
-              FXTRACE((TOPIC_DEBUG,"Found %d configs\n",nvi));
-              FXTRACE((TOPIC_DEBUG,"Default visualid=0x%02x\n",defvisualid));
+              FXTRACE(TOPIC_DEBUG,"Found %d configs\n",nvi);
+              FXTRACE(TOPIC_DEBUG,"Default visualid=0x%02x\n",defvisualid);
 
               // Find the best one
               for(int v=0; v<nvi; v++){
@@ -665,22 +665,22 @@ void FXGLVisual::create(){
                 match=matchSpecs(specs);
 
                 // Trace
-                FXTRACE((TOPIC_DEBUG,"Config: #%d: match=%d\n",v,match));
-                FXTRACE((TOPIC_DEBUG,"  visualid   = 0x%02lx\n",vi[v].visualid));
-                FXTRACE((TOPIC_DEBUG,"  red size   = %d\n",specs.redsize));
-                FXTRACE((TOPIC_DEBUG,"  green size = %d\n",specs.greensize));
-                FXTRACE((TOPIC_DEBUG,"  blue size  = %d\n",specs.bluesize));
-                FXTRACE((TOPIC_DEBUG,"  alpha size = %d\n",specs.alphasize));
-                FXTRACE((TOPIC_DEBUG,"  depth size = %d\n",specs.depthsize));
-                FXTRACE((TOPIC_DEBUG,"  stencil    = %d\n",specs.stencilsize));
-                FXTRACE((TOPIC_DEBUG,"  acc red    = %d\n",specs.accumredsize));
-                FXTRACE((TOPIC_DEBUG,"  acc green  = %d\n",specs.accumgreensize));
-                FXTRACE((TOPIC_DEBUG,"  acc blue   = %d\n",specs.accumbluesize));
-                FXTRACE((TOPIC_DEBUG,"  acc alpha  = %d\n",specs.accumalphasize));
-                FXTRACE((TOPIC_DEBUG,"  double buf = %d\n",specs.doublebuffer));
-                FXTRACE((TOPIC_DEBUG,"  stereo buf = %d\n",specs.stereobuffer));
-                FXTRACE((TOPIC_DEBUG,"  samples    = %d\n",specs.multisamples));
-                FXTRACE((TOPIC_DEBUG,"  accel      = %d\n",specs.accel));
+                FXTRACE(TOPIC_DEBUG,"Config: #%d: match=%d\n",v,match);
+                FXTRACE(TOPIC_DEBUG,"  visualid   = 0x%02lx\n",vi[v].visualid);
+                FXTRACE(TOPIC_DEBUG,"  red size   = %d\n",specs.redsize);
+                FXTRACE(TOPIC_DEBUG,"  green size = %d\n",specs.greensize);
+                FXTRACE(TOPIC_DEBUG,"  blue size  = %d\n",specs.bluesize);
+                FXTRACE(TOPIC_DEBUG,"  alpha size = %d\n",specs.alphasize);
+                FXTRACE(TOPIC_DEBUG,"  depth size = %d\n",specs.depthsize);
+                FXTRACE(TOPIC_DEBUG,"  stencil    = %d\n",specs.stencilsize);
+                FXTRACE(TOPIC_DEBUG,"  acc red    = %d\n",specs.accumredsize);
+                FXTRACE(TOPIC_DEBUG,"  acc green  = %d\n",specs.accumgreensize);
+                FXTRACE(TOPIC_DEBUG,"  acc blue   = %d\n",specs.accumbluesize);
+                FXTRACE(TOPIC_DEBUG,"  acc alpha  = %d\n",specs.accumalphasize);
+                FXTRACE(TOPIC_DEBUG,"  double buf = %d\n",specs.doublebuffer);
+                FXTRACE(TOPIC_DEBUG,"  stereo buf = %d\n",specs.stereobuffer);
+                FXTRACE(TOPIC_DEBUG,"  samples    = %d\n",specs.multisamples);
+                FXTRACE(TOPIC_DEBUG,"  accel      = %d\n",specs.accel);
 
                 // May the best config win
                 if(match<=bestmatch){
@@ -710,7 +710,7 @@ void FXGLVisual::create(){
 
               // We should have one now
               if(0<=best){
-                FXTRACE((TOPIC_DETAIL,"Best Config: #%d: match=%d\n",best,bestmatch));
+                FXTRACE(TOPIC_DETAIL,"Best Config: #%d: match=%d\n",best,bestmatch);
 
                 // Remember visual, depth, visualid
                 visual=vi[best].visual;
@@ -751,7 +751,7 @@ void FXGLVisual::create(){
 void FXGLVisual::detach(){
 #ifdef HAVE_GL_H
   if(xid){
-    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::detach %p\n",getClassName(),this);
     colormap=0;
     freemap=false;
     xid=0;
@@ -765,7 +765,7 @@ void FXGLVisual::destroy(){
 #ifdef HAVE_GL_H
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 #ifdef WIN32
       if(colormap){ DeleteObject(colormap); }
 #else
@@ -822,7 +822,7 @@ void FXGLVisual::load(FXStream& store){
 
 // Destroy
 FXGLVisual::~FXGLVisual(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXGLVisual::~FXGLVisual %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXGLVisual::~FXGLVisual %p\n",this);
   destroy();
   }
 

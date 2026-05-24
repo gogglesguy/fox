@@ -3,7 +3,7 @@
 *                      S e p a r a t o r   W i d g e t s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -59,10 +59,10 @@ public:
   FXSeparator(FXComposite* p,FXuint opts=SEPARATOR_GROOVE|LAYOUT_FILL_X,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0);
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change separator style
   void setSeparatorStyle(FXuint style);

@@ -3,7 +3,7 @@
 *                      T e x t   R e p l a c e   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -173,13 +173,13 @@ public:
   FXColor getReplaceTextColor() const;
 
   /// Run modal invocation of the dialog
-  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR) override;
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXReplaceDialog();

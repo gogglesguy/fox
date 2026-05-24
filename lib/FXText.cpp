@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -225,8 +225,8 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CURSOR_COLUMN,FXText::onUpdCursorColumn),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CUT_SEL,FXText::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_COPY_SEL,FXText::onUpdHaveSelection),
-  FXMAPFUNC(SEL_UPDATE,FXText::ID_PASTE_SEL,FXText::onUpdIsEditable),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_DELETE_SEL,FXText::onUpdHaveEditableSelection),
+  FXMAPFUNC(SEL_UPDATE,FXText::ID_PASTE_SEL,FXText::onUpdIsEditable),
   FXMAPFUNC(SEL_UPDATE,FXText::ID_CLEAN_INDENT,FXText::onUpdHaveEditableSelection),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_TOP,FXText::onCmdCursorTop),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_BOTTOM,FXText::onCmdCursorBottom),
@@ -284,8 +284,8 @@ FXDEFMAP(FXText) FXTextMap[]={
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_CHAR,FXText::onCmdDeleteChar),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_WORD,FXText::onCmdDeleteWord),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_EOL,FXText::onCmdDeleteEol),
-  FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_ALL,FXText::onCmdDeleteAll),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_LINE,FXText::onCmdDeleteLine),
+  FXMAPFUNC(SEL_COMMAND,FXText::ID_DELETE_ALL,FXText::onCmdDeleteAll),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_TOGGLE_EDITABLE,FXText::onCmdToggleEditable),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_TOGGLE_OVERSTRIKE,FXText::onCmdToggleOverstrike),
   FXMAPFUNC(SEL_COMMAND,FXText::ID_CURSOR_POS,FXText::onCmdCursorPos),
@@ -1292,11 +1292,11 @@ void FXText::recompute(){
   // quite expensive.
   toprow=measureText(0,toppos,ww1,hh1);
 
-  FXTRACE((TOPIC_LAYOUT,"measureText(%d,%d,%d,%d) = %d\n",0,toppos,ww1,hh1,toprow));
+  FXTRACE(TOPIC_LAYOUT,"measureText(%d,%d,%d,%d) = %d\n",0,toppos,ww1,hh1,toprow);
 
   botrow=measureText(toppos,length,ww2,hh2);
 
-  FXTRACE((TOPIC_LAYOUT,"measureText(%d,%d,%d,%d) = %d\n",toppos,length,ww2,hh2,botrow));
+  FXTRACE(TOPIC_LAYOUT,"measureText(%d,%d,%d,%d) = %d\n",toppos,length,ww2,hh2,botrow);
 
   // Update text dimensions in terms of pixels and rows; note one extra
   // row always added, as there is always at least one row, even though
@@ -1311,7 +1311,7 @@ void FXText::recompute(){
 
   FXASSERT(pos_x<=0 && pos_y<=0);
 
-  FXTRACE((TOPIC_LAYOUT,"recompute: textWidth=%d textHeight=%d nrows=%d\n",textWidth,textHeight,nrows));
+  FXTRACE(TOPIC_LAYOUT,"recompute: textWidth=%d textHeight=%d nrows=%d\n",textWidth,textHeight,nrows);
 
   // All is clean
   flags&=~FLAG_RECALC;
@@ -2093,7 +2093,7 @@ void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel)
   FXint nrdelta=nrins-nrdel;
   FXint line,i,y;
 
-  FXTRACE((TOPIC_LAYOUT,"BEFORE: pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length));
+  FXTRACE(TOPIC_LAYOUT,"BEFORE: pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length);
 
   FXASSERT(0<=toprow);
   FXASSERT(0<=ncins && 0<=ncdel);
@@ -2210,7 +2210,7 @@ void FXText::mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel)
     update();                                   // Repaint all
     }
   FXASSERT(pos_x<=0 && pos_y<=0);
-  FXTRACE((TOPIC_LAYOUT,"AFTER : pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length));
+  FXTRACE(TOPIC_LAYOUT,"AFTER : pos=%d ncins=%d ncdel=%d nrins=%d nrdel=%d toppos=%d toprow=%d nrows=%d nvisrows=%d length=%d\n",pos,ncins,ncdel,nrins,nrdel,toppos,toprow,nrows,nvisrows,length);
   }
 
 
@@ -2295,7 +2295,7 @@ void FXText::replace(FXint pos,FXint del,const FXchar *text,FXint ins,FXint styl
   // Inviolate
   FXASSERT(pos_x<=0 && pos_y<=0);
 
-  FXTRACE((TOPIC_TEXT,"pos=%d del=%d ins=%d\n",pos,del,ins));
+  FXTRACE(TOPIC_TEXT,"pos=%d del=%d ins=%d\n",pos,del,ins);
 
   // Delta in characters
   dif=ins-del;
@@ -2308,7 +2308,7 @@ void FXText::replace(FXint pos,FXint del,const FXchar *text,FXint ins,FXint styl
   nrdel=measureText(wbeg,wend,wdel,hdel);
   ncdel=wend-wbeg;
 
-  FXTRACE((TOPIC_TEXT,"wbeg=%d wend=%d nrdel=%d ncdel=%d length=%d nrows=%d wdel=%d hdel=%d\n",wbeg,wend,nrdel,ncdel,length,nrows,wdel,hdel));
+  FXTRACE(TOPIC_TEXT,"wbeg=%d wend=%d nrdel=%d ncdel=%d length=%d nrows=%d wdel=%d hdel=%d\n",wbeg,wend,nrdel,ncdel,length,nrows,wdel,hdel);
 
   // Move the gap to current position
   movegap(pos);
@@ -2334,7 +2334,7 @@ void FXText::replace(FXint pos,FXint del,const FXchar *text,FXint ins,FXint styl
   // Adjust number of rows now
   nrows+=nrins-nrdel;
 
-  FXTRACE((TOPIC_TEXT,"wbeg=%d wend+dif=%d nrins=%d ncins=%d length=%d nrows=%d wins=%d hins=%d\n",wbeg,wend+dif,nrins,ncins,length,nrows,wins,hins));
+  FXTRACE(TOPIC_TEXT,"wbeg=%d wend+dif=%d nrins=%d ncins=%d length=%d nrows=%d wins=%d hins=%d\n",wbeg,wend+dif,nrins,ncins,length,nrows,wins,hins);
 
   // Update visrows array and other stuff
   mutation(wbeg,ncins,ncdel,nrins,nrdel);
@@ -4144,7 +4144,7 @@ void FXText::updateRange(FXint startpos,FXint endpos) const {
 long FXText::onPaint(FXObject*,FXSelector,void* ptr){
   FXDCWindow dc(this,(FXEvent*)ptr);
 
-  FXTRACE((TOPIC_TEXT,"%s::onPaint(%d,%d,%d,%d)\n",getClassName(),((FXEvent*)ptr)->rect.x,((FXEvent*)ptr)->rect.y,((FXEvent*)ptr)->rect.w,((FXEvent*)ptr)->rect.h));
+  FXTRACE(TOPIC_TEXT,"%s::onPaint(%d,%d,%d,%d)\n",getClassName(),((FXEvent*)ptr)->rect.x,((FXEvent*)ptr)->rect.y,((FXEvent*)ptr)->rect.w,((FXEvent*)ptr)->rect.h);
 
   // Set font
   dc.setFont(font);
@@ -4928,7 +4928,7 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_TIP;
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
-    FXTRACE((TOPIC_KEYBOARD,"%s::onKeyPress keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state));
+    FXTRACE(TOPIC_KEYBOARD,"%s::onKeyPress keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state);
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
     flags&=~FLAG_UPDATE;
     switch(event->code){
@@ -5130,22 +5130,28 @@ long FXText::onKeyPress(FXObject*,FXSelector,void* ptr){
         break;
       case KEY_x:
         if(!(event->state&CONTROLMASK)) goto ins;
+        handle(this,FXSEL(SEL_COMMAND,ID_CUT_SEL),nullptr);
+        break;
       case KEY_F20:                               // Sun Cut key
         handle(this,FXSEL(SEL_COMMAND,ID_CUT_SEL),nullptr);
         break;
       case KEY_c:
         if(!(event->state&CONTROLMASK)) goto ins;
+        handle(this,FXSEL(SEL_COMMAND,ID_COPY_SEL),nullptr);
+        break;
+      case KEY_k:
+        if(!(event->state&CONTROLMASK)) goto ins;
+        handle(this,FXSEL(SEL_COMMAND,ID_DELETE_LINE),nullptr);
+        break;
       case KEY_F16:                               // Sun Copy key
         handle(this,FXSEL(SEL_COMMAND,ID_COPY_SEL),nullptr);
         break;
       case KEY_v:
         if(!(event->state&CONTROLMASK)) goto ins;
-      case KEY_F18:                               // Sun Paste key
         handle(this,FXSEL(SEL_COMMAND,ID_PASTE_SEL),nullptr);
         break;
-      case KEY_k:
-        if(!(event->state&CONTROLMASK)) goto ins;
-        handle(this,FXSEL(SEL_COMMAND,ID_DELETE_LINE),nullptr);
+      case KEY_F18:                               // Sun Paste key
+        handle(this,FXSEL(SEL_COMMAND,ID_PASTE_SEL),nullptr);
         break;
       case KEY_j:
         if(!(event->state&CONTROLMASK)) goto ins;
@@ -5166,7 +5172,7 @@ ins:    if((event->state&(CONTROLMASK|ALTMASK)) || ((FXuchar)event->text[0]<32))
 long FXText::onKeyRelease(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
-    FXTRACE((TOPIC_KEYBOARD,"%s::onKeyRelease keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state));
+    FXTRACE(TOPIC_KEYBOARD,"%s::onKeyRelease keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state);
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
     switch(event->code){
       case KEY_Shift_L:
@@ -5595,6 +5601,14 @@ long FXText::onCmdCopySel(FXObject*,FXSelector,void*){
   }
 
 
+// Delete selection
+long FXText::onCmdDeleteSel(FXObject*,FXSelector,void*){
+  if(isEditable() && deleteSelection(true)) return 1;
+  getApp()->beep();
+  return 1;
+  }
+
+
 // Paste clipboard
 long FXText::onCmdPasteSel(FXObject*,FXSelector,void*){
   if(isEditable() && pasteClipboard(true)) return 1;
@@ -5606,14 +5620,6 @@ long FXText::onCmdPasteSel(FXObject*,FXSelector,void*){
 // Paste selection
 long FXText::onCmdPasteMiddle(FXObject*,FXSelector,void*){
   if(isEditable() && pasteSelection(true)) return 1;
-  getApp()->beep();
-  return 1;
-  }
-
-
-// Delete selection
-long FXText::onCmdDeleteSel(FXObject*,FXSelector,void*){
-  if(isEditable() && deleteSelection(true)) return 1;
   getApp()->beep();
   return 1;
   }
@@ -5802,7 +5808,7 @@ long FXText::onCmdDeleteEol(FXObject*,FXSelector,void*){
   }
 
 
-// Delete line
+// Delete lines
 long FXText::onCmdDeleteLine(FXObject*,FXSelector,void*){
   if(isEditable()){
     if(deletePendingSelection(true)) return 1;

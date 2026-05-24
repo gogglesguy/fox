@@ -3,7 +3,7 @@
 *                      O p e n G L   C y l i n d e r   O b j e c t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,7 +43,7 @@ FXIMPLEMENT(FXGLCylinder,FXGLShape,nullptr,0)
 
 // Create cylinder
 FXGLCylinder::FXGLCylinder():height(1.0f),radius(1.0f){
-  FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
+  FXTRACE(100,"FXGLCylinder::FXGLCylinder\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
@@ -51,7 +51,7 @@ FXGLCylinder::FXGLCylinder():height(1.0f),radius(1.0f){
 // Create initialized cylinder
 FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),height(h),radius(r){
-  FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
+  FXTRACE(100,"FXGLCylinder::FXGLCylinder\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
@@ -59,14 +59,14 @@ FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):
 // Create initialized cylinder
 FXGLCylinder::FXGLCylinder(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),height(h),radius(r){
-  FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
+  FXTRACE(100,"FXGLCylinder::FXGLCylinder\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Copy constructor
 FXGLCylinder::FXGLCylinder(const FXGLCylinder& orig):FXGLShape(orig){
-  FXTRACE((100,"FXGLCylinder::FXGLCylinder\n"));
+  FXTRACE(100,"FXGLCylinder::FXGLCylinder\n");
   height=orig.height;
   radius=orig.radius;
   }
@@ -137,6 +137,6 @@ void FXGLCylinder::load(FXStream& store){
 
 // Destroy
 FXGLCylinder::~FXGLCylinder(){
-  FXTRACE((100,"FXGLCylinder::~FXGLCylinder\n"));
+  FXTRACE(100,"FXGLCylinder::~FXGLCylinder\n");
   }
 

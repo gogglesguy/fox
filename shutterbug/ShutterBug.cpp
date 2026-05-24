@@ -3,7 +3,7 @@
 *                S h u t t e r   B u g   A p p l i c a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -439,7 +439,7 @@ long ShutterBug::onBtnRelease(FXObject*,FXSelector,void* ptr){
 // Keyboard press
 long ShutterBug::onKeyPress(FXObject*,FXSelector,void* ptr){
   if(((FXEvent*)ptr)->code==KEY_q || ((FXEvent*)ptr)->code==KEY_Q){
-    FXTRACE((1,"quit\n"));
+    FXTRACE(1,"quit\n");
     writeRegistry();
     getApp()->exit();
     }
@@ -455,7 +455,7 @@ long ShutterBug::onKeyRelease(FXObject*,FXSelector,void*){
 
 // Quit
 long ShutterBug::onCmdQuit(FXObject*,FXSelector,void*){
-  FXTRACE((1,"quit\n"));
+  FXTRACE(1,"quit\n");
   writeRegistry();
   getApp()->exit();
   return 1;
@@ -634,7 +634,7 @@ FXbool ShutterBug::saveImage(const FXString& file,FXColor* pixels,FXint w,FXint 
 // We lost the selection somehow
 long ShutterBug::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
   FXShell::onClipboardLost(sender,sel,ptr);
-  FXTRACE((1,"%s::onClipboardLost \n",getClassName()));
+  FXTRACE(1,"%s::onClipboardLost \n",getClassName());
   freeElms(clipbuffer);
   clipwidth=0;
   clipheight=0;
@@ -648,7 +648,7 @@ long ShutterBug::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
   FXuchar *pointer;
   FXuval   length;
 
-  FXTRACE((1,"%s::onClipboardRequest \n",getClassName()));
+  FXTRACE(1,"%s::onClipboardRequest \n",getClassName());
 
   // Try handling it in base class first
   if(FXShell::onClipboardRequest(sender,sel,ptr)) return 1;
@@ -664,36 +664,36 @@ long ShutterBug::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
       // Render image to memory stream
       if(event->target==dndTypes[0]){
-        FXTRACE((1,"Request for bmpType\n"));
+        FXTRACE(1,"Request for bmpType\n");
         fxsaveBMP(ms,clipbuffer,clipwidth,clipheight);
         }
       else if(event->target==dndTypes[1]){
-        FXTRACE((1,"Request for gifType\n"));
+        FXTRACE(1,"Request for gifType\n");
         fxsaveGIF(ms,clipbuffer,clipwidth,clipheight);
         }
       else if(event->target==dndTypes[2]){
-        FXTRACE((1,"Request for xpmType\n"));
+        FXTRACE(1,"Request for xpmType\n");
         fxsaveXPM(ms,clipbuffer,clipwidth,clipheight);
         }
       else if(event->target==dndTypes[3]){
-        FXTRACE((1,"Request for ppmType\n"));
+        FXTRACE(1,"Request for ppmType\n");
         fxsavePPM(ms,clipbuffer,clipwidth,clipheight);
         }
       else if(event->target==dndTypes[4]){
-        FXTRACE((1,"Request for jpgType\n"));
+        FXTRACE(1,"Request for jpgType\n");
         fxsaveJPG(ms,clipbuffer,clipwidth,clipheight,75);
         }
       else if(event->target==dndTypes[5]){
-        FXTRACE((1,"Request for pngType\n"));
+        FXTRACE(1,"Request for pngType\n");
         fxsavePNG(ms,clipbuffer,clipwidth,clipheight);
         }
       else if(event->target==dndTypes[6]){
-        FXTRACE((1,"Request for tifType\n"));
+        FXTRACE(1,"Request for tifType\n");
         fxsaveTIF(ms,clipbuffer,clipwidth,clipheight,0);
         }
 #ifdef WIN32
   //  else if(event->target==imageType){
-  //    FXTRACE((1,"Request for imageType\n"));
+  //    FXTRACE(1,"Request for imageType\n");
   //    fxsaveBMP(ms,chart->getData(),chart->getWidth(),chart->getHeight());
   //    }
 #endif
@@ -779,7 +779,7 @@ long ShutterBug::onCmdRecordMovie(FXObject*,FXSelector,void*){
     filename=savedialog.getFilename();
     fileformat=savedialog.getCurrentPattern();
     filecount=frameFromFilename(filename);
-    FXTRACE((1,"Frame: %s %d\n",filename.text(),filecount));
+    FXTRACE(1,"Frame: %s %d\n",filename.text(),filecount);
     hideSnapRectangle();
     hide();
     getApp()->addTimeout(this,ID_RECORD_FRAME,rate);
@@ -795,7 +795,7 @@ long ShutterBug::onCmdRecordFrame(FXObject*,FXSelector,void*){
   FXbool ok=false;
   FXWindow *root=getRoot();
   filename=filenameFromFrame(filename,filecount);
-  FXTRACE((1,"Snap Frame: %s\n",filename.text()));
+  FXTRACE(1,"Snap Frame: %s\n",filename.text());
   if(grabRectangle(pointer,rectangle)){
     ok=saveImage(filename,pointer,rectangle.w,rectangle.h);
     freeElms(pointer);
@@ -893,7 +893,7 @@ long ShutterBug::onMovedSnapper(FXObject*,FXSelector sel,void* ptr){
   FXEvent *event=(FXEvent*)ptr;
   FXuchar m;
   FXint t;
-  FXTRACE((1,"%s::onMovedSnapper %d,%d\n",getClassName(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y));
+  FXTRACE(1,"%s::onMovedSnapper %d,%d\n",getClassName(),((FXEvent*)ptr)->win_x,((FXEvent*)ptr)->win_y);
   if(mode!=MODE_NONE){
 
     // Move whole rectangle
@@ -965,7 +965,7 @@ long ShutterBug::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"ShutterBug",nullptr,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nFOX Screenshot Utility, version %d.%d.%d.\nShutterBug uses the FOX Toolkit version %d.%d.%d.\nCopyright (C) 2003,2022 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nFOX Screenshot Utility, version %d.%d.%d.\nShutterBug uses the FOX Toolkit version %d.%d.%d.\nCopyright (C) 2003,2026 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),nullptr,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute();
@@ -1005,7 +1005,7 @@ long ShutterBug::onCmdSize(FXObject*,FXSelector sel,void*){
       rectangle.w=size;
       rectangle.h=size;
       }
-    FXTRACE((1,"x=%d y=%d w=%d h=%d\n",rectangle.x,rectangle.y,rectangle.w,rectangle.h));
+    FXTRACE(1,"x=%d y=%d w=%d h=%d\n",rectangle.x,rectangle.y,rectangle.w,rectangle.h);
     moveSnapRectangle(rectangle);
     }
   return 1;

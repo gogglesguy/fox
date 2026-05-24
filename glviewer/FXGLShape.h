@@ -3,7 +3,7 @@
 *                   O p e n G L   S h a p e   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -95,25 +95,25 @@ public:
   FXGLShape(const FXGLShape& orig);
 
   /// Called by the viewer to get bounds for this object
-  virtual void bounds(FXRangef& box);
+  virtual void bounds(FXRangef& box) override;
 
   /// Draw this object in a viewer
-  virtual void draw(FXGLViewer* viewer);
+  virtual void draw(FXGLViewer* viewer) override;
 
   /// Draw this object for hit-testing purposes
-  virtual void hit(FXGLViewer* viewer);
+  virtual void hit(FXGLViewer* viewer) override;
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Return true if this object can be dragged around
-  virtual FXbool canDrag() const;
+  virtual FXbool canDrag() const override;
 
   /// Return true if this object can be deleted from the scene
-  virtual FXbool canDelete() const;
+  virtual FXbool canDelete() const override;
 
   /// Drag this object from one position to another
-  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
+  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty) override;
 
   /// Set the tool tip message for this object
   void setTipText(const FXString& text){ tip=text; }
@@ -134,10 +134,10 @@ public:
   void getMaterial(FXint side,FXMaterial &mtl) const;
 
   /// Save shape to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load shape from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 #endif

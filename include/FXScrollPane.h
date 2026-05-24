@@ -3,7 +3,7 @@
 *               S c r o l l i n g   M e n u   P a n e   W i d g e t             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -63,16 +63,16 @@ public:
   FXScrollPane(FXWindow* owner,FXint nvis,FXuint opts=0);
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Show this window
-  virtual void show();
+  virtual void show() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return number of visible items
   FXint getNumVisible() const { return visible; }

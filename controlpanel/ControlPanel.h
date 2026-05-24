@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2026 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -240,7 +240,7 @@ public:
   FXbool setApplicationAndVendor(const FXString& an,const FXString& vn=FXString::null);
 
   // Create widgets
-  virtual void create();
+  virtual void create() override;
 
   // Read settings file
   FXbool readSettingsFile(const FXString& file);
@@ -249,7 +249,7 @@ public:
   FXbool writeSettingsFile(const FXString& file);
 
   // Close the application, return TRUE if actually closed
-  virtual FXbool close(FXbool notify=false);
+  virtual FXbool close(FXbool notify=false) override;
 
   // Destructor
   virtual ~FXDesktopSetup();

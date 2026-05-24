@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -257,13 +257,13 @@ public:
   FXFont(FXApp* a,const FXFontDesc& fontdesc);
 
   /// Create the font
-  virtual void create();
+  virtual void create() override;
 
   /// Detach the font
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy the font
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Return family part of name
   FXString getFamily() const;
@@ -418,10 +418,10 @@ public:
   static FXbool listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& face,FXuint wt=0,FXuint sl=0,FXuint sw=0,FXuint en=0,FXuint h=0);
 
   /// Save font data into stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load font data from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy font
   virtual ~FXFont();

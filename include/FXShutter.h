@@ -3,7 +3,7 @@
 *                 S h u t t e r   C o n t a i n e r   W i d g e t               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Charles W. Warren.   All Rights Reserved.          *
+* Copyright (C) 1998,2026 by Charles W. Warren.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -117,10 +117,10 @@ public:
   FXString getTipText() const;
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXShutterItem();
@@ -177,7 +177,7 @@ public:
   FXShutter(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_SPACING,FXint pr=DEFAULT_SPACING,FXint pt=DEFAULT_SPACING,FXint pb=DEFAULT_SPACING,FXint hs=DEFAULT_SPACING,FXint vs=DEFAULT_SPACING);
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Set the currently displayed item (panel = 0, 1, 2, ..., npanels-1)
   virtual void setCurrent(FXint panel,FXbool notify=false);
@@ -186,10 +186,10 @@ public:
   FXint getCurrent() const { return current; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXShutter();

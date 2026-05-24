@@ -3,7 +3,7 @@
 *                         C o n s o l e   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -190,7 +190,7 @@ void FXConsole::layout(){
     if(style.no()){ style.no(totallines); }
     }
 
-  FXTRACE((TOPIC_DETAIL,"visiblelines=%d historylines=%d totallines=%d hh=%d space=%d\n",visiblelines,historylines,totallines,hh,height-margintop-marginbottom));
+  FXTRACE(TOPIC_DETAIL,"visiblelines=%d historylines=%d totallines=%d hh=%d space=%d\n",visiblelines,historylines,totallines,hh,height-margintop-marginbottom);
 
   // Scrollbars adjusted
   placeScrollBars(width,height);
@@ -320,7 +320,7 @@ void FXConsole::drawContents(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h) con
   FXint ln;
   if(tl<0) tl=0;
   if(bl>=contents.no()) bl=contents.no()-1;
-  FXTRACE((TOPIC_DETAIL,"tl=%d bl=%d\n",tl,bl));
+  FXTRACE(TOPIC_DETAIL,"tl=%d bl=%d\n",tl,bl);
   for(ln=tl; ln<=bl; ln++){
     drawTextLine(dc,ln,x,x+w);
     }

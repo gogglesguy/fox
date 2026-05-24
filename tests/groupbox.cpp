@@ -3,7 +3,7 @@
 *                                 Test Group Box                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -599,7 +599,7 @@ long GroupWindow::onCmdRadio(FXObject*,FXSelector sel,void*){
 long GroupWindow::onCmdIconify(FXObject*,FXSelector,void*){
   minimize();
   getApp()->addTimeout(this,ID_DEICONIFY,2000000000);
-  FXTRACE((1,"iconify\n"));
+  FXTRACE(1,"iconify\n");
   return 1;
   }
 
@@ -607,7 +607,7 @@ long GroupWindow::onCmdIconify(FXObject*,FXSelector,void*){
 // Test of deiconify
 long GroupWindow::onCmdDeiconify(FXObject*,FXSelector,void*){
   restore();
-  FXTRACE((1,"deiconify\n"));
+  FXTRACE(1,"deiconify\n");
   return 1;
   }
 
@@ -630,14 +630,14 @@ long GroupWindow::onCmdAbout(FXObject*,FXSelector,void*){
 long GroupWindow::onCmdChoice(FXObject*,FXSelector,void*){
   FXGIFIcon choiceicon(getApp(),minifolderclosed);
   FXint result=FXChoiceBox::ask(this,DECOR_RESIZE,"Choose","What is your choice?",&choiceicon,"One\nTwo\nThree\nFour\nFive\nSix\nSeven\nOne very very very very very long entry");
-  FXTRACE((1,"choice=%d\n",result));
+  FXTRACE(1,"choice=%d\n",result);
   return 1;
   }
 
 
 // Listbox
 long GroupWindow::onCmdListBox(FXObject*,FXSelector sel,void* ptr){
-  FXTRACE((1,"%s: %d (%d)\n",FXSELTYPE(sel)==SEL_COMMAND?"SEL_COMMAND":"SEL_CHANGED",(FXint)(FXival)ptr,listbox->getCurrentItem()));
+  FXTRACE(1,"%s: %d (%d)\n",FXSELTYPE(sel)==SEL_COMMAND?"SEL_COMMAND":"SEL_CHANGED",(FXint)(FXival)ptr,listbox->getCurrentItem());
   return 1;
   }
 

@@ -3,7 +3,7 @@
 *             M u l t i p l e   D o c u m e n t   B u t t o n                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -44,8 +44,8 @@ public:
 public:
   /// Constructor
   FXMDIDeleteButton(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FRAME_RAISED,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  virtual FXint getDefaultWidth();
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultWidth() override;
+  virtual FXint getDefaultHeight() override;
   };
 
 
@@ -62,8 +62,8 @@ public:
 public:
   /// Constructor
   FXMDIRestoreButton(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FRAME_RAISED,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  virtual FXint getDefaultWidth();
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultWidth() override;
+  virtual FXint getDefaultHeight() override;
   };
 
 
@@ -80,8 +80,8 @@ public:
 public:
   /// Constructor
   FXMDIMaximizeButton(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FRAME_RAISED,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  virtual FXint getDefaultWidth();
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultWidth() override;
+  virtual FXint getDefaultHeight() override;
   };
 
 
@@ -98,8 +98,8 @@ public:
 public:
   /// Constructor
   FXMDIMinimizeButton(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FRAME_RAISED,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  virtual FXint getDefaultWidth();
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultWidth() override;
+  virtual FXint getDefaultHeight() override;
   };
 
 
@@ -116,8 +116,8 @@ public:
 public:
   /// Constructor
   FXMDIWindowButton(FXComposite* p,FXPopup* pup,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
-  virtual FXint getDefaultWidth();
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultWidth() override;
+  virtual FXint getDefaultHeight() override;
   };
 
 

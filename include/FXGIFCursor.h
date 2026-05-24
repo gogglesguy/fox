@@ -3,7 +3,7 @@
 *                        G I F   C u r so r   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Daniel Gehriger.   All Rights Reserved.            *
+* Copyright (C) 2000,2026 by Daniel Gehriger.   All Rights Reserved.            *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -49,10 +49,10 @@ public:
   FXGIFCursor(FXApp* a,const FXuchar* pix,FXint hx=0,FXint hy=0);
 
   /// Save pixel data only, in GIF format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Load pixel data only, in GIF format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destroy
   virtual ~FXGIFCursor(){}

@@ -3,7 +3,7 @@
 *                          Test Header Controls                                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -186,7 +186,7 @@ long HeaderWindow::onCmdAbout(FXObject*,FXSelector,void*){
 long HeaderWindow::onCmdHeader(FXObject*,FXSelector,void* ptr){
   FXint which=(FXint)(FXival)ptr;
   FXASSERT(0<=which && which<4);
-  FXTRACE((1,"Width of item %d = %d\n",which,header1->getItemSize(which)));
+  FXTRACE(1,"Width of item %d = %d\n",which,header1->getItemSize(which));
   list[which]->setWidth(header1->getItemSize(which));
   return 1;
   }

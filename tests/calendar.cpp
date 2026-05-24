@@ -3,7 +3,7 @@
 *                    Calendar Example and Test Program                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 Sander Jansen. All Rights Reserved                    *
+* Copyright (C) 2006,2026 Sander Jansen. All Rights Reserved                    *
 ********************************************************************************/
 #include <fx.h>
 
@@ -58,7 +58,7 @@ public:
   long onCmdSelected(FXObject*,FXSelector,void*);
 public:
   TestWindow(FXApp *app);
-  virtual void create();
+  virtual void create() override;
   virtual ~TestWindow();
   };
 

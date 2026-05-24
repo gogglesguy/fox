@@ -3,7 +3,7 @@
 *                          H e a d e r   W i d g e t                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -160,8 +160,8 @@ public:
   virtual void destroy();
 
   /// Stream serialization
-  virtual void save(FXStream& store) const;
-  virtual void load(FXStream& store);
+  virtual void save(FXStream& store) const override;
+  virtual void load(FXStream& store) override;
 
   /// Delete item and free icon if owned
   virtual ~FXHeaderItem();
@@ -237,13 +237,13 @@ public:
   FXHeader(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=HEADER_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return number of items
   FXint getNumItems() const { return (FXint)items.no(); }
@@ -252,10 +252,10 @@ public:
   FXint getTotalSize() const;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Set the current position
   void setPosition(FXint pos);
@@ -424,10 +424,10 @@ public:
   const FXString& getHelpText() const { return help; }
 
   /// Save header to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load header from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXHeader();

@@ -3,7 +3,7 @@
 *                     U n d o a b l e   C o m m a n d s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -33,8 +33,8 @@ protected:
 protected:
   FXTextCommand(FXText* txt,FXint p,FXbool mg);
 public:
-  virtual FXuval size() const;
-  virtual FXbool canMerge() const;
+  virtual FXuval size() const override;
+  virtual FXbool canMerge() const override;
   };
 
 
@@ -47,12 +47,12 @@ protected:
   FXString inserted;
 public:
   FXTextInsert(FXText* txt,FXint p,FXint ni,const FXchar* ins);
-  virtual FXuval size() const;
-  virtual FXString undoName() const;
-  virtual FXString redoName() const;
-  virtual FXuint mergeWith(FXCommand* command);
-  virtual void undo();
-  virtual void redo();
+  virtual FXuval size() const override;
+  virtual FXString undoName() const override;
+  virtual FXString redoName() const override;
+  virtual FXuint mergeWith(FXCommand* command) override;
+  virtual void undo() override;
+  virtual void redo() override;
   virtual ~FXTextInsert();
   };
 
@@ -66,12 +66,12 @@ protected:
   FXString deleted;
 public:
   FXTextDelete(FXText* txt,FXint p,FXint nd,const FXchar* del);
-  virtual FXuval size() const;
-  virtual FXString undoName() const;
-  virtual FXString redoName() const;
-  virtual FXuint mergeWith(FXCommand* command);
-  virtual void undo();
-  virtual void redo();
+  virtual FXuval size() const override;
+  virtual FXString undoName() const override;
+  virtual FXString redoName() const override;
+  virtual FXuint mergeWith(FXCommand* command) override;
+  virtual void undo() override;
+  virtual void redo() override;
   virtual ~FXTextDelete();
   };
 
@@ -86,12 +86,12 @@ protected:
   FXString inserted;
 public:
   FXTextReplace(FXText* txt,FXint p,FXint nd,FXint ni,const FXchar* del,const FXchar* ins);
-  virtual FXuval size() const;
-  virtual FXString undoName() const;
-  virtual FXString redoName() const;
-  virtual FXuint mergeWith(FXCommand* command);
-  virtual void undo();
-  virtual void redo();
+  virtual FXuval size() const override;
+  virtual FXString undoName() const override;
+  virtual FXString redoName() const override;
+  virtual FXuint mergeWith(FXCommand* command) override;
+  virtual void undo() override;
+  virtual void redo() override;
   virtual ~FXTextReplace();
   };
 

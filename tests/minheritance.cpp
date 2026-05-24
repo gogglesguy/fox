@@ -3,7 +3,7 @@
 *                           Multiple Inheritance Test                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -161,13 +161,13 @@ public:
 /*******************************************************************************/
 
 Base1::Base1(){
-  FXTRACE((100,"Base1::Base1 at %p\n",this));
+  FXTRACE(100,"Base1::Base1 at %p\n",this);
   a=1;
   }
 
 
 Base1::~Base1(){
-  FXTRACE((100,"Base1::~Base1\n"));
+  FXTRACE(100,"Base1::~Base1\n");
   }
 
 /*******************************************************************************/
@@ -180,17 +180,17 @@ FXDEFMAP(Base2) Base2Map[]={
 FXIMPLEMENT(Base2,FXObject,Base2Map,ARRAYNUMBER(Base2Map))
 
 Base2::Base2(){
-  FXTRACE((100,"Base2::Base2 at %p\n",this));
+  FXTRACE(100,"Base2::Base2 at %p\n",this);
   b=2;
   }
 
 long Base2::onCmdBase2(FXObject*,FXSelector,void*){
-  FXTRACE((100,"Base2::onCmdBase2 at %p b=%d\n",this,b));
+  FXTRACE(100,"Base2::onCmdBase2 at %p b=%d\n",this,b);
   return 1;
   }
 
 Base2::~Base2(){
-  FXTRACE((100,"Base2::~Base2\n"));
+  FXTRACE(100,"Base2::~Base2\n");
   }
 
 
@@ -198,13 +198,13 @@ Base2::~Base2(){
 
 
 Base3::Base3(){
-  FXTRACE((100,"Base3::Base3 at %p\n",this));
+  FXTRACE(100,"Base3::Base3 at %p\n",this);
   c=3;
   }
 
 
 Base3::~Base3(){
-  FXTRACE((100,"Base3::~Base3\n"));
+  FXTRACE(100,"Base3::~Base3\n");
   }
 
 
@@ -219,17 +219,17 @@ FXDEFMAP(TwoBaseOne) TwoBaseOneMap[]={
 FXIMPLEMENT(TwoBaseOne,Base2,TwoBaseOneMap,ARRAYNUMBER(TwoBaseOneMap))
 
 TwoBaseOne::TwoBaseOne(){
-  FXTRACE((100,"TwoBaseOne::TwoBaseOne at %p\n",this));
+  FXTRACE(100,"TwoBaseOne::TwoBaseOne at %p\n",this);
   d=4;
   }
 
 long TwoBaseOne::onCmdTwoBaseOne(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TwoBaseOne::onCmdTwoBaseOne at %p d=%d\n",this,d));
+  FXTRACE(100,"TwoBaseOne::onCmdTwoBaseOne at %p d=%d\n",this,d);
   return 1;
   }
 
 TwoBaseOne::~TwoBaseOne(){
-  FXTRACE((100,"TwoBaseOne::~TwoBaseOne\n"));
+  FXTRACE(100,"TwoBaseOne::~TwoBaseOne\n");
   }
 
 /*******************************************************************************/
@@ -242,17 +242,17 @@ FXDEFMAP(TwoBaseTwo) TwoBaseTwoMap[]={
 FXIMPLEMENT(TwoBaseTwo,Base2,TwoBaseTwoMap,ARRAYNUMBER(TwoBaseTwoMap))
 
 TwoBaseTwo::TwoBaseTwo(){
-  FXTRACE((100,"TwoBaseTwo::TwoBaseTwo at %p\n",this));
+  FXTRACE(100,"TwoBaseTwo::TwoBaseTwo at %p\n",this);
   e=4;
   }
 
 long TwoBaseTwo::onCmdTwoBaseTwo(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TwoBaseTwo::onCmdTwoBaseTwo at %p e=%d\n",this,e));
+  FXTRACE(100,"TwoBaseTwo::onCmdTwoBaseTwo at %p e=%d\n",this,e);
   return 1;
   }
 
 TwoBaseTwo::~TwoBaseTwo(){
-  FXTRACE((100,"TwoBaseTwo::~TwoBaseTwo\n"));
+  FXTRACE(100,"TwoBaseTwo::~TwoBaseTwo\n");
   }
 
 
@@ -268,17 +268,17 @@ FXDEFMAP(ThreeBase) ThreeBaseMap[]={
 FXIMPLEMENT(ThreeBase,TwoBaseOne,ThreeBaseMap,ARRAYNUMBER(ThreeBaseMap))
 
 ThreeBase::ThreeBase(){
-  FXTRACE((100,"ThreeBase::ThreeBase at %p\n",this));
+  FXTRACE(100,"ThreeBase::ThreeBase at %p\n",this);
   f=5;
   }
 
 long ThreeBase::onCmdThreeBase(FXObject*,FXSelector,void*){
-  FXTRACE((100,"ThreeBase::onCmdThreeBase at %p f=%d\n",this,f));
+  FXTRACE(100,"ThreeBase::onCmdThreeBase at %p f=%d\n",this,f);
   return 1;
   }
 
 ThreeBase::~ThreeBase(){
-  FXTRACE((100,"ThreeBase::~ThreeBase\n"));
+  FXTRACE(100,"ThreeBase::~ThreeBase\n");
   }
 
 
@@ -293,51 +293,51 @@ int main(int,char**){
   TwoBaseOne twobase1;
 
   // Found in TwoBaseOne
-  FXTRACE((100,"calling TwoBaseOne\n"));
+  FXTRACE(100,"calling TwoBaseOne\n");
   twobase1.handle(nullptr,FXSEL(SEL_COMMAND,TwoBaseOne::ID_TWOBASEONE),nullptr);
 
   // Found in Base2
-  FXTRACE((100,"calling Base2\n"));
+  FXTRACE(100,"calling Base2\n");
   twobase1.handle(nullptr,FXSEL(SEL_COMMAND,Base2::ID_BASE2),nullptr);
   }
 
-  FXTRACE((100,"=============\n"));
+  FXTRACE(100,"=============\n");
 
   {
   TwoBaseTwo twobase2;
 
   // Found in TwoBaseTwo
-  FXTRACE((100,"calling TwoBaseTwo\n"));
+  FXTRACE(100,"calling TwoBaseTwo\n");
   twobase2.handle(nullptr,FXSEL(SEL_COMMAND,TwoBaseTwo::ID_TWOBASETWO),nullptr);
 
   // Found in Base2
-  FXTRACE((100,"calling Base2\n"));
+  FXTRACE(100,"calling Base2\n");
   twobase2.handle(nullptr,FXSEL(SEL_COMMAND,Base2::ID_BASE2),nullptr);
   }
 
-  FXTRACE((100,"=============\n"));
+  FXTRACE(100,"=============\n");
 
   {
   ThreeBase threebase;
 
   // Found in ThreeBase
-  FXTRACE((100,"calling ThreeBase\n"));
+  FXTRACE(100,"calling ThreeBase\n");
   threebase.handle(nullptr,FXSEL(SEL_COMMAND,ThreeBase::ID_THREEBASE),nullptr);
 
   // Found in TwoBaseOne
-  FXTRACE((100,"calling TwoBaseOne\n"));
+  FXTRACE(100,"calling TwoBaseOne\n");
   threebase.handle(nullptr,FXSEL(SEL_COMMAND,TwoBaseOne::ID_TWOBASEONE),nullptr);
 
   // Found in Base2
-  FXTRACE((100,"calling Base2\n"));
+  FXTRACE(100,"calling Base2\n");
   threebase.handle(nullptr,FXSEL(SEL_COMMAND,Base2::ID_BASE2),nullptr);
 
   // Found in TwoBaseOne
-  FXTRACE((100,"calling TwoBaseOne via ThreeBase\n"));
+  FXTRACE(100,"calling TwoBaseOne via ThreeBase\n");
   threebase.handle(nullptr,FXSEL(SEL_COMMAND,ThreeBase::ID_TWOBASEONE),nullptr);
 
   // Found in Base2
-  FXTRACE((100,"calling Base2 via ThreeBase\n"));
+  FXTRACE(100,"calling Base2 via ThreeBase\n");
   threebase.handle(nullptr,FXSEL(SEL_COMMAND,ThreeBase::ID_BASE2),nullptr);
   }
 

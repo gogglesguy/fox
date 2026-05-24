@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -115,17 +115,17 @@ FXuint FXIODevice::mode() const {
 /*
       PUBLIC_OBJECT_BASIC_INFORMATION obi;
       if(fxNtQueryObject(device,ObjectBasicInformation,&obi,sizeof(obi),nullptr)>=0){
-        //FXTRACE((TOPIC_DETAIL,"obi.Attributes     = %08x\n",obi.Attributes));
-        //FXTRACE((TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
-        //FXTRACE((TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess));
-        //FXTRACE((TOPIC_DETAIL,"obi.HandleCount    = %08x\n",obi.HandleCount));
-        //FXTRACE((TOPIC_DETAIL,"obi.PointerCount   = %08x\n",obi.PointerCount));
+        //FXTRACE(TOPIC_DETAIL,"obi.Attributes     = %08x\n",obi.Attributes);
+        //FXTRACE(TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess);
+        //FXTRACE(TOPIC_DETAIL,"obi.GrantedAccess  = %08x\n",obi.GrantedAccess);
+        //FXTRACE(TOPIC_DETAIL,"obi.HandleCount    = %08x\n",obi.HandleCount);
+        //FXTRACE(TOPIC_DETAIL,"obi.PointerCount   = %08x\n",obi.PointerCount);
         if(obi.GrantedAccess&GENERIC_READ){ result|=FXIO::ReadOnly; }
         if(obi.GrantedAccess&GENERIC_WRITE){ result|=FXIO::WriteOnly; }
         if(obi.GrantedAccess&GENERIC_ALL){ result|=FXIO::ReadWrite; }
         if(obi.GrantedAccess&GENERIC_EXECUTE){ result|=FXIO::Executable; }
         }
-      FXTRACE((TOPIC_DETAIL,"result             = %08x\n",result));
+      FXTRACE(TOPIC_DETAIL,"result             = %08x\n",result);
 */
       return result;
       }
@@ -214,7 +214,7 @@ FXuint FXIODevice::perms() const {
       if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
         result&=~FXIO::AllWrite;
         }
-      if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){ 
+      if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
         result|=FXIO::Device;
         }
       return result;

@@ -3,7 +3,7 @@
 *                        I / O   B u f f e r   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,37 +54,37 @@ public:
   FXuchar* data() const { return buffer; }
 
   /// Return true if open
-  virtual FXbool isOpen() const;
+  virtual FXbool isOpen() const override;
 
   /// Return true if serial access only
-  virtual FXbool isSerial() const;
+  virtual FXbool isSerial() const override;
 
   /// Get current buffer position
-  virtual FXlong position() const;
+  virtual FXlong position() const override;
 
   /// Change buffer position, returning new position from start
-  virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
+  virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin) override;
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* ptr,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count) override;
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* ptr,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count) override;
 
   /// Truncate size of the buffer
-  virtual FXlong truncate(FXlong sz);
+  virtual FXlong truncate(FXlong sz) override;
 
   /// Flush to disk
-  virtual FXbool flush();
+  virtual FXbool flush() override;
 
   /// Test if we're at the end; -1 if error
-  virtual FXint eof();
+  virtual FXint eof() override;
 
   /// Return size of the buffer
-  virtual FXlong size();
+  virtual FXlong size() override;
 
   /// Close handle
-  virtual FXbool close();
+  virtual FXbool close() override;
 
   /// Destroy and close
   virtual ~FXIOBuffer();

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -112,7 +112,6 @@ namespace FXPath {
   * Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows)
   * are expanded by substituting the value of the variable, recusively up to
   * given maximum level.
-  * On Windows, only environment variables are expanded.
   */
   extern FXAPI FXString expand(const FXString& file,FXint level=4);
 
@@ -147,7 +146,7 @@ namespace FXPath {
   * separators "/" and "\", %VAR% and $VAR or ${VAR}.
   */
   extern FXAPI FXString convert(const FXString& path);
-  
+
   /**
   * Convert a foreign path-list to local conventions, changing path
   * separators "/" and "\", %VAR% and $VAR or ${VAR}, and path-list
@@ -320,13 +319,13 @@ namespace FXPath {
   * Search path list for this file, return full path name for first occurrence.
   * Each path in the pathlist is expanded first.
   */
-  extern FXAPI FXString search(const FXString& pathlist,const FXString& file);
+  extern FXAPI FXString search(const FXString& list,const FXString& file);
 
   /**
-  * Given search path list, return shortest relative path name that still
-  * uniquely resolves to the given file name.
+  * Given search path list, return a relative path name that a search
+  * of the path list would resolve back to the file name.
   */
-  extern FXAPI FXString relativize(const FXString& pathlist,const FXString& file);
+  extern FXAPI FXString relativize(const FXString& list,const FXString& file);
 
   /**
   * Check if the file has an extension from the list of known executable

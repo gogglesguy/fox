@@ -3,7 +3,7 @@
 *                   V a r a r g s   S c a n f   R o u t i n e s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -294,34 +294,32 @@ integer:  ivalue=0;
             width--;
             }
           if(0<width && string[0]=='0'){                        // Got "0"
-            if(1<width && (string[1]|32)=='x'){                 // Got a "0x"
-              if(base==0 || base==16){                          // Its hex
-                string+=2;
-                width-=2;
-                comma=NORMAL;
-                base=16;
+            if(1<width){
+              if((string[1]|32)=='x'){                          // Its hex
+                if(base==0 || base==16){
+                  comma=NORMAL;
+                  base=16;
+                  string+=2;
+                  width-=2;
+                  }
                 }
-              }
-            else if(1<width && (string[1]|32)=='b'){            // Got a "0b"
-              if(base==0 || base==2){                           // Its binary
-                string+=2;
-                width-=2;
-                comma=NORMAL;
-                base=2;
+              else if((string[1]|32)=='b'){                     // Its binary
+                if(base==0 || base==2){
+                  comma=NORMAL;
+                  base=2;
+                  string+=2;
+                  width-=2;
+                  }
                 }
-              }
-            else{                                               // Got a "0"
-              if(base==0 || base==8){                           // Its octal
-                comma=NORMAL;
-                base=8;
+              else{                                             // Its octal
+                if(base==0){
+                  comma=NORMAL;
+                  base=8;
+                  }
                 }
               }
             }
-          else{                                                 // Got something else
-            if(base==0){                                        // If not set, its decimal now
-              base=10;
-              }
-            }
+          if(base==0) base=10;                                  // If not set, its decimal now
           while(0<width && 0<=(v=Ascii::digitValue(string[0])) && v<base){
             ivalue=ivalue*base+v;
             string++;
@@ -380,10 +378,10 @@ integer:  ivalue=0;
           ivalue=0;
           digits=0;
           if(width<1) width=2147483647;                         // Width at least 1
-          
+
           // Parse over whitespace; not included in field width
           while(Ascii::isSpace(*string)) string++;
-          
+
           // Found a sign!
           if((neg=(*string=='-')) || (*string=='+')){
             string++;
@@ -395,7 +393,7 @@ integer:  ivalue=0;
 
           // Starts like some kind of number
           if(width && *string<='9' && '0'<=*string){
-          
+
             // Leading with non-0 means its decimal
             if('1'<=*string) goto gtz;
             string++;
@@ -405,7 +403,7 @@ integer:  ivalue=0;
             if(width && (*string|32)!='x'){
               digits++;
 
-              // Leading zeros 
+              // Leading zeros
               while(width && *string=='0'){
                 digits++;
                 string++;
@@ -464,7 +462,7 @@ dp2:            while(width && '0'<=(ch=*string) && ch<='9'){
 
               // No digits seen!
               if(!digits) goto x;
-                                     
+
               // Tentatively check for exponent
               if(1<width && (string[0]|32)=='e'){
                 ss=string;                                      // Rewind point if no match
@@ -493,7 +491,7 @@ dp2:            while(width && '0'<=(ch=*string) && ch<='9'){
                   width=ww;
                   }
                 }
-    
+
               // Convert to result parameter
               if(convert){
                 count++;
@@ -515,7 +513,7 @@ dp2:            while(width && '0'<=(ch=*string) && ch<='9'){
               string++;
               width--;
 
-              // Leading zeros 
+              // Leading zeros
               while(width && *string=='0'){
                 digits++;
                 string++;
@@ -523,7 +521,7 @@ dp2:            while(width && '0'<=(ch=*string) && ch<='9'){
                 }
 
               // Hexadecimal point
-              if(width && *string=='.'){                       
+              if(width && *string=='.'){
                 string++;
                 width--;
                 while(width && *string=='0'){
@@ -555,12 +553,12 @@ dp3:            while(width && Ascii::isHexDigit((ch=*string))){
                   width--;
                   }
                 }
-                
+
               // No digits seen!
-              if(!digits) goto x;               
+              if(!digits) goto x;
 
               // Tentatively check for exponent
-              if(1<width && (*string|32)=='p'){               
+              if(1<width && (*string|32)=='p'){
                 ss=string;                                      // Rewind point if no match
                 ww=width;
                 ss++;
@@ -587,7 +585,7 @@ dp3:            while(width && Ascii::isHexDigit((ch=*string))){
                   width=ww;
                   }
                 }
-    
+
               // Convert to result parameter
               if(convert){
                 count++;
@@ -625,7 +623,7 @@ dp3:            while(width && Ascii::isHexDigit((ch=*string))){
             }
 
           // Check for Inf{inity}
-          else if(2<width && (string[0]|32)=='i' && (string[1]|32)=='n' && (string[2]|32)=='f'){  
+          else if(2<width && (string[0]|32)=='i' && (string[1]|32)=='n' && (string[2]|32)=='f'){
             if(7<width && (string[3]|32)=='i' && (string[4]|32)=='n' && (string[5]|32)=='i' && (string[6]|32)=='t' && (string[7]|32)=='y'){
               string+=5;
               width-=5;

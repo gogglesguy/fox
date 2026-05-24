@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   B o x   O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -558,7 +558,7 @@ long FXDirBox::onTreeChanged(FXObject*,FXSelector,void* ptr){
 
 // Set directory
 void FXDirBox::setDirectory(const FXString& pathname,FXbool notify){
-  FXTRACE((TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",pathname.text(),notify));
+  FXTRACE(TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",pathname.text(),notify);
   setCurrentItem(getPathnameItem(FXPath::absolute(pathname)),notify);
   }
 

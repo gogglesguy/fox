@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1279,7 +1279,7 @@ FXuint FXFileSelector::getFileBoxStyle() const {
 
 // List of sort functions
 static const FXIconListSortFunc sortFuncTable[]={
-  FXFileList::ascending,FXFileList::descending, 
+  FXFileList::ascending,FXFileList::descending,
   FXFileList::ascendingCase,FXFileList::descendingCase,
   FXFileList::ascendingType,FXFileList::descendingType,
   FXFileList::ascendingSize,FXFileList::descendingSize,
@@ -1295,7 +1295,7 @@ void FXFileSelector::setSortOrder(FXuint order){
     filebox->setSortFunc(sortFuncTable[order]);
     }
   }
-    
+
 
 // Return File List sorting order
 FXuint FXFileSelector::getSortOrder() const {

@@ -3,7 +3,7 @@
 *                      O p e n G L   S p h e r e   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,7 +42,7 @@ FXIMPLEMENT(FXGLSphere,FXGLShape,nullptr,0)
 
 // Create sphere
 FXGLSphere::FXGLSphere(void):radius(0.5f),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
-  FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
+  FXTRACE(100,"FXGLSphere::FXGLSphere\n");
   range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
@@ -50,7 +50,7 @@ FXGLSphere::FXGLSphere(void):radius(0.5f),slices(SPHERE_SLICES),stacks(SPHERE_ST
 // Create initialized sphere
 FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),radius(r),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
-  FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
+  FXTRACE(100,"FXGLSphere::FXGLSphere\n");
   range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
@@ -58,14 +58,14 @@ FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r):
 // Create initialized sphere
 FXGLSphere::FXGLSphere(FXfloat x,FXfloat y,FXfloat z,FXfloat r,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),radius(r),slices(SPHERE_SLICES),stacks(SPHERE_STACKS){
-  FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
+  FXTRACE(100,"FXGLSphere::FXGLSphere\n");
   range.set(-radius,radius,-radius,radius,-radius,radius);
   }
 
 
 // Copy constructor
 FXGLSphere::FXGLSphere(const FXGLSphere& orig):FXGLShape(orig){
-  FXTRACE((100,"FXGLSphere::FXGLSphere\n"));
+  FXTRACE(100,"FXGLSphere::FXGLSphere\n");
   radius=orig.radius;
   slices=orig.slices;
   stacks=orig.stacks;
@@ -124,6 +124,6 @@ void FXGLSphere::load(FXStream& store){
 
 // Destroy
 FXGLSphere::~FXGLSphere(){
-  FXTRACE((100,"FXGLSphere::~FXGLSphere\n"));
+  FXTRACE(100,"FXGLSphere::~FXGLSphere\n");
   }
 

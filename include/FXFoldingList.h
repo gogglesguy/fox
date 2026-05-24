@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -204,10 +204,10 @@ public:
   virtual void destroy();
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy item and free icons if owned
   virtual ~FXFoldingItem();
@@ -276,7 +276,7 @@ protected:
   void recompute();
   void mergesort(FXFoldingItem*& list);
   void sort(FXFoldingItem*& f1,FXFoldingItem*& t1,FXFoldingItem*& f2,FXFoldingItem*& t2,int n);
-  virtual void moveContents(FXint x,FXint y);
+  virtual void moveContents(FXint x,FXint y) override;
   virtual FXFoldingItem* createItem(const FXString& text,FXIcon* oi,FXIcon* ci,FXptr ptr);
   static FXint compareSection(const FXchar *p,const FXchar* q,FXint s);
   static FXint compareSectionCase(const FXchar *p,const FXchar* q,FXint s);
@@ -324,43 +324,43 @@ public:
   FXFoldingList(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FOLDINGLIST_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Return visible scroll-area y position
-  virtual FXint getVisibleY() const;
+  virtual FXint getVisibleY() const override;
 
   /// Return visible scroll-area height
-  virtual FXint getVisibleHeight() const;
+  virtual FXint getVisibleHeight() const override;
 
   /// Compute and return content width
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Return content height
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
 
   /// Recalculate layout
-  virtual void recalc();
+  virtual void recalc() override;
 
   /// Tree list can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Return header control
   FXHeader* getHeader() const { return header; }
@@ -663,10 +663,10 @@ public:
   const FXString& getHelpText() const { return help; }
 
   /// Save object to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXFoldingList();

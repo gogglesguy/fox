@@ -3,7 +3,7 @@
 *                 T o p - L e v e l   W i n d o w   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -151,28 +151,28 @@ public:
 public:
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach the server-side resources for this window
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy the server-side resources for this window
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Show this window
-  virtual void show();
+  virtual void show() override;
 
   /// Hide this window
-  virtual void hide();
+  virtual void hide() override;
 
   /// Show this window with given placement
   virtual void show(FXuint placement);
@@ -181,28 +181,28 @@ public:
   void place(FXuint placement);
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Obtain border sizes added to our window by the window manager
   FXbool getWMBorders(FXint& left,FXint& right,FXint& top,FXint& bottom);
 
   /// Raise this window to the top of the stacking order
-  virtual void raise();
+  virtual void raise() override;
 
   /// Lower this window to the bottom of the stacking order
-  virtual void lower();
+  virtual void lower() override;
 
   /// Move this window to the specified position in the parent's coordinates
-  virtual void move(FXint x,FXint y);
+  virtual void move(FXint x,FXint y) override;
 
   /// Resize this window to the specified width and height
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /// Move and resize this window in the parent's coordinates
-  virtual void position(FXint x,FXint y,FXint w,FXint h);
+  virtual void position(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Flash the window to get user's attention
   virtual void flash(FXbool yes);
@@ -307,10 +307,10 @@ public:
   void setMiniIcon(FXIcon *ic);
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXTopWindow();

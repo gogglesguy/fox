@@ -1,4 +1,4 @@
-/*********** Generated on 2025/12/31 09:55:20 by reswrap version 6.0.0 *********/
+/*********** Generated on 2026/05/21 22:26:05 by reswrap version 6.0.0 *********/
 
 /* Created by reswrap from file ../adie/adie_gif.gif */
 extern const unsigned char adie_gif[];
@@ -12,20 +12,41 @@ extern const unsigned char big_gif[];
 /* Created by reswrap from file ../adie/bookclr2_gif.gif */
 extern const unsigned char bookclr2_gif[];
 
+/* Created by reswrap from file ../adie/bookclr_gif.gif */
+extern const unsigned char bookclr_gif[];
+
 /* Created by reswrap from file ../adie/bookdel2_gif.gif */
 extern const unsigned char bookdel2_gif[];
+
+/* Created by reswrap from file ../adie/bookdel_gif.gif */
+extern const unsigned char bookdel_gif[];
 
 /* Created by reswrap from file ../adie/bookmrk2_gif.gif */
 extern const unsigned char bookmrk2_gif[];
 
+/* Created by reswrap from file ../adie/bookmrk_gif.gif */
+extern const unsigned char bookmrk_gif[];
+
 /* Created by reswrap from file ../adie/booknxt2_gif.gif */
 extern const unsigned char booknxt2_gif[];
+
+/* Created by reswrap from file ../adie/booknxt_gif.gif */
+extern const unsigned char booknxt_gif[];
 
 /* Created by reswrap from file ../adie/bookprv2_gif.gif */
 extern const unsigned char bookprv2_gif[];
 
+/* Created by reswrap from file ../adie/bookprv_gif.gif */
+extern const unsigned char bookprv_gif[];
+
 /* Created by reswrap from file ../adie/bookset2_gif.gif */
 extern const unsigned char bookset2_gif[];
+
+/* Created by reswrap from file ../adie/bookset_gif.gif */
+extern const unsigned char bookset_gif[];
+
+/* Created by reswrap from file ../adie/books_gif.gif */
+extern const unsigned char books_gif[];
 
 /* Created by reswrap from file ../adie/browser.gif */
 extern const unsigned char browser[];
@@ -45,8 +66,14 @@ extern const unsigned char command_bmp[];
 /* Created by reswrap from file ../adie/config_gif.gif */
 extern const unsigned char config_gif[];
 
+/* Created by reswrap from file ../adie/copy2_gif.gif */
+extern const unsigned char copy2_gif[];
+
 /* Created by reswrap from file ../adie/copy_gif.gif */
 extern const unsigned char copy_gif[];
+
+/* Created by reswrap from file ../adie/cut2_gif.gif */
+extern const unsigned char cut2_gif[];
 
 /* Created by reswrap from file ../adie/cut_gif.gif */
 extern const unsigned char cut_gif[];
@@ -105,11 +132,14 @@ extern const unsigned char logger[];
 /* Created by reswrap from file ../adie/lowercase.gif */
 extern const unsigned char lowercase[];
 
-/* Created by reswrap from file ../adie/new_gif.gif */
-extern const unsigned char new_gif[];
+/* Created by reswrap from file ../adie/miscellaneous_gif.gif */
+extern const unsigned char miscellaneous_gif[];
 
 /* Created by reswrap from file ../adie/newfile_gif.gif */
 extern const unsigned char newfile_gif[];
+
+/* Created by reswrap from file ../adie/new_gif.gif */
+extern const unsigned char new_gif[];
 
 /* Created by reswrap from file ../adie/nobrowser.gif */
 extern const unsigned char nobrowser[];
@@ -120,9 +150,6 @@ extern const unsigned char nologger[];
 /* Created by reswrap from file ../adie/nowrap_gif.gif */
 extern const unsigned char nowrap_gif[];
 
-/* Created by reswrap from file ../adie/miscellaneous_gif.gif */
-extern const unsigned char miscellaneous_gif[];
-
 /* Created by reswrap from file ../adie/open_gif.gif */
 extern const unsigned char open_gif[];
 
@@ -132,17 +159,17 @@ extern const unsigned char opensel_gif[];
 /* Created by reswrap from file ../adie/palette_gif.gif */
 extern const unsigned char palette_gif[];
 
-/* Created by reswrap from file ../adie/pattern_gif.gif */
-extern const unsigned char pattern_gif[];
-
 /* Created by reswrap from file ../adie/paste_gif.gif */
 extern const unsigned char paste_gif[];
 
-/* Created by reswrap from file ../adie/point_gif.gif */
-extern const unsigned char point_gif[];
+/* Created by reswrap from file ../adie/pattern_gif.gif */
+extern const unsigned char pattern_gif[];
 
 /* Created by reswrap from file ../adie/point2_gif.gif */
 extern const unsigned char point2_gif[];
+
+/* Created by reswrap from file ../adie/point_gif.gif */
+extern const unsigned char point_gif[];
 
 /* Created by reswrap from file ../adie/print_gif.gif */
 extern const unsigned char print_gif[];
@@ -165,8 +192,8 @@ extern const unsigned char replace_gif[];
 /* Created by reswrap from file ../adie/revert_gif.gif */
 extern const unsigned char revert_gif[];
 
-/* Created by reswrap from file ../adie/save_gif.gif */
-extern const unsigned char save_gif[];
+/* Created by reswrap from file ../adie/run_gif.gif */
+extern const unsigned char run_gif[];
 
 /* Created by reswrap from file ../adie/saveall_gif.gif */
 extern const unsigned char saveall_gif[];
@@ -174,44 +201,26 @@ extern const unsigned char saveall_gif[];
 /* Created by reswrap from file ../adie/saveas_gif.gif */
 extern const unsigned char saveas_gif[];
 
+/* Created by reswrap from file ../adie/save_gif.gif */
+extern const unsigned char save_gif[];
+
 /* Created by reswrap from file ../adie/saveto_gif.gif */
 extern const unsigned char saveto_gif[];
 
 /* Created by reswrap from file ../adie/script_gif.gif */
 extern const unsigned char script_gif[];
 
-/* Created by reswrap from file ../adie/search_gif.gif */
-extern const unsigned char search_gif[];
-
-/* Created by reswrap from file ../adie/search_rex.gif */
-extern const unsigned char search_rex[];
-
-/* Created by reswrap from file ../adie/search_norex.gif */
-extern const unsigned char search_norex[];
-
 /* Created by reswrap from file ../adie/search_case.gif */
 extern const unsigned char search_case[];
 
-/* Created by reswrap from file ../adie/search_nocase.gif */
-extern const unsigned char search_nocase[];
-
-/* Created by reswrap from file ../adie/search_word.gif */
-extern const unsigned char search_word[];
-
-/* Created by reswrap from file ../adie/search_noword.gif */
-extern const unsigned char search_noword[];
-
-/* Created by reswrap from file ../adie/search_word2.gif */
-extern const unsigned char search_word2[];
-
-/* Created by reswrap from file ../adie/search_noword2.gif */
-extern const unsigned char search_noword2[];
-
-/* Created by reswrap from file ../adie/search_up.gif */
-extern const unsigned char search_up[];
-
 /* Created by reswrap from file ../adie/search_dn.gif */
 extern const unsigned char search_dn[];
+
+/* Created by reswrap from file ../adie/searchfiles_gif.gif */
+extern const unsigned char searchfiles_gif[];
+
+/* Created by reswrap from file ../adie/search_gif.gif */
+extern const unsigned char search_gif[];
 
 /* Created by reswrap from file ../adie/searchicon_gif.gif */
 extern const unsigned char searchicon_gif[];
@@ -219,11 +228,32 @@ extern const unsigned char searchicon_gif[];
 /* Created by reswrap from file ../adie/searchnext_gif.gif */
 extern const unsigned char searchnext_gif[];
 
+/* Created by reswrap from file ../adie/search_nocase.gif */
+extern const unsigned char search_nocase[];
+
+/* Created by reswrap from file ../adie/search_norex.gif */
+extern const unsigned char search_norex[];
+
+/* Created by reswrap from file ../adie/search_noword2.gif */
+extern const unsigned char search_noword2[];
+
+/* Created by reswrap from file ../adie/search_noword.gif */
+extern const unsigned char search_noword[];
+
 /* Created by reswrap from file ../adie/searchprev_gif.gif */
 extern const unsigned char searchprev_gif[];
 
-/* Created by reswrap from file ../adie/searchfiles_gif.gif */
-extern const unsigned char searchfiles_gif[];
+/* Created by reswrap from file ../adie/search_rex.gif */
+extern const unsigned char search_rex[];
+
+/* Created by reswrap from file ../adie/search_up.gif */
+extern const unsigned char search_up[];
+
+/* Created by reswrap from file ../adie/search_word2.gif */
+extern const unsigned char search_word2[];
+
+/* Created by reswrap from file ../adie/search_word.gif */
+extern const unsigned char search_word[];
 
 /* Created by reswrap from file ../adie/shiftleft_gif.gif */
 extern const unsigned char shiftleft_gif[];
@@ -236,6 +266,9 @@ extern const unsigned char small_gif[];
 
 /* Created by reswrap from file ../adie/styles_gif.gif */
 extern const unsigned char styles_gif[];
+
+/* Created by reswrap from file ../adie/switch_gif.gif */
+extern const unsigned char switch_gif[];
 
 /* Created by reswrap from file ../adie/syntax_gif.gif */
 extern const unsigned char syntax_gif[];
@@ -251,7 +284,4 @@ extern const unsigned char uppercase[];
 
 /* Created by reswrap from file ../adie/wordwrap_gif.gif */
 extern const unsigned char wordwrap_gif[];
-
-/* Created by reswrap from file ../adie/switch_gif.gif */
-extern const unsigned char switch_gif[];
 

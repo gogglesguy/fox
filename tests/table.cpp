@@ -3,7 +3,7 @@
 *                                 Test Table Widget                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -305,35 +305,35 @@ long TableWindow::onCmdResizeTable(FXObject*,FXSelector,void*){
 // Selected
 long TableWindow::onTableSelected(FXObject*,FXSelector,void* ptr){
   FXTablePos *tp=(FXTablePos*)ptr;
-  FXTRACE((10,"SEL_SELECTED row=%d, col=%d\n",tp->row,tp->col));
+  FXTRACE(10,"SEL_SELECTED row=%d, col=%d\n",tp->row,tp->col);
   return 1;
   }
 
 // Deselected
 long TableWindow::onTableDeselected(FXObject*,FXSelector,void* ptr){
   FXTablePos *tp=(FXTablePos*)ptr;
-  FXTRACE((10,"SEL_DESELECTED row=%d, col=%d\n",tp->row,tp->col));
+  FXTRACE(10,"SEL_DESELECTED row=%d, col=%d\n",tp->row,tp->col);
   return 1;
   }
 
 // Inserted
 long TableWindow::onTableInserted(FXObject*,FXSelector,void* ptr){
   FXTableRange *range=(FXTableRange*)ptr;
-  FXTRACE((10,"SEL_INSERTED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col));
+  FXTRACE(10,"SEL_INSERTED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col);
   return 1;
   }
 
 // Deleted
 long TableWindow::onTableDeleted(FXObject*,FXSelector,void* ptr){
   FXTableRange *range=(FXTableRange*)ptr;
-  FXTRACE((10,"SEL_DELETED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col));
+  FXTRACE(10,"SEL_DELETED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col);
   return 1;
   }
 
 // Changed
 long TableWindow::onTableChanged(FXObject*,FXSelector,void* ptr){
   FXTablePos *tp=(FXTablePos*)ptr;
-  FXTRACE((10,"SEL_CHANGED row=%d, col=%d\n",tp->row,tp->col));
+  FXTRACE(10,"SEL_CHANGED row=%d, col=%d\n",tp->row,tp->col);
   return 1;
   }
 
@@ -341,7 +341,7 @@ long TableWindow::onTableChanged(FXObject*,FXSelector,void* ptr){
 // Replaced
 long TableWindow::onTableReplaced(FXObject*,FXSelector,void* ptr){
   FXTableRange *range=(FXTableRange*)ptr;
-  FXTRACE((10,"SEL_REPLACED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col));
+  FXTRACE(10,"SEL_REPLACED fm.row=%d, fm.col=%d to.row=%d, to.col=%d\n",range->fm.row,range->fm.col,range->to.row,range->to.col);
   return 1;
   }
 

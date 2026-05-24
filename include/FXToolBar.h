@@ -3,7 +3,7 @@
 *                        T o o l   B a r   W i d g e t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,19 +55,19 @@ public:
   FXToolBar(FXComposite* p,FXuint opts,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=2,FXint pr=3,FXint pt=3,FXint pb=2,FXint hs=DEFAULT_SPACING,FXint vs=DEFAULT_SPACING);
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Dock and optionally flip orientation of toolbar before other window
-  virtual void dock(FXDockSite* docksite,FXWindow* other=nullptr,FXbool notify=false);
+  virtual void dock(FXDockSite* docksite,FXWindow* other=nullptr,FXbool notify=false) override;
 
   /// Dock and optionally flip orientation of toolbar
-  virtual void dock(FXDockSite* docksite,FXint localx,FXint localy,FXbool notify=false);
+  virtual void dock(FXDockSite* docksite,FXint localx,FXint localy,FXbool notify=false) override;
 
   /// Set docking side
   void setDockingSide(FXuint side=LAYOUT_SIDE_TOP);

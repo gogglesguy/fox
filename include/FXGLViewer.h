@@ -3,7 +3,7 @@
 *                      O p e n G L   V i e w e r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -267,8 +267,7 @@ public:
   long onCmdLassoSelect(FXObject*,FXSelector,void*);
   long onQueryHelp(FXObject*,FXSelector,void*);
   long onQueryTip(FXObject*,FXSelector,void*);
-  virtual long onDefault(FXObject*,FXSelector,void*);
-
+  virtual long onDefault(FXObject*,FXSelector,void*) override;
 public:
 
   // Projection modes
@@ -339,13 +338,13 @@ public:
   FXGLViewer(FXComposite* p,FXGLContext* ctx,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create all of the server-side resources for this window
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return size of pixel in world coordinates
   FXdouble worldPix() const { return worldpx; }
@@ -549,10 +548,10 @@ public:
   void setLight(const FXLight& lite);
 
   /// Save viewer to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load viewer from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLViewer();

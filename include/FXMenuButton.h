@@ -3,7 +3,7 @@
 *                        M e n u B u t t o n   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -101,25 +101,25 @@ public:
   FXMenuButton(FXComposite* p,const FXString& text,FXIcon* ic=nullptr,FXPopup* pup=nullptr,FXuint opts=JUSTIFY_NORMAL|ICON_BEFORE_TEXT|MENUBUTTON_DOWN,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Returns true because a menu button can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Return true if window logically contains the given point
-  virtual FXbool contains(FXint parentx,FXint parenty) const;
+  virtual FXbool contains(FXint parentx,FXint parenty) const override;
 
   /// Change the popup menu
   void setMenu(FXPopup *pup);
@@ -164,10 +164,10 @@ public:
   FXuint getAttachment() const;
 
   /// Save menu button to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load menu button from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXMenuButton();

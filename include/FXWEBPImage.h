@@ -3,7 +3,7 @@
 *                         W E B P   I m a g e   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -48,10 +48,10 @@ public:
   static const FXbool supported;
 
   /// Load pixels from stream in WEBP format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Save pixels into stream in WEBP format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destroy
   virtual ~FXWEBPImage();

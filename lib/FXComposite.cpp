@@ -3,7 +3,7 @@
 *                C o m p o s i t e   W i n d o w   O b j e c t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -240,7 +240,7 @@ long FXComposite::onFocusPrev(FXObject*,FXSelector sel,void* ptr){
 long FXComposite::onKeyPress(FXObject* sender,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
 
-  FXTRACE((TOPIC_KEYBOARD,"%p->%s::onKeyPress keysym=0x%04x state=%04x\n",this,getClassName(),((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
+  FXTRACE(TOPIC_KEYBOARD,"%p->%s::onKeyPress keysym=0x%04x state=%04x\n",this,getClassName(),((FXEvent*)ptr)->code,((FXEvent*)ptr)->state);
 
   // Bounce to focus widget
   if(getFocus() && getFocus()->handle(sender,sel,ptr)) return 1;
@@ -281,7 +281,7 @@ long FXComposite::onKeyPress(FXObject* sender,FXSelector sel,void* ptr){
 // Keyboard release
 long FXComposite::onKeyRelease(FXObject* sender,FXSelector sel,void* ptr){
 
-  FXTRACE((TOPIC_KEYBOARD,"%p->%s::onKeyRelease keysym=0x%04x state=%04x\n",this,getClassName(),((FXEvent*)ptr)->code,((FXEvent*)ptr)->state));
+  FXTRACE(TOPIC_KEYBOARD,"%p->%s::onKeyRelease keysym=0x%04x state=%04x\n",this,getClassName(),((FXEvent*)ptr)->code,((FXEvent*)ptr)->state);
 
   // Bounce to focus widget
   if(getFocus() && getFocus()->handle(sender,sel,ptr)) return 1;

@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,7 +62,7 @@ protected:
   FXint     border;
 protected:
   FXPopup();
-  virtual FXbool doesOverrideRedirect() const;
+  virtual FXbool doesOverrideRedirect() const override;
   void drawBorderRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
   void drawRaisedRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
   void drawSunkenRectangle(FXDCWindow& dc,FXint x,FXint y,FXint w,FXint h);
@@ -108,13 +108,13 @@ public:
   FXPopup(FXWindow* owner,FXuint opts=POPUP_VERTICAL|FRAME_RAISED|FRAME_THICK,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return a pointer to the prior active popup
   FXPopup* getPrevActive() const { return prevActive; }
@@ -123,16 +123,16 @@ public:
   FXPopup* getNextActive() const { return nextActive; }
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Show this window
-  virtual void show();
+  virtual void show() override;
 
   /// Hide this window
-  virtual void hide();
+  virtual void hide() override;
 
   /// Change frame style
   void setFrameStyle(FXuint style);
@@ -195,7 +195,7 @@ public:
   FXbool getShrinkWrap() const;
 
   /// Does save-unders
-  virtual FXbool doesSaveUnder() const;
+  virtual FXbool doesSaveUnder() const override;
 
   /// Destructor
   virtual ~FXPopup();

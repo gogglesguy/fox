@@ -3,7 +3,7 @@
 *                         T o p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -314,18 +314,18 @@ void FXTopWindow::killFocus(){
 /*
     if(GetFocus()==(HWND)xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
+        FXTRACE(TOPIC_DETAIL,"focus back to owner\n");
         SetFocus((HWND)getOwner()->id());
         }
       else{
-        FXTRACE((TOPIC_DETAIL,"focus back to NULL\n"));
+        FXTRACE(TOPIC_DETAIL,"focus back to NULL\n");
         SetFocus((HWND)nullptr);
         }
       }
 */
     if(GetActiveWindow()==(HWND)xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
+        FXTRACE(TOPIC_DETAIL,"focus back to owner\n");
         SetActiveWindow((HWND)getOwner()->getShell()->id());        // Fix from Sander
         //SetForegroundWindow((HWND)getOwner()->getShell()->id());
         }
@@ -336,11 +336,11 @@ void FXTopWindow::killFocus(){
     XGetInputFocus(DISPLAY(getApp()),&win,&dum);
     if(win==xid){
       if(getOwner() && getOwner()->id()){
-        FXTRACE((TOPIC_DETAIL,"focus back to owner\n"));
+        FXTRACE(TOPIC_DETAIL,"focus back to owner\n");
         XSetInputFocus(DISPLAY(getApp()),getOwner()->id(),RevertToPointerRoot,CurrentTime);
         }
       else{
-        FXTRACE((TOPIC_DETAIL,"focus back to NULL\n"));
+        FXTRACE(TOPIC_DETAIL,"focus back to NULL\n");
         XSetInputFocus(DISPLAY(getApp()),PointerRoot,RevertToPointerRoot,CurrentTime);
         }
       }
@@ -1572,14 +1572,14 @@ long FXTopWindow::onCmdClose(FXObject*,FXSelector,void*){
 
 // Session is about to close, give opportunity to save data
 long FXTopWindow::onSessionNotify(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onSessionNotify %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onSessionNotify %p\n",getClassName(),this);
   return target && target->tryHandle(this,FXSEL(SEL_SESSION_NOTIFY,message),ptr);
   }
 
 
 // Session has closed, close the window with prejudice
 long FXTopWindow::onSessionClosed(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onSessionClosed %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onSessionClosed %p\n",getClassName(),this);
   if(target) target->tryHandle(this,FXSEL(SEL_SESSION_CLOSED,message),ptr);
   close(false);
   return 1;
@@ -1716,21 +1716,21 @@ long FXTopWindow::onFocusRight(FXObject*,FXSelector,void* ptr){
 
 // Handle restore notify
 long FXTopWindow::onRestore(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onRestore %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onRestore %p\n",getClassName(),this);
   return target && target->tryHandle(this,FXSEL(SEL_RESTORE,message),ptr);
   }
 
 
 // Handle maximize notify
 long FXTopWindow::onMaximize(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onMaximize %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onMaximize %p\n",getClassName(),this);
   return target && target->tryHandle(this,FXSEL(SEL_MAXIMIZE,message),ptr);
   }
 
 
 // Handle minimize notify
 long FXTopWindow::onMinimize(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onMinimize %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onMinimize %p\n",getClassName(),this);
   return target && target->tryHandle(this,FXSEL(SEL_MINIMIZE,message),ptr);
   }
 

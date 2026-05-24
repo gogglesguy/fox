@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -49,13 +49,13 @@ public:
   FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr=nullptr);
 
   /// Create context
-  virtual void create();
+  virtual void create() override;
 
   /// Detach context
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy context
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Change visual
   void setVisual(FXGLVisual* vis);
@@ -94,10 +94,10 @@ public:
   FXbool isStereo() const;
 
   /// Save object to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLContext();

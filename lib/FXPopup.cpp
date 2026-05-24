@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -152,6 +152,13 @@ const void* FXPopup::GetClass() const { return TEXT("FXPopup"); }
 void FXPopup::setFocus(){
   FXShell::setFocus();
   //grabKeyboard();
+//   if(xid){
+//#ifdef WIN32
+//    SetActiveWindow((HWND)xid);
+//#else
+//    XSetInputFocus(DISPLAY(getApp()),xid,RevertToPointerRoot,CurrentTime);
+//#endif
+//    }
   }
 
 
@@ -578,7 +585,7 @@ long FXPopup::onMap(FXObject* sender,FXSelector sel,void* ptr){
   FXShell::onMap(sender,sel,ptr);
   getCursorPosition(x,y,buttons);
   if(0<=x && 0<=y && x<width && y<height){
-    FXTRACE((TOPIC_DETAIL,"under cursor\n"));
+    FXTRACE(TOPIC_DETAIL,"under cursor\n");
     if(getGrabOwner()->grabbed()) getGrabOwner()->ungrab();
     }
   return 1;
@@ -599,7 +606,7 @@ long FXPopup::onLayout(FXObject*,FXSelector,void*){
 
 // Pressed button outside popup
 long FXPopup::onButtonPress(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this);
   handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);
   //popdown(0);
   return 1;
@@ -609,7 +616,7 @@ long FXPopup::onButtonPress(FXObject*,FXSelector,void*){
 // Released button outside popup
 long FXPopup::onButtonRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXTRACE((TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this);
   if(event->moved){handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);}
   //popdown(0);
   return 1;
@@ -649,7 +656,7 @@ long FXPopup::onKeyRelease(FXObject* sender,FXSelector sel,void* ptr){
 // Unpost menu in case it was its own owner; otherwise
 // tell the owner to do so.
 long FXPopup::onCmdUnpost(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this);
   if(grabowner){
     grabowner->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),ptr);
     }
@@ -727,7 +734,7 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
   rw=getRoot()->getWidth();
   rh=getRoot()->getHeight();
 #endif
-  FXTRACE((TOPIC_DETAIL,"%s::popup %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::popup %p\n",getClassName(),this);
   grabowner=grabto;
   if((options&POPUP_SHRINKWRAP) || w<=1) w=getDefaultWidth();
   if((options&POPUP_SHRINKWRAP) || h<=1) h=getDefaultHeight();
@@ -745,7 +752,7 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
 
 // Pops down menu and its submenus
 void FXPopup::popdown(){
-  FXTRACE((TOPIC_DETAIL,"%s::popdown %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::popdown %p\n",getClassName(),this);
   if(!grabowner) ungrab();
   grabowner=nullptr;
   killFocus();

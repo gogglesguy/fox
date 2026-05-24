@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,7 +54,7 @@ public:
   FXRunnable* getRunnable() const { return runnable; }
 
   /// Run worker
-  virtual FXint run();
+  virtual FXint run() override;
 
   /// Create and start a worker on a given runnable.
   static FXWorker* execute(FXRunnable* task,FXuval stacksize=0);

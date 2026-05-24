@@ -3,7 +3,7 @@
 *                     S c r o l l W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@ class FXAPI FXScrollWindow : public FXScrollArea {
   FXDECLARE(FXScrollWindow)
 protected:
   FXScrollWindow(){}
-  virtual void moveContents(FXint x,FXint y);
+  virtual void moveContents(FXint x,FXint y) override;
 private:
   FXScrollWindow(const FXScrollWindow&);
   FXScrollWindow &operator=(const FXScrollWindow&);
@@ -65,16 +65,16 @@ public:
   FXScrollWindow(FXComposite* p,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return a pointer to the contents window
   FXWindow* contentWindow() const;
 
   /// Return the width of the contents
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Return the height of the contents
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
   };
 
 }

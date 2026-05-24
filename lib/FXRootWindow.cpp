@@ -3,7 +3,7 @@
 *                       R o o t   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -123,7 +123,7 @@ static FXbool getMaxScreenSize(FXint& width,FXint& height){
 void FXRootWindow::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 
       // Got to have a visual
       if(!visual){ fxerror("%s::create: trying to create window without a visual.\n",getClassName()); }
@@ -190,7 +190,7 @@ void FXRootWindow::detach(){
 void FXRootWindow::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 
       // Normally destroy children
       for(FXWindow *c=getFirst(); c; c=c->getNext()) c->destroy();

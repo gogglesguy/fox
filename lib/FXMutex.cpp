@@ -3,7 +3,7 @@
 *                              M u t e x   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -58,15 +58,15 @@ FXMutex::FXMutex(FXbool recursive){
   // If this fails on your machine, determine what value
   // of sizeof(CRITICAL_SECTION) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(CRITICAL_SECTION));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)=%d\n",sizeof(CRITICAL_SECTION));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION));
   InitializeCriticalSection((CRITICAL_SECTION*)data);
 #else
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_mutex_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_mutex_t));
   pthread_mutexattr_t mutexatt;
   pthread_mutexattr_init(&mutexatt);
   pthread_mutexattr_settype(&mutexatt,recursive?PTHREAD_MUTEX_RECURSIVE:PTHREAD_MUTEX_DEFAULT);

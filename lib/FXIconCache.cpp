@@ -3,7 +3,7 @@
 *                              I c o n   C a c h e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -91,19 +91,19 @@ FXIMPLEMENT(FXIconCache,FXObject,nullptr,0)
 
 // Build icon cache
 FXIconCache::FXIconCache():app((FXApp*)-1L),loader(&FXIconSource::defaultIconSource){
-  FXTRACE((TOPIC_CONSTRUCT,"FXIconCache::FXIconCache\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXIconCache::FXIconCache\n");
   }
 
 
 // Build icon cache
 FXIconCache::FXIconCache(FXApp* ap,const FXString& sp):app(ap),loader(&FXIconSource::defaultIconSource),path(sp){
-  FXTRACE((TOPIC_CONSTRUCT,"FXIconCache::FXIconCache\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXIconCache::FXIconCache\n");
   }
 
 
 // Insert unique icon loaded from filename into dictionary
 FXIcon* FXIconCache::insert(const FXchar* name){
-  FXTRACE((TOPIC_DETAIL,"FXIconCache::insert(\"%s\")\n",name));
+  FXTRACE(TOPIC_DETAIL,"FXIconCache::insert(\"%s\")\n",name);
   FXIcon* result=dict[name];
   if(!result){
     result=loader->loadIconFile(getApp(),FXPath::search(path,name));
@@ -117,14 +117,14 @@ FXIcon* FXIconCache::insert(const FXchar* name){
 
 // Remove icon from cache and delete it
 void FXIconCache::remove(const FXchar* name){
-  FXTRACE((TOPIC_DETAIL,"FXIconCache::remove(\"%s\")\n",name));
+  FXTRACE(TOPIC_DETAIL,"FXIconCache::remove(\"%s\")\n",name);
   delete dict.remove(name);
   }
 
 
 // Delete all icons
 void FXIconCache::clear(){
-  FXTRACE((TOPIC_DETAIL,"FXIconCache::clear()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXIconCache::clear()\n");
   for(FXival i=0; i<dict.no(); ++i){
     delete dict.data(i);
     }
@@ -148,7 +148,7 @@ void FXIconCache::load(FXStream& store){
 
 // Destructor
 FXIconCache::~FXIconCache(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXIconCache::~FXIconCache\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXIconCache::~FXIconCache\n");
   clear();
   app=(FXApp*)-1L;
   loader=(FXIconSource*)-1L;

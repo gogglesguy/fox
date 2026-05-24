@@ -3,7 +3,7 @@
 *                       B i t m a p   F r a m e   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 by H. J. Daniel III. All Rights Reserved.             *
+* Copyright (C) 2001,2026 by H. J. Daniel III. All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -52,13 +52,13 @@ public:
   FXBitmapFrame(FXComposite* p,FXBitmap *bmp,FXuint opts=FRAME_SUNKEN|FRAME_THICK,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0);
 
   /// Create window
-  virtual void create();
+  virtual void create() override;
 
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change the image being displayed
   void setBitmap(FXBitmap* bmp);
@@ -85,10 +85,10 @@ public:
   FXuint getJustify() const;
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy the widget, but do not destroy the image
   virtual ~FXBitmapFrame();

@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -242,16 +242,19 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     new FXLabel(rgbblock,tr("&Red:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     rgbatext[0]=new FXTextField(rgbblock,5,this,FXColorSelector::ID_RGB_RED_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     rgbaslider[0]=new FXSlider(rgbblock,this,FXColorSelector::ID_RGB_RED_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //rgbaslider[0]->setSlotColor(FXColors::Red);
 
     // Green slider
     new FXLabel(rgbblock,tr("&Green:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     rgbatext[1]=new FXTextField(rgbblock,5,this,FXColorSelector::ID_RGB_GREEN_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     rgbaslider[1]=new FXSlider(rgbblock,this,FXColorSelector::ID_RGB_GREEN_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //rgbaslider[1]->setSlotColor(FXColors::Green);
 
     // Blue slider
     new FXLabel(rgbblock,tr("&Blue:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     rgbatext[2]=new FXTextField(rgbblock,5,this,FXColorSelector::ID_RGB_BLUE_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     rgbaslider[2]=new FXSlider(rgbblock,this,FXColorSelector::ID_RGB_BLUE_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //rgbaslider[2]->setSlotColor(FXColors::Blue);
 
     // Alpha slider
     label=new FXLabel(rgbblock,tr("&Alpha:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
@@ -312,16 +315,19 @@ FXColorSelector::FXColorSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXu
     new FXLabel(cmyblock,tr("Cyan:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     cmytext[0]=new FXTextField(cmyblock,5,this,FXColorSelector::ID_CMY_CYAN_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     cmyslider[0]=new FXSlider(cmyblock,this,FXColorSelector::ID_CMY_CYAN_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //cmyslider[0]->setSlotColor(FXColors::Cyan);
 
     // Magenta slider
     new FXLabel(cmyblock,tr("Magenta:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     cmytext[1]=new FXTextField(cmyblock,5,this,FXColorSelector::ID_CMY_MAGENTA_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     cmyslider[1]=new FXSlider(cmyblock,this,FXColorSelector::ID_CMY_MAGENTA_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //cmyslider[1]->setSlotColor(FXColors::Magenta);
 
     // Yellow slider
     new FXLabel(cmyblock,tr("Yellow:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);
     cmytext[2]=new FXTextField(cmyblock,5,this,FXColorSelector::ID_CMY_YELLOW_TEXT,JUSTIFY_RIGHT|LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0, DEFAULT_PAD,DEFAULT_PAD,0,0);
     cmyslider[2]=new FXSlider(cmyblock,this,FXColorSelector::ID_CMY_YELLOW_SLIDER,LAYOUT_FILL_ROW|LAYOUT_FILL_COLUMN|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FIX_HEIGHT|SLIDER_HORIZONTAL|SLIDER_INSIDE_BAR,0,0,0,15);
+    //cmyslider[2]->setSlotColor(FXColors::Yellow);
 
     // Alpha slider
     label=new FXLabel(cmyblock,tr("Alpha:"),nullptr,LAYOUT_FILL_ROW|LAYOUT_CENTER_Y|LAYOUT_RIGHT);

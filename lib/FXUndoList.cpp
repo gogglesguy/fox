@@ -3,7 +3,7 @@
 *                  U n d o / R e d o - a b l e   C o m m a n d                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -116,20 +116,20 @@
     How to identify alternate history sequences? First, we can identify
     the end of an alternate history sequence, by the fact that the direction
     flips at that point:
-    
+
                __ __ __
       C1 C2 C3 C3 C2 C1
-      
+
     There may also be "wrinkles" in history, i.e. paths not taken *within* the
     paths not taken; these types of undo records will have reference counts
     that are >2.  However, it should be true that a *complete* alternate history
     will have an even-numbered reference count. This may not remain true once
     history is trimmed, however.
-    
+
     One may be able to trim undo by record-size starting from the oldest linear
     record; this should have a reference count==1.  When finding a reference
     count>1, identify the first direction-change (in the above, the position
-    between C3 and C3's inverse).  Delete pairs of Ci, Ci-inverse) until the 
+    between C3 and C3's inverse).  Delete pairs of Ci, Ci-inverse) until the
     remaining oldest record has a refcount of 1, then proceed with oldest-
     first as before.
 */
@@ -247,7 +247,7 @@ FXIMPLEMENT(FXUndoList,FXCommandGroup,FXUndoListMap,ARRAYNUMBER(FXUndoListMap))
 
 // Make new empty undo list
 FXUndoList::FXUndoList():space(0),undocount(0),redocount(0),marker(0),markset(false),alternate(true),working(false){
-  FXTRACE((TOPIC_CONSTRUCT,"FXUndoList::FXUndoList\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXUndoList::FXUndoList\n");
   }
 
 
@@ -342,7 +342,7 @@ void FXUndoList::undo(){
     redocount++;
 
     working=false;
-    FXTRACE((TOPIC_DEBUG,"FXUndoList::undo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker));
+    FXTRACE(TOPIC_DEBUG,"FXUndoList::undo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   }
 
@@ -370,7 +370,7 @@ void FXUndoList::redo(){
     undocount++;
 
     working=false;
-    FXTRACE((TOPIC_DEBUG,"FXUndoList::redo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker));
+    FXTRACE(TOPIC_DEBUG,"FXUndoList::redo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   }
 
@@ -469,7 +469,7 @@ FXbool FXUndoList::cut(){
       // Update the books
       undocount+=redocount;
       redocount=0;
-      FXTRACE((TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker));
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
       return true;
       }
 
@@ -481,7 +481,7 @@ FXbool FXUndoList::cut(){
 
     // Update the books
     redocount=0;
-    FXTRACE((TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker));
+    FXTRACE(TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   return true;
   }
@@ -560,7 +560,7 @@ FXbool FXUndoList::add(FXCommand* cmd,FXbool doit,FXbool merge){
           delete cmd;
 
           working=false;
-          FXTRACE((TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker));
+          FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
           return true;
           }
         }
@@ -589,7 +589,7 @@ FXbool FXUndoList::add(FXCommand* cmd,FXbool doit,FXbool merge){
 
       working=false;
 
-      FXTRACE((TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker));
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
       return true;
       }
     working=false;
@@ -689,7 +689,7 @@ FXbool FXUndoList::abort(){
 
 // Clear list
 void FXUndoList::clear(){
-  FXTRACE((TOPIC_DEBUG,"FXUndoList::clear: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker));
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::clear: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
   FXCommandGroup::clear();
   space=0;
   undocount=0;
@@ -702,7 +702,7 @@ void FXUndoList::clear(){
 
 // Trim undo list down to at most nc records
 void FXUndoList::trimCount(FXint nc){
-  FXTRACE((TOPIC_DEBUG,"FXUndoList::trimCount: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimCount: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
   if(nc<undocount){
     FXint i=0;
     while(i<undocount-nc){
@@ -714,13 +714,13 @@ void FXUndoList::trimCount(FXint nc){
     undocount-=i;
     if(undocount<marker) markset=false;
     }
-  FXTRACE((TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
   }
 
 
 // Trim undo list down to at most size sz
 void FXUndoList::trimSize(FXuval sz){
-  FXTRACE((TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
   if(sz<space){
     FXint i=0;
     while(i<undocount && sz<space){
@@ -732,13 +732,13 @@ void FXUndoList::trimSize(FXuval sz){
     undocount-=i;
     if(undocount<marker) markset=false;
     }
-  FXTRACE((TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
   }
 
 
 // Trim undo list down to (but not including) marked node.
 void FXUndoList::trimMark(){
-  FXTRACE((TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
   if(markset && marker<undocount){
     FXint i=0;
     while(i<undocount-marker){
@@ -750,7 +750,7 @@ void FXUndoList::trimMark(){
     undocount-=i;
     FXASSERT(undocount==marker);
     }
-  FXTRACE((TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker));
+  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
   }
 
 
@@ -888,7 +888,7 @@ long FXUndoList::onCmdDumpStats(FXObject*,FXSelector,void*){
 
 // Destroy now
 FXUndoList::~FXUndoList(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXUndoList::~FXUndoList\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXUndoList::~FXUndoList\n");
   clear();
   }
 

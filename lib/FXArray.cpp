@@ -3,7 +3,7 @@
 *                          G e n e r i c   A r r a y                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,8 +32,7 @@
     only; basically, just a pointer to the memory buffer.
   - The buffer pointer is never NULL; thus its always safe to reference the buffer
     pointer.
-  - Alignment is assumed to be 8 for 64-bit systems and 4 for 32-bit systems, same
-    as malloc() returns.
+  - Alignment is assumed to be 16 for 64-bit systems and 8 for 32-bit systems.
   - Note sizeof(FXival) == sizeof(FXptr).
 */
 
@@ -50,7 +49,7 @@ namespace FX {
 
 // Empty array value
 extern const FXival __array__empty__[];
-const FXival __array__empty__[2]={0,0};
+const FXival __array__empty__[4]={0,0,0,0};
 
 
 // Copying empty array uses same empty-array pointer regardless of
@@ -68,17 +67,18 @@ FXbool FXArrayBase::resize(FXival num,FXival sz){
     FXptr p;
     if(0<num){
       if(ptr!=EMPTY){
-        if(__unlikely((p=::realloc(((FXival*)ptr)-1,sizeof(FXival)+num*sz))==nullptr)) return false;
+        if(__unlikely((p=::realloc(((FXival*)ptr)-2,sizeof(FXival)*2+num*sz))==nullptr)) return false;
         }
       else{
-        if(__unlikely((p=::malloc(sizeof(FXival)+num*sz))==nullptr)) return false;
+        if(__unlikely((p=::malloc(sizeof(FXival)*2+num*sz))==nullptr)) return false;
         }
-      ptr=((FXival*)p)+1;
+      ptr=((FXival*)p)+2;
+      *(((FXival*)ptr)-2)=1;
       *(((FXival*)ptr)-1)=num;
       }
     else{
       if(ptr!=EMPTY){
-        ::free(((FXival*)ptr)-1);
+        ::free(((FXival*)ptr)-2);
         ptr=EMPTY;
         }
       }

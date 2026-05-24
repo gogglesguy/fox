@@ -3,7 +3,7 @@
 *                     R e c e n t   F i l e s   L i s t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -45,6 +45,9 @@
   - Use the auto-hide or auto-gray feature to hide menus which are connected
     to the FXRecentFiles class.
   - Default constructor is deprecated in applications; used only for serialization.
+  - FIXME prefer to maintain a local list instead of direct access to registry;
+    registry manipulation is awkward and requirs pointer to settings, which should
+    not bee here.
 */
 
 using namespace FX;
@@ -121,17 +124,21 @@ void FXRecentFiles::setFile(FXuint index,const FXString& filename){
 // is moved down the list one notch; the last one is dropped from the list.
 void FXRecentFiles::appendFile(const FXString& filename){
   if(!filename.empty()){
+    FXStringDictionary& dict=settings->at(group);
     FXString newname=filename;
     FXString oldname;
     FXuint i=0;
     FXuint j=0;
-    do{
-      do{ oldname=settings->readStringEntry(group,key[j++],nullptr); }while(oldname==filename);
-      settings->writeStringEntry(group,key[i],newname.text());
+    while(i<maxfiles){
+      oldname.adopt(dict.at(key[i++]));
+      if(oldname==filename) continue;
+      dict.at(key[j++],true).adopt(newname);
       if(oldname.empty()) break;
-      newname=oldname;
+      newname.adopt(oldname);
       }
-    while(++i<maxfiles);
+    while(j<maxfiles){
+      dict.remove(key[j++]);
+      }
     }
   }
 
@@ -139,18 +146,19 @@ void FXRecentFiles::appendFile(const FXString& filename){
 // Remove a file
 void FXRecentFiles::removeFile(const FXString& filename){
   if(!filename.empty()){
+    FXStringDictionary& dict=settings->at(group);
     FXString name;
     FXuint i=0;
     FXuint j=0;
-    do{
-      name=settings->readStringEntry(group,key[i],nullptr);
+    while(i<maxfiles){
+      name.adopt(dict.at(key[i++]));
       if(name.empty()) break;
-      if(name!=filename){
-        settings->writeStringEntry(group,key[j++],name.text());
-        }
+      if(name==filename) continue;
+      dict.at(key[j++],true).adopt(name);
       }
-    while(++i<maxfiles);
-    settings->deleteEntry(group,key[j++]);
+    while(j<maxfiles){
+      dict.remove(key[j++]);
+      }
     }
   }
 

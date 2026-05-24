@@ -3,7 +3,7 @@
 *                        C U R   C u r s o r    O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2001,2026 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -47,10 +47,10 @@ public:
   FXCURCursor(FXApp* a,const FXuchar* pix);
 
   /// Save pixel data only, in CUR format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Load pixel data only, in CUR format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destructor
   virtual ~FXCURCursor();

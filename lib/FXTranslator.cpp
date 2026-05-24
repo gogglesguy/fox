@@ -3,7 +3,7 @@
 *                       M e s s a g e   T r a n s l a t o r                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,7 +67,7 @@ FXIMPLEMENT(FXTranslator,FXObject,nullptr,0)
 
 // Construct translator
 FXTranslator::FXTranslator(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXTranslator::FXTranslator()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXTranslator::FXTranslator()\n");
   }
 
 /*
@@ -112,7 +112,7 @@ FXTranslator::FXTranslator(){
 
 // Translate a string
 const FXchar* FXTranslator::tr(const FXchar* context,const FXchar* message,const FXchar* hint,FXint count) const {
-  FXTRACE((TOPIC_TRANSLATE,"tr context: '%s' message: '%s' hint: '%s' count: %d.\n",context,message,hint?hint:"",count));
+  FXTRACE(TOPIC_TRANSLATE,"tr context: '%s' message: '%s' hint: '%s' count: %d.\n",context,message,hint?hint:"",count);
   return message;
   }
 
@@ -131,7 +131,7 @@ void FXTranslator::load(FXStream& store){
 
 // Destroy translator
 FXTranslator::~FXTranslator(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXTranslator::~FXTranslator()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXTranslator::~FXTranslator()\n");
   }
 
 }

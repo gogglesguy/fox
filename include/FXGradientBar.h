@@ -3,7 +3,7 @@
 *                      G r a d i e n t B a r   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -172,16 +172,16 @@ public:
   FXGradientBar(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=FRAME_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /**
    * Obtain segment containing location x, y.
@@ -334,10 +334,10 @@ public:
   const FXString& getTipText() const { return tip; }
 
   /// Save gradient bar to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load gradient bar from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGradientBar();

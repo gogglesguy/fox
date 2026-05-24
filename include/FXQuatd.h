@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,10 +31,10 @@ class FXMat3d;
 /// Double-precision quaternion
 class FXAPI FXQuatd {
 public:
-  double x;
-  double y;
-  double z;
-  double w;
+  FXdouble x;
+  FXdouble y;
+  FXdouble z;
+  FXdouble w;
 public:
 
   /**

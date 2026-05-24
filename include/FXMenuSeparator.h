@@ -3,7 +3,7 @@
 *                    M e n u   S e p a r a t o r   W i d g e t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,10 +55,10 @@ public:
   FXMenuSeparator(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0);
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change highlight color
   void setHiliteColor(FXColor clr);
@@ -73,10 +73,10 @@ public:
   FXColor getShadowColor() const { return shadowColor; }
 
   /// Save menu to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load menu from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 }

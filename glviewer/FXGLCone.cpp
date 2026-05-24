@@ -3,7 +3,7 @@
 *                      O p e n G L   C o n e   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,28 +43,28 @@ FXIMPLEMENT(FXGLCone,FXGLShape,nullptr,0)
 
 // Create cone
 FXGLCone::FXGLCone():height(1.0f),radius(1.0f){
-  FXTRACE((100,"FXGLCone::FXGLCone\n"));
+  FXTRACE(100,"FXGLCone::FXGLCone\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Create cone
 FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h,FXfloat r):FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),height(h),radius(r){
-  FXTRACE((100,"FXGLCone::FXGLCone\n"));
+  FXTRACE(100,"FXGLCone::FXGLCone\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Create cone
 FXGLCone::FXGLCone(FXfloat x,FXfloat y,FXfloat z,FXfloat h, FXfloat r,const FXMaterial& mtl):FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),height(h),radius(r){
-  FXTRACE((100,"FXGLCone::FXGLCone\n"));
+  FXTRACE(100,"FXGLCone::FXGLCone\n");
   range.set(-radius,radius,0.0f,height,-radius,radius);
   }
 
 
 // Copy constructor
 FXGLCone::FXGLCone(const FXGLCone& orig):FXGLShape(orig){
-  FXTRACE((100,"FXGLCone::FXGLCone\n"));
+  FXTRACE(100,"FXGLCone::FXGLCone\n");
   height=orig.height;
   radius=orig.radius;
   }
@@ -131,5 +131,5 @@ void FXGLCone::load(FXStream& store){
 
 // Destroy
 FXGLCone::~FXGLCone(){
-  FXTRACE((100,"FXGLCone::~FXGLCone\n"));
+  FXTRACE(100,"FXGLCone::~FXGLCone\n");
   }

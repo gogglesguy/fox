@@ -3,7 +3,7 @@
 #                       A d i e   S y n t a x   F i l e                         #
 #                                                                               #
 #################################################################################
-# Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        #
+# Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        #
 #################################################################################
 # This program is free software; you can redistribute it and/or modify          #
 # it under the terms of the GNU General Public License as published by          #
@@ -402,7 +402,7 @@ language "C++"
       style   "carrot"
     end
     rule "Format"
-      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%(%|\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\]))"
       style   "fuchsia"
     end
   end
@@ -486,7 +486,7 @@ language "C++"
 
   # Special macros
   rule "FOXMacro"
-    pattern "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXULONG|FXLONG|FXASSERT_STATIC|FXUNUSED|FXASSERT_STATIC|FXASSERT|FXVERIFY|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|VA_NUM_ARGS|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|bitmoveElms|bitcopyElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
+    pattern "\<(FXAPI|FXDEFMAP|FXTRACE|FXMAPFUNCS|FXMAPFUNC|FXIMPLEMENT|FXIMPLEMENT_ABSTRACT|FXDECLARE|FXDECLARE_ABSTRACT|FXMAPTYPES|FXMAPTYPE|FXMETACLASS|FXRGBA|FXRGB|FXREDVAL|FXGREENVAL|FXBLUEVAL|FXALPHAVAL|FXULONG|FXLONG|FXASSERT_STATIC|FXUNUSED|FXSTATIC_ASSERT|FXASSERT|FXVERIFY|FXSELID|FXSELTYPE|FXSEL|FXMINMAX|FXMIN3|FXMIN4|FXMIN|FXMAX3|FXMAX4|FXMAX|FXSWAP|FXCLAMP|FXABS|FXSGNZ|FXSGN|FXSGNX|FXLERP|ARRAYNUMBER|STRUCTOFFSET|CONTAINER|VA_NUM_ARGS|__likely|__unlikely|__threadlocal|__noreturn|__prefetchw|__prefetch|__restrict|constructElms|destructElms|copyElms|moveElms|bitmoveElms|bitcopyElms|swapElms|equalElms|fillElms|clearElms|allocElms|callocElms|dupElms|resizeElms|freeElms|construct|destruct)\>"
   end
 
   rule "FOXType"
@@ -596,7 +596,7 @@ language "C"
       style   "carrot"
     end
     rule "Format"
-      pattern "%\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\])"
+      pattern "%(%|\*?(\d+\$)?['#0 +-]*(\*(\d+\$)?|\d*)(\.(\*(\d+\$)?|\d*))?(ll|l|hh|h|L|q|t|z)?([dDbiouxXeEfFgGaAcspn]|\[.*?\]))"
       style   "fuchsia"
     end
   end
@@ -2656,7 +2656,7 @@ language "YAML"
     pattern  "(^\s*- |:\s)"
   end
   rule "identifier"
-    pattern  "\<\l\w+\>"
+    pattern  "\l[-0-9A-Za-z+]+"
   end
   rule "String"
     open  "\""

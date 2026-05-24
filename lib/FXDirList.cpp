@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   L i s t   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -561,7 +561,7 @@ long FXDirList::onDNDRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Delete selected files
   if(((FXEvent*)ptr)->target==deleteType){
-    FXTRACE((TOPIC_DETAIL,"Delete files not yet implemented\n"));
+    FXTRACE(TOPIC_DETAIL,"Delete files not yet implemented\n");
     return 1;
     }
   return 0;
@@ -1239,7 +1239,7 @@ FXTreeItem* FXDirList::expandPath(const FXString& path,FXbool notify){
 
 // Set current file; return true if success
 FXbool FXDirList::setCurrentFile(const FXString& pathname,FXbool notify){
-  FXTRACE((TOPIC_DETAIL,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text()));
+  FXTRACE(TOPIC_DETAIL,"%s::setCurrentFile(%s)\n",getClassName(),pathname.text());
   FXTreeItem* item;
   if((item=expandPath(FXPath::absolute(pathname),notify))!=nullptr){
     setAnchorItem(item);
@@ -1259,7 +1259,7 @@ FXString FXDirList::getCurrentFile() const {
 
 // Set current directory; return true if success
 FXbool FXDirList::setDirectory(const FXString& pathname,FXbool notify){
-  FXTRACE((TOPIC_DETAIL,"%s::setDirectory(%s)\n",getClassName(),pathname.text()));
+  FXTRACE(TOPIC_DETAIL,"%s::setDirectory(%s)\n",getClassName(),pathname.text());
   FXTreeItem* item;
   if((item=expandPath(FXPath::absolute(pathname),notify))!=nullptr){
     expandTree(item,notify);

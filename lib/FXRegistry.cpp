@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -140,22 +140,33 @@
 
       o Otherwise, it will have the default value: "~/.config".
 
-
   - The Freedesktop.org XDG standard is found at:
 
-        http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+      http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
-    Important for FOX is:
+      $XDG_CONFIG_DIRS          Colon separated search path for configuration files.
+                                Default: "/etc/xdg".
+      $XDG_CONFIG_HOME          Configuration files for single user.
+                                Default: "$HOME/.config".
+      $XDG_DATA_DIRS            Colon separated search path for data files.
+                                Default: "$HOME/.local/share:/usr/local/share/:/usr/share/"
+      $XDG_DATA_HOME            Data files for single user.
+                                Default: "$HOME/.local/share".
 
-     $XDG_DATA_HOME     Per-user data files, defaults to "$HOME/.local/share".
+  - Somewhat equivalent information for Windows:
 
-     $XDG_CONFIG_HOME   Per-user configuration files, defaults to "$HOME/.config".
+      %ALLUSERSPROFILE%         Configurations for all users of the system.
+                                Default: "C:\ProgramData".
+      %APPDATA%                 Configuration file for single user, migrated to other
+                                PCs user might log on to.
+                                Default: "C:\Users\UserName\AppData\Roaming".
+      %LOCALAPPDATA%            Configuration files for single user on this PC only.
+                                Default: "C:\Users\UserName\AppData\Local".
+      %USERPROFILE%             Home directory.
 
-     $XDG_DATA_DIRS     Colon separated search path for per-user data files; default
-                        paths are "/usr/local/share/:/usr/share/"
-
-     $XDG_CONFIG_DIRS   Colon separated search path for per-user configuration files;
-                        defaults to "/etc/xdg".
+    We use the order $FOXDIR, $XDG_CONFIG_DIRS, and "/etc/xdg" on Linux, and %FOXDIR%,
+    %ALLUSERSPROFILE%, and %APPDATA% on Windows [an argument could be made for using
+    %LOCALAPPDATA%, however].
 */
 
 #define TOPIC_CONSTRUCT 1000
@@ -167,13 +178,13 @@
 // Default locations and names
 #if defined(WIN32)
 #define FOXRC           "fox.ini"
-#define SYSTEMDIRS      "C:\\Program Files;C:\\Windows"
-#define USERDIR         "%USERPROFILE%\\.config"
+#define SYSTEMDIRS      "%FOXDIR%;%ALLUSERSPROFILE%;C:\\ProgramData"
+#define USERDIR         "%APPDATA%"
 #define FILEEXT         ".ini"
 #else
 #define FOXRC           "fox.rc"
-#define SYSTEMDIRS      "/etc/xdg"
-#define USERDIR         "~/.config"
+#define SYSTEMDIRS      "$FOXDIR:$XDG_CONFIG_DIRS:/etc/xdg"
+#define USERDIR         "$HOME/.config"
 #define FILEEXT         ".rc"
 #endif
 
@@ -194,305 +205,78 @@ const FXchar FXRegistry::foxrc[]=FOXRC;
 
 // Make registry object
 FXRegistry::FXRegistry(const FXString& akey,const FXString& vkey):applicationkey(akey),vendorkey(vkey),systemdirs(SYSTEMDIRS),userdir(USERDIR){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRegistry::FXRegistry\n"));
-#if defined(WIN32)
-  ascii=false;
-#else
-  ascii=true;
-#endif
+  FXTRACE(TOPIC_CONSTRUCT,"FXRegistry::FXRegistry\n");
   }
 
-
-#if defined(WIN32)
-
-// Read from Windows Registry
-FXbool FXRegistry::readFromRegistry(FXptr hroot,FXbool mrk){
-  HKEY hsoftware;
-  FXbool ok=false;
-
-  FXTRACE((TOPIC_DETAIL,"FXRegistry::readFromRegistry(%p,%d)\n",hroot,mrk));
-
-  // Open Software registry section
-  if(RegOpenKeyExA((HKEY)hroot,"Software",0,KEY_READ,&hsoftware)==ERROR_SUCCESS){
-
-    // Read Software\FOX
-    if(readFromRegistryGroup("FOX",hsoftware,false)) ok=true;
-
-    // Have vendor key
-    if(!vendorkey.empty()){
-      HKEY hvendor;
-
-      // Open vendor registry sub-section
-      if(RegOpenKeyExA(hsoftware,vendorkey.text(),0,KEY_READ,&hvendor)==ERROR_SUCCESS){
-
-        // Read under "Software\Vendor\Vendor"
-        if(readFromRegistryGroup(vendorkey,hvendor,false)) ok=true;
-
-        // Have application key
-        if(!applicationkey.empty()){
-
-          // Read under "Software\Vendor\Application"
-          if(readFromRegistryGroup(applicationkey,hvendor,mrk)) ok=true;
-          }
-        RegCloseKey(hvendor);
-        }
-      }
-
-    // No vendor key
-    else{
-
-      // Have application key
-      if(!applicationkey.empty()){
-
-        // Read under "Software\Application"
-        if(readFromRegistryGroup(applicationkey,hsoftware,mrk)) ok=true;
-        }
-      }
-    RegCloseKey(hsoftware);
-    }
-  return ok;
-  }
-
-
-// Read from given group
-FXbool FXRegistry::readFromRegistryGroup(const FXString& group,FXptr hbase,FXbool mrk){
-  FXchar section[MAXNAME],name[MAXNAME],value[MAXVALUE];
-  HKEY hgroup;
-
-  // Open registry group
-  if(RegOpenKeyExA((HKEY)hbase,group.text(),0,KEY_READ,&hgroup)==ERROR_SUCCESS){
-    DWORD sectionsize=MAXNAME;
-    DWORD sectionindex=0;
-    FILETIME writetime;
-
-    // Read sections
-    while(RegEnumKeyExA(hgroup,sectionindex,section,&sectionsize,nullptr,nullptr,nullptr,&writetime)==ERROR_SUCCESS){
-
-      // Open section
-      HKEY hsection;
-      if(RegOpenKeyExA(hgroup,section,0,KEY_READ,&hsection)==ERROR_SUCCESS){
-        DWORD namesize=MAXNAME;
-        DWORD valuesize=MAXVALUE;
-        DWORD index=0;
-        DWORD type;
-
-        // Read key-value pairs
-        while(RegEnumValueA(hsection,index,name,&namesize,nullptr,&type,(BYTE*)value,&valuesize)!=ERROR_NO_MORE_ITEMS){
-          FXASSERT(type==REG_SZ);
-          at(section).at(name,mrk)=value;
-          namesize=MAXNAME;
-          valuesize=MAXVALUE;
-          index++;
-          }
-
-        // Close section
-        RegCloseKey(hsection);
-        }
-      sectionsize=MAXNAME;
-      sectionindex++;
-      }
-
-    // Close group
-    RegCloseKey(hgroup);
-    return true;
-    }
-  return false;
-  }
-
-
-// Update current user's settings
-FXbool FXRegistry::writeToRegistry(FXptr hroot){
-  FXbool ok=false;
-
-  FXTRACE((TOPIC_DETAIL,"FXRegistry::writeToRegistry(%p)\n",hroot));
-
-  // Have application key
-  if(!applicationkey.empty()){
-    HKEY hsoftware;
-
-    // Open software registry section
-    if(RegOpenKeyExA((HKEY)hroot,"Software",0,KEY_WRITE,&hsoftware)==ERROR_SUCCESS){
-
-      // Have vendor key
-      if(!vendorkey.empty()){
-        HKEY hvendor;
-        DWORD disp;
-
-        // Open vendor registry sub-section
-        if(RegCreateKeyExA(hsoftware,vendorkey.text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,nullptr,&hvendor,&disp)==ERROR_SUCCESS){
-
-          // Have application key
-          if(!applicationkey.empty()){
-
-            // Write under "Software\Vendor\Application"
-            if(writeToRegistryGroup(applicationkey,hvendor)) ok=true;
-            }
-
-          // Done with vendor key
-          RegCloseKey(hvendor);
-          }
-        }
-
-      // No vendor key
-      else{
-
-        // Have application key
-        if(!applicationkey.empty()){
-
-          // Write under "Software\Application"
-          if(writeToRegistryGroup(applicationkey,hsoftware)) ok=true;
-          }
-        }
-
-      // Done with software key
-      RegCloseKey(hsoftware);
-      }
-    }
-  return ok;
-  }
-
-
-// Write to registry group
-FXbool FXRegistry::writeToRegistryGroup(const FXString& group,FXptr hbase){
-  FXchar section[MAXNAME];
-  DWORD sectionsize,sectionindex,disp;
-  HKEY hgroup,hsection;
-  FXint s,e;
-  FILETIME writetime;
-
-  // Open registry group
-  if(RegCreateKeyExA((HKEY)hbase,group.text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,nullptr,&hgroup,&disp)==ERROR_SUCCESS){
-
-    // First, purge all existing sections
-    while(1){
-      sectionindex=0;
-      sectionsize=MAXNAME;
-      if(RegEnumKeyExA(hgroup,sectionindex,section,&sectionsize,nullptr,nullptr,nullptr,&writetime)!=ERROR_SUCCESS) break;
-      if(RegDeleteKeyA(hgroup,section)!=ERROR_SUCCESS) break;
-      }
-
-    // Write sections
-    for(s=0; s<no(); ++s){
-
-      // Section is non-empty
-      if(!empty(s)){
-        hsection=nullptr;
-
-        // Write keys in this section
-        for(e=0; e<data(s).no(); ++e){
-
-          // Key is non-empty and marked
-          if(!data(s).empty(e) && data(s).mark(e)){
-
-            // Create section in registry upon finding first key in it
-            if(!hsection){
-              if(RegCreateKeyExA(hgroup,key(s).text(),0,REG_NONE,REG_OPTION_NON_VOLATILE,KEY_WRITE|KEY_READ,nullptr,&hsection,&disp)!=ERROR_SUCCESS) goto x;
-              }
-
-            // Write key-value pair
-            if(RegSetValueExA(hsection,data(s).key(e).text(),0,REG_SZ,(BYTE*)data(s).data(e).text(),data(s).data(e).length()+1)!=ERROR_SUCCESS) break;
-            }
-          }
-
-        // Close section
-        if(hsection) RegCloseKey(hsection);
-        }
-
-      // Process next registry section
-x:    continue;
-      }
-
-    // Close group
-    RegCloseKey(hgroup);
-    return true;
-    }
-  return false;
-  }
-
-#endif
-
-
-/*******************************************************************************/
 
 // Read registry
 FXbool FXRegistry::read(){
+  FXString path;
   FXbool ok=false;
-  if(ascii){
-    FXString path;
 
-    // Read system-wide settings from systemdirs
-    if(!systemdirs.empty()){
+  // Read system-wide settings from systemdirs
+  if(!systemdirs.empty()){
 
-      FXTRACE((TOPIC_DETAIL,"FXRegistry::read: systemdirs=%s\n",systemdirs.text()));
+    FXTRACE(TOPIC_DETAIL,"FXRegistry::read: systemdirs=%s\n",systemdirs.text());
 
-      // Find common settings
-      path=FXPath::search(systemdirs,FOXRC);
+    // Find common settings
+    path=FXPath::search(systemdirs,FOXRC);
+    if(!path.empty()){
+      if(parseFile(path,false)) ok=true;
+      }
+
+    // Have vendor subdirectory
+    if(!vendorkey.empty()){
+
+      // Find vendor subdirectory
+      path=FXPath::search(systemdirs,vendorkey);
+      if(!path.empty()){
+
+        // Try read vendor settings
+        if(parseFile(path+PATHSEPSTRING+vendorkey+ext,false)) ok=true;
+
+        // Try read application settings
+        if(!applicationkey.empty()){
+          if(parseFile(path+PATHSEPSTRING+applicationkey+ext,false)) ok=true;
+          }
+        }
+      }
+
+    // Have application settings only
+    else if(!applicationkey.empty()){
+
+      // Find applications settings
+      path=FXPath::search(systemdirs,applicationkey+ext);
+
+      // Try read application settings
       if(!path.empty()){
         if(parseFile(path,false)) ok=true;
         }
-
-      // Have vendor subdirectory
-      if(!vendorkey.empty()){
-
-        // Find vendor subdirectory
-        path=FXPath::search(systemdirs,vendorkey);
-        if(!path.empty()){
-
-          // Try read vendor settings
-          if(parseFile(path+PATHSEPSTRING+vendorkey+ext,false)) ok=true;
-
-          // Try read application settings
-          if(!applicationkey.empty()){
-            if(parseFile(path+PATHSEPSTRING+applicationkey+ext,false)) ok=true;
-            }
-          }
-        }
-
-      // Have application settings only
-      else if(!applicationkey.empty()){
-
-        // Find applications settings
-        path=FXPath::search(systemdirs,applicationkey+ext);
-
-        // Try read application settings
-        if(!path.empty()){
-          if(parseFile(path,false)) ok=true;
-          }
-        }
-      }
-
-    // Read per-user settings from userdir
-    if(!userdir.empty()){
-
-      FXTRACE((TOPIC_DETAIL,"FXRegistry::read: userdir=%s\n",userdir.text()));
-
-      // Path to settings data
-      path=FXPath::absolute(FXPath::expand(userdir));
-
-      // Try read common settings
-      if(parseFile(path+PATHSEPSTRING FOXRC,false)) ok=true;
-
-      // Try read vendor settings
-      if(!vendorkey.empty()){
-        path.append(PATHSEPSTRING+vendorkey);
-        if(parseFile(path+PATHSEPSTRING+vendorkey+ext,false)) ok=true;
-        }
-
-      // Try read application settings
-      if(!applicationkey.empty()){
-        if(parseFile(path+PATHSEPSTRING+applicationkey+ext,true)) ok=true;
-        }
       }
     }
-#if defined(WIN32)
-  else{
-    // Try read system-wide registry settings from HKEY_LOCAL_MACHINE
-    if(readFromRegistry(HKEY_LOCAL_MACHINE,false)) ok=true;
 
-    // Try read per-user registry settings from HKEY_CURRENT_USER
-    if(readFromRegistry(HKEY_CURRENT_USER,true)) ok=true;
+  // Read per-user settings from userdir
+  if(!userdir.empty()){
+
+    FXTRACE(TOPIC_DETAIL,"FXRegistry::read: userdir=%s\n",userdir.text());
+
+    // Path to settings data
+    path=FXPath::absolute(FXPath::expand(userdir));
+
+    // Try read common settings
+    if(parseFile(path+PATHSEPSTRING FOXRC,false)) ok=true;
+
+    // Try read vendor settings
+    if(!vendorkey.empty()){
+      path.append(PATHSEPSTRING+vendorkey);
+      if(parseFile(path+PATHSEPSTRING+vendorkey+ext,false)) ok=true;
+      }
+
+    // Try read application settings
+    if(!applicationkey.empty()){
+      if(parseFile(path+PATHSEPSTRING+applicationkey+ext,true)) ok=true;
+      }
     }
-#endif
   return ok;
   }
 
@@ -501,56 +285,45 @@ FXbool FXRegistry::read(){
 // Write registry
 FXbool FXRegistry::write(){
   FXbool ok=false;
-  FXString path;
   if(isModified()){
-    if(ascii){
 
-      // Write per-user settings to userdir
-      if(!userdir.empty()){
+    // Write per-user settings to userdir
+    if(!userdir.empty()){
 
-      FXTRACE((TOPIC_DETAIL,"FXRegistry::write: userdir=%s\n",userdir.text()));
+      FXTRACE(TOPIC_DETAIL,"FXRegistry::write: userdir=%s\n",userdir.text());
 
-        // Have application key
-        if(!applicationkey.empty()){
+      // Have application key
+      if(!applicationkey.empty()){
 
-          // Path to settings data
-          path=FXPath::absolute(FXPath::expand(userdir));
+        // Path to settings data
+        FXString path=FXPath::absolute(FXPath::expand(userdir));
 
-          // Have vendor key
-          if(!vendorkey.empty()){
-            path.append(PATHSEPSTRING+vendorkey);
-            }
+        // Have vendor key
+        if(!vendorkey.empty()){
+          path.append(PATHSEPSTRING+vendorkey);
+          }
 
-          // Ensure parent directories exist
-          if(FXDir::createDirectories(path)){
-            FXString realfile;
-            FXString tempfile;
+        // Ensure parent directories exist
+        if(FXDir::createDirectories(path)){
 
-            // Final registry filename
-            realfile=path+PATHSEPSTRING+applicationkey+ext;
+          // Final registry filename
+          FXString realfile=path+PATHSEPSTRING+applicationkey+ext;
 
-            // Temporary registry filename
-            tempfile=path+PATHSEPSTRING+applicationkey+"_"+FXString::value(FXProcess::current())+ext;
+          // Temporary registry filename
+          FXString tempfile=path+PATHSEPSTRING+applicationkey+"_"+FXString::value(FXProcess::current())+ext;
 
-            // Unparse settings into temp file first
-            if(unparseFile(tempfile)){
+          // Unparse settings into temp file first
+          if(unparseFile(tempfile)){
 
-              // Rename ATOMICALLY to proper name
-              if(FXFile::move(tempfile,realfile,true)){
-                setModified(false);
-                ok=true;
-                }
+            // Rename ATOMICALLY to proper name
+            if(FXFile::move(tempfile,realfile,true)){
+              setModified(false);
+              ok=true;
               }
             }
           }
         }
       }
-#if defined(WIN32)
-    else{
-      // Write per-user registry settings to HKEY_CURRENT_USER
-      if(writeToRegistry(HKEY_CURRENT_USER)) ok=true;
-      }
-#endif
     }
   return ok;
   }
@@ -558,7 +331,7 @@ FXbool FXRegistry::write(){
 
 // Destructor
 FXRegistry::~FXRegistry(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRegistry::~FXRegistry\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRegistry::~FXRegistry\n");
   }
 
 }

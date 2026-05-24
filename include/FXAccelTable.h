@@ -3,7 +3,7 @@
 *                   A c c e l e r a t o r   T a b l e   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -142,10 +142,10 @@ public:
   static FXString unparseAccel(FXHotKey key);
 
   /// Save table to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load table from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /**
   * Destroy accelerator table.

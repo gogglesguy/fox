@@ -3,7 +3,7 @@
 *                         C o l o r   L i s t   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,8 +38,8 @@ private:
   FXColorItem& operator=(const FXColorItem&);
 protected:
   FXColorItem():color(0){}
-  virtual void draw(const FXList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const;
-  virtual FXint hitItem(const FXList* list,FXint x,FXint y) const;
+  virtual void draw(const FXList* list,FXDC& dc,FXint x,FXint y,FXint w,FXint h) const override;
+  virtual FXint hitItem(const FXList* list,FXint x,FXint y) const override;
 public:
   /// Construct new item with given text, color, and user-data
   FXColorItem(const FXString& text,FXColor clr,void* ptr=nullptr):FXListItem(text,nullptr,ptr),color(clr){}
@@ -51,10 +51,10 @@ public:
   FXColor getColor() const { return color; }
 
   /// Return width of item as drawn in list
-  virtual FXint getWidth(const FXList* list) const;
+  virtual FXint getWidth(const FXList* list) const override;
 
   /// Return height of item as drawn in list
-  virtual FXint getHeight(const FXList* list) const;
+  virtual FXint getHeight(const FXList* list) const override;
   };
 
 
@@ -65,7 +65,7 @@ class FXAPI FXColorList : public FXList {
   FXDECLARE(FXColorList)
 protected:
   FXColorList(){}
-  virtual FXListItem *createItem(const FXString& text,FXIcon* icon,void* ptr);
+  virtual FXListItem *createItem(const FXString& text,FXIcon* icon,void* ptr) override;
 private:
   FXColorList(const FXColorList&);
   FXColorList &operator=(const FXColorList&);

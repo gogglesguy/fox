@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -127,19 +127,19 @@ public:
   * BITMAP_KEEP has been specified.  If the pixel buffer is not owned, i.e.
   * the flag BITMAP_OWNED is not set, the pixel buffer will not be deleted.
   */
-  virtual void create();
+  virtual void create() override;
 
   /**
   * Detach the server side pixmap from the Bitmap.
   * Afterwards, the Bitmap is left as if it never had a server-side resources.
   */
-  virtual void detach();
+  virtual void detach() override;
 
   /**
   * Destroy the server-side pixmap.
   * The client-side pixel buffer is not affected.
   */
-  virtual void destroy();
+  virtual void destroy() override;
 
   /**
   * Retrieves pixels from the server-side bitmap.
@@ -163,7 +163,7 @@ public:
   * given width and height.  The new representations typically contain garbage
   * after this operation and need to be re-filled.
   */
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /**
   * Rescale pixels image to the specified width and height; this calls
@@ -189,10 +189,10 @@ public:
   virtual void fill(FXbool color);
 
   /// Save object to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Save pixel data only
   virtual FXbool savePixels(FXStream& store) const;

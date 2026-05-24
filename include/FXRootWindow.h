@@ -3,7 +3,7 @@
 *                     R o o t   W i n d o w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -46,43 +46,43 @@ public:
   FXRootWindow(FXApp* a,FXVisual *vis);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Can not attach the root window
-  virtual void attach(FXID w);
+  virtual void attach(FXID w) override;
 
   /// Can not detach the root window
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return width of the root window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return height of the root window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// No op
-  virtual void recalc();
+  virtual void recalc() override;
 
   /// Root window can not be moved
-  virtual void move(FXint x,FXint y);
+  virtual void move(FXint x,FXint y) override;
 
   /// Root window can not be resized
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /// Root window can not be positioned
-  virtual void position(FXint x,FXint y,FXint w,FXint h);
+  virtual void position(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Root window can not get focus
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Root window can not loose
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Destructor
   virtual ~FXRootWindow();

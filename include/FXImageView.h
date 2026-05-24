@@ -3,7 +3,7 @@
 *                       I m a g e   V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -73,22 +73,22 @@ public:
   FXImageView(FXComposite* p,FXImage* img=nullptr,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Image view widget can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Return the width of the contents
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Return the height of the contents
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
 
   /// Change image
   void setImage(FXImage* img);
@@ -103,10 +103,10 @@ public:
   FXuint getAlignment() const;
 
   /// Save list to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load list from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy
   virtual ~FXImageView();

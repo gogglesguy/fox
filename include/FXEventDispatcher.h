@@ -3,7 +3,7 @@
 *                          E v e n t   D i s p a t c h e r                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2019,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2019,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #ifndef FXEVENTDISPATCHER_H
 #define FXEVENTDISPATCHER_H
@@ -39,7 +39,7 @@ public:
   virtual FXbool init(FXptr dpy);
 
   /// Initialize dispatcher without display.
-  virtual FXbool init();
+  virtual FXbool init() override;
 
   /// Return display pointer
   FXptr getDisplay() const { return display; }
@@ -47,13 +47,13 @@ public:
   /// Dispatch if something happens within given blocking time.
   /// Flags control subsets of events to be dispatched (signals, timers,
   /// idle, and more). Default is to dispatch all events.
-  virtual FXbool dispatch(FXTime blocking=forever,FXuint flags=DispatchAll);
+  virtual FXbool dispatch(FXTime blocking=forever,FXuint flags=DispatchAll) override;
 
   /// Dispatch platform-dependent event
   virtual FXbool dispatchEvent(FXRawEvent& event);
 
   /// Exit dispatcher.
-  virtual FXbool exit();
+  virtual FXbool exit() override;
 
   /// Destroy event dispatcher object.
   virtual ~FXEventDispatcher();

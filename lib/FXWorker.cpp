@@ -3,7 +3,7 @@
 *                            W o r k e r   T h r e a d                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -48,7 +48,7 @@ namespace FX {
 
 // Create worker for runnable
 FXWorker::FXWorker(FXRunnable* task):runnable(task){
-  FXTRACE((TOPIC_CONSTRUCT,"FXWorker::FXWorker %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXWorker::FXWorker %p\n",this);
   }
 
 
@@ -83,7 +83,7 @@ FXWorker* FXWorker::execute(FXRunnable* task,FXuval stacksize){
 
 // Destroy
 FXWorker::~FXWorker(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXWorker::~FXWorker %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXWorker::~FXWorker %p\n",this);
   runnable=(FXRunnable*)-1L;
   }
 

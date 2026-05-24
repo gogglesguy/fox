@@ -3,7 +3,7 @@
 *                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -347,6 +347,23 @@ FXTime FXThread::steadytime(){
   return tv.tv_sec*seconds+tv.tv_usec*microseconds;
 #endif
   }
+  
+
+// Return total process cpu time
+FXTime FXThread::cputime(){
+#if defined(WIN32)
+  FILETIME crt,ext,krt,ust;
+  GetProcessTimes(GetCurrentProcess(),&crt,&ext,&krt,&ust);
+  return (ust.dwHighDateTime*FXLONG(4294967296)+ust.dwLowDateTime)*FXLONG(100);
+#elif (_POSIX_C_SOURCE >= 199309L)
+  const FXTime seconds=1000000000;
+  struct timespec ts;
+  clock_gettime(CLOCK_PROCESS_CPUTIME_ID,&ts);
+  return ts.tv_sec*seconds+ts.tv_nsec;
+#else
+  return 0;
+#endif
+  }
 
 
 // Return time in processor ticks.
@@ -356,7 +373,7 @@ FXTime FXThread::ticks(){
   return __rdtsc();
 #else
   FXTime value;
-  FXASSERT_STATIC(sizeof(FXTime)==sizeof(LARGE_INTEGER));
+  FXSTATIC_ASSERT(sizeof(FXTime)==sizeof(LARGE_INTEGER));
   QueryPerformanceCounter((LARGE_INTEGER*)&value);
   return value;
 #endif
@@ -421,7 +438,7 @@ static DWORD WINAPI NtDelayExecutionStub(BOOLEAN Alertable,LARGE_INTEGER* DelayI
   if(fxNtDelayExecution==NtDelayExecutionStub){
     HMODULE ntdllDll=GetModuleHandleA("ntdll.dll");
     FXASSERT(ntdllDll);
-    fxNtDelayExecution=(PFN_NTDELAYEXECUTION)GetProcAddress(ntdllDll,"NtDelayExecution");
+    fxNtDelayExecution=(PFN_NTDELAYEXECUTION)(void*)GetProcAddress(ntdllDll,"NtDelayExecution");
     FXASSERT(fxNtDelayExecution);
     }
   return fxNtDelayExecution(Alertable,DelayInterval);
@@ -915,7 +932,7 @@ static PFN_GETTHREADDESCRIPTION fxGetThreadDescription=GetThreadDescriptionStub;
 static HRESULT WINAPI SetThreadDescriptionStub(HANDLE hThread,const WCHAR* desc){
   if(fxSetThreadDescription==SetThreadDescriptionStub){
     HMODULE hnddll=GetModuleHandleA("kernel32.dll");
-    fxSetThreadDescription=(PFN_SETTHREADDESCRIPTION)GetProcAddress(hnddll,"SetThreadDescription");
+    fxSetThreadDescription=(PFN_SETTHREADDESCRIPTION)(void*)GetProcAddress(hnddll,"SetThreadDescription");
     }
   if(fxSetThreadDescription){
     return fxSetThreadDescription(hThread,desc);
@@ -928,7 +945,7 @@ static HRESULT WINAPI SetThreadDescriptionStub(HANDLE hThread,const WCHAR* desc)
 static HRESULT WINAPI GetThreadDescriptionStub(HANDLE hThread,WCHAR** desc){
   if(fxGetThreadDescription==GetThreadDescriptionStub){
     HMODULE hnddll=GetModuleHandleA("kernel32.dll");
-    fxGetThreadDescription=(PFN_GETTHREADDESCRIPTION)GetProcAddress(hnddll,"GetThreadDescription");
+    fxGetThreadDescription=(PFN_GETTHREADDESCRIPTION)(void*)GetProcAddress(hnddll,"GetThreadDescription");
     }
   if(fxGetThreadDescription){
     return fxGetThreadDescription(hThread,desc);

@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -77,41 +77,41 @@ const FXchar *floatnumbers[]={
   // SP corner cases
   "0x0.000002p-126",                    // FLT_TRUE_MIN
   "1.401298464e-45",                    // FLT_TRUE_MIN
-  
+
   "0x1.000000p-126",                    // FLT_MIN
   "1.175494351e-38",                    // FLT_MIN
-  
+
   "0x1.FFFFFEp+127",                    // FLT_MAX
   "3.402823466e+38",                    // FLT_MAX
-  
+
   "0x1.000000p+128",                    // FLT INF
   "0x1.FFFFFEp+128",                    // FLT INF
-  
+
   "Inf",                                // FLT INF
   "Infinity",                           // FLT INF
-  
+
   "NaN",                                // FLT NAN
-  
+
   "0x1.000000p-23",                     // FLT_EPSILON
   "1.192092896e-07\n",                  // FLT_EPSILON
-  
+
   // DP corner cases
   "0x0.0000000000001p-1022",            // DBL_TRUE_MIN
   "4.9406564584124654e-324",            // DBL_TRUE_MIN
-  
+
   "0x1.0000000000000p-1022",            // DBL_MIN
   "2.2250738585072014e-308",            // DBL_MIN
-  
+
   "0x1.FFFFFFFFFFFFFp+1023",            // DBL_MAX
   "1.79769313486231578e+308",           // DBL_MAX
-  
+
   "0x1.0000000000000p+1024",            // DBL INF
   "0x1.FFFFFFFFFFFFFp+1024",            // DBL INF
   "Inf",                                // DBL INF
   "Infinity",                           // DBL INF
-  
+
   "NaN",                                // DBL NAN
-  
+
   "0x1.0000000000000p-52",              // DBL_EPSILON
   "2.2204460492503131e-016\n",          // DBL_EPSILON
 
@@ -145,7 +145,7 @@ const FXchar *floatnumbers[]={
   "+0.5",
   "-.5",
   "0.005\n",
-  
+
   "0x1.ac53a7df93d691111p+66",
   "0x1.3e9e4e4c2f344p+199",
   "0x003.fffffffffffffp+00",

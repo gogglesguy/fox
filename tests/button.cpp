@@ -3,7 +3,7 @@
 *                                 Button Test                                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -68,9 +68,9 @@ public:
   long onCmdQuit(FXObject*,FXSelector,void*);
 public:
   ButtonWindow(FXApp* a);
-  void create();
-  virtual void save(FXStream& store) const;
-  virtual void load(FXStream& store);
+  virtual void create() override;
+  virtual void save(FXStream& store) const override;
+  virtual void load(FXStream& store) override;
   virtual ~ButtonWindow();
   };
 

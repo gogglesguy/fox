@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -413,49 +413,49 @@ void FXQuatd::setYawRollPitch(FXdouble yaw,FXdouble roll,FXdouble pitch){
 
 // Obtain roll, pitch, yaw
 void FXQuatd::getRollPitchYaw(FXdouble& roll,FXdouble& pitch,FXdouble& yaw) const {
-  roll=Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+y*y));
-  pitch=Math::asin(Math::fclamp(-1.0,-2.0*(x*z-w*y),1.0));
-  yaw=Math::atan2(2.0*(x*y+w*z),1.0-2.0*(y*y+z*z));
+  roll=Math::atan2(y*z+w*x,0.5-x*x-y*y);
+  pitch=Math::asin(Math::fclamp(-2.0*(x*z-w*y),1.0));
+  yaw=Math::atan2(x*y+w*z,0.5-y*y-z*z);
   }
 
 
 // Obtain yaw, pitch, and roll
 void FXQuatd::getYawPitchRoll(FXdouble& yaw,FXdouble& pitch,FXdouble& roll) const {
-  yaw=Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(y*y+z*z));
-  pitch=Math::asin(Math::fclamp(-1.0,2.0*(x*z+w*y),1.0));
-  roll=Math::atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+y*y));
+  yaw=Math::atan2(w*z-x*y,0.5-y*y-z*z);
+  pitch=Math::asin(Math::fclamp(2.0*(x*z+w*y),1.0));
+  roll=Math::atan2(w*x-y*z,0.5-x*x-y*y);
   }
 
 
 // Obtain roll, yaw, pitch
 void FXQuatd::getRollYawPitch(FXdouble& roll,FXdouble& yaw,FXdouble& pitch) const {
-  roll=Math::atan2(-2.0*(y*z-w*x),1.0-2.0*(x*x+z*z));
-  yaw=Math::asin(Math::fclamp(-1.0,2.0*(x*y+w*z),1.0));
-  pitch=Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(y*y+z*z));
+  roll=Math::atan2(w*x-y*z,0.5-x*x-z*z);
+  yaw=Math::asin(Math::fclamp(2.0*(x*y+w*z),1.0));
+  pitch=Math::atan2(w*y-x*z,0.5-y*y-z*z);
   }
 
 
 // Obtain pitch, roll, yaw
 void FXQuatd::getPitchRollYaw(FXdouble& pitch,FXdouble& roll,FXdouble& yaw) const {
-  pitch=Math::atan2(-2.0*(x*z-w*y),1.0-2.0*(x*x+y*y));
-  roll=Math::asin(Math::fclamp(-1.0,2.0*(y*z+w*x),1.0));
-  yaw=Math::atan2(-2.0*(x*y-w*z),1.0-2.0*(x*x+z*z));
+  pitch=Math::atan2(w*y-x*z,0.5-x*x-y*y);
+  roll=Math::asin(Math::fclamp(2.0*(y*z+w*x),1.0));
+  yaw=Math::atan2(w*z-x*y,0.5-x*x-z*z);
   }
 
 
 // Obtain pitch, yaw, roll
 void FXQuatd::getPitchYawRoll(FXdouble& pitch,FXdouble& yaw,FXdouble& roll) const {
-  pitch=Math::atan2(2.0*(x*z+w*y),1.0-2.0*(y*y+z*z));
-  yaw=Math::asin(Math::fclamp(-1.0,-2.0*(x*y-w*z),1.0));
-  roll=Math::atan2(2.0*(y*z+w*x),1.0-2.0*(x*x+z*z));
+  pitch=Math::atan2(x*z+w*y,0.5-y*y-z*z);
+  yaw=Math::asin(Math::fclamp(-2.0*(x*y-w*z),1.0));
+  roll=Math::atan2(y*z+w*x,0.5-x*x-z*z);
   }
 
 
 // Obtain yaw, roll, pitch
 void FXQuatd::getYawRollPitch(FXdouble& yaw,FXdouble& roll,FXdouble& pitch) const {
-  yaw=Math::atan2(2.0*(x*y+w*z),1.0-2.0*(x*x+z*z));
-  roll=Math::asin(Math::fclamp(-1.0,-2.0*(y*z-w*x),1.0));
-  pitch=Math::atan2(2.0*(x*z+w*y),1.0-2.0*(x*x+y*y));
+  yaw=Math::atan2(x*y+w*z,0.5-x*x-z*z);
+  roll=Math::asin(Math::fclamp(-2.0*(y*z-w*x),1.0));
+  pitch=Math::atan2(x*z+w*y,0.5-x*x-y*y);
   }
 
 

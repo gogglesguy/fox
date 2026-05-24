@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -296,7 +296,7 @@ FXExpression::Error FXCompile::compile(){
   gettok();
   pc+=2;
 
-  FXASSERT_STATIC(OP_LAST<=256);
+  FXSTATIC_ASSERT(OP_LAST<=256);
 
   // Empty expression
   if(token==TK_EOF) return FXExpression::ErrEmpty;
@@ -309,7 +309,7 @@ FXExpression::Error FXCompile::compile(){
 
   // Return from evaluator
   opcode(OP_END);
-  FXTRACE((TOPIC_DETAIL,"SIZE=%ld\n",pc-code));
+  FXTRACE(TOPIC_DETAIL,"SIZE=%ld\n",pc-code);
 
   // Code is too long
   if(code+32767<pc) return FXExpression::ErrLong;
@@ -317,7 +317,7 @@ FXExpression::Error FXCompile::compile(){
   // Fix up compiled code size
   fix(at,pc-code);
 
-  FXTRACE((TOPIC_DETAIL,"OP_LAST=%d\n",OP_LAST));
+  FXTRACE(TOPIC_DETAIL,"OP_LAST=%d\n",OP_LAST);
 
   // Not at the end of the expression
   if(token!=TK_EOF) return FXExpression::ErrMore;
@@ -943,7 +943,7 @@ void FXCompile::gettok(){
         while(Ascii::isWord(*tail)){
           token=((token<<5)+token) ^ (FXuchar)*tail++;
           }
-        //FXTRACE((TOPIC_DETAIL,"token=%u\n",token));
+        //FXTRACE(TOPIC_DETAIL,"token=%u\n",token);
         return;
       default:
         token=TK_ERROR;
@@ -1040,13 +1040,13 @@ const FXchar *const FXExpression::errors[]={
 
 // Construct empty expression object
 FXExpression::FXExpression():code(EMPTY){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::FXExpression()\n");
   }
 
 
 // Copy regex object
 FXExpression::FXExpression(const FXExpression& orig):code(EMPTY){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(FXExpression)\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::FXExpression(FXExpression)\n");
   if(orig.code!=initial){
     dupElms(code,orig.code,GETARG(orig.code));
     }
@@ -1055,7 +1055,7 @@ FXExpression::FXExpression(const FXExpression& orig):code(EMPTY){
 
 // Compile expression from pattern; fail if error
 FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpression::Error* error):code(EMPTY){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression,variables,error));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression,variables,error);
   FXExpression::Error err=parse(expression,variables);
   if(error){ *error=err; }
   }
@@ -1063,7 +1063,7 @@ FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXEx
 
 // Compile expression from pattern; fail if error
 FXExpression::FXExpression(const FXString& expression,const FXchar* variables,FXExpression::Error* error):code(EMPTY){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables,error));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables,error);
   FXExpression::Error err=parse(expression.text(),variables);
   if(error){ *error=err; }
   }
@@ -1071,7 +1071,7 @@ FXExpression::FXExpression(const FXString& expression,const FXchar* variables,FX
 
 // Compile expression from pattern; fail if error
 FXExpression::FXExpression(const FXString& expression,const FXString& variables,FXExpression::Error* error):code(EMPTY){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables.text(),error));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables.text(),error);
   FXExpression::Error err=parse(expression.text(),variables.text());
   if(error){ *error=err; }
   }
@@ -1100,7 +1100,7 @@ FXExpression& FXExpression::operator=(const FXExpression& orig){
 FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* variables){
   FXExpression::Error err=FXExpression::ErrEmpty;
 
-  FXTRACE((TOPIC_DETAIL,"Expression::parse(%s,%p)\n",expression,variables));
+  FXTRACE(TOPIC_DETAIL,"Expression::parse(%s,%p)\n",expression,variables);
 
   // Free old code, if any
   clear();
@@ -1432,7 +1432,7 @@ void FXExpression::clear(){
 
 // Clean up
 FXExpression::~FXExpression(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::~FXExpression()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXExpression::~FXExpression()\n");
   clear();
   }
 

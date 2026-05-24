@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -84,6 +84,7 @@ protected:
   FXbool               filenameset;             // Filename is set
   FXString             delimiters;              // Text delimiters
   FXString             searchpath;              // Search paths for files
+  FXString             clipped;                 // Clipped (file/path/dir) name
   ShellCommand        *shellCommand;            // Running shell command, if any
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
@@ -334,6 +335,14 @@ public:
   long onCmdMergeUndos(FXObject*,FXSelector,void*);
   long onUpdMergeUndos(FXObject*,FXSelector,void*);
 
+  // Copy filename to clipboard  
+  long onClipboardLost(FXObject*,FXSelector,void*);
+  long onClipboardGained(FXObject*,FXSelector,void*);
+  long onClipboardRequest(FXObject*,FXSelector,void*);
+  long onCmdCopyFilename(FXObject*,FXSelector,void*);
+  long onCmdCopyPathname(FXObject*,FXSelector,void*);
+  long onUpdCopyPathname(FXObject*,FXSelector,void*);
+
   // Shell commands
   long onCmdShellDialog(FXObject*,FXSelector,void*);
   long onUpdShellDialog(FXObject*,FXSelector,void*);
@@ -421,6 +430,8 @@ public:
     ID_SAVE,
     ID_SAVEAS,
     ID_SAVETO,
+    ID_COPY_FILENAME,
+    ID_COPY_PATHNAME,
     ID_FONT,
     ID_HELP,
     ID_WINDOW,
@@ -595,7 +606,7 @@ public:
   TextWindow(Adie* a);
 
   // Create window
-  virtual void create();
+  virtual void create() override;
 
   // Return Adie application
   Adie* getApp() const { return (Adie*)FXMainWindow::getApp(); }
@@ -755,10 +766,10 @@ public:
   void logClear();
 
   // Detach window
-  virtual void detach();
+  virtual void detach() override;
 
   // Close the window, return true if actually closed
-  virtual FXbool close(FXbool notify=false);
+  virtual FXbool close(FXbool notify=false) override;
 
   // Delete text window
   virtual ~TextWindow();

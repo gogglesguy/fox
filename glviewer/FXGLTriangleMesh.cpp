@@ -3,7 +3,7 @@
 *               O p e n G L   T r i a n g l e   M e s h   O b j e c t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -47,7 +47,7 @@ FXIMPLEMENT(FXGLTriangleMesh,FXGLShape,nullptr,0)
 
 // Create cube
 FXGLTriangleMesh::FXGLTriangleMesh():vertexBuffer(nullptr),colorBuffer(nullptr),normalBuffer(nullptr),textureBuffer(nullptr),vertexNumber(0){
-  FXTRACE((100,"FXGLTriangleMesh::FXGLTriangleMesh\n"));
+  FXTRACE(100,"FXGLTriangleMesh::FXGLTriangleMesh\n");
   range.lower.x=range.upper.x=0.0f;
   range.lower.y=range.upper.y=0.0f;
   range.lower.z=range.upper.z=0.0f;
@@ -58,7 +58,7 @@ FXGLTriangleMesh::FXGLTriangleMesh():vertexBuffer(nullptr),colorBuffer(nullptr),
 FXGLTriangleMesh::FXGLTriangleMesh(FXfloat x,FXfloat y,FXfloat z,FXint nv,FXfloat *v,FXfloat *n,FXfloat *c,FXfloat *t):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),
   vertexBuffer(v),colorBuffer(c),normalBuffer(n),textureBuffer(t),vertexNumber(nv){
-  FXTRACE((100,"FXGLTriangleMesh::FXGLTriangleMesh\n"));
+  FXTRACE(100,"FXGLTriangleMesh::FXGLTriangleMesh\n");
   if(!normalBuffer){ generatenormals(); }
   recomputerange();
   }
@@ -68,7 +68,7 @@ FXGLTriangleMesh::FXGLTriangleMesh(FXfloat x,FXfloat y,FXfloat z,FXint nv,FXfloa
 FXGLTriangleMesh::FXGLTriangleMesh(FXfloat x,FXfloat y,FXfloat z,FXint nv,FXfloat *v,FXfloat *n,FXfloat *c,FXfloat *t,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),
   vertexBuffer(v),colorBuffer(c),normalBuffer(n),textureBuffer(t),vertexNumber(nv){
-  FXTRACE((100,"FXGLTriangleMesh::FXGLTriangleMesh\n"));
+  FXTRACE(100,"FXGLTriangleMesh::FXGLTriangleMesh\n");
   if(!normalBuffer){ generatenormals(); }
   recomputerange();
   }
@@ -76,7 +76,7 @@ FXGLTriangleMesh::FXGLTriangleMesh(FXfloat x,FXfloat y,FXfloat z,FXint nv,FXfloa
 
 // Copy constructor
 FXGLTriangleMesh::FXGLTriangleMesh(const FXGLTriangleMesh& orig):FXGLShape(orig){
-  FXTRACE((100,"FXGLTriangleMesh::FXGLTriangleMesh\n"));
+  FXTRACE(100,"FXGLTriangleMesh::FXGLTriangleMesh\n");
   dupElms(vertexBuffer,orig.vertexBuffer,3*orig.vertexNumber);
   dupElms(colorBuffer,orig.colorBuffer,4*orig.vertexNumber);
   dupElms(normalBuffer,orig.normalBuffer,3*orig.vertexNumber);
@@ -242,7 +242,7 @@ void FXGLTriangleMesh::load(FXStream& store){
 
 // Zap object
 FXGLTriangleMesh::~FXGLTriangleMesh(){
-  FXTRACE((100,"FXGLTriangleMesh::~FXGLTriangleMesh\n"));
+  FXTRACE(100,"FXGLTriangleMesh::~FXGLTriangleMesh\n");
   freeElms(vertexBuffer);
   freeElms(colorBuffer);
   freeElms(normalBuffer);

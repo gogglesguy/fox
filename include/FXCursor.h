@@ -3,7 +3,7 @@
 *                         C u r s o r - O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -108,13 +108,13 @@ public:
   FXbool isColor() const;
 
   /// Create cursor
-  virtual void create();
+  virtual void create() override;
 
   /// Detach cursor
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy cursor
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Release pixels buffer if it was owned
   virtual void release();
@@ -126,10 +126,10 @@ public:
   virtual FXbool loadPixels(FXStream& store);
 
   /// Save cursor to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load cursor from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXCursor();

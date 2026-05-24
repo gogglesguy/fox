@@ -3,7 +3,7 @@
 *                         D o c k S i t e   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -108,31 +108,31 @@ public:
   * dock would have if no toolbars need to be moved to other
   * galleys than they would be logically placed.
   */
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /**
   * Return default height.  This is the height the toolbar
   * dock would have if no toolbars need to be moved to other
   * galleys than they would be logically placed.
   */
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /**
   * For a vertically oriented dock site, this computes
   * the total width of all the galleys based on any "wrapping"
   * needed to fit the toolbars on a galley.
   */
-  virtual FXint getWidthForHeight(FXint h);
+  virtual FXint getWidthForHeight(FXint h) override;
 
   /**
   * For a horizontally oriented dock site, this computes
   * the total height of all the galleys based on any "wrapping"
   * needed to fit the toolbars on a galley.
   */
-  virtual FXint getHeightForWidth(FXint w);
+  virtual FXint getHeightForWidth(FXint w) override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Resize toolbar
   virtual void resizeToolBar(FXDockBar* bar,FXint barx,FXint bary,FXint barw,FXint barh);

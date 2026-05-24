@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -52,7 +52,7 @@ FXColor colorFromVec4f(const FXVec4f& vec){
   // Assign to output
   return _mm_cvtsi128_si32(bbbb);
   }
- 
+
 
 // Convert from color to vector
 FXVec4f colorToVec4f(FXColor clr){

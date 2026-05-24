@@ -3,7 +3,7 @@
 *                         M e n u   B a r   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -194,7 +194,7 @@ long FXMenuBar::onMotion(FXObject*,FXSelector,void* ptr){
 
 // Button pressed
 long FXMenuBar::onButtonPress(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onButtonPress %p\n",getClassName(),this);
   handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr);
   return 1;
   }
@@ -203,7 +203,7 @@ long FXMenuBar::onButtonPress(FXObject*,FXSelector,void*){
 // Button released
 long FXMenuBar::onButtonRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* ev=(FXEvent*)ptr;
-  FXTRACE((TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onButtonRelease %p\n",getClassName(),this);
   if(ev->moved){ handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),nullptr); }
   return 1;
   }
@@ -211,7 +211,7 @@ long FXMenuBar::onButtonRelease(FXObject*,FXSelector,void* ptr){
 
 // Unpost the menu
 long FXMenuBar::onCmdUnpost(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DETAIL,"%s::onCmdUnpost %p\n",getClassName(),this);
   if(getFocus()) getFocus()->killFocus();
   //killFocus();
   return 1;

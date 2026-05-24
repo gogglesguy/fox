@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -81,7 +81,7 @@ FXIcon::FXIcon():shape(0),etch(0),transp(0),thresh(382){
 
 // Initialize nicely
 FXIcon::FXIcon(FXApp* a,const FXColor *pix,FXColor clr,FXuint opts,FXint w,FXint h):FXImage(a,pix,opts,w,h),shape(0),etch(0),transp(clr),thresh(382){
-  FXTRACE((TOPIC_CONSTRUCT,"FXIcon::FXIcon %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXIcon::FXIcon %p\n",this);
   }
 
 
@@ -132,7 +132,7 @@ FXshort FXIcon::guessthresh() const {
 void FXIcon::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 
       // Initialize visual
       visual->create();
@@ -180,7 +180,7 @@ void FXIcon::create(){
 void FXIcon::detach(){
   visual->detach();
   if(xid){
-    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::detach %p\n",getClassName(),this);
     shape=0;
     etch=0;
     xid=0;
@@ -192,7 +192,7 @@ void FXIcon::detach(){
 void FXIcon::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 #ifdef WIN32
       ::DeleteObject(shape);
       ::DeleteObject(etch);
@@ -230,7 +230,7 @@ void FXIcon::render(){
     BITMAPINFO2 bmi;
     HDC hdcmsk;
 
-    FXTRACE((TOPIC_CREATION,"%s::render %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::render %p\n",getClassName(),this);
 
     // Render the image (color) pixels as usual
     FXImage::render();
@@ -355,7 +355,7 @@ void FXIcon::render(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((TOPIC_CREATION,"%s::render shape %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::render shape %p\n",getClassName(),this);
 
     // Render the image pixels
     FXImage::render();
@@ -380,7 +380,7 @@ void FXIcon::render(){
             shminfo.shmaddr=xim->data=(char*)shmat(shminfo.shmid,0,0);
             shminfo.readOnly=false;
             XShmAttach((Display*)getApp()->getDisplay(),&shminfo);
-            FXTRACE((TOPIC_DETAIL,"Bitmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+            FXTRACE(TOPIC_DETAIL,"Bitmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
             }
           }
         }
@@ -405,25 +405,25 @@ void FXIcon::render(){
       // Should have succeeded
       FXASSERT(xim);
 
-      FXTRACE((TOPIC_DETAIL,"bm width = %d\n",xim->width));
-      FXTRACE((TOPIC_DETAIL,"bm height = %d\n",xim->height));
-      FXTRACE((TOPIC_DETAIL,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((TOPIC_DETAIL,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"bm bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"bm depth = %d\n",xim->depth));
-      FXTRACE((TOPIC_DETAIL,"bm bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((TOPIC_DETAIL,"bm bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE(TOPIC_DETAIL,"bm width = %d\n",xim->width);
+      FXTRACE(TOPIC_DETAIL,"bm height = %d\n",xim->height);
+      FXTRACE(TOPIC_DETAIL,"bm format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap");
+      FXTRACE(TOPIC_DETAIL,"bm byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"bm bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"bm bitmap_pad = %d\n",xim->bitmap_pad);
+      FXTRACE(TOPIC_DETAIL,"bm bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"bm depth = %d\n",xim->depth);
+      FXTRACE(TOPIC_DETAIL,"bm bytes_per_line = %d\n",xim->bytes_per_line);
+      FXTRACE(TOPIC_DETAIL,"bm bits_per_pixel = %d\n",xim->bits_per_pixel);
 
       // Fill shape mask
       if(options&IMAGE_OPAQUE){                                 // Opaque image
-        FXTRACE((TOPIC_DETAIL,"Shape rectangle\n"));
+        FXTRACE(TOPIC_DETAIL,"Shape rectangle\n");
         memset(xim->data,0xff,xim->bytes_per_line*height);
         }
       else if(options&(IMAGE_ALPHACOLOR|IMAGE_ALPHAGUESS)){     // Transparent color
-        FXTRACE((TOPIC_DETAIL,"Shape from alpha-color\n"));
+        FXTRACE(TOPIC_DETAIL,"Shape from alpha-color\n");
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
@@ -433,7 +433,7 @@ void FXIcon::render(){
           }
         }
       else{                                                     // Transparency channel
-        FXTRACE((TOPIC_DETAIL,"Shape from alpha-channel\n"));
+        FXTRACE(TOPIC_DETAIL,"Shape from alpha-channel\n");
         img=data;
         for(y=0; y<height; y++){
           for(x=0; x<width; x++){
@@ -497,7 +497,7 @@ void FXIcon::render(){
       // Clean up
 #ifdef HAVE_XSHM_H
       if(shmi){
-        FXTRACE((TOPIC_DETAIL,"Bitmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+        FXTRACE(TOPIC_DETAIL,"Bitmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
         XShmDetach((Display*)getApp()->getDisplay(),&shminfo);
         xim->data=nullptr;
         XDestroyImage(xim);
@@ -521,7 +521,7 @@ void FXIcon::render(){
 void FXIcon::resize(FXint w,FXint h){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((TOPIC_CREATION,"%s::resize(%d,%d) %p\n",getClassName(),w,h,this));
+  FXTRACE(TOPIC_CREATION,"%s::resize(%d,%d) %p\n",getClassName(),w,h,this);
   if(width!=w || height!=h){
 
     // Resize device dependent pixmap
@@ -589,7 +589,7 @@ void FXIcon::resize(FXint w,FXint h){
 
 // Clean up
 FXIcon::~FXIcon(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXIcon::~FXIcon %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXIcon::~FXIcon %p\n",this);
   destroy();
   }
 

@@ -3,7 +3,7 @@
 *             O p e n G L   T r i a n g l e   M e s h   O b j e c t             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,7 +33,7 @@ private:
   FXint      vertexNumber;
 protected:
   FXGLTriangleMesh();
-  virtual void drawshape(FXGLViewer* viewer);
+  virtual void drawshape(FXGLViewer* viewer) override;
   virtual void recomputerange();
   virtual void generatenormals();
 public:
@@ -48,7 +48,7 @@ public:
   FXGLTriangleMesh(const FXGLTriangleMesh& orig);
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Change number of vertices
   void setVertexNumber(FXint nvertices){ vertexNumber=nvertices; }
@@ -81,10 +81,10 @@ public:
   FXfloat* getTextureCoordBuffer() const { return textureBuffer; }
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLTriangleMesh();

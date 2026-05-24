@@ -3,7 +3,7 @@
 *                     G L  R e n d e r i n g   C o n t e x t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -84,13 +84,13 @@ FXIMPLEMENT(FXGLContext,FXId,nullptr,0)
 
 // Make GL context
 FXGLContext::FXGLContext():surface(nullptr),visual(nullptr),shared(nullptr){
-  FXTRACE((TOPIC_CONSTRUCT,"FXGLContext::FXGLContext %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXGLContext::FXGLContext %p\n",this);
   }
 
 
 // Make a GL context
 FXGLContext::FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr):FXId(a),surface(nullptr),visual(vis),shared(shr){
-  FXTRACE((TOPIC_CONSTRUCT,"FXGLContext::FXGLContext %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXGLContext::FXGLContext %p\n",this);
   }
 
 
@@ -98,7 +98,7 @@ FXGLContext::FXGLContext(FXApp *a,FXGLVisual *vis,FXGLContext* shr):FXId(a),surf
 void FXGLContext::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 
       // Got to have a visual
       if(!visual){ fxerror("%s::create: trying to create context without a visual.\n",getClassName()); }
@@ -416,7 +416,7 @@ void FXGLContext::detach(){
   visual->detach();
 #ifdef HAVE_GL_H
   if(xid){
-    FXTRACE((TOPIC_CREATION,"FXGLContext::detach %p\n",this));
+    FXTRACE(TOPIC_CREATION,"FXGLContext::detach %p\n",this);
     surface=nullptr;
     xid=0;
     }
@@ -429,7 +429,7 @@ void FXGLContext::destroy(){
 #ifdef HAVE_GL_H
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"FXGLContext::destroy %p\n",this));
+      FXTRACE(TOPIC_CREATION,"FXGLContext::destroy %p\n",this);
 #ifdef WIN32
       wglDeleteContext((HGLRC)xid);
 #else
@@ -593,7 +593,7 @@ void FXGLContext::load(FXStream& store){
 
 // Close and release any resources
 FXGLContext::~FXGLContext(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXGLContext::~FXGLContext %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXGLContext::~FXGLContext %p\n",this);
   destroy();
   surface=(FXDrawable*)-1L;
   visual=(FXGLVisual*)-1L;
@@ -699,7 +699,7 @@ x:glPixelStorei(GL_UNPACK_SWAP_BYTES,swapbytes);
 FXbool glUseFXFont(FXFont* font,int first,int count,int list){
   FXbool result=false;
   if(!font || !font->id()){ fxerror("glUseFXFont: invalid font.\n"); }
-  FXTRACE((TOPIC_DETAIL,"glUseFXFont: first=%d count=%d list=%d\n",first,count,list));
+  FXTRACE(TOPIC_DETAIL,"glUseFXFont: first=%d count=%d list=%d\n",first,count,list);
 #ifdef HAVE_GL_H
 #ifdef WIN32
   if(wglGetCurrentContext()){

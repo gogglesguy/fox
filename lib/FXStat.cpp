@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -246,7 +246,7 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
           info.modeFlags&=~FXIO::AllWrite;
           }
-        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){ 
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
           info.modeFlags|=FXIO::Device;
           }
         if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)){

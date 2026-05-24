@@ -3,7 +3,7 @@
 *                         T a b   B o o k   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,16 +72,16 @@ public:
   * tab bar will also send a SEL_COMMAND message to its target, containing
   * the currently active tab index in the void pointer.
   */
-  virtual void setCurrent(FXint index,FXbool notify=false);
+  virtual void setCurrent(FXint index,FXbool notify=false) override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
   };
 
 }

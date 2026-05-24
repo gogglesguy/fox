@@ -3,7 +3,7 @@
 *                             F i l e   C l a s s                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -50,25 +50,25 @@ public:
   virtual FXbool open(const FXString& filename,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite);
 
   /// Return true if serial access only
-  virtual FXbool isSerial() const;
+  virtual FXbool isSerial() const override;
 
   /// Get current file position
-  virtual FXlong position() const;
+  virtual FXlong position() const override;
 
   /// Change file position, returning new position from start
-  virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin);
+  virtual FXlong position(FXlong offset,FXuint from=FXIO::Begin) override;
 
   /// Truncate file to size s
-  virtual FXlong truncate(FXlong sz);
+  virtual FXlong truncate(FXlong sz) override;
 
   /// Flush to disk
-  virtual FXbool flush();
+  virtual FXbool flush() override;
 
   /// Test if we're at the end; -1 if error
-  virtual FXint eof();
+  virtual FXint eof() override;
 
   /// Return file size
-  virtual FXlong size();
+  virtual FXlong size() override;
 
   /// Create new (empty) file
   static FXbool create(const FXString& file,FXuint perm=FXIO::AllReadWrite);

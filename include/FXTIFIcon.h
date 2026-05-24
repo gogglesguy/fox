@@ -3,7 +3,7 @@
 *                          T I F F   I c o n   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 Eric Gillet.   All Rights Reserved.                   *
+* Copyright (C) 2001,2026 Eric Gillet.   All Rights Reserved.                   *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,10 +56,10 @@ public:
   FXushort getCodec() const { return codec; }
 
   /// Save pixels into stream in TIFF format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Load pixels from stream in TIFF format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destroy
   virtual ~FXTIFIcon();

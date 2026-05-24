@@ -3,7 +3,7 @@
 *                S p l i t t e r   W i n d o w   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -98,13 +98,13 @@ public:
   FXSplitter(FXComposite* p,FXObject* tgt,FXSelector sel,FXuint opts=SPLITTER_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return size of the panel at index
   FXint getSplit(FXint index) const;
@@ -125,10 +125,10 @@ public:
   FXint getBarSize() const { return barsize; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy splitter
   virtual ~FXSplitter();

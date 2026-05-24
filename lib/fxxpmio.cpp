@@ -3,7 +3,7 @@
 *                          X P M   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -161,7 +161,7 @@ FXbool fxloadXPM(const FXchar **pixels,FXColor*& data,FXint& width,FXint& height
   // Allow more colors for short lookup strings
   if(ncolors>16384) return false;
 
-  //FXTRACE((TOPIC_DETAIL,"fxloadXPM: width=%d height=%d ncolors=%d cpp=%d\n",width,height,ncolors,cpp));
+  //FXTRACE(TOPIC_DETAIL,"fxloadXPM: width=%d height=%d ncolors=%d cpp=%d\n",width,height,ncolors,cpp);
 
   // Read the color table
   for(c=0; c<ncolors; c++){
@@ -258,7 +258,7 @@ FXbool fxloadXPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Allow more colors for short lookup strings
   if(ncolors>16384) return false;
 
-  //FXTRACE((TOPIC_DETAIL,"fxloadXPM: width=%d height=%d ncolors=%d cpp=%d\n",width,height,ncolors,cpp));
+  //FXTRACE(TOPIC_DETAIL,"fxloadXPM: width=%d height=%d ncolors=%d cpp=%d\n",width,height,ncolors,cpp);
 
   // Read the color table
   for(c=0; c<ncolors; c++){

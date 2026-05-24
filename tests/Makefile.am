@@ -49,6 +49,7 @@ table \
 thread \
 timefmt \
 unicode \
+units \
 variant \
 wizard \
 xml \
@@ -97,11 +98,12 @@ dctest_SOURCES		= dctest.cpp dippy.h
 half_SOURCES		= half.cpp
 match_SOURCES		= match.cpp
 unicode_SOURCES		= unicode.cpp
+units_SOURCES		= units.cpp
 parallel_SOURCES	= parallel.cpp
 variant_SOURCES         = variant.cpp
 math_SOURCES            = math.cpp
 xml_SOURCES             = xml.cpp
-dictest_SOURCES             = dictest.cpp
+dictest_SOURCES         = dictest.cpp
 
 
 

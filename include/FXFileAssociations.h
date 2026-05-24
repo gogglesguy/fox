@@ -3,7 +3,7 @@
 *                        F i l e   A s s o c i a t i o n s                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -230,12 +230,12 @@ public:
   /**
   * Save object to stream.
   */
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /**
   * Load object from stream.
   */
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /**
   * Delete all FileAssoc's, and the IconCache.

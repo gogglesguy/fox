@@ -3,7 +3,7 @@
 *                  U n d o / R e d o - a b l e   C o m m a n d                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -169,13 +169,13 @@ public:
   FXbool empty(){ return command.no()==0; }
 
   /// Undo whole command group
-  virtual void undo();
+  virtual void undo() override;
 
   /// Redo whole command group
-  virtual void redo();
+  virtual void redo() override;
 
   /// Return the size of the command group
-  virtual FXuval size() const;
+  virtual FXuval size() const override;
 
   /// Clear list
   virtual void clear();
@@ -312,12 +312,12 @@ public:
   /**
   * Undo last command. This will move the command to the redo list.
   */
-  virtual void undo();
+  virtual void undo() override;
 
   /**
   * Redo next command. This will move the command back to the undo list.
   */
-  virtual void redo();
+  virtual void redo() override;
 
   /**
   * Undo all commands.
@@ -358,19 +358,19 @@ public:
   * Return name of the first undo command available; if no
   * undo command available this will return the empty string.
   */
-  virtual FXString undoName() const;
+  virtual FXString undoName() const override;
 
   /**
   * Return name of the first redo command available; if no
   * Redo command available this will return the empty string.
   */
-  virtual FXString redoName() const;
+  virtual FXString redoName() const override;
 
   /// Size of undo information
-  virtual FXuval size() const;
+  virtual FXuval size() const override;
 
   /// Clear list
-  virtual void clear();
+  virtual void clear() override;
 
   /// Number of undo records
   FXint undoCount() const { return undocount; }

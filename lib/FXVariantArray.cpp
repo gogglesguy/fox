@@ -3,7 +3,7 @@
 *                           V a r i a n t - A r r a y                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -65,6 +65,7 @@ FXVariantArray::FXVariantArray(const FXVariant& src,FXival n):FXArray<FXVariant>
 // Allocate initialized with array of n objects
 FXVariantArray::FXVariantArray(const FXVariant* src,FXival n):FXArray<FXVariant>(src,n){
   }
+
 
 // Destructor
 FXVariantArray::~FXVariantArray(){

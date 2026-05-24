@@ -3,7 +3,7 @@
 *           W a t c h   D i r e c t o r i e s   f o r   C h a n g e s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -103,13 +103,13 @@ FXIMPLEMENT(FXDirWatch,FXObject,FXDirWatchMap,ARRAYNUMBER(FXDirWatchMap));
 
 // Add handler to application
 FXDirWatch::FXDirWatch(FXApp* a,FXObject* tgt,FXSelector sel):app(a),hnd(BadHandle),timestamp(0),target(tgt),message(sel){
-  FXTRACE((TOPIC_CONSTRUCT,"FXDirWatch::FXDirWatch(%p,%p,%d)\n",a,tgt,sel));
+  FXTRACE(TOPIC_CONSTRUCT,"FXDirWatch::FXDirWatch(%p,%p,%d)\n",a,tgt,sel);
   }
 
 
 // Remove handler from application
 FXDirWatch::~FXDirWatch(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXDirWatch::~FXDirWatch\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXDirWatch::~FXDirWatch\n");
   clearAll();
   app=(FXApp*)-1L;
   target=(FXObject*)-1L;
@@ -130,7 +130,7 @@ const FXuint FILTER=FILE_NOTIFY_CHANGE_FILE_NAME|FILE_NOTIFY_CHANGE_DIR_NAME|FIL
 
 // Add path to watch; return true if added
 FXbool FXDirWatch::addWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text());
   if(!pathToHandle.has(path)){
 #if defined(UNICODE)
     FXnchar unifile[MAXPATHLEN];
@@ -147,7 +147,7 @@ FXbool FXDirWatch::addWatch(const FXString& path){
         app->addInput(this,ID_CHANGE,h,INPUT_READ,(FXptr)h);
         pathToHandle[path]=(FXptr)h;
         handleToPath[(FXptr)h]=path;
-        FXTRACE((TOPIC_DETAIL,"%s -> %d\n",path.text(),h));
+        FXTRACE(TOPIC_DETAIL,"%s -> %d\n",path.text(),h);
         return true;
         }
       }
@@ -158,14 +158,14 @@ FXbool FXDirWatch::addWatch(const FXString& path){
 
 // Remove path to watch; return true if removed
 FXbool FXDirWatch::remWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text());
   if(pathToHandle.has(path)){
     HANDLE h=(HANDLE)pathToHandle[path];
     pathToHandle.remove(path);
     handleToPath.remove((FXptr)h);
     app->removeInput(h,INPUT_READ);
     if(FindCloseChangeNotification(h)!=0){
-      FXTRACE((TOPIC_DETAIL,"%s -> %d\n",path.text(),h));
+      FXTRACE(TOPIC_DETAIL,"%s -> %d\n",path.text(),h);
       return true;
       }
     }
@@ -175,7 +175,7 @@ FXbool FXDirWatch::remWatch(const FXString& path){
 
 // Clear all watches
 FXbool FXDirWatch::clearAll(){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::clearAll\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::clearAll\n");
   if(pathToHandle.used()!=0){
     for(FXint i=0; i<pathToHandle.no(); ++i){
       if(!pathToHandle.empty(i)){
@@ -194,12 +194,12 @@ FXbool FXDirWatch::clearAll(){
 
 // Fire signal message to target
 long FXDirWatch::onMessage(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::onMessage()\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::onMessage()\n");
   FXString pathname;
   HANDLE h=(HANDLE)ptr;
   FindNextChangeNotification(h);
   pathname=handleToPath[(FXptr)h];
-  FXTRACE((TOPIC_DEBUG,"pathname=\"%s\"\n",pathname.text()));
+  FXTRACE(TOPIC_DEBUG,"pathname=\"%s\"\n",pathname.text());
 #if 0
 BOOL ReadDirectoryChangesW(
   HANDLE                          hDirectory,
@@ -258,7 +258,7 @@ const FXuint FILTER_FILE=IN_ATTRIB|IN_DELETE_SELF|IN_MOVE|IN_MODIFY|IN_MOVE_SELF
 
 // Add path to watch; return true if added
 FXbool FXDirWatch::addWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text());
   if(!pathToHandle.has(path)){
     FXStat stat;
     if(FXStat::statFile(path,stat)){
@@ -274,7 +274,7 @@ FXbool FXDirWatch::addWatch(const FXString& path){
         if(h!=BadHandle){
           pathToHandle[path]=(FXptr)(FXival)h;
           handleToPath[(FXptr)(FXival)h]=path;
-          FXTRACE((TOPIC_DETAIL,"FXDirWatch::addWatch(%s) -> %d\n",path.text(),h));
+          FXTRACE(TOPIC_DETAIL,"FXDirWatch::addWatch(%s) -> %d\n",path.text(),h);
           return true;
           }
         }
@@ -286,14 +286,14 @@ FXbool FXDirWatch::addWatch(const FXString& path){
 
 // Remove path to watch; return true if removed
 FXbool FXDirWatch::remWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text());
   if(pathToHandle.has(path)){
     if(hnd!=BadHandle){
       FXInputHandle h=(FXival)pathToHandle[path];
       pathToHandle.remove(path);
       handleToPath.remove((FXptr)(FXival)h);
       if(::inotify_rm_watch(hnd,h)!=BadHandle){
-        FXTRACE((TOPIC_DETAIL,"FXDirWatch::remWatch(%s) -> %d\n",path.text(),h));
+        FXTRACE(TOPIC_DETAIL,"FXDirWatch::remWatch(%s) -> %d\n",path.text(),h);
         if(pathToHandle.used()==0){
           app->removeInput(hnd,INPUT_READ);
           ::close(hnd);
@@ -309,7 +309,7 @@ FXbool FXDirWatch::remWatch(const FXString& path){
 
 // Clear all watches
 FXbool FXDirWatch::clearAll(){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::clearAll\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::clearAll\n");
   if(pathToHandle.used()!=0){
     for(FXint i=0; i<pathToHandle.no(); ++i){
       if(!pathToHandle.empty(i)){
@@ -329,46 +329,46 @@ FXbool FXDirWatch::clearAll(){
 
 // Fire signal message to target
 long FXDirWatch::onMessage(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::onMessage()\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::onMessage()\n");
   FXival expect=0;
   if(0<=::ioctl(hnd,FIONREAD,&expect) && 0<expect){
-    FXTRACE((TOPIC_DEBUG,"expect=%ld\n",expect));
+    FXTRACE(TOPIC_DEBUG,"expect=%ld\n",expect);
     FXchar *ptr;
     if(allocElms(ptr,expect)){
       FXival actual=::read(hnd,ptr,expect);
-      FXTRACE((TOPIC_DEBUG,"actual=%ld\n",actual));
+      FXTRACE(TOPIC_DEBUG,"actual=%ld\n",actual);
       if(0<actual){
         FXchar *end=ptr+actual;
         FXchar *pne=ptr;
         while(pne<end){
           inotify_event* ne=(inotify_event*)pne;
           FXString pathname=FXPath::absolute(handleToPath[(FXptr)(FXival)ne->wd],ne->name);
-          FXTRACE((TOPIC_DEBUG,"wd=%d mask=%x cookie=%u len=%u name=\"%s\" pathname=\"%s\"\n",ne->wd,ne->mask,ne->cookie,ne->len,ne->name,pathname.text()));
-          if(ne->mask&IN_ACCESS)        FXTRACE((TOPIC_DEBUG,"IN_ACCESS "));
-          if(ne->mask&IN_ATTRIB)        FXTRACE((TOPIC_DEBUG,"IN_ATTRIB "));
-          if(ne->mask&IN_CLOSE_NOWRITE) FXTRACE((TOPIC_DEBUG,"IN_CLOSE_NOWRITE "));
-          if(ne->mask&IN_CLOSE_WRITE)   FXTRACE((TOPIC_DEBUG,"IN_CLOSE_WRITE "));
-          if(ne->mask&IN_CREATE)        FXTRACE((TOPIC_DEBUG,"IN_CREATE "));
-          if(ne->mask&IN_DELETE)        FXTRACE((TOPIC_DEBUG,"IN_DELETE "));
-          if(ne->mask&IN_DELETE_SELF)   FXTRACE((TOPIC_DEBUG,"IN_DELETE_SELF "));
-          if(ne->mask&IN_IGNORED)       FXTRACE((TOPIC_DEBUG,"IN_IGNORED "));
-          if(ne->mask&IN_ISDIR)         FXTRACE((TOPIC_DEBUG,"IN_ISDIR "));
-          if(ne->mask&IN_MODIFY)        FXTRACE((TOPIC_DEBUG,"IN_MODIFY "));
-          if(ne->mask&IN_MOVE_SELF)     FXTRACE((TOPIC_DEBUG,"IN_MOVE_SELF "));
-          if(ne->mask&IN_MOVED_FROM)    FXTRACE((TOPIC_DEBUG,"IN_MOVED_FROM "));
-          if(ne->mask&IN_MOVED_TO)      FXTRACE((TOPIC_DEBUG,"IN_MOVED_TO "));
-          if(ne->mask&IN_OPEN)          FXTRACE((TOPIC_DEBUG,"IN_OPEN "));
-          if(ne->mask&IN_Q_OVERFLOW)    FXTRACE((TOPIC_DEBUG,"IN_Q_OVERFLOW "));
-          if(ne->mask&IN_UNMOUNT)       FXTRACE((TOPIC_DEBUG,"IN_UNMOUNT "));
-          FXTRACE((TOPIC_DEBUG,"\n"));
+          FXTRACE(TOPIC_DEBUG,"wd=%d mask=%x cookie=%u len=%u name=\"%s\" pathname=\"%s\"\n",ne->wd,ne->mask,ne->cookie,ne->len,ne->name,pathname.text());
+          if(ne->mask&IN_ACCESS)        FXTRACE(TOPIC_DEBUG,"IN_ACCESS ");
+          if(ne->mask&IN_ATTRIB)        FXTRACE(TOPIC_DEBUG,"IN_ATTRIB ");
+          if(ne->mask&IN_CLOSE_NOWRITE) FXTRACE(TOPIC_DEBUG,"IN_CLOSE_NOWRITE ");
+          if(ne->mask&IN_CLOSE_WRITE)   FXTRACE(TOPIC_DEBUG,"IN_CLOSE_WRITE ");
+          if(ne->mask&IN_CREATE)        FXTRACE(TOPIC_DEBUG,"IN_CREATE ");
+          if(ne->mask&IN_DELETE)        FXTRACE(TOPIC_DEBUG,"IN_DELETE ");
+          if(ne->mask&IN_DELETE_SELF)   FXTRACE(TOPIC_DEBUG,"IN_DELETE_SELF ");
+          if(ne->mask&IN_IGNORED)       FXTRACE(TOPIC_DEBUG,"IN_IGNORED ");
+          if(ne->mask&IN_ISDIR)         FXTRACE(TOPIC_DEBUG,"IN_ISDIR ");
+          if(ne->mask&IN_MODIFY)        FXTRACE(TOPIC_DEBUG,"IN_MODIFY ");
+          if(ne->mask&IN_MOVE_SELF)     FXTRACE(TOPIC_DEBUG,"IN_MOVE_SELF ");
+          if(ne->mask&IN_MOVED_FROM)    FXTRACE(TOPIC_DEBUG,"IN_MOVED_FROM ");
+          if(ne->mask&IN_MOVED_TO)      FXTRACE(TOPIC_DEBUG,"IN_MOVED_TO ");
+          if(ne->mask&IN_OPEN)          FXTRACE(TOPIC_DEBUG,"IN_OPEN ");
+          if(ne->mask&IN_Q_OVERFLOW)    FXTRACE(TOPIC_DEBUG,"IN_Q_OVERFLOW ");
+          if(ne->mask&IN_UNMOUNT)       FXTRACE(TOPIC_DEBUG,"IN_UNMOUNT ");
+          FXTRACE(TOPIC_DEBUG,"\n");
           if(ne->mask&(IN_MOVED_TO|IN_CREATE)){
-            FXTRACE((TOPIC_DEBUG,"SEL_INSERTED \"%s\"\n",pathname.text()));
+            FXTRACE(TOPIC_DEBUG,"SEL_INSERTED \"%s\"\n",pathname.text());
             }
           else if(ne->mask&(IN_DELETE|IN_MOVED_FROM)){
-            FXTRACE((TOPIC_DEBUG,"SEL_DELETED \"%s\"\n",pathname.text()));
+            FXTRACE(TOPIC_DEBUG,"SEL_DELETED \"%s\"\n",pathname.text());
             }
           else if(ne->mask&(IN_ATTRIB)){
-            FXTRACE((TOPIC_DEBUG,"SEL_CHANGED \"%s\"\n",pathname.text()));
+            FXTRACE(TOPIC_DEBUG,"SEL_CHANGED \"%s\"\n",pathname.text());
             }
           pne+=sizeof(inotify_event)+ne->len;
           }
@@ -389,7 +389,7 @@ const FXTime REFRESHINTERVAL=1000000000;
 
 // Add path to watch; return true if added
 FXbool FXDirWatch::addWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::addWatch(%s)\n",path.text());
   if(!pathToHandle.has(path)){
     FXStat stat;
     if(FXStat::statFile(path,stat)){
@@ -406,7 +406,7 @@ FXbool FXDirWatch::addWatch(const FXString& path){
 
 // Remove path to watch; return true if removed
 FXbool FXDirWatch::remWatch(const FXString& path){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text()));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::remWatch(%s)\n",path.text());
   if(pathToHandle.has(path)){
     pathToHandle.remove(path);
     if(pathToHandle.used()==0){
@@ -420,7 +420,7 @@ FXbool FXDirWatch::remWatch(const FXString& path){
 
 // Clear all watches
 FXbool FXDirWatch::clearAll(){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::clearAll()\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::clearAll()\n");
   if(pathToHandle.used()!=0){
     pathToHandle.clear();
     getApp()->removeTimeout(this,ID_CHANGE);
@@ -432,7 +432,7 @@ FXbool FXDirWatch::clearAll(){
 
 // Fire signal message to target
 long FXDirWatch::onMessage(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DEBUG,"FXDirWatch::onMessage()\n"));
+  FXTRACE(TOPIC_DEBUG,"FXDirWatch::onMessage()\n");
   if(pathToHandle.used()!=0){
     FXTime newstamp=0;
     for(FXint i=0; i<pathToHandle.no(); ++i){
@@ -442,11 +442,11 @@ long FXDirWatch::onMessage(FXObject*,FXSelector,void*){
           FXTime time=stat.modified();
           if(newstamp<time) newstamp=time;
           if(timestamp<time){
-            FXTRACE((TOPIC_DETAIL,"SEL_CHANGED \"%s\"\n",pathToHandle.key(i).text()));
+            FXTRACE(TOPIC_DETAIL,"SEL_CHANGED \"%s\"\n",pathToHandle.key(i).text());
             }
           }
         else{
-          FXTRACE((TOPIC_DETAIL,"SEL_DELETED \"%s\"\n",pathToHandle.key(i).text()));
+          FXTRACE(TOPIC_DETAIL,"SEL_DELETED \"%s\"\n",pathToHandle.key(i).text());
           }
         }
       }

@@ -3,7 +3,7 @@
 *                         M e t a C l a s s   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -156,7 +156,7 @@ void FXMetaClass::resize(FXuint slots){
 
 // Constructor adds metaclass to the table
 FXMetaClass::FXMetaClass(const FXchar* name,FXObject *(fac)(),const FXMetaClass* base,const void* ass,FXuint nass,FXuint assz):className(name),manufacture(fac),baseClass(base),assoc(ass),nassocs(nass),assocsz(assz){
-  FXTRACE((TOPIC_CONSTRUCT,"FXMetaClass::FXMetaClass(%s)\n",className));
+  FXTRACE(TOPIC_CONSTRUCT,"FXMetaClass::FXMetaClass(%s)\n",className);
   FXuint p=FXString::hash(className);
   FXuint x=(p<<1)|1;
   if((++metaClassCount<<1) > metaClassSlots){
@@ -244,7 +244,7 @@ FXObject* FXMetaClass::nullObject(){
 
 // Destructor removes metaclass from the table
 FXMetaClass::~FXMetaClass(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXMetaClass::~FXMetaClass(%s)\n",className));
+  FXTRACE(TOPIC_CONSTRUCT,"FXMetaClass::~FXMetaClass(%s)\n",className);
   FXuint p=FXString::hash(className);
   FXuint x=(p<<1)|1;
   while(metaClassTable[p=(p+x)&(metaClassSlots-1)]!=this){

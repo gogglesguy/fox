@@ -3,7 +3,7 @@
 *                       M e n u   C a s c a d e   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -161,7 +161,7 @@ long FXMenuCascade::onButtonRelease(FXObject*,FXSelector,void* ptr){
 long FXMenuCascade::onKeyPress(FXObject*,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(!isEnabled()) return 0;
-  FXTRACE((TOPIC_KEYBOARD,"%s::onKeyPress %p keysym=0x%04x state=%04x\n",getClassName(),this,event->code,event->state));
+  FXTRACE(TOPIC_KEYBOARD,"%s::onKeyPress %p keysym=0x%04x state=%04x\n",getClassName(),this,event->code,event->state);
   if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
   switch(event->code){
     case KEY_Right:
@@ -195,7 +195,7 @@ long FXMenuCascade::onKeyPress(FXObject*,FXSelector sel,void* ptr){
 long FXMenuCascade::onKeyRelease(FXObject*,FXSelector sel,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   if(!isEnabled()) return 0;
-  FXTRACE((TOPIC_KEYBOARD,"%s::onKeyRelease %p keysym=0x%04x state=%04x\n",getClassName(),this,event->code,event->state));
+  FXTRACE(TOPIC_KEYBOARD,"%s::onKeyRelease %p keysym=0x%04x state=%04x\n",getClassName(),this,event->code,event->state);
   if(pane && pane->shown() && pane->handle(pane,sel,ptr)) return 1;
   switch(event->code){
     case KEY_Right:
@@ -213,7 +213,7 @@ long FXMenuCascade::onKeyRelease(FXObject*,FXSelector sel,void* ptr){
 
 // Hot key combination pressed
 long FXMenuCascade::onHotKeyPress(FXObject*,FXSelector,void* ptr){
-  FXTRACE((TOPIC_KEYBOARD,"%s::onHotKeyPress %p\n",getClassName(),this));
+  FXTRACE(TOPIC_KEYBOARD,"%s::onHotKeyPress %p\n",getClassName(),this);
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     handle(this,FXSEL(SEL_COMMAND,ID_POST),nullptr);
@@ -224,7 +224,7 @@ long FXMenuCascade::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 
 // Hot key combination released
 long FXMenuCascade::onHotKeyRelease(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_KEYBOARD,"%s::onHotKeyRelease %p\n",getClassName(),this));
+  FXTRACE(TOPIC_KEYBOARD,"%s::onHotKeyRelease %p\n",getClassName(),this);
   return 1;
   }
 

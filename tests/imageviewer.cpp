@@ -3,7 +3,7 @@
 *                      I m a g e   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -80,7 +80,7 @@ public:
     };
 public:
   ImageWindow(FXApp* a);
-  virtual void create();
+  virtual void create() override;
   FXbool loadimage(const FXString& file);
   FXbool saveimage(const FXString& file);
   virtual ~ImageWindow();
@@ -553,7 +553,7 @@ long ImageWindow::onCmdSave(FXObject*,FXSelector,void*){
 
 // Quit
 long ImageWindow::onCmdQuit(FXObject*,FXSelector,void*){
-  FXTRACE((100,"Quit\n"));
+  FXTRACE(100,"Quit\n");
 
   // Write new window size back to registry
   getApp()->reg().writeIntEntry("SETTINGS","x",getX());

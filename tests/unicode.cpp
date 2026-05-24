@@ -3,7 +3,7 @@
 *                        Unicode  Character  Database  Tests                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2011,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2011,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>

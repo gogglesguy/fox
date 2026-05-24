@@ -3,7 +3,7 @@
 *                           C o l o r   D i a l o g                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,10 +72,10 @@ public:
   FXColorDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Set the color
   void setRGBA(FXColor clr);
@@ -102,10 +102,10 @@ public:
   FXbool isOpaqueOnly() const;
 
   /// Save dialog to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load dialog from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXColorDialog();

@@ -3,7 +3,7 @@
 *                             X M L   S t r i n g   I / O                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2016,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2016,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,27 +56,27 @@ namespace FX {
 
 // Create XML file i/o object
 FXXMLString::FXXMLString(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLString::FXXMLString\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLString::FXXMLString\n");
   }
 
 
 // Create XML file i/o object and open it
 FXXMLString::FXXMLString(const FXString& string,Direction d){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLString::FXXMLString(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLString::FXXMLString(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop");
   open(string,d);
   }
 
 
 // Create XML file i/o object and open it
 FXXMLString::FXXMLString(const FXchar* string,FXuval length,Direction d){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLString::FXXMLString(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLString::FXXMLString(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop");
   open(string,length,d);
   }
 
 
 // Open XML for load or save
 FXbool FXXMLString::open(const FXString& string,Direction d){
-  FXTRACE((TOPIC_DETAIL,"FXXMLString::open(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_DETAIL,"FXXMLString::open(\"%.*s\",%s)\n",(FXint)FXMIN(string.length(),16),string.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop");
   FXASSERT(dir==Stop);
   buffer=string;
   if(FXXML::open(buffer.text(),buffer.length(),d)){
@@ -89,7 +89,7 @@ FXbool FXXMLString::open(const FXString& string,Direction d){
 
 // Open JSON character string of length for direction d
 FXbool FXXMLString::open(const FXchar* string,FXuval length,Direction d){
-  FXTRACE((TOPIC_DETAIL,"FXXMLString::open(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_DETAIL,"FXXMLString::open(\"%.*s\",%lu,%s)\n",(FXint)FXMIN(length,16),string,length,(d==Save)?"Save":(d==Load)?"Load":"Stop");
   FXASSERT(dir==Stop);
   buffer.assign(string,length);
   if(FXXML::open(buffer.text(),buffer.length(),d)){
@@ -129,14 +129,14 @@ FXival FXXMLString::flush(FXival count){
 
 // Close stream and delete buffers
 FXbool FXXMLString::close(){
-  FXTRACE((TOPIC_DETAIL,"FXXMLString::close()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXXMLString::close()\n");
   return FXXML::close();
   }
 
 
 // Close XML stream and clean up.
 FXXMLString::~FXXMLString(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLString::~FXXMLString\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLString::~FXXMLString\n");
   close();
   }
 

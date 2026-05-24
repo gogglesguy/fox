@@ -3,7 +3,7 @@
 *                       U R L   M a n i p u l a t i o n                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -196,8 +196,8 @@ static const FXuchar properties[256]={
   };
 
 
-// URL parts
-class URL {
+// Split URL into parts
+class URLSplit {
 public:
   FXint prot[2];
   FXint user[2];
@@ -208,12 +208,12 @@ public:
   FXint quer[2];
   FXint frag[2];
 public:
-  URL(const FXString& string);
+  URLSplit(const FXString& string);
   };
 
 
 // Parse string to url parts
-URL::URL(const FXString& string){
+URLSplit::URLSplit(const FXString& string){
   FXint s=0;
   FXuchar c;
 
@@ -366,73 +366,9 @@ FXString FXURL::decode(const FXString& url){
 
 /*******************************************************************************/
 
-// Convert path from using 'sepfm' to use 'septo' path-separators
-static FXString convertPathSep(const FXString& file,FXchar septo,FXchar sepfm){
-  if(!file.empty()){
-    FXString result(file);
-    FXint p=0;
-    FXint q=0;
-#if defined(WIN32)
-    if(result[q]==sepfm || result[q]==septo){                   // UNC
-      result[p++]=septo; q++;
-      if(result[q]==sepfm || result[q]==septo){
-        result[p++]=septo; q++;
-        while(result[q]==sepfm || result[q]==septo) q++;
-        }
-      }
-    else if(Ascii::isLetter(result[q]) && result[q+1]==':'){    // C:
-      result[p++]=result[q++];
-      result[p++]=':'; q++;
-      if(result[q]==sepfm || result[q]==septo){
-        result[p++]=septo; q++;
-        while(result[q]==sepfm || result[q]==septo) q++;
-        }
-      }
-    while(result[q]){
-      if(result[q]==sepfm || result[q]==septo){                 // FIXME don't convert escaped path separators!!
-        result[p++]=septo; q++;
-        while(result[q]==sepfm || result[q]==septo) q++;
-        continue;
-        }
-      result[p++]=result[q++];
-      }
-    return result.trunc(p);
-#else
-    if(result[q]==sepfm || result[q]==septo){
-      result[p++]=septo; q++;
-      while(result[q]==sepfm || result[q]==septo) q++;
-      }
-    while(result[q]){
-      if(result[q]==sepfm || result[q]==septo){                 // FIXME don't convert escaped path separators!!
-        result[p++]=septo; q++;
-        while(result[q]==sepfm || result[q]==septo) q++;
-        continue;
-        }
-      result[p++]=result[q++];
-      }
-    return result.trunc(p);
-#endif
-    }
-  return FXString::null;
-  }
-
-
-/*******************************************************************************/
-
-// FIXME check for file share...
-
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
 #ifdef WIN32
-/*
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    return "file:"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://share/path-with-slashes
-    }
-  if(Ascii::isLetter(file[0]) && file[1]==':'){
-    return "file:///"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
-    }
-  return "file://"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://path-with-slashes
-*/
   return "file://"+encode(FXPath::convertFromWindows(file),ENCODE_THESE);
 #else
   return "file://"+encode(file,ENCODE_THESE);                                   // file://path
@@ -444,16 +380,10 @@ FXString FXURL::fileToURL(const FXString& file){
 FXString FXURL::fileFromURL(const FXString& string){
   if(FXString::comparecase(string,"file:",5)==0){
 #ifdef WIN32
-    URL url(string);
-/*
-    if(url.host[0]<url.host[1]){
-      return "\\\\"+string.mid(url.host[0],url.host[1]-url.host[0])+decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
-      }
-    return decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
-*/
+    URLSplit url(string);
     return FXPath::convertToWindows(decode(string.mid(url.path[0],url.path[1]-url.path[0])));
 #else
-    URL url(string);
+    URLSplit url(string);
     return decode(string.mid(url.path[0],url.path[1]-url.path[0]));
 #endif
     }
@@ -494,28 +424,28 @@ FXString* FXURL::filesFromURIList(const FXString& urilist){
 
 // Parse scheme from url
 FXString FXURL::scheme(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.prot[0],url.prot[1]-url.prot[0]);
   }
 
 
 // Parse username from string containing url
 FXString FXURL::username(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.user[0],url.user[1]-url.user[0]);
   }
 
 
 // Parse password from string containing url
 FXString FXURL::password(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.pass[0],url.pass[1]-url.pass[0]);
   }
 
 
 // Parse hostname from string containing url
 FXString FXURL::host(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.host[0],url.host[1]-url.host[0]);
   }
 
@@ -523,7 +453,7 @@ FXString FXURL::host(const FXString& string){
 // Parse port number from string containing url
 FXint FXURL::port(const FXString& string,FXint def){
   FXint result=def;
-  URL url(string);
+  URLSplit url(string);
   if(url.port[0]<url.port[1]){
     result=Ascii::digitValue(string[url.port[0]++]);
     while(url.port[0]<url.port[1]){
@@ -536,21 +466,21 @@ FXint FXURL::port(const FXString& string,FXint def){
 
 // Parse path from string containing url
 FXString FXURL::path(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.path[0],url.path[1]-url.path[0]);
   }
 
 
 // Parse query from string containing url
 FXString FXURL::query(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.quer[0],url.quer[1]-url.quer[0]);
   }
 
 
 // Parse fragment from string containing url
 FXString FXURL::fragment(const FXString& string){
-  URL url(string);
+  URLSplit url(string);
   return string.mid(url.frag[0],url.frag[1]-url.frag[0]);
   }
 

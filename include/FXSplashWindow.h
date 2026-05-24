@@ -3,7 +3,7 @@
 *                            S p l a s h    W i n d o w                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -74,25 +74,25 @@ public:
   FXSplashWindow(FXWindow* ow,FXIcon* ic,FXuint opts=SPLASH_SIMPLE,FXTime ns=2000000000);
 
   /// Create
-  virtual void create();
+  virtual void create() override;
 
   /// Detach
-  virtual void detach();
+  virtual void detach() override;
 
   /// Show splash window
-  virtual void show();
+  virtual void show() override;
 
   /// Show splash window with a given placement
-  virtual void show(FXuint placement);
+  virtual void show(FXuint placement) override;
 
   /// Hide splash window
-  virtual void hide();
+  virtual void hide() override;
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Set the icon for the splash window
   void setIcon(FXIcon* ic);
@@ -107,10 +107,10 @@ public:
   FXTime getDelay() const { return delay; }
 
   /// Save label to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load label from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy splash window
   virtual ~FXSplashWindow();

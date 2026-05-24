@@ -3,7 +3,7 @@
 *               T r i - S t a t e    B u t t o n    W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Charles Warren.   All Rights Reserved.             *
+* Copyright (C) 2002,2026 by Charles Warren.   All Rights Reserved.             *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -58,16 +58,16 @@ public:
   FXTriStateButton(FXComposite* p,const FXString& text1,const FXString& text2,const FXString& text3,FXIcon* icon1=nullptr,FXIcon* icon2=nullptr,FXIcon* icon3=nullptr,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=TOGGLEBUTTON_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change maybe text shown when toggled
   void setMaybeText(const FXString& text);
@@ -94,10 +94,10 @@ public:
   FXString getMaybeTipText() const { return maybetip; }
 
   /// Save toggle button to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load toggle button from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXTriStateButton();

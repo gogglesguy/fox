@@ -3,7 +3,7 @@
 *             T w o - D i m e n s i o n a l   C h a r t   W i d g e t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,7 +36,7 @@ protected:
   FillStyle chartstyle;         // Chart fill style
 protected:
   FX2DChart();
-  virtual void drawSelf(FXDC& dc) const;
+  virtual void drawSelf(FXDC& dc) const override;
 private:
   FX2DChart(const FX2DChart&);
   FX2DChart &operator=(const FX2DChart&);
@@ -61,10 +61,10 @@ public:
   FX2DChart(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=CAPTION_ABOVE|CAPTION_SHOWN,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=4,FXint pr=4,FXint pt=4,FXint pb=4);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Return axis
   FXAxis* getAxis(FXint ax) const { return axes[ax]; }
@@ -76,10 +76,10 @@ public:
   const FillStyle& getChartStyle() const { return chartstyle; }
 
   /// Save chart to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load chart from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FX2DChart();

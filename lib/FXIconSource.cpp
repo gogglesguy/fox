@@ -3,7 +3,7 @@
 *                            I c o n   S o u r c e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -434,7 +434,7 @@ FXImage *FXIconSource::imageFromStream(FXApp* app,FXStream& store) const {
 // Load from file
 FXIcon *FXIconSource::loadIconFile(FXApp* app,const FXString& filename,const FXString& type) const {
   FXIcon *icon=nullptr;
-  FXTRACE((TOPIC_DEBUG,"FXIconSource loadIcon(%s)\n",filename.text()));
+  FXTRACE(TOPIC_DEBUG,"FXIconSource loadIcon(%s)\n",filename.text());
   if(!filename.empty()){
     FXFileStream store;
     if(store.open(filename,FXStreamLoad,65536)){
@@ -484,7 +484,7 @@ FXIcon *FXIconSource::loadIconStream(FXApp* app,FXStream& store,const FXString& 
 // Load from file
 FXImage *FXIconSource::loadImageFile(FXApp* app,const FXString& filename,const FXString& type) const {
   FXImage *image=nullptr;
-  FXTRACE((TOPIC_DEBUG,"FXIconSource loadImage(%s)\n",filename.text()));
+  FXTRACE(TOPIC_DEBUG,"FXIconSource loadImage(%s)\n",filename.text());
   if(!filename.empty()){
     FXFileStream store;
     if(store.open(filename,FXStreamLoad,65536)){

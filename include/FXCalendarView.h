@@ -3,7 +3,7 @@
 *                   B a s e   C a l e n d a r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Sander Jansen.   All Rights Reserved.              *
+* Copyright (C) 2006,2026 by Sander Jansen.   All Rights Reserved.              *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -93,31 +93,31 @@ public:
   FXCalendarView(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=CALENDAR_BROWSESELECT,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Yes we can
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Set focus
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Kill focus
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Enable the window
-  virtual void enable();
+  virtual void enable() override;
 
   /// Disable the window
-  virtual void disable();
+  virtual void disable() override;
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Get date at x,y if any
   FXbool getDateAt(FXint x,FXint y,FXDate& date) const;

@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2026 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -39,8 +39,8 @@ private:
   BZBlock *bz;
   int      ac;
 protected:
-  virtual FXuval writeBuffer(FXuval count);
-  virtual FXuval readBuffer(FXuval count);
+  virtual FXuval writeBuffer(FXuval count) override;
+  virtual FXuval readBuffer(FXuval count) override;
 private:
   FXBZFileStream(const FXBZFileStream&);
   FXBZFileStream& operator=(const FXBZFileStream&);
@@ -56,16 +56,16 @@ public:
   FXbool open(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
   /// Flush buffer
-  virtual FXbool flush();
+  virtual FXbool flush() override;
 
   /// Close file stream
-  virtual FXbool close();
+  virtual FXbool close() override;
 
   /// Get position
   FXlong position() const { return FXStream::position(); }
 
   /// Move to position
-  virtual FXbool position(FXlong,FXWhence){ return false; }
+  virtual FXbool position(FXlong,FXWhence) override;
 
   /// Save single items to stream
   FXBZFileStream& operator<<(const FXuchar& v){ FXStream::operator<<(v); return *this; }

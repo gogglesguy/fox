@@ -3,7 +3,7 @@
 *                          P P M   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -126,7 +126,7 @@ FXbool fxloadPPM(FXStream& store,FXColor*& data,FXint& width,FXint& height){
           if(maxvalue<=0 || maxvalue>=256) return false;
           }
 
-        FXTRACE((TOPIC_DETAIL,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format));
+        FXTRACE(TOPIC_DETAIL,"fxloadPPM: width=%d height=%d type=%c \n",width,height,format);
 
         // Allocate buffer
         if(callocElms(data,npixels)){

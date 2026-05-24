@@ -3,7 +3,7 @@
 *                      B Z F i l e S t r e a m   C l a s s e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Lyle Johnson. All Rights Reserved.                 *
+* Copyright (C) 1999,2026 by Lyle Johnson. All Rights Reserved.                 *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,6 +67,12 @@ FXBZFileStream::FXBZFileStream(const FXObject* cont):FXFileStream(cont),bz(nullp
 // Create and open BZIP2 file stream
 FXBZFileStream::FXBZFileStream(const FXString& filename,FXStreamDirection save_or_load,FXuval size):bz(nullptr),ac(0){
   open(filename,save_or_load,size);
+  }
+
+
+// Move to position
+FXbool FXBZFileStream::position(FXlong,FXWhence){
+  return false;
   }
 
 

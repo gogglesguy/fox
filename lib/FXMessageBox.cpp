@@ -3,7 +3,7 @@
 *                         M e s s a g e   B o x e s                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,7 +56,7 @@
     different ways.
 
   - Added MBOX_SAVE_CANCEL_DONTSAVE dialog from Sander.
-  
+
   - More additions: YES/YES ALL/NO, and YES/ NO/ NO ALL added, very
     useful to avoid repeatedly asking same question over and over.
 */

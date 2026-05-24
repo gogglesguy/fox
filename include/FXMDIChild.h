@@ -3,7 +3,7 @@
 *          M u l t i p l e   D o c u m e n t   C h i l d   W i n d o w          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -164,41 +164,41 @@ public:
   long onCmdGetStringValue(FXObject*,FXSelector,void*);
   long onCmdSetIconValue(FXObject*,FXSelector,void*);
   long onCmdGetIconValue(FXObject*,FXSelector,void*);
-  virtual long onDefault(FXObject*,FXSelector,void*);
+  virtual long onDefault(FXObject*,FXSelector,void*) override;
 public:
 
   /// Construct MDI Child window with given name and icon
   FXMDIChild(FXMDIClient* p,const FXString& name,FXIcon* ic=nullptr,FXPopup* pup=nullptr,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create window
-  virtual void create();
+  virtual void create() override;
 
   /// Detach window
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return the default width of this window
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return the default height of this window
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// MDI Child can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Move this window to the specified position in the parent's coordinates
-  virtual void move(FXint x,FXint y);
+  virtual void move(FXint x,FXint y) override;
 
   /// Resize this window to the specified width and height
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /// Move and resize this window in the parent's coordinates
-  virtual void position(FXint x,FXint y,FXint w,FXint h);
+  virtual void position(FXint x,FXint y,FXint w,FXint h) override;
 
   /// Change normal (restored) position
   void setNormalX(FXint x){ normalPosX=x; }
@@ -292,10 +292,10 @@ public:
   FXFont* getFont() const { return font; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy
   virtual ~FXMDIChild();

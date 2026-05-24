@@ -3,7 +3,7 @@
 *                       S c r o l l A r e a   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -131,13 +131,13 @@ public:
   virtual FXint getVisibleHeight() const;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return true if horizontally scrollable
   FXbool isHorizontalScrollable() const;
@@ -158,10 +158,10 @@ public:
   FXScrollBar* verticalScrollBar() const { return vertical; }
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXScrollArea();

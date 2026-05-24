@@ -3,7 +3,7 @@
 *             R e a l - V a l u e d   S p i n n e r  W i d g e t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Bill Baxter.   All Rights Reserved.                *
+* Copyright (C) 2003,2026 by Bill Baxter.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -94,25 +94,25 @@ public:
   FXRealSpinner(FXComposite *p,FXint cols,FXObject *tgt=nullptr,FXSelector sel=0,FXuint opts=REALSPIN_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Disable spinner
-  virtual void disable();
+  virtual void disable() override;
 
   /// Enable spinner
-  virtual void enable();
+  virtual void enable() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Increment spinner
   void increment(FXbool notify=false);
@@ -235,10 +235,10 @@ public:
   FXint getNumColumns() const;
 
   /// Save spinner to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load spinner from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXRealSpinner();

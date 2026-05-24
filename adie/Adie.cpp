@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -34,7 +34,9 @@
 
 /*
   Notes:
-  - One single collection of icons.
+  - One single collection of icons, shared between all windows.
+  - One list of all parsed syntaxes, shared between all windows.
+  - One collection of file-associations, also shared between all windows.
   - Manage list of open windows.
 */
 
@@ -61,7 +63,7 @@ FXIMPLEMENT(Adie,FXApp,AdieMap,ARRAYNUMBER(AdieMap))
 
 // Make some windows
 Adie::Adie(const FXString& name):FXApp(name){
-  FXTRACE((TOPIC_MAIN,"Adie::Adie(%s)\n",name.text()));
+  FXTRACE(TOPIC_MAIN,"Adie::Adie(%s)\n",name.text());
 
   // File associations, shared between all windows
   associations=new FXFileAssociations(this);
@@ -157,7 +159,7 @@ Adie::Adie(const FXString& name):FXApp(name){
 
 // Clean up the mess
 Adie::~Adie(){
-  FXTRACE((TOPIC_MAIN,"Adie::~Adie()\n"));
+  FXTRACE(TOPIC_MAIN,"Adie::~Adie()\n");
   for(int i=0; i<numSyntaxes(); i++) delete getSyntax(i);
   FXASSERT(numWindows()==0);
   delete associations;
@@ -234,11 +236,11 @@ Adie::~Adie(){
 
 // Get syntax for language name
 Syntax* Adie::getSyntaxByName(const FXString& lang){
-  FXTRACE((TOPIC_DETAIL,"Adie::getSyntaxByName(%s)\n",lang.text()));
+  FXTRACE(TOPIC_DETAIL,"Adie::getSyntaxByName(%s)\n",lang.text());
   if(!lang.empty()){
     for(FXint syn=0; syn<numSyntaxes(); syn++){
       if(FXString::comparecase(getSyntax(syn)->getName(),lang)==0){
-        FXTRACE((TOPIC_DETAIL,"syntaxes[%d]: language: %s matched name: %s!\n",syn,getSyntax(syn)->getName().text(),lang.text()));
+        FXTRACE(TOPIC_DETAIL,"syntaxes[%d]: language: %s matched name: %s!\n",syn,getSyntax(syn)->getName().text(),lang.text());
         return getSyntax(syn);
         }
       }
@@ -249,7 +251,7 @@ Syntax* Adie::getSyntaxByName(const FXString& lang){
 
 // Get syntax by consulting registry
 Syntax* Adie::getSyntaxByRegistry(const FXString& file){
-  FXTRACE((TOPIC_DETAIL,"Adie::getSyntaxByRegistry(%s)\n",file.text()));
+  FXTRACE(TOPIC_DETAIL,"Adie::getSyntaxByRegistry(%s)\n",file.text());
   if(!file.empty()){
     FXString name=FXPath::name(file);
     FXString lang=reg().readStringEntry("SYNTAX",name);
@@ -261,11 +263,11 @@ Syntax* Adie::getSyntaxByRegistry(const FXString& file){
 
 // Get syntax by matching file patterns
 Syntax* Adie::getSyntaxByPattern(const FXString& file){
-  FXTRACE((TOPIC_DETAIL,"Adie::getSyntaxByPattern(%s)\n",file.text()));
+  FXTRACE(TOPIC_DETAIL,"Adie::getSyntaxByPattern(%s)\n",file.text());
   if(!file.empty()){
     for(FXint syn=0; syn<numSyntaxes(); syn++){
       if(getSyntax(syn)->matchFilename(file)){
-        FXTRACE((TOPIC_DETAIL,"syntaxes[%d]: language: %s matched file: %s!\n",syn,getSyntax(syn)->getName().text(),file.text()));
+        FXTRACE(TOPIC_DETAIL,"syntaxes[%d]: language: %s matched file: %s!\n",syn,getSyntax(syn)->getName().text(),file.text());
         return getSyntax(syn);
         }
       }
@@ -276,11 +278,11 @@ Syntax* Adie::getSyntaxByPattern(const FXString& file){
 
 // Get syntax by matching file contents
 Syntax* Adie::getSyntaxByContents(const FXString& contents){
-  FXTRACE((TOPIC_DETAIL,"Adie::getSyntaxByContents(%s)\n",contents.text()));
+  FXTRACE(TOPIC_DETAIL,"Adie::getSyntaxByContents(%s)\n",contents.text());
   if(!contents.empty()){
     for(FXint syn=0; syn<numSyntaxes(); syn++){
       if(getSyntax(syn)->matchContents(contents)){
-        FXTRACE((TOPIC_DETAIL,"syntaxes[%d]: language: %s matched contents: %s!\n",syn,getSyntax(syn)->getName().text(),contents.text()));
+        FXTRACE(TOPIC_DETAIL,"syntaxes[%d]: language: %s matched contents: %s!\n",syn,getSyntax(syn)->getName().text(),contents.text());
         return getSyntax(syn);
         }
       }
@@ -326,10 +328,10 @@ TextWindow* Adie::findWindow(const FXString& file) const {
 
 // Open window on file, creating new one if not already open
 TextWindow* Adie::openFileWindow(const FXString& file,FXbool edit){
-  FXTRACE((TOPIC_DETAIL,"Adie::openFileWindow(%s)\n",file.text()));
+  FXTRACE(TOPIC_DETAIL,"Adie::openFileWindow(%s)\n",file.text());
 
   // See if we already have this file
-  TextWindow * window=findWindow(file);
+  TextWindow* window=findWindow(file);
   if(!window){
 
     // Create new one if no unused windows
@@ -403,31 +405,63 @@ long Adie::onCmdCloseAll(FXObject*,FXSelector,void*){
   return 1;
   }
 
+
+// Parse filename, line number, column number from file:<line>:<column>.
+// Deal with possibility of drive letter, and the minimum file namme being at least
+// one character. Also, ':' may appear elsewhere in filename.
+FXString Adie::parseFileAndLocation(const FXString& string,FXint& line,FXint& col){
+   FXint end=string.length(),ptr=end,beg=1,mx=1,my=1,x=0,y=0,c;
+   line=col=0;
+   if(Ascii::isLetter(string[0]) && string[1]==':') beg=3;
+   while(beg<ptr && Ascii::isDigit((c=string[--ptr]))){
+     x+=(c-'0')*mx;
+     mx*=10;
+     }
+   if(beg<ptr && string[ptr]==':'){
+     end=ptr;
+     line=x;
+     while(beg<ptr && Ascii::isDigit((c=string[--ptr]))){
+       y+=(c-'0')*my;
+       my*=10;
+       }
+     if(beg<ptr && string[ptr]==':'){
+       end=ptr;
+       line=y;
+       col=x;
+       }
+     }
+   return string.left(end);
+   }
+
 /*******************************************************************************/
 
 // Print command line help
 static void printusage(){
-  fxmessage("Usage: adie [options] files...\n");
-  fxmessage("  options:\n");
+  fxmessage("Usage: adie [special-options] [options] files ...\n");
+  fxmessage("  special-options:\n");
   fxmessage("  --help, -h               Print help.\n");
-  fxmessage("  --detach, -d             Detach from terminal.\n");
   fxmessage("  --version                Print version number.\n");
-  fxmessage("  --view                   Start in view-only mode.\n");
-  fxmessage("  --edit                   Start in edit-mode.\n");
-  fxmessage("  --line=NUM               Jump cursor position to line number.\n");
-  fxmessage("  --column=NUM             Jump cursor position to column.\n");
-  fxmessage("  --lang=LANGUAGE          Force language mode.\n");
-  fxmessage("  --size=WxH+X+Y           Force window size and placement.\n");
   fxmessage("  --syntax=SYNTAXFILE      Syntax file (default: Adie.stx).\n");
-  fxmessage("  --iconpath=PATHLIST      Directories to search for icons.\n");
-  fxmessage("  --syntaxpath=PATHLIST    Directories to search for syntax file.\n");
+  fxmessage("  --syntax-path=PATHLIST   Directories to search for syntax file.\n");
+  fxmessage("  --icon-path=PATHLIST     Directories to search for icons.\n");
+  fxmessage("  options:\n");
+  fxmessage("  --view, -v               Start in view-only mode.\n");
+  fxmessage("  --edit, -e               Start in edit-mode.\n");
+  fxmessage("  --line=LINE, -l LINE     Jump cursor position to line.\n");
+  fxmessage("  --column=COL, -c COL     Jump cursor position to column.\n");
+  fxmessage("  --lang=LANGUAGE          Use syntax highlighting language.\n");
+  fxmessage("  --size=WxH+X+Y           Display window with size at given location.\n");
+  fxmessage("  files:\n");
+  fxmessage("    filename.ext           Open filename.\n");
+  fxmessage("    filename.ext:LINE      Open filename at given line.\n");
+  fxmessage("    filename.ext:LINE:COL  Open filename at given line and column.\n");
   }
 
 
 // Print verson info
 static void printversion(){
   fxmessage("A.d.i.e. - ADvanced Interactive Editor %d.%d.%d.\n",VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH);
-  fxmessage("Copyright (C) 2000,2025 Jeroen van der Zijp.  All Rights Reserved.\n\n");
+  fxmessage("Copyright (C) 2000,2026 Jeroen van der Zijp.  All Rights Reserved.\n\n");
   fxmessage("Please visit: http://www.fox-toolkit.org for further information.\n");
   fxmessage("\n");
   fxmessage("This program is free software: you can redistribute it and/or modify\n");
@@ -445,19 +479,6 @@ static void printversion(){
   }
 
 
-// Parse line and column following filename, if any
-static FXString parseFileAndLocation(const FXString& string,FXint& line,FXint& col){
-  FXchar filename[1024];
-  if(string.scan("%1023[^:]:%d:%d",filename,&line,&col)==3){
-    return FXString(filename);
-    }
-  if(string.scan("%1023[^:]:%d",filename,&line)==2){
-    return FXString(filename);
-    }
-  return string;
-  }
-
-
 // Start the application
 FXint Adie::start(int argc,char** argv){
   FXString    name,execpath,iconpath,syntaxfile;
@@ -465,6 +486,7 @@ FXint Adie::start(int argc,char** argv){
   TextWindow *window=nullptr;
   Syntax     *syntax=nullptr;
   FXbool      edit=true;
+  FXbool      back=false;
   FXint       geom=0;
   FXint       winx=0;
   FXint       winy=0;
@@ -492,42 +514,27 @@ FXint Adie::start(int argc,char** argv){
   // Folders where icons may be found
   iconpath=reg().readStringEntry("SETTINGS","iconpath",FXIconCache::defaultIconPath);
 
-  FXTRACE((TOPIC_DETAIL,"execpath=%s\n",execpath.text()));
-  FXTRACE((TOPIC_DETAIL,"iconpath=%s\n",iconpath.text()));
-  FXTRACE((TOPIC_DETAIL,"syntaxpath=%s\n",syntaxpath.text()));
+  FXTRACE(TOPIC_DETAIL,"execpath=%s\n",execpath.text());
+  FXTRACE(TOPIC_DETAIL,"iconpath=%s\n",iconpath.text());
+  FXTRACE(TOPIC_DETAIL,"syntaxpath=%s\n",syntaxpath.text());
 
   // A few boilerplate options before starting
   while(arg<argc){
     if(FXString::compare(argv[arg],"--syntax=",9)==0){
       syntaxfile=argv[arg]+9;
-      arg++;
+      ++arg;
       continue;
       }
-    if(FXString::compare(argv[arg],"--iconpath=",11)==0){
-      iconpath=argv[arg]+11;
-      arg++;
+    if(FXString::compare(argv[arg],"--icon-path=",12)==0){
+      iconpath=argv[arg]+12;
+      ++arg;
       continue;
       }
-    if(FXString::compare(argv[arg],"--syntaxpath=",13)==0){
-      syntaxpath=argv[arg]+13;
-      arg++;
+    if(FXString::compare(argv[arg],"--syntax-path=",14)==0){
+      syntaxpath=argv[arg]+14;
+      ++arg;
       continue;
       }
-/*
-    if(FXString::compare(argv[arg],"--list")==0){
-      FXString* ptr=nullptr;
-      FXint cnt=FXDir::listShares(ptr);
-      fxmessage("shares:\n");
-      if(ptr){
-        for(FXint i=0; i<cnt; ++i){
-          fxmessage("share: %d: %s\n",i,ptr[i]);
-          }
-        delete ptr;
-        }
-      arg++;
-      return 0;
-      }
-*/
     if(FXString::compare(argv[arg],"-h")==0){
       printusage();
       return 0;
@@ -551,7 +558,7 @@ FXint Adie::start(int argc,char** argv){
     syntaxfile=FXPath::search(syntaxpath,"Adie.stx");
     }
 
-  FXTRACE((TOPIC_DETAIL,"syntaxfile=%s\n",syntaxfile.text()));
+  FXTRACE(TOPIC_DETAIL,"syntaxfile=%s\n",syntaxfile.text());
 
   // Load syntax file
   if(!syntaxfile.empty()){
@@ -564,56 +571,75 @@ FXint Adie::start(int argc,char** argv){
   while(arg<argc){
 
     // Open for viewing
+    if(FXString::compare(argv[arg],"-v")==0){
+      edit=false; ++arg;
+      continue;
+      }
+
+    // Open for viewing
     if(FXString::compare(argv[arg],"--view")==0){
-      edit=false;
-      arg++;
+      edit=false; ++arg;
+      continue;
+      }
+
+    // Open for editing
+    if(FXString::compare(argv[arg],"-e")==0){
+      edit=true; ++arg;
       continue;
       }
 
     // Open for editing
     if(FXString::compare(argv[arg],"--edit")==0){
-      edit=true;
-      arg++;
+      edit=true; ++arg;
       continue;
       }
 
-    // Specify language
-    if(FXString::compare(argv[arg],"--lang=",7)==0){
-      syntax=getSyntaxByName(argv[arg]+7);
-      arg++;
-      continue;
-      }
-
-    // Specify window geometry
-    if(FXString::compare(argv[arg],"--size=",7)==0){
-      geom=fxparsegeometry(argv[arg]+7,winx,winy,winw,winh);
-      arg++;
+    // Jump to line after opening
+    if(FXString::compare(argv[arg],"-l")==0){
+      line=strtol(argv[++arg],nullptr,10); ++arg;
       continue;
       }
 
     // Jump to line after opening
     if(FXString::compare(argv[arg],"--line=",7)==0){
-      sscanf(argv[arg]+7,"%d",&line);
-      arg++;
+      line=strtol(argv[arg]+7,nullptr,10); ++arg;
+      continue;
+      }
+
+    // Jump to column after opening
+    if(FXString::compare(argv[arg],"-c")==0){
+      col=strtol(argv[++arg],nullptr,10); ++arg;
       continue;
       }
 
     // Jump to column after opening
     if(FXString::compare(argv[arg],"--column=",9)==0){
-      sscanf(argv[arg]+9,"%d",&col);
-      arg++;
+      col=strtol(argv[arg]+9,nullptr,10); ++arg;
       continue;
       }
 
-    // Parse optional line and column from end of filename
-    name=parseFileAndLocation(argv[arg],line,col);
+    // Specify language
+    if(FXString::compare(argv[arg],"--lang=",7)==0){
+      syntax=getSyntaxByName(argv[arg]+7); ++arg;
+      continue;
+      }
 
-    FXTRACE((TOPIC_DETAIL,"name=%s:%d:%d\n",file.text(),line,col));
+    // Specify window geometry
+    if(FXString::compare(argv[arg],"--size=",7)==0){
+      geom=fxparsegeometry(argv[arg]+7,winx,winy,winw,winh); ++arg;
+      continue;
+      }
 
-    // Get absolute filename
-    file=FXPath::absolute(name);
 
-    FXTRACE((TOPIC_DETAIL,"file=%s\n",file.text()));
+
+    // Get the filename to open from the command line; the name may be followed
+    // by optional line and column to jump to after opening; this is useful for
+    // parsing compiler outputs.
+    // Also convert file to local operating system conventions, and make it
+    // absolute so we know where it came from.
+    file=FXPath::absolute(FXPath::convert(parseFileAndLocation(argv[arg],line,col)));
+
+    FXTRACE(TOPIC_DETAIL,"file=%s\n",file.text());
 
     // Open window
     window=openFileWindow(file,edit);

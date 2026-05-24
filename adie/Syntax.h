@@ -3,7 +3,7 @@
 *                   S y n t a x   H i g h l i g h t   E n g i n e               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -100,10 +100,10 @@ public:
   DefaultRule(const FXString& nam,const FXString& sty,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~DefaultRule();
@@ -125,10 +125,10 @@ public:
   SimpleRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~SimpleRule();
@@ -151,10 +151,10 @@ public:
   BracketRule(const FXString& nam,const FXString& sty,const FXString& brex,const FXString& erex,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~BracketRule();
@@ -176,10 +176,10 @@ public:
   SafeBracketRule(const FXString& nam,const FXString& sty,const FXString& brex,const FXString& erex,const FXString& srex,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~SafeBracketRule();
@@ -201,10 +201,10 @@ public:
   SpanRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~SpanRule();
@@ -227,10 +227,10 @@ public:
   CapturingRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx);
 
   // Stylize text
-  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const;
+  virtual FXint stylize(const FXchar* text,FXchar *textstyle,FXint pos,FXint len) const override;
 
   // Stylize body, i.e. after begin pattern has been seen
-  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const;
+  virtual FXint stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXint len) const override;
 
   // Destructor
   virtual ~CapturingRule();

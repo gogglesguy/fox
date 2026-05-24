@@ -3,7 +3,7 @@
 *                      C a l l b a c k   D i s p a t c h e r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #ifndef FXDISPATCHER_H
 #define FXDISPATCHER_H
@@ -55,36 +55,36 @@ public:
   FXDispatcher();
 
   /// Initialize dispatcher.
-  virtual FXbool init();
+  virtual FXbool init() override;
 
   /// Add callback cb with new handle hnd to watch-list
   virtual FXbool addHandle(HandleCallback cb,FXInputHandle hnd,FXuint mode=InputRead,void* ptr=nullptr);
 
   /// Add new handle hnd to watch-list (no callback)
-  virtual FXbool addHandle(FXInputHandle hnd,FXuint mode=InputRead);
+  virtual FXbool addHandle(FXInputHandle hnd,FXuint mode=InputRead) override;
 
   /// Remove handle hnd from watch-list
-  virtual FXbool remHandle(FXInputHandle hnd);
+  virtual FXbool remHandle(FXInputHandle hnd) override;
 
   /// Return true if handle has been set.
   virtual FXbool hasHandle(FXInputHandle hnd) const;
 
   /// Dispatch handler when handle index is raised.
   /// Return true if the handle was raised and the callback returned true.
-  virtual FXbool dispatchHandle(FXInputHandle hnd,FXuint mode,FXuint flags);
+  virtual FXbool dispatchHandle(FXInputHandle hnd,FXuint mode,FXuint flags) override;
 
   /// Add (optionally asynchronous) callback cb for signal sig to signal-set
   virtual FXbool addSignal(SignalCallback cb,FXint sig,void* ptr=nullptr,FXbool async=false);
 
   /// Add (optionally asynchronous) signal sig to signal-set (no callback)
-  virtual FXbool addSignal(FXint sig,FXbool async=false);
+  virtual FXbool addSignal(FXint sig,FXbool async=false) override;
 
   /// Remove signal from signal-set
-  virtual FXbool remSignal(FXint sig);
+  virtual FXbool remSignal(FXint sig) override;
 
   /// Dispatch a signal handler if signal fired.
   /// Return true if the signal was raised and the callback handler returned true.
-  virtual FXbool dispatchSignal(FXint sig);
+  virtual FXbool dispatchSignal(FXint sig) override;
 
   /// Add timeout callback cb at time due (ns since Epoch).
   /// If callback cb was already set, remove it and return its old
@@ -109,11 +109,11 @@ public:
 
   /// Return time when first timer callback is due.
   /// If no timeout callback is currently set, return forever.
-  virtual FXTime nextTimeout();
+  virtual FXTime nextTimeout() override;
 
   /// Dispatch a timer when due.
   /// Return true if a timer was due and the callback returned true.
-  virtual FXbool dispatchTimeout(FXTime due);
+  virtual FXbool dispatchTimeout(FXTime due) override;
 
   /// Add idle callback be executed when dispatch about to block.
   /// If callback cb was already set, remove it and return its old
@@ -129,10 +129,10 @@ public:
 
   /// Dispatch one idle callback.
   /// Return true if a chore was set and the callback returned true.
-  virtual FXbool dispatchIdle();
+  virtual FXbool dispatchIdle() override;
 
   /// Exit dispatcher.
-  virtual FXbool exit();
+  virtual FXbool exit() override;
 
   /// Destroy dispatcher object.
   virtual ~FXDispatcher();

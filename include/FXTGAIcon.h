@@ -3,7 +3,7 @@
 *                     T A R G A   I c o n   O b j e c t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2026 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -45,10 +45,10 @@ public:
   FXTGAIcon(FXApp* a,const FXuchar *pix=nullptr,FXColor clr=FXRGB(192,192,192),FXuint opts=0,FXint w=1,FXint h=1);
 
   /// Save pixels into stream in TARGA format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Load pixels from stream in TARGA format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destroy icon
   virtual ~FXTGAIcon();

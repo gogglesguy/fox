@@ -3,7 +3,7 @@
 *                      I N I   R e a d e r  &  W r i t e r                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2022,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2022,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -181,20 +181,20 @@ const FXchar *const FXINI::errors[]={
 
 // Construct INIParser serializer
 FXINI::FXINI():offset(0),token(TK_EOF),column(0),line(1),state(ST_DEF),prec(15),fmt(2),esc(0){
-  FXTRACE((TOPIC_CONSTRUCT,"FXINI::FXINI\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXINI::FXINI\n");
   }
 
 
 // Construct and open for loading
 FXINI::FXINI(FXchar* buffer,FXuval sz,Direction d):offset(0),token(TK_EOF),column(0),line(1),state(ST_DEF),prec(16),fmt(2),esc(0){
-  FXTRACE((TOPIC_CONSTRUCT,"FXINI::FXINI(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXINI::FXINI(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop");
   open(buffer,sz,d);
   }
 
 
 // Open INIParser stream for given direction and set its buffer
 FXbool FXINI::open(FXchar* buffer,FXuval sz,Direction d){
-  FXTRACE((TOPIC_DETAIL,"FXINI::open(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop"));
+  FXTRACE(TOPIC_DETAIL,"FXINI::open(%p,%lu,%s)\n",buffer,sz,(d==Save)?"Save":(d==Load)?"Load":"Stop");
   if(FXParseBuffer::open(buffer,sz,d)){
     token=TK_ERROR;
     state=ST_DEF;
@@ -522,7 +522,7 @@ FXINI::Error FXINI::loadVariant(FXVariant& var){
     // Empty section key
     if(sectionkey.empty()) return ErrToken;
 
-    FXTRACE((TOPIC_DEBUG,"sectionkey=[%s]\n",sectionkey.text()));
+    FXTRACE(TOPIC_DEBUG,"sectionkey=[%s]\n",sectionkey.text());
 
     // Next token
     token=next();
@@ -536,7 +536,7 @@ FXINI::Error FXINI::loadVariant(FXVariant& var){
       // Empty entry key
       if(entrykey.empty()) return ErrToken;
 
-      FXTRACE((TOPIC_DEBUG,"entrykey=\"%s\"\n",entrykey.text()));
+      FXTRACE(TOPIC_DEBUG,"entrykey=\"%s\"\n",entrykey.text());
 
       // Next token
       token=next();
@@ -547,7 +547,7 @@ FXINI::Error FXINI::loadVariant(FXVariant& var){
       // Get entry value
       entryvalue=FXString::unescape(rptr,(FXint)(sptr-rptr),'"','"');
 
-      FXTRACE((TOPIC_DEBUG,"entryvalue=\"%s\"\n",entryvalue.text()));
+      FXTRACE(TOPIC_DEBUG,"entryvalue=\"%s\"\n",entryvalue.text());
 
       // Assign to variant
       var[sectionkey][entrykey]=entryvalue;
@@ -562,7 +562,7 @@ FXINI::Error FXINI::loadVariant(FXVariant& var){
 
 // Load a variant
 FXINI::Error FXINI::load(FXVariant& variant){
-  FXTRACE((TOPIC_DETAIL,"FXINI::load(variant)\n"));
+  FXTRACE(TOPIC_DETAIL,"FXINI::load(variant)\n");
   Error err=ErrLoad;
   if(dir==Load){
     token=next();
@@ -739,7 +739,7 @@ FXINI::Error FXINI::saveVariant(const FXVariant& section){
 
 // Save a variant
 FXINI::Error FXINI::save(const FXVariant& variant){
-  FXTRACE((TOPIC_DETAIL,"FXINI::save(variant)\n"));
+  FXTRACE(TOPIC_DETAIL,"FXINI::save(variant)\n");
   Error err=ErrSave;
   if(dir==Save){
     err=saveVariant(variant);
@@ -752,7 +752,7 @@ FXINI::Error FXINI::save(const FXVariant& variant){
 
 // Close json parse buffer
 FXbool FXINI::close(){
-  FXTRACE((TOPIC_DETAIL,"FXINI::close()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXINI::close()\n");
   if(FXParseBuffer::close()){
     return true;
     }
@@ -762,7 +762,7 @@ FXbool FXINI::close(){
 
 // Close stream and clean up
 FXINI::~FXINI(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXINI::~FXINI\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXINI::~FXINI\n");
   close();
   }
 

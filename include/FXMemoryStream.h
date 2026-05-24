@@ -3,7 +3,7 @@
 *                   M e m o r y   S t r e a m   C l a s s e s                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,8 +31,8 @@ namespace FX {
 /// Memory Store Definition
 class FXAPI FXMemoryStream : public FXStream {
 protected:
-  virtual FXuval writeBuffer(FXuval count);
-  virtual FXuval readBuffer(FXuval count);
+  virtual FXuval writeBuffer(FXuval count) override;
+  virtual FXuval readBuffer(FXuval count) override;
 private:
   FXMemoryStream(const FXMemoryStream&);
   FXMemoryStream &operator=(const FXMemoryStream&);
@@ -67,7 +67,7 @@ public:
   FXlong position() const { return FXStream::position(); }
 
   /// Move to position
-  virtual FXbool position(FXlong offset,FXWhence whence=FXFromStart);
+  virtual FXbool position(FXlong offset,FXWhence whence=FXFromStart) override;
 
   /// Save single items to stream
   FXMemoryStream& operator<<(const FXuchar& v){ FXStream::operator<<(v); return *this; }

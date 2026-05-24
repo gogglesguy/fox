@@ -16,6 +16,53 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+May 21 - FOX DEVELOPMENT 1.7.90
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>New unit-conversion facility (FXUnits). Convert from any unit to any other unit with ease;
+FXUnits also knows about prefixes such as k[ilo], m[illi], G[iga], etc. It will automatically
+parse these prefixes and apply the necessary scaling.</li>
+<li>Subtle bug fixed in FXString's number parser; you've probably not run into it, but when
+a number starts with 0, and more digits follow, it was sometimes switching to octal when
+it shouldn't.</li>
+<li>Class FXGlobVisitor has been split off from FXDirVisitor.  FXGlobVisitor, as the name
+suggests, recursively walks directories, filters files and folders based on flags and wildcards.</li>
+<li>FXPath::expand() can now also expand ~user and ~ on Windows.</li>
+<li>FXSystem::getUserDirectory() improved for Windows port.</li>
+<li>Starting with version 1.7.90, FOX no longer uses Windows Registry; instead, it writes
+its files in user-friendly .ini format, under normally hidden APPDATA directory; this
+makes copying configurations between Windows and Linux much easier, and also allows hand-editing
+some configurations.</li>
+<li>Adie text editor tries a bit harder trying to find files in "Open Selected", using new
+parseFileAndLocation() routine. It handles drive-letters better on Windows as well.</li>
+<li>FXASSERT_STATIC() has been renamed FXSTATIC_ASSERT(). It maps to corresponding C++
+static_assert() if your compiler supports it.</li>
+<li>FXTRACE() macro has been enhanced to use VA_ARGS feature in C/C++ preprocessor; thus,
+it no longer needs double parentheses!</li>
+<li>More work was performed on AARCH64 port; we now have AARCH64 v8.4 processor as well as
+good old Raspberry Pi. You will see more in the future, particularly AARCH64 on Windows!</li>
+<li>FXPath::simplify() was rewritten and no longer has arbitrary limits to path-components</li>
+<li>FXPath general bug fixes and improvements, particularly Windows support has made major
+steps forward.</li>
+<li>FXArray data pointer was not properly aligned for bigger data-types; now, FXArray returns
+data pointer aligned to 16-bytes on 64-bit systems, and 8-bytes on 32-bit systems.</li>
+<li>Small bug in memory-mapping fixed on Windows</li>
+<li>Slight speedup in FXQuat to euler calculations.</li>
+<li>Improvement in FXMat3d, etc. classes</li>
+<li>Last bunch of unsafe strncpy() calls removed from FOX.</li>
+<li>Additional compiler warning enabled, and those new warnings are now mostly fixed.</li>
+<li>FXASSERT() now has a touch of color. Hopefully, you won't see it.</li>
+<li>Print supports binary format (%b), now can write both 0b10101 as well as 0B10101, similar
+to hex support.</li>
+<li>FXRegistry parser is a bit more fanatic about what constitutes correct input.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 Dec 31 - FOX DEVELOPMENT 1.7.89
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -3715,7 +3762,7 @@ Older News
 <tr>
 <td width=100% valign=top id=HEADLINE align=right>
 <img src='art/line.gif' width=100% height=1>
-<font size=-1>Copyright &copy; 1997-2022 Jeroen van der Zijp</font>
+<font size=-1>Copyright &copy; 1997-2026 Jeroen van der Zijp</font>
 </td>
 </tr>
 </table>

@@ -3,7 +3,7 @@
 *                     T h e   A d i e   T e x t   E d i t o r                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -98,6 +98,9 @@
 // Map
 FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,0,TextWindow::onUpdate),
+  FXMAPFUNC(SEL_CLIPBOARD_LOST,0,TextWindow::onClipboardLost),
+  FXMAPFUNC(SEL_CLIPBOARD_GAINED,0,TextWindow::onClipboardGained),
+  FXMAPFUNC(SEL_CLIPBOARD_REQUEST,0,TextWindow::onClipboardRequest),
   FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CLOCKTIME,TextWindow::onClock),
   FXMAPFUNC(SEL_TIMEOUT,TextWindow::ID_CHECKCHANGE,TextWindow::onCheckChange),
   FXMAPFUNC(SEL_FOCUSIN,TextWindow::ID_TEXT,TextWindow::onTextFocus),
@@ -132,6 +135,11 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERT_FILE,TextWindow::onCmdInsertFile),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_EXTRACT_FILE,TextWindow::onUpdHasSelection),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_EXTRACT_FILE,TextWindow::onCmdExtractFile),
+
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_COPY_FILENAME,TextWindow::onCmdCopyFilename),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_COPY_FILENAME,TextWindow::onUpdCopyPathname),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_COPY_PATHNAME,TextWindow::onCmdCopyPathname),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_COPY_PATHNAME,TextWindow::onUpdCopyPathname),
 
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FONT,TextWindow::onCmdFont),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PRINT,TextWindow::onCmdPrint),
@@ -518,11 +526,13 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(filemenu,tr("&Open...\tCtl-O\tOpen a file."),getApp()->openicon,this,ID_OPEN);
   new FXMenuCommand(filemenu,tr("S&witch...\t\tSwitch to other file."),getApp()->switchicon,this,ID_SWITCH);
   new FXMenuCommand(filemenu,tr("&Reload...\t\tReload file from disk."),getApp()->reloadicon,this,ID_RELOAD);
-  new FXMenuCommand(filemenu,tr("Open Selected...  \tCtl-Y\tOpen selected file."),getApp()->openselicon,this,ID_OPEN_SELECTED);
+  new FXMenuCommand(filemenu,tr("Open Selected...  \tCtl-Y\tOpen file from selection or clipboard."),getApp()->openselicon,this,ID_OPEN_SELECTED);
   new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave file to disk."),getApp()->saveicon,this,ID_SAVE);
   new FXMenuCommand(filemenu,tr("Save &As...\tShift-Ctl-S\tSave under a different file name."),getApp()->saveasicon,this,ID_SAVEAS);
   new FXMenuCommand(filemenu,tr("Save &To...\tShift-Ctl-T\tSave copy to a different file name."),getApp()->savetoicon,this,ID_SAVETO);
   new FXMenuCommand(filemenu,tr("Rename To...\t\tGive file a different name."),getApp()->renameicon,this,ID_RENAME);
+  new FXMenuCommand(filemenu,tr("Clip filename\t\tClip name of file to clipboard."),getApp()->copyicon,this,ID_COPY_FILENAME);
+  new FXMenuCommand(filemenu,tr("Clip pathname\t\tClip full path of file to clipboard."),getApp()->copyicon,this,ID_COPY_PATHNAME);
   new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),getApp()->closeicon,this,ID_CLOSE);
   new FXMenuSeparator(filemenu);
   new FXMenuCommand(filemenu,tr("&Insert text from file...\t\tInsert text from file."),getApp()->importicon,this,ID_INSERT_FILE);
@@ -565,7 +575,7 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(editmenu,tr("&Copy\tCtl-C\tCopy selection to clipboard."),getApp()->copyicon,editor,FXText::ID_COPY_SEL);
   new FXMenuCommand(editmenu,tr("Cu&t\tCtl-X\tCut selection to clipboard."),getApp()->cuticon,editor,FXText::ID_CUT_SEL);
   new FXMenuCommand(editmenu,tr("&Paste\tCtl-V\tPaste from clipboard."),getApp()->pasteicon,editor,FXText::ID_PASTE_SEL);
-  new FXMenuCommand(editmenu,tr("&Delete\t\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
+  new FXMenuCommand(editmenu,tr("&Delete\tCtl-K\tDelete selection."),getApp()->deleteicon,editor,FXText::ID_DELETE_SEL);
   new FXMenuSeparator(editmenu);
   new FXMenuCommand(editmenu,tr("Expression\t\tEvaluate selected expression."),getApp()->expressicon,this,ID_EXPRESSION);
   new FXMenuCommand(editmenu,tr("URL Encode\t\tEncode url special characters."),nullptr,this,ID_URL_ENCODE);
@@ -641,14 +651,14 @@ void TextWindow::createMenubar(){
 
   // Tabs menu
   tabsmenu=new FXMenuPane(this);
-  new FXMenuRadio(tabsmenu,"1\t\tSet tab to one column.",this,ID_TABSELECT_1);
-  new FXMenuRadio(tabsmenu,"2\t\tSet tab to two columns.",this,ID_TABSELECT_2);
-  new FXMenuRadio(tabsmenu,"3\t\tSet tab to three columns.",this,ID_TABSELECT_3);
-  new FXMenuRadio(tabsmenu,"4\t\tSet tab to four columns.",this,ID_TABSELECT_4);
-  new FXMenuRadio(tabsmenu,"5\t\tSet tab to five columns.",this,ID_TABSELECT_5);
-  new FXMenuRadio(tabsmenu,"6\t\tSet tab to six columns.",this,ID_TABSELECT_6);
-  new FXMenuRadio(tabsmenu,"7\t\tSet tab to seven columns.",this,ID_TABSELECT_7);
-  new FXMenuRadio(tabsmenu,"8\t\tSet tab to eight columns.",this,ID_TABSELECT_8);
+  new FXMenuRadio(tabsmenu,tr("1\t\tSet tab to one column."),this,ID_TABSELECT_1);
+  new FXMenuRadio(tabsmenu,tr("2\t\tSet tab to two columns."),this,ID_TABSELECT_2);
+  new FXMenuRadio(tabsmenu,tr("3\t\tSet tab to three columns."),this,ID_TABSELECT_3);
+  new FXMenuRadio(tabsmenu,tr("4\t\tSet tab to four columns."),this,ID_TABSELECT_4);
+  new FXMenuRadio(tabsmenu,tr("5\t\tSet tab to five columns."),this,ID_TABSELECT_5);
+  new FXMenuRadio(tabsmenu,tr("6\t\tSet tab to six columns."),this,ID_TABSELECT_6);
+  new FXMenuRadio(tabsmenu,tr("7\t\tSet tab to seven columns."),this,ID_TABSELECT_7);
+  new FXMenuRadio(tabsmenu,tr("8\t\tSet tab to eight columns."),this,ID_TABSELECT_8);
 
   // Shell Menu
   shellmenu=new FXMenuPane(this);
@@ -752,7 +762,7 @@ void TextWindow::createToolbar(){
   // Toobar buttons: File manipulation
   new FXButton(toolbar,tr("\tNew\tCreate new document."),getApp()->newicon,this,ID_NEW,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tNew File\tCreate new file."),getApp()->newfileicon,this,ID_NEW_FILE,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
-  new FXButton(toolbar,tr("\tOpen Selected\tOpen selected file."),getApp()->openselicon,this,ID_OPEN_SELECTED,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tOpen Selected\tOpen file from selection or clipboard."),getApp()->openselicon,this,ID_OPEN_SELECTED,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tOpen\tOpen a file."),getApp()->openicon,this,ID_OPEN,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tSave\tSave file to disk."),getApp()->saveicon,this,ID_SAVE,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tSave As\tSave under a different file name."),getApp()->saveasicon,this,ID_SAVEAS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
@@ -1023,18 +1033,20 @@ FXString TextWindow::getSearchPath() const {
 // The searchpath may contain both absolute and relative directories.
 // Relative directories are interpreted relative to the one containing
 // the current file; for example "../include:../lib:/usr/include".
-FXString TextWindow::searchForFile(const FXString& file){
-  if(!file.empty()){
+FXString TextWindow::searchForFile(const FXString& name){
+  if(!name.empty()){
+    FXString file(FXPath::convert(name));
     FXString base(FXPath::directory(getFilename()));
     FXString path(FXPath::absolute(base,file));
+    FXint beg=0,end=0;
     if(FXStat::exists(path)) return path;
-    for(FXint beg=0,end=0; searchpath[beg]; beg=end){
-      while(searchpath[beg]==PATHLISTSEP) beg++;
-      end=beg;
-      while(searchpath[end] && searchpath[end]!=PATHLISTSEP) end++;
-      if(beg==end) break;
-      path=FXPath::absolute(FXPath::absolute(base,FXPath::expand(searchpath.mid(beg,end-beg))),file);
-      if(FXStat::exists(path)) return path;
+    while(end<searchpath.length()){
+      while(end<searchpath.length() && searchpath[end]!=PATHLISTSEP) ++end;
+      if(beg<end){
+        path=FXPath::absolute(FXPath::absolute(base,FXPath::expand(searchpath.mid(beg,end-beg))),file);
+        if(FXStat::exists(path)) return path;
+        }
+      beg=++end;
       }
     }
   return FXString::null;
@@ -1777,7 +1789,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",nullptr,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s %s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2025 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,__TIME__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s %s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2026 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,__TIME__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),nullptr,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1837,6 +1849,86 @@ long TextWindow::onUpdHasSelection(FXObject* sender,FXSelector,void*){
   return 1;
   }
 
+
+// We lost the selection somehow
+long TextWindow::onClipboardLost(FXObject* sender,FXSelector sel,void* ptr){
+  FXMainWindow::onClipboardLost(sender,sel,ptr);
+  clipped=FXString::null;
+  return 1;
+  }
+
+
+// We now really do have the selection
+long TextWindow::onClipboardGained(FXObject* sender,FXSelector sel,void* ptr){
+  FXMainWindow::onClipboardGained(sender,sel,ptr);
+  return 1;
+  }
+
+
+// Somebody wants our selection
+long TextWindow::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
+  FXEvent *event=(FXEvent*)ptr;
+
+  // Try handling it in base class first
+  if(FXMainWindow::onClipboardRequest(sender,sel,ptr)) return 1;
+
+  // Requested data from clipboard
+  if(event->target==stringType || event->target==textType || event->target==utf8Type || event->target==utf16Type){
+    FXString string=clipped;
+
+    // Expand newlines to CRLF on Windows
+#ifdef WIN32
+    unixToDos(string);
+#endif
+
+    // Return clipped text as as UTF-8
+    if(event->target==utf8Type){
+      setDNDData(FROM_CLIPBOARD,event->target,string);
+      return 1;
+      }
+
+    // Return clipped text translated to 8859-1
+    if(event->target==stringType || event->target==textType){
+      setDNDData(FROM_CLIPBOARD,event->target,string);
+      return 1;
+      }
+
+    // Return text of the selection translated to UTF-16
+    if(event->target==utf16Type){
+      setDNDData(FROM_CLIPBOARD,event->target,string);
+      return 1;
+      }
+    }
+  return 0;
+  }
+
+
+// Copy the filename
+long TextWindow::onCmdCopyFilename(FXObject*,FXSelector,void*){
+  FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
+  if(acquireClipboard(types,ARRAYNUMBER(types))){
+    clipped=FXPath::name(filename);
+    }
+  return 1;
+  }
+
+
+// Copy the full pathname
+long TextWindow::onCmdCopyPathname(FXObject*,FXSelector,void*){
+  FXDragType types[4]={stringType,textType,utf8Type,utf16Type};
+  if(acquireClipboard(types,ARRAYNUMBER(types))){
+    clipped=FXPath::absolute(filename);
+    }
+  return 1;
+  }
+
+
+// Filename was set already?
+long TextWindow::onUpdCopyPathname(FXObject* sender,FXSelector,void*){
+  sender->handle(this,filenameset?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),nullptr);
+  return 1;
+  }
+
 /*******************************************************************************/
 
 // Before switching to another file or closing the window, check to
@@ -1859,14 +1951,14 @@ FXbool TextWindow::saveChanges(){
     if(0<getFiletime()){
       FXStat info;
 
-      // File on disk was removed or renamed 
+      // File on disk was removed or renamed
       if(!FXStat::statFile(getFilename(),info)){
         answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Was Removed From Disk"),tr("Save file: %s to disk?"),getFilename().text());
         if(answer==MBOX_CLICKED_CANCEL) return false;
         if(answer==MBOX_CLICKED_NO) return true;
         return saveDocAs();
         }
-        
+
       // File was changed on disk since last time
       if(getFiletime()!=info.modified()){
         answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Was Changed On Disk"),tr("Save file: %s to disk?"),getFilename().text());
@@ -1875,7 +1967,7 @@ FXbool TextWindow::saveChanges(){
         return saveDocAs();
         }
       }
-      
+
     // File was modified, save it back to disk
     if(isModified()){
       answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Has Unsaved Changes"),tr("Save file: %s to disk?"),getFilename().text());
@@ -1883,13 +1975,13 @@ FXbool TextWindow::saveChanges(){
       if(answer==MBOX_CLICKED_NO) return true;
       return saveDoc();
       }
-      
+
     // Just save bookmarks and view
     writeBookmarks(getFilename());
     writeView(getFilename());
     return true;
     }
-    
+
   // File was modified, save to new name
   if(isModified()){
     answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Has Unsaved Changes"),tr("Save file: %s to disk?"),getFilename().text());
@@ -2106,10 +2198,8 @@ FXbool TextWindow::openDoc(){
   opendialog.setPatternList(getPatternList());
   opendialog.setCurrentPattern(FXCLAMP(0,patno,opendialog.getNumPatterns()-1));
   opendialog.setFilename(file);
-  //opendialog.showReadOnly(true);
   if(opendialog.execute()){
     file=opendialog.getFilename();
-    //FXbool readonly=opendialog.getReadOnly();
     getApp()->reg().writeIntEntry("File Dialog","pattern",opendialog.getCurrentPattern());
     return openDoc(file);
     }
@@ -2182,8 +2272,8 @@ FXbool TextWindow::switchDoc(const FXString& file){
 FXbool TextWindow::openSelDoc(){
   FXString string;
 
-  // Get selection
-  if(getDNDData(FROM_SELECTION,stringType,string)){
+  // Get filename from selection, or from clipboard
+  if(getDNDData(FROM_SELECTION,stringType,string) || getDNDData(FROM_CLIPBOARD,stringType,string)){
 
     // Its too big, most likely not a file name
     if(string.length()<1024){
@@ -2200,49 +2290,59 @@ FXbool TextWindow::openSelDoc(){
       if(file.empty()){
         FXchar name[1024];
 
-        // Extract name from #include "file.h" syntax
-        if(string.scan("#%*[ \t]include \"%1023[^\"]\"",name)==1){
+        // Filename urls of the form: file:///pathname
+        if(FXString::compare(string,"file://",7)==0){
+          file=searchForFile(FXURL::fileFromURL(string));
+          }
+
+        // Filename extracted from: #include "file.h"
+        else if(string.scan("#%*[ \t]include \"%1023[^\"]\"",name)==1){
           file=searchForFile(name);
           }
 
-        // Extract name from #include <file.h> syntax
+        // Filename extracted from: #include <file.h>
         else if(string.scan("#%*[ \t]include <%1023[^>]>",name)==1){
           file=searchForFile(name);
           }
 
-        // Compiler output in the form <filename>:<number>:<number>: Error message
-        else if(string.scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
-          file=searchForFile(name);
-          }
-
-        // Compiler output in the form <filename>:<number>: Error message
-        else if(string.scan("%1023[^:]:%d",name,&lineno)==2){
-          file=searchForFile(name);
-          }
-
-        // Compiler output in the form <filename>(<number>) : Error message
+        // Filename of the form: filename(<line>): message
         else if(string.scan("%1023[^(](%d)",name,&lineno)==2){
           file=searchForFile(name);
           }
 
-        // Compiler output in the form "<filename>", line <number>: Error message
-        else if(string.scan("\"%1023[^\"]\", line %d",name,&lineno)==2){
-          file=searchForFile(name);
-          }
-
-        // Compiler output in the form ... File = <filename>, Line = <number>
-        else if(string.scan("%*[^:]: %*s File = %1023[^,], Line = %d",name,&lineno)==2){
-          file=searchForFile(name);
-          }
-
-        // Compiler output in the form filename: Other stuff
-        else if(string.scan("%1023[^:]:",name)==1){
-          file=searchForFile(name);
-          }
-
-        // Last straw, maybe dequote it?
+        // File followed by line number and column?
         if(file.empty()){
-          file=FXPath::dequote(string);
+
+          // Filenames of the form: C:pathname:<line>:<column>, C:pathname:<line>, or C:pathname
+          if(Ascii::isLetter(string[0]) && string[1]==':'){
+            if(string.scan("%c%c%1021[^:]:%d:%d",&name[0],&name[1],&name[2],&lineno,&column)==5){
+              file=searchForFile(name);
+              }
+            else if(string.scan("%c%c%1021[^:]:%d",&name[0],&name[1],&name[2],&lineno)==4){
+              file=searchForFile(name);
+              }
+            else if(string.scan("%c%c%1021s",&name[0],&name[1],&name[2])==3){
+              file=searchForFile(name);
+              }
+            }
+
+          // Filenames of the form: pathname:<line>:<column>, pathname:<line>, or pathname
+          else{
+            if(string.scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
+              file=searchForFile(name);
+              }
+            else if(string.scan("%1023[^:]:%d",name,&lineno)==2){
+              file=searchForFile(name);
+              }
+            else if(string.scan("%1023s",name)==1){
+              file=searchForFile(name);
+              }
+            }
+
+          // Shell-safe enquoted filename, perhaps?
+          if(file.empty()){
+            file=searchForFile(FXPath::dequote(string));
+            }
           }
         }
 
@@ -2555,7 +2655,7 @@ long TextWindow::onCmdPrint(FXObject*,FXSelector,void*){
   FXPrinter printer;
   if(dlg.execute()){
     dlg.getPrinter(printer);
-    FXTRACE((TOPIC_COMMAND,"Printer = %s\n",printer.name.text()));
+    FXTRACE(TOPIC_COMMAND,"Printer = %s\n",printer.name.text());
     }
   return 1;
   }
@@ -3718,6 +3818,7 @@ void TextWindow::textAppend(const FXchar* text,FXint len){
   FXint ins=editor->insertText(pos,text,len,true);
   editor->setCursorPos(pos+ins,true);
   editor->makePositionVisible(pos+ins);
+  editor->setModified(true);
   }
 
 
@@ -3815,7 +3916,7 @@ FXbool TextWindow::matchesSelection(const FXString& string,FXint* beg,FXint* end
 
 // Search text
 long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearch()\n"));
+  FXTRACE(TOPIC_COMMAND,"TextWindow::onCmdSearch()\n");
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXSearchDialog searchdialog(this,tr("Search"),&dialogicon);
   FXint    beg[10],end[10],pos,code;
@@ -3902,7 +4003,7 @@ static FXString substitute(const FXString& original,const FXString& replace,FXin
 
 // Replace text
 long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdReplace()\n"));
+  FXTRACE(TOPIC_COMMAND,"TextWindow::onCmdReplace()\n");
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXReplaceDialog replacedialog(this,tr("Replace"),&dialogicon);
   FXint    beg[10],end[10],pos,finish,fm,to,code;
@@ -4074,7 +4175,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
 
 // Search selected
 long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
-  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearchSel()\n"));
+  FXTRACE(TOPIC_COMMAND,"TextWindow::onCmdSearchSel()\n");
   FXString string;
   if(getDNDData(FROM_SELECTION,utf8Type,string)){               // UTF8 string
     searchstring=string;
@@ -4103,7 +4204,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
       if(editor->isPosSelected(pos)) pos=selstart-1;            // Start from selection start-1 if position is selected
       searchflags=(searchflags&~SEARCH_FORWARD)|SEARCH_BACKWARD;
       }
-    FXTRACE((TOPIC_DETAIL,"searchstring=\n\"\"\"\n%s\n\"\"\"\n",searchstring.text()));
+    FXTRACE(TOPIC_DETAIL,"searchstring=\n\"\"\"\n%s\n\"\"\"\n",searchstring.text());
     if(editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
       if(beg[0]!=selstart || end[0]!=selend){
         editor->setAnchorPos(beg[0]);
@@ -4119,7 +4220,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
 
 // Search for next occurence
 long TextWindow::onCmdSearchNext(FXObject*,FXSelector sel,void*){
-  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearchNext()\n"));
+  FXTRACE(TOPIC_COMMAND,"TextWindow::onCmdSearchNext()\n");
   if(!searchstring.empty()){
     FXint selstart=editor->getSelStartPos();
     FXint selend=editor->getSelEndPos();
@@ -4518,7 +4619,7 @@ long TextWindow::onTextFocus(FXObject*,FXSelector,void*){
 long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((TOPIC_DETAIL,"Inserted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE(TOPIC_DETAIL,"Inserted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins);
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4548,7 +4649,7 @@ long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
 long TextWindow::onTextReplaced(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((TOPIC_DETAIL,"Replaced: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE(TOPIC_DETAIL,"Replaced: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins);
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4578,7 +4679,7 @@ long TextWindow::onTextReplaced(FXObject*,FXSelector,void* ptr){
 long TextWindow::onTextDeleted(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((TOPIC_DETAIL,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE(TOPIC_DETAIL,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins);
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4639,7 +4740,7 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuSeparator(&popupmenu);
 
     // Open selected
-    new FXMenuCommand(&popupmenu,tr("Open selected...\t\tOpen selected file."),getApp()->openselicon,this,ID_OPEN_SELECTED);
+    new FXMenuCommand(&popupmenu,tr("Open selected...\t\tOpen file from selection or clipboard."),getApp()->openselicon,this,ID_OPEN_SELECTED);
     new FXMenuSeparator(&popupmenu);
 
     // Switch between open windows
@@ -4722,7 +4823,7 @@ long TextWindow::onCheckChange(FXObject*,FXSelector,void*){
 
         // Check file on disk still exists, or has changed
         if(FXStat::statFile(getFilename(),info)){
-        
+
           // Filetime on disk was changed, i.e. another application changed
           // this file while we were editing it. Offer the user a choice to
           // reload, ignore this one change, or all future changes.
@@ -5345,7 +5446,7 @@ long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
 // Switch syntax
 void TextWindow::setSyntax(Syntax* syn){
   if(syntax!=syn){
-  
+
     // Switch
     syntax=syn;
 
@@ -5382,48 +5483,48 @@ void TextWindow::setSyntax(Syntax* syn){
       if(syntax->getWrapMode()==1) modebits|=(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
       if(syntax->getTabMode()==0) modebits&=~TEXT_NO_TABS;
       if(syntax->getTabMode()==1) modebits|=TEXT_NO_TABS;
-  
+
       // Tab and wrap widths
       if(syntax->getTabWidth()>0) tabwidth=syntax->getTabWidth();
       if(syntax->getWrapWidth()>0) wrapwidth=syntax->getWrapWidth();
-  
+
       // Strip trailing spaces
       if(syntax->getStripSpaces()==0) setStripSpaces(false);
       if(syntax->getStripSpaces()==1) setStripSpaces(true);
-  
+
       // Put back (modified) parameters
       editor->setTextStyle(modebits);
       editor->setTabColumns(tabwidth);
       editor->setWrapColumns(wrapwidth);
       }
-      
+
     // Plain mode
     else{
-    
+
       // Update language setting
       language->setText("---");
-  
+
       // Set styles
       editor->setStyled(false);
       editor->setHiliteStyles(nullptr);
-  
+
       // Delimiters
       editor->setDelimiters(delimiters.text());
-  
+
       // Mode bits
       FXuint modebits=editor->getTextStyle();
       if(autoindent) modebits|=TEXT_AUTOINDENT; else modebits&=~TEXT_AUTOINDENT;
       if(wrapping) modebits|=TEXT_WORDWRAP; else modebits&=~TEXT_WORDWRAP;
       if(fixedwrap) modebits|=TEXT_FIXEDWRAP; else modebits&=~TEXT_FIXEDWRAP;
       if(hardtabs) modebits&=~TEXT_NO_TABS; else modebits|=TEXT_NO_TABS;
-  
+
       // Put back default parameters
       editor->setTextStyle(modebits);
       editor->setTabColumns(tabcols);
       editor->setWrapColumns(wrapcols);
       }
     }
-  
+
   // Restyle buffer
   restyleText();
   }
@@ -5551,7 +5652,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& changed,FXint rule){
 
 // Restyle text after change in buffer
 void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
-  FXTRACE((TOPIC_DETAIL,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
+  FXTRACE(TOPIC_DETAIL,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins);
   if(colorize && syntax){
     FXint tail,changed,affected,beg,end,len,rule,restylejump;
 
@@ -5568,7 +5669,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
     // Scan forward by one context
     end=forwardByContext(changed);
 
-    FXTRACE((TOPIC_DETAIL,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
+    FXTRACE(TOPIC_DETAIL,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text());
 
     FXASSERT(0<=rule && rule<syntax->getNumRules());
 
@@ -5580,7 +5681,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
       // and the range of affected characters where style was changed
       tail=restyleRange(beg,end,affected,rule);
 
-      FXTRACE((TOPIC_DETAIL,"affected=%d beg=%d end=%d tail=%d, rule=%d (%s)\n",affected,beg,end,tail,rule,syntax->getRule(rule)->getName().text()));
+      FXTRACE(TOPIC_DETAIL,"affected=%d beg=%d end=%d tail=%d, rule=%d (%s)\n",affected,beg,end,tail,rule,syntax->getRule(rule)->getName().text());
 
       // Not all colored yet, continue coloring with parent rule from tail
       if(tail<end){

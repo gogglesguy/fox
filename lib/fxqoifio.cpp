@@ -3,7 +3,7 @@
 *                         Q O I F    I n p u t / O u t p u t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2024,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2024,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -283,7 +283,7 @@ FXbool fxloadQOIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
       // Total size
       size=imgwidth*imgheight;
 
-      FXTRACE((TOPIC_DETAIL,"fxloadQOIF: %d x %d\n",width,height));
+      FXTRACE(TOPIC_DETAIL,"fxloadQOIF: %d x %d\n",width,height);
 
       // Proper numbers
       if((channels==3 || channels==4) && (colorspace==0 || colorspace==1)){
@@ -362,7 +362,7 @@ FXbool fxloadQOIF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
             // Loaded tail
             if(tail[7]==1){
-              FXTRACE((TOPIC_DETAIL,"fxloadQOIF: ok\n"));
+              FXTRACE(TOPIC_DETAIL,"fxloadQOIF: ok\n");
               store.swapBytes(swap);
               data=imgdata;
               width=imgwidth;
@@ -407,7 +407,7 @@ FXbool fxsaveQOIF(FXStream& store,const FXColor* data,FXint width,FXint height){
       FXuint   p=0;
       FXuint   h;
 
-      FXTRACE((TOPIC_DETAIL,"fxsaveQOIF: %d x %d\n",width,height));
+      FXTRACE(TOPIC_DETAIL,"fxsaveQOIF: %d x %d\n",width,height);
 
       // Big endian
       store.setBigEndian(true);
@@ -499,7 +499,7 @@ FXbool fxsaveQOIF(FXStream& store,const FXColor* data,FXint width,FXint height){
       // Tail end padding
       store.save(padding,8);
 
-      FXTRACE((TOPIC_DETAIL,"fxsaveQOIF: ok\n"));
+      FXTRACE(TOPIC_DETAIL,"fxsaveQOIF: ok\n");
 
       // Reset byte order
       store.swapBytes(swap);

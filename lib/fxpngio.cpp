@@ -3,7 +3,7 @@
 *                         P N G    I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2024,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2024,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -422,7 +422,7 @@ FXbool PNGDecoder::header(FXStream& store){
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: IHDR crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: IHDR crc mismatch\n");
     return false;
     }
 
@@ -432,17 +432,17 @@ FXbool PNGDecoder::header(FXStream& store){
   totbytes=numbytes*height+height;              // One extra byte/line
   stride=(ch*bitdepth+7)>>3;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: Header:\n"));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: width     = %u\n",width));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: height    = %u\n",height));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: imagetype = %s\n",imagetype==Gray?"Gray":imagetype==RGB?"RGB":imagetype==Indexed?"Indexed":imagetype==GrayAlpha?"GrayAlpha":imagetype==RGBA?"RGBA":"Invalid"));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: channels  = %u\n",ch));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: bitdepth  = %u\n",bitdepth));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: compress  = %u\n",compression));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: filter    = %u\n",filter));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: interlace = %s\n",interlace?"Adam7":"None"));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: stride    = %u\n",stride));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: numbytes  = %u\n",numbytes));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: Header:\n");
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: width     = %u\n",width);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: height    = %u\n",height);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: imagetype = %s\n",imagetype==Gray?"Gray":imagetype==RGB?"RGB":imagetype==Indexed?"Indexed":imagetype==GrayAlpha?"GrayAlpha":imagetype==RGBA?"RGBA":"Invalid");
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: channels  = %u\n",ch);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: bitdepth  = %u\n",bitdepth);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: compress  = %u\n",compression);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: filter    = %u\n",filter);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: interlace = %s\n",interlace?"Adam7":"None");
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: stride    = %u\n",stride);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: numbytes  = %u\n",numbytes);
 
   // Set up interlacing
   if(interlace==Adam7){
@@ -460,16 +460,16 @@ FXbool PNGDecoder::header(FXStream& store){
         intheight[p]=0;
         }
       }
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: intbytes  = %5u %5u %5u %5u %5u %5u %5u\n",intbytes[0],intbytes[1],intbytes[2],intbytes[3],intbytes[4],intbytes[5],intbytes[6]));
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: intwidth  = %5u %5u %5u %5u %5u %5u %5u\n",intwidth[0],intwidth[1],intwidth[2],intwidth[3],intwidth[4],intwidth[5],intwidth[6]));
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: intheight = %5u %5u %5u %5u %5u %5u %5u\n",intheight[0],intheight[1],intheight[2],intheight[3],intheight[4],intheight[5],intheight[6]));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: intbytes  = %5u %5u %5u %5u %5u %5u %5u\n",intbytes[0],intbytes[1],intbytes[2],intbytes[3],intbytes[4],intbytes[5],intbytes[6]);
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: intwidth  = %5u %5u %5u %5u %5u %5u %5u\n",intwidth[0],intwidth[1],intwidth[2],intwidth[3],intwidth[4],intwidth[5],intwidth[6]);
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: intheight = %5u %5u %5u %5u %5u %5u %5u\n",intheight[0],intheight[1],intheight[2],intheight[3],intheight[4],intheight[5],intheight[6]);
     }
 
   // Entire image, with a bit extra for decompression plus decoding
   buffersize=(totbytes*5)/4+(numbytes+1)*2;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: totbytes  = %u\n",totbytes));
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: buffersize= %u\n",buffersize));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: totbytes  = %u\n",totbytes);
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: buffersize= %u\n",buffersize);
 
   // OK?
   return (store.status()==FXStreamOK);
@@ -486,14 +486,14 @@ FXbool PNGDecoder::palette(FXStream& store,FXuint length){
   FXuint chunkcrc=0;
   FXuchar r,g,b;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: PLTE length = %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: PLTE length = %u\n",length);
 
   // Number of colors
   ncolormap=length/3;
 
   // Too many of colors
   if(__unlikely(256<ncolormap)){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: PLTE: unexpected length = %u\n",length));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: PLTE: unexpected length = %u\n",length);
     return false;
     }
 
@@ -511,12 +511,12 @@ FXbool PNGDecoder::palette(FXStream& store,FXuint length){
     colormap[c].a=255;
     }
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: ncolormap = %u\n",ncolormap));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: ncolormap = %u\n",ncolormap);
 
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: PLTE crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: PLTE crc mismatch\n");
     return false;
     }
   return (store.status()==FXStreamOK);
@@ -529,13 +529,13 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
   FXuint   chunkcrc=0;
   FXuchar  x;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD length = %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD length = %u\n",length);
 
   // Grab backcolor
   switch(imagetype){
   case Indexed:
     if(__unlikely(length!=1)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length);
       return false;
       }
     store >> x;
@@ -544,12 +544,12 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
     backGreen=colormap[x].g;
     backBlue=colormap[x].b;
     back=true;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue);
     break;
   case RGB:
   case RGBA:
     if(__unlikely(length!=6)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length);
       return false;
       }
     store >> backRed;
@@ -559,12 +559,12 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
     crc=CRC32::CRC(crc,backGreen);
     crc=CRC32::CRC(crc,backBlue);
     back=true;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue);
     break;
   case Gray:
   case GrayAlpha:
     if(__unlikely(length!=2)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD: unexpected length = %u\n",length);
       return false;
       }
     store >> backRed;
@@ -572,7 +572,7 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
     backBlue=backRed;
     crc=CRC32::CRC(crc,backRed);
     back=true;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD = (%3u %3u %3u)\n",backRed,backGreen,backBlue);
     break;
   default:
     __unreachable();
@@ -581,7 +581,7 @@ FXbool PNGDecoder::background(FXStream& store,FXuint length){
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: bKGD crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: bKGD crc mismatch\n");
     return false;
     }
   return (store.status()==FXStreamOK);
@@ -601,13 +601,13 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
   FXuint   chunkcrc=0;
   FXuchar  x;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS length = %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS length = %u\n",length);
 
   // Grab transparency
   switch(imagetype){
   case Indexed:
     if(__unlikely(length>ncolormap)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length);
       return false;
       }
     for(FXuint c=0; c<length; ++c){
@@ -615,12 +615,12 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
       crc=CRC32::CRC(crc,x);
       colormap[c].a=x;
       }
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: nalphas = %u\n",length));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS: nalphas = %u\n",length);
     break;
   case RGB:
   case RGBA:
     if(__unlikely(length!=6)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length);
       return false;
       }
     store >> alfaRed;
@@ -630,12 +630,12 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
     crc=CRC32::CRC(crc,alfaGreen);
     crc=CRC32::CRC(crc,alfaBlue);
     alfa=true;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue);
     break;
   case Gray:
   case GrayAlpha:
     if(__unlikely(length!=2)){
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS: unexpected length = %u\n",length);
       return false;
       }
     store >> alfaRed;
@@ -643,7 +643,7 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
     alfaBlue=alfaRed;
     crc=CRC32::CRC(crc,alfaRed);
     alfa=true;
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS = (%3u %3u %3u)\n",alfaRed,alfaGreen,alfaBlue);
     break;
   default:
     __unreachable();
@@ -652,7 +652,7 @@ FXbool PNGDecoder::transparency(FXStream& store,FXuint length){
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: tRNS crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: tRNS crc mismatch\n");
     return false;
     }
   return (store.status()==FXStreamOK);
@@ -1396,7 +1396,7 @@ static inline FXuchar predictor(FXshort a,FXshort b,FXshort c){
 
 
 PERFORMANCE_RECORDER(PNGDecoder_decodeLine);
- 
+
 // Decode one line
 static void decodeLine(FXuchar filt,FXuchar* __restrict cur,const FXuchar* __restrict prv,FXuval count,FXuval step){
   PERFORMANCE_COUNTER(PNGDecoder_decodeLine);
@@ -1549,7 +1549,7 @@ FXbool PNGDecoder::data(FXStream& store,FXuint length){
   FXuint chunkcrc=0;
   FXint  zstatus=Z_OK;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: IDAT length: %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: IDAT length: %u\n",length);
 
   // Loop to consume this chunk
   while(0<length){
@@ -1579,17 +1579,17 @@ FXbool PNGDecoder::data(FXStream& store,FXuint length){
       stream.avail_out=stream.next_in-stream.next_out;
       zstatus=inflate(&stream,Z_NO_FLUSH);
       if(zstatus<=Z_ERRNO){
-        FXTRACE((TOPIC_DETAIL,"fxloadPNG: inflate returned: %d\n",zstatus));
+        FXTRACE(TOPIC_DETAIL,"fxloadPNG: inflate returned: %d\n",zstatus);
         return false;
         }
-      FXTRACE((TOPIC_DETAIL,"fxloadPNG: inflated = %u/%u\n",(FXuint)(stream.next_out-buffer),totbytes));
+      FXTRACE(TOPIC_DETAIL,"fxloadPNG: inflated = %u/%u\n",(FXuint)(stream.next_out-buffer),totbytes);
       }
     }
 
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: IDAT crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: IDAT crc mismatch\n");
     return false;
     }
   return (store.status()==FXStreamOK);
@@ -1601,24 +1601,24 @@ FXbool PNGDecoder::end(FXStream& store,FXuint length){
   FXuint crc=CRC32::CRC(~0,IEND);
   FXuint chunkcrc=0;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: IEND length: %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: IEND length: %u\n",length);
 
   // Are we short?
   if((stream.next_out-buffer)<totbytes){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: expected: %u bytes, got only %u\n",totbytes,(FXuint)(stream.next_out-buffer)));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: expected: %u bytes, got only %u\n",totbytes,(FXuint)(stream.next_out-buffer));
     return false;
     }
 
   // Decode
   if(!decode()){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: IEND bad filter selection\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: IEND bad filter selection\n");
     return false;
     }
 
   // Checksum
   store >> chunkcrc;
   if(chunkcrc!=~crc){
-    FXTRACE((TOPIC_DETAIL,"fxloadPNG: IEND crc mismatch\n"));
+    FXTRACE(TOPIC_DETAIL,"fxloadPNG: IEND crc mismatch\n");
     return false;
     }
 
@@ -1665,7 +1665,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
             // Palette
             if(chunkid==PLTE){
               if(!palette(store,chunklength)){
-                FXTRACE((TOPIC_DETAIL,"fxloadPNG: failed to load PLTE\n"));
+                FXTRACE(TOPIC_DETAIL,"fxloadPNG: failed to load PLTE\n");
                 break;
                 }
               continue;
@@ -1674,7 +1674,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
             // Background
             if(chunkid==bKGD){
               if(!background(store,chunklength)){
-                FXTRACE((TOPIC_DETAIL,"fxloadPNG: failed to load bKGD\n"));
+                FXTRACE(TOPIC_DETAIL,"fxloadPNG: failed to load bKGD\n");
                 break;
                 }
               continue;
@@ -1683,7 +1683,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
             // Transparancy
             if(chunkid==tRNS){
               if(!transparency(store,chunklength)){
-                FXTRACE((TOPIC_DETAIL,"fxloadPNG: failed to load tRNS\n"));
+                FXTRACE(TOPIC_DETAIL,"fxloadPNG: failed to load tRNS\n");
                 break;
                 }
               continue;
@@ -1692,7 +1692,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
             // Data
             if(chunkid==IDAT){
               if(!data(store,chunklength)){
-                FXTRACE((TOPIC_DETAIL,"fxloadPNG: failed to load IDAT\n"));
+                FXTRACE(TOPIC_DETAIL,"fxloadPNG: failed to load IDAT\n");
                 break;
                 }
               continue;
@@ -1701,7 +1701,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
             // End
             if(chunkid==IEND){
               if(!end(store,chunklength)){
-                FXTRACE((TOPIC_DETAIL,"fxloadPNG: failed to load IEND\n"));
+                FXTRACE(TOPIC_DETAIL,"fxloadPNG: failed to load IEND\n");
                 break;
                 }
 
@@ -1727,7 +1727,7 @@ FXbool PNGDecoder::load(FXStream& store,FXColor*& output_image,FXint& output_wid
       inflateEnd(&stream);
       }
     }
-  FXTRACE((TOPIC_DETAIL,"fxloadPNG: %s\n\n",result?"ok":"failed"));
+  FXTRACE(TOPIC_DETAIL,"fxloadPNG: %s\n\n",result?"ok":"failed");
   return result;
   }
 
@@ -2434,7 +2434,7 @@ FXbool PNGEncoder::encode(FXuint flags){
       swap(prv,cur);
       }
     }
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: encoded: %u/%u\n",(FXuint)(dst-buffer-buffersize+totbytes),totbytes));
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: encoded: %u/%u\n",(FXuint)(dst-buffer-buffersize+totbytes),totbytes);
   return true;
   }
 
@@ -2479,16 +2479,16 @@ FXbool PNGEncoder::data(FXStream& store){
     stream.avail_out=stream.next_in-stream.next_out;
     zstatus=deflate(&stream,Z_FINISH);          // 92% of the runtime of fsavePNG
     if(zstatus<=Z_ERRNO){
-      FXTRACE((TOPIC_DETAIL,"fxsavePNG: deflate returned: %d\n",zstatus));
+      FXTRACE(TOPIC_DETAIL,"fxsavePNG: deflate returned: %d\n",zstatus);
       return false;
       }
-    FXTRACE((TOPIC_DETAIL,"fxsavePNG: deflated = %u/%u\n",(FXuint)(stream.next_in-buffer-buffersize+totbytes),totbytes));
+    FXTRACE(TOPIC_DETAIL,"fxsavePNG: deflated = %u/%u\n",(FXuint)(stream.next_in-buffer-buffersize+totbytes),totbytes);
     }
 
   // Compute compressed length
   length=(FXuint)(stream.next_out-buffer);
 
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: IDAT len: %u\n",length));
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: IDAT len: %u\n",length);
 
   // Save chunk length and chunk id
   store << length;
@@ -2578,20 +2578,20 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
   totbytes=numbytes*height+height;
   stride=(ch*bitdepth+7)>>3;
 
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: width     = %u\n",width));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: height    = %u\n",height));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: bitdepth  = %u\n",bitdepth));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: imagetype = %s\n",imagetype==Gray?"Gray":imagetype==RGB?"RGB":imagetype==Indexed?"Indexed":imagetype==GrayAlpha?"GrayAlpha":imagetype==RGBA?"RGBA":"Invalid"));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: compress  = %u\n",compression));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: filter    = %u\n",filter));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: interlace = %s\n",interlace?"Adam7":"None"));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: channels  = %u\n",ch));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: totbytes  = %u\n",totbytes));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: numbytes  = %u\n",numbytes));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: stride    = %u\n",stride));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: ncolormap = %u\n",ncolormap));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: mode      = %04b\n",mode));
-  FXTRACE((TOPIC_DETAIL,"fxsavePNG: flags     = %04b\n",flags));
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: width     = %u\n",width);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: height    = %u\n",height);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: bitdepth  = %u\n",bitdepth);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: imagetype = %s\n",imagetype==Gray?"Gray":imagetype==RGB?"RGB":imagetype==Indexed?"Indexed":imagetype==GrayAlpha?"GrayAlpha":imagetype==RGBA?"RGBA":"Invalid");
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: compress  = %u\n",compression);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: filter    = %u\n",filter);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: interlace = %s\n",interlace?"Adam7":"None");
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: channels  = %u\n",ch);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: totbytes  = %u\n",totbytes);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: numbytes  = %u\n",numbytes);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: stride    = %u\n",stride);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: ncolormap = %u\n",ncolormap);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: mode      = %04b\n",mode);
+  FXTRACE(TOPIC_DETAIL,"fxsavePNG: flags     = %04b\n",flags);
 
   // Save header
   if(header(store)){
@@ -2617,7 +2617,7 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
       // Enough space for deflate() totbytes, plus extra lines
       buffersize=deflateBound(&stream,totbytes+(numbytes<<2));
 
-      FXTRACE((TOPIC_DETAIL,"fxsavePNG: buffersize = %u\n",buffersize));
+      FXTRACE(TOPIC_DETAIL,"fxsavePNG: buffersize = %u\n",buffersize);
 
       // Allocate storage
       if(callocElms(buffer,buffersize)){
@@ -2645,7 +2645,7 @@ FXbool PNGEncoder::save(FXStream& store,const FXColor* img,FXint w,FXint h,FXuin
     }
 
   // Successfully saved
-x:FXTRACE((TOPIC_DETAIL,"fxsavePNG: %s\n",result?"ok":"failed"));
+x:FXTRACE(TOPIC_DETAIL,"fxsavePNG: %s\n",result?"ok":"failed");
   return result;
   }
 

@@ -3,7 +3,7 @@
 *                             I N I   F i l e   I / O                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2022,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2022,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,10 +55,10 @@ public:
   FXbool open(const FXString& filename,Direction d=Load,FXuval sz=8192);
 
   /// Read at least count bytes into buffer; return bytes available, or -1 for error
-  virtual FXival fill(FXival count);
+  virtual FXival fill(FXival count) override;
 
   /// Write at least count bytes from buffer; return space available, or -1 for error
-  virtual FXival flush(FXival count);
+  virtual FXival flush(FXival count) override;
 
   /**
   * Close INI file and delete buffers.

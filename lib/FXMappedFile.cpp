@@ -3,7 +3,7 @@
 *                      M a p p e d   F i l e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2023,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2023,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *

@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -115,7 +115,7 @@ static const FXchar mkey[20][3]={
 
 // Traverse files under path and search for pattern in each
 FXuint SearchVisitor::traverse(const FXString& path,const FXString& pattern,const FXString& wild,FXint mode,FXuint opts,FXint depth){
-  FXTRACE((TOPIC_FIND,"SearchVisitor::traverse(path=%s,pattern=%s,wild=%s,mode=%b,opts=%b,depth=%d)\n",path.text(),pattern.text(),wild.text(),mode,opts,depth));
+  FXTRACE(TOPIC_FIND,"SearchVisitor::traverse(path=%s,pattern=%s,wild=%s,mode=%b,opts=%b,depth=%d)\n",path.text(),pattern.text(),wild.text(),mode,opts,depth);
 
   // Compile the pattern
   if(rex.parse(pattern,mode)==FXRex::ErrOK){
@@ -151,7 +151,7 @@ FXuint SearchVisitor::visit(const FXString& path){
 FXint SearchVisitor::searchFile(const FXString& path) const {
   FXString dirpath=FXPath::directory(path);
   FXString text;
-  FXTRACE((TOPIC_FIND,"searchFile(path=%s)\n",path.text()));
+  FXTRACE(TOPIC_FIND,"searchFile(path=%s)\n",path.text());
   dlg->setSearchingText(dirpath);
   if(loadFile(path,text)){
     FXString hit;
@@ -159,7 +159,7 @@ FXint SearchVisitor::searchFile(const FXString& path) const {
     FXint lineno=1;
     FXint column=0;
     FXint pos=0;
-    FXTRACE((TOPIC_FIND,"loadFile(path=%s) -> %d bytes\n",path.text(),text.length()));
+    FXTRACE(TOPIC_FIND,"loadFile(path=%s) -> %d bytes\n",path.text(),text.length());
     while(pos<text.length()){
       if(rex.amatch(text,pos,FXRex::Normal,beg,end,10)){
         for(ls=beg[0]; 0<ls && text[ls-1]!='\n'; --ls){ }               // Back up to line start
@@ -304,7 +304,7 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
 // Load registy
 void FindInFiles::readRegistry(){
-  FXTRACE((TOPIC_FIND,"FindInFiles::readRegistry()\n"));
+  FXTRACE(TOPIC_FIND,"FindInFiles::readRegistry()\n");
   setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
   setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
   firsthit=getApp()->reg().readBoolEntry(sectionName,"firsthit",false);
@@ -324,7 +324,7 @@ void FindInFiles::readRegistry(){
 
 // Save registry
 void FindInFiles::writeRegistry(){
-  FXTRACE((TOPIC_FIND,"FindInFiles::writeRegistry()\n"));
+  FXTRACE(TOPIC_FIND,"FindInFiles::writeRegistry()\n");
   getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
   getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
   getApp()->reg().writeBoolEntry(sectionName,"firsthit",firsthit);
@@ -745,6 +745,26 @@ long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
 long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
   FXint which=(FXint)(FXival)ptr;
   if(0<=which){
+    FXString text(locations->getItem(which)->getText());
+    FXRex    rex("(.*):(\\d+):(\\d+)\t.*\t(.*)",FXRex::Capture|FXRex::Exact);
+    FXint    beg[5],end[5];
+    if(rex.amatch(text,0,FXRex::Normal,beg,end,5)){
+      FXString filename(FXPath::absolute(text.mid(beg[4],end[4]-beg[4]),text.mid(beg[1],end[1]-beg[1])));
+      FXint    lineno(text.mid(beg[2],end[2]-beg[2]).toInt());
+      FXint    column(text.mid(beg[3],end[3]-beg[3]).toInt());
+      TextWindow* window=getApp()->openFileWindow(filename);
+      window->visitLine(lineno,column);
+      window->show(PLACEMENT_DEFAULT);
+      }
+    }
+  return 1;
+  }
+
+/*
+// File list double clicked
+long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
+  FXint which=(FXint)(FXival)ptr;
+  if(0<=which){
     FXchar file[256];
     FXchar directory[1024];
     FXint  lineno=0;
@@ -758,6 +778,7 @@ long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
     }
   return 1;
   }
+*/
 
 /*******************************************************************************/
 

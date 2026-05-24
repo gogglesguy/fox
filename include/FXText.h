@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -235,12 +235,12 @@ protected:
   FXint matchBackward(FXint pos,FXint beg,FXwchar l,FXwchar r,FXint level) const;
   FXint findMatching(FXint pos,FXint beg,FXint end,FXwchar ch,FXint level) const;
   void flashMatching();
-  void moveContents(FXint x,FXint y);
   FXint changeBeg(FXint pos) const;
   FXint changeEnd(FXint pos) const;
   void mutation(FXint pos,FXint ncins,FXint ncdel,FXint nrins,FXint nrdel);
   FXint overstruck(FXint start,FXint end,const FXchar *text,FXint num);
   void drawCursor(FXuint state);
+  virtual void moveContents(FXint x,FXint y) override;
   virtual void paintCursor(FXDCWindow& dc) const;
   virtual void eraseCursor(FXDCWindow& dc) const;
   virtual void eraseCursorOverhang();
@@ -372,9 +372,9 @@ public:
   // Manipulation Selection
   long onCmdCutSel(FXObject*,FXSelector,void*);
   long onCmdCopySel(FXObject*,FXSelector,void*);
+  long onCmdDeleteSel(FXObject*,FXSelector,void*);
   long onCmdPasteSel(FXObject*,FXSelector,void*);
   long onCmdPasteMiddle(FXObject*,FXSelector,void*);
-  long onCmdDeleteSel(FXObject*,FXSelector,void*);
   long onCmdSelectChar(FXObject*,FXSelector,void*);
   long onCmdSelectWord(FXObject*,FXSelector,void*);
   long onCmdSelectLine(FXObject*,FXSelector,void*);
@@ -390,8 +390,8 @@ public:
   long onCmdDeleteChar(FXObject*,FXSelector,void*);
   long onCmdDeleteWord(FXObject*,FXSelector,void*);
   long onCmdDeleteEol(FXObject*,FXSelector,void*);
-  long onCmdDeleteAll(FXObject*,FXSelector,void*);
   long onCmdDeleteLine(FXObject*,FXSelector,void*);
+  long onCmdDeleteAll(FXObject*,FXSelector,void*);
 
   // Control commands
   long onCmdShiftText(FXObject*,FXSelector,void*);
@@ -510,8 +510,8 @@ public:
     ID_DELETE_CHAR,
     ID_DELETE_WORD,
     ID_DELETE_EOL,
-    ID_DELETE_ALL,
     ID_DELETE_LINE,
+    ID_DELETE_ALL,
     ID_TOGGLE_EDITABLE,
     ID_TOGGLE_OVERSTRIKE,
     ID_CURSOR_POS,
@@ -549,55 +549,55 @@ public:
   FXText(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=3,FXint pr=3,FXint pt=2,FXint pb=2);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Get default width
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Get default height
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
 
   /// Return visible scroll-area x position
-  virtual FXint getVisibleX() const;
+  virtual FXint getVisibleX() const override;
 
   /// Return visible scroll-area y position
-  virtual FXint getVisibleY() const;
+  virtual FXint getVisibleY() const override;
 
   /// Return visible scroll-area width
-  virtual FXint getVisibleWidth() const;
+  virtual FXint getVisibleWidth() const override;
 
   /// Return visible scroll-area height
-  virtual FXint getVisibleHeight() const;
+  virtual FXint getVisibleHeight() const override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Enable the text widget
-  virtual void enable();
+  virtual void enable() override;
 
   /// Disable the text widget
-  virtual void disable();
+  virtual void disable() override;
 
   /// Need to recalculate size
-  virtual void recalc();
+  virtual void recalc() override;
 
   /// Returns true because a text widget can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Set modified flag
   void setModified(FXbool mod=true){ modified=mod; }
@@ -1162,10 +1162,10 @@ public:
   FXString getTipText() const { return tip; }
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXText();

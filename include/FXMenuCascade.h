@@ -3,7 +3,7 @@
 *                        M e n u C a s c a d e   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -68,22 +68,22 @@ public:
   FXMenuCascade(FXComposite* p,const FXString& text,FXIcon* ic=nullptr,FXPopup* pup=nullptr,FXuint opts=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Yes it can receive the focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Set popup menu to pop up
   void setMenu(FXPopup *pup){ pane = pup; }
@@ -92,13 +92,13 @@ public:
   FXPopup* getMenu() const { return pane; }
 
   /// True if this menu or is popup logically contains the mouse
-  virtual FXbool contains(FXint parentx,FXint parenty) const;
+  virtual FXbool contains(FXint parentx,FXint parenty) const override;
 
   /// Save menu to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load menu from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXMenuCascade();

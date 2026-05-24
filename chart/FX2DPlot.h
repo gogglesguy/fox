@@ -3,7 +3,7 @@
 *              T w o - D i m e n s i o n a l   P l o t   W i d g e t            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,10 +72,10 @@ public:
   virtual void clearCurves();
 
   /// Save plot to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load plot from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FX2DPlot();

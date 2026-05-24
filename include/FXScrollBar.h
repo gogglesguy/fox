@@ -3,7 +3,7 @@
 *                       S c r o l l   B a r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -126,13 +126,13 @@ public:
   FXScrollBar(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=SCROLLBAR_VERTICAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /**
   * Set content size range.  The range must be at least 1,
@@ -211,10 +211,10 @@ public:
   FXint getBarSize() const { return barsize; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXScrollBar();
@@ -237,10 +237,10 @@ public:
   FXScrollCorner(FXComposite* p);
 
   /// Can not be enabled
-  virtual void enable();
+  virtual void enable() override;
 
   /// Can not be disabled
-  virtual void disable();
+  virtual void disable() override;
   };
 
 }

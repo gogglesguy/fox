@@ -3,7 +3,7 @@
 *                          U t i l i t y   F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -231,10 +231,15 @@ void fxwarning(const FXchar* format,...){
 // Assert failed routine
 void fxassert(const FXchar* expression,const FXchar* filename,unsigned int lineno){
 #if defined(WIN32)
-  fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
+  if(_isatty(_fileno(stderr))){
+    fxmessage("%s(%d): \033[1;31mFXASSERT\033[1;33m(%s)\033[1;31m failed.\033[0m\n",filename,lineno,expression);
+    }
+  else{
+    fxmessage("%s(%d): FXASSERT(%s) failed.\n",filename,lineno,expression);
+    }
 #else
   if(isatty(fileno(stderr))){
-    fxmessage("%s:%d: \033[1;33mFXASSERT(%s)\033[0m failed.\n",filename,lineno,expression);
+    fxmessage("%s:%d: \033[1;31mFXASSERT\033[1;33m(%s)\033[1;31m failed.\033[0m\n",filename,lineno,expression);
     }
   else{
     fxmessage("%s:%d: FXASSERT(%s) failed.\n",filename,lineno,expression);
@@ -246,10 +251,15 @@ void fxassert(const FXchar* expression,const FXchar* filename,unsigned int linen
 // Verify failed routine
 void fxverify(const FXchar* expression,const FXchar* filename,unsigned int lineno){
 #if defined(WIN32)
-  fxmessage("%s(%d): FXVERIFY(%s) failed.\n",filename,lineno,expression);
+  if(_isatty(_fileno(stderr))){
+    fxmessage("%s(%d): \033[1;31mFXVERIFY\033[1;33m(%s)\033[1;31m failed.\033[0m\n\n",filename,lineno,expression);
+    }
+  else{
+    fxmessage("%s(%d): FXVERIFY(%s) failed.\n",filename,lineno,expression);
+    }
 #else
   if(isatty(fileno(stderr))){
-    fxmessage("%s:%d: \033[1;33mFXVERIFY(%s)\033[0m failed.\n",filename,lineno,expression);
+    fxmessage("%s:%d: \033[1;31mFXVERIFY\033[1;33m(%s)\033[1;31m failed.\033[0m\n",filename,lineno,expression);
     }
   else{
     fxmessage("%s:%d: FXVERIFY(%s) failed.\n",filename,lineno,expression);

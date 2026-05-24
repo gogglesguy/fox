@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -83,32 +83,32 @@ public:
   * is not owned, i.e. the flag IMAGE_OWNED is not set, the pixel buffer will not
   * be deleted; however the pixel buffer will be set to NULL.
   */
-  virtual void create();
+  virtual void create() override;
 
   /**
   * Detach the server side pixmap, shape bitmap, and etch bitmap from the Icon.
   * Afterwards, the Icon is left as if it never had a server-side resources.
   */
-  virtual void detach();
+  virtual void detach() override;
 
   /**
   * Destroy the server-side pixmap and the shape bitmap and etch bitmap.
   * The client-side pixel buffer is not affected.
   */
-  virtual void destroy();
+  virtual void destroy() override;
 
   /**
   * Render the server-side pixmap, shape bitmap and etch bitmap for the icon
   * from the client-side pixel buffer.
   */
-  virtual void render();
+  virtual void render() override;
 
   /**
   * Resize both client-side and server-side representations (if any) to the
   * given width and height.  The new representations typically contain garbage
   * after this operation and need to be re-filled.
   */
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /// Get transparency color
   FXColor getTransparentColor() const { return transp; }

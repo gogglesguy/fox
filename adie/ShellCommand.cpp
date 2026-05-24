@@ -3,7 +3,7 @@
 *                             S h e l l - C o m m a n d                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2014,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2014,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -64,7 +64,7 @@ FXIMPLEMENT(ShellCommand,FXObject,ShellCommandMap,ARRAYNUMBER(ShellCommandMap))
 
 // Construct shell command
 ShellCommand::ShellCommand(TextWindow* win,const FXString& dir,FXuint flgs):app(win->getApp()),window(win),selstartpos(0),selendpos(-1),selstartcol(0),selendcol(-1),directory(dir),ninput(0),noutput(0),flags(flgs){
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::ShellCommand(%p,%s,%x)\n",win,dir.text(),flgs));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::ShellCommand(%p,%s,%x)\n",win,dir.text(),flgs);
   }
 
 
@@ -79,7 +79,7 @@ void ShellCommand::setSelection(FXint sp,FXint ep,FXint sc,FXint ec){
 
 // Execute command
 FXbool ShellCommand::start(const FXString& command){
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::start(%s)\n",command.text()));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::start(%s)\n",command.text());
   FXbool result=false;
   if(!command.empty() && !process.id()){
     FXchar** argv=nullptr;
@@ -151,14 +151,14 @@ FXbool ShellCommand::start(const FXString& command){
 x:    freeElms(argv);
       }
     }
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::start: %s\n",result?"OK":"FAILED"));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::start: %s\n",result?"OK":"FAILED");
   return result;
   }
 
 
 // Stop command
 FXbool ShellCommand::stop(){
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::stop()\n"));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::stop()\n");
   if(process.id()){
 
     // Remove I/O callbacks
@@ -184,7 +184,7 @@ FXbool ShellCommand::stop(){
 
 // Cancel command
 FXbool ShellCommand::cancel(){
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::cancel()\n"));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::cancel()\n");
   if(process.id()){
     process.kill();
     return stop();
@@ -214,7 +214,7 @@ long ShellCommand::onCmdInput(FXObject*,FXSelector sel,void*){
 long ShellCommand::onCmdOutput(FXObject*,FXSelector sel,void*){
   FXchar buffer[BUFFERSIZE+1];
   FXival count=pipe[1].readBlock(buffer,BUFFERSIZE);
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::onCmdOutput: pipe[%d]: bytes: %ld\n",1,count));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::onCmdOutput: pipe[%d]: bytes: %ld\n",1,count);
   if(count==FXIO::Again) return 1;
   if(0<=count){
     buffer[count]='\0';
@@ -252,7 +252,7 @@ long ShellCommand::onCmdOutput(FXObject*,FXSelector sel,void*){
 long ShellCommand::onCmdLogger(FXObject*,FXSelector sel,void*){
   FXchar buffer[BUFFERSIZE+1];
   FXival count=pipe[2].readBlock(buffer,BUFFERSIZE);
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::onCmdLogger: pipe[%d]: bytes: %ld\n",2,count));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::onCmdLogger: pipe[%d]: bytes: %ld\n",2,count);
   if(count==FXIO::Again) return 1;
   if(0<=count){
     buffer[count]='\0';
@@ -268,7 +268,7 @@ long ShellCommand::onCmdLogger(FXObject*,FXSelector sel,void*){
 
 // Destroy shell command
 ShellCommand::~ShellCommand(){
-  FXTRACE((TOPIC_COMMAND,"ShellCommand::~ShellCommand\n"));
+  FXTRACE(TOPIC_COMMAND,"ShellCommand::~ShellCommand\n");
   stop();
   }
 

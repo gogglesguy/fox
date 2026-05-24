@@ -124,7 +124,7 @@
       <PrecompiledHeaderOutputFile />
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <SmallerTypeCheck>false</SmallerTypeCheck>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <ControlFlowGuard>false</ControlFlowGuard>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -181,8 +181,9 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
       <OmitFramePointers>true</OmitFramePointers>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -536,6 +537,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <ClInclude Include="..\..\include\FXTriStateButton.h" />
     <ClInclude Include="..\..\include\FXUndoList.h" />
     <ClInclude Include="..\..\include\fxunicode.h" />
+    <ClInclude Include="..\..\include\FXUnits.h" />
     <ClInclude Include="..\..\include\FXURL.h" />
     <ClInclude Include="..\..\include\FXUTF16Codec.h" />
     <ClInclude Include="..\..\include\FXUTF32Codec.h" />
@@ -720,6 +722,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <ClCompile Include="..\..\lib\FXGLCanvas.cpp" />
     <ClCompile Include="..\..\lib\FXGLContext.cpp" />
     <ClCompile Include="..\..\lib\FXGLObject.cpp" />
+    <ClCompile Include="..\..\lib\FXGlobVisitor.cpp" />
     <ClCompile Include="..\..\lib\FXGLViewer.cpp" />
     <ClCompile Include="..\..\lib\FXGLVisual.cpp" />
     <ClCompile Include="..\..\lib\FXGradientBar.cpp" />
@@ -925,6 +928,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <ClCompile Include="..\..\lib\FXTriStateButton.cpp" />
     <ClCompile Include="..\..\lib\FXUndoList.cpp" />
     <ClCompile Include="..\..\lib\fxunicode.cpp" />
+    <ClCompile Include="..\..\lib\FXUnits.cpp" />
     <ClCompile Include="..\..\lib\FXURL.cpp" />
     <ClCompile Include="..\..\lib\FXUTF16Codec.cpp" />
     <ClCompile Include="..\..\lib\FXUTF32Codec.cpp" />

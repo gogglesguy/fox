@@ -3,7 +3,7 @@
 *                           T o o l   T i p   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -49,7 +49,7 @@ protected:
   FXbool    popped;                     // Is currently popped up
 protected:
   FXToolTip();
-  virtual FXbool doesOverrideRedirect() const;
+  virtual FXbool doesOverrideRedirect() const override;
   void place(FXint x,FXint y);
   void autoplace();
 private:
@@ -77,19 +77,19 @@ public:
   FXToolTip(FXApp* a,FXuint opts=TOOLTIP_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Display the tip
-  virtual void show();
+  virtual void show() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Set the text for this tip
   void setText(const FXString& text);
@@ -109,13 +109,13 @@ public:
   /// Set the current tip text color
   void setTextColor(FXColor clr);
 
-  virtual FXbool doesSaveUnder() const;
+  virtual FXbool doesSaveUnder() const override;
 
   /// Save tip to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load tip from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXToolTip();

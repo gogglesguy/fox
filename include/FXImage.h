@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -163,19 +163,19 @@ public:
   * the flag IMAGE_OWNED is not set, the pixel buffer will not be deleted,
   * however the pixel buffer will be set to NULL.
   */
-  virtual void create();
+  virtual void create() override;
 
   /**
   * Detach the server side pixmap from the Image.
   * Afterwards, the Image is left as if it never had a server-side resources.
   */
-  virtual void detach();
+  virtual void detach() override;
 
   /**
   * Destroy the server-side pixmap.
   * The client-side pixel buffer is not affected.
   */
-  virtual void destroy();
+  virtual void destroy() override;
 
   /**
   * Retrieves pixels from the server-side image.  For example, to make
@@ -204,7 +204,7 @@ public:
   * given width and height.  The new representations typically contain garbage
   * after this operation and need to be re-filled.
   */
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /**
   * Rescale pixels image to the specified width and height; this calls
@@ -274,10 +274,10 @@ public:
   virtual FXbool loadPixels(FXStream& store);
 
   /// Save object to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXImage();

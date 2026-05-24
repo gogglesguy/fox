@@ -3,7 +3,7 @@
 *            D o u b l e - P r e c i s i o n   4 x 4   M a t r i x              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,7 +33,7 @@
 #include "FXQuatd.h"
 #include "FXMat3d.h"
 #include "FXMat4d.h"
-
+ 
 
 /*
   Notes:
@@ -1336,16 +1336,16 @@ FXMat3d FXMat4d::normalMatrix() const {
 // Uses Gram-Schmidt orthogonalization on a row-by-row basis
 FXMat4d orthogonalize(const FXMat4d& m){
   FXMat4d result(m);
-  result[0]/=result[0].length();
+  result[0]*=Math::rsqrt(result[0].length2());
   result[1]-=result[0]*(result[1]*result[0]);
-  result[1]/=result[1].length();
+  result[1]*=Math::rsqrt(result[1].length2());
   result[2]-=result[0]*(result[2]*result[0]);
   result[2]-=result[1]*(result[2]*result[1]);
-  result[2]/=result[2].length();
+  result[2]*=Math::rsqrt(result[2].length2());
   result[3]-=result[0]*(result[3]*result[0]);
   result[3]-=result[1]*(result[3]*result[1]);
   result[3]-=result[2]*(result[3]*result[2]);
-  result[3]/=result[3].length();
+  result[3]*=Math::rsqrt(result[3].length2());
   return result;
   }
 

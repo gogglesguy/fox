@@ -3,7 +3,7 @@
 *                    B i t m a p   V i e w e r   D e m o                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -550,7 +550,7 @@ long BitmapWindow::onCmdSave(FXObject*,FXSelector,void*){
 
 // Quit
 long BitmapWindow::onCmdQuit(FXObject*,FXSelector,void*){
-  FXTRACE((100,"Quit\n"));
+  FXTRACE(100,"Quit\n");
 
   // Write new window size back to registry
   getApp()->reg().writeIntEntry("SETTINGS","x",getX());

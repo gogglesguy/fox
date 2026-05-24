@@ -3,7 +3,7 @@
 *                      P l o t - C u r v e   D e s c r i p t i o n              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -79,10 +79,10 @@ public:
   FXData* getYData() const { return ydata; }
 
   /// Save curve to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load curve from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXCurve();

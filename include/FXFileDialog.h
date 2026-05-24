@@ -3,7 +3,7 @@
 *                   F i l e   S e l e c t i o n   D i a l o g                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,10 +56,10 @@ public:
   FXFileDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=500,FXint h=300);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Change file name
   void setFilename(const FXString& path);
@@ -250,10 +250,10 @@ public:
   static FXString getOpenDirectory(FXWindow* owner,const FXString& caption,const FXString& path);
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXFileDialog();

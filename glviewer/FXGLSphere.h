@@ -3,7 +3,7 @@
 *                   O p e n G L   S p h e r e   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,7 +31,7 @@ public:
   FXint   stacks;   // Latitudinal subdivision
 protected:
   FXGLSphere();
-  virtual void drawshape(FXGLViewer* viewer);
+  virtual void drawshape(FXGLViewer* viewer) override;
 public:
   enum {
     ID_LAST=FXGLShape::ID_LAST
@@ -48,7 +48,7 @@ public:
   FXGLSphere(const FXGLSphere& orig);
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Change radius
   virtual void setRadius(FXfloat r);
@@ -63,10 +63,10 @@ public:
   FXint getStacks() const { return stacks; }
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy
   virtual ~FXGLSphere();

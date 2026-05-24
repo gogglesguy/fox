@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,7 +67,7 @@ struct SPACE {
 FXDir::FXDir(){
   // If this fails on your machine, determine what sizeof(SPACE) is
   // on your machine and mail it to: jeroen@fox-toolkit.net!
-  //FXTRACE((TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
+  //FXTRACE(TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32
   alias_cast<SPACE>(space)->handle=INVALID_HANDLE_VALUE;
@@ -81,7 +81,7 @@ FXDir::FXDir(){
 FXDir::FXDir(const FXString& path){
   // If this fails on your machine, determine what sizeof(SPACE) is
   // on your machine and mail it to: jeroen@fox-toolkit.net!
-  //FXTRACE((TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE)));
+  //FXTRACE(TOPIC_DETAIL,"sizeof(SPACE)=%ld\n",sizeof(SPACE));
   FXASSERT(sizeof(SPACE)<=sizeof(space));
 #ifdef WIN32
   alias_cast<SPACE>(space)->handle=INVALID_HANDLE_VALUE;
@@ -275,18 +275,18 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 #ifdef WIN32
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (!(flags&HiddenFiles) && data.isHidden()) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || ((flags&NoParent) && (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))) || (!(flags&HiddenDirs) && data.isHidden()) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
 
 #else
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (!(flags&HiddenFiles) && name[0]=='.') || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || ((flags&NoParent) && (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))) || (!(flags&HiddenDirs) && name[0]=='.') || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
 
 #endif
 
@@ -363,7 +363,7 @@ FXint FXDir::listShares(FXString*& sharelist){
       // Next batch of NETRESOURCE structs
       DWORD result=WNetEnumResourceW(handle,&entries,resource,&size);
 
-      FXTRACE((TOPIC_DETAIL,"WNetEnumResourceW=%d\n",result));
+      FXTRACE(TOPIC_DETAIL,"WNetEnumResourceW=%d\n",result);
 
       if(result==ERROR_NO_NETWORK){ break; }            // No network available
       if(result==ERROR_MORE_DATA){ break; }             // Buffer was too small; size has required size
@@ -396,14 +396,14 @@ FXint FXDir::listShares(FXString*& sharelist){
         //   LPSTR lpComment;         // Provider-supplied comment associated with item
         //   LPSTR lpProvider;        // Name of the provider
         //   };
-        FXTRACE((TOPIC_DETAIL,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?"));
-        FXTRACE((TOPIC_DETAIL,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?"));
-        FXTRACE((TOPIC_DETAIL,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?"));
-        FXTRACE((TOPIC_DETAIL,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?"));
-        FXTRACE((TOPIC_DETAIL,"lpLocalName=%s\n",resource[i].lpLocalName));
-        FXTRACE((TOPIC_DETAIL,"lpRemoteName=%s\n",resource[i].lpRemoteName));
-        FXTRACE((TOPIC_DETAIL,"lpComment=%s\n",resource[i].lpComment));
-        FXTRACE((TOPIC_DETAIL,"lpProvider=%s\n\n",resource[i].lpProvider));
+        FXTRACE(TOPIC_DETAIL,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?");
+        FXTRACE(TOPIC_DETAIL,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?");
+        FXTRACE(TOPIC_DETAIL,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?");
+        FXTRACE(TOPIC_DETAIL,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?");
+        FXTRACE(TOPIC_DETAIL,"lpLocalName=%s\n",resource[i].lpLocalName);
+        FXTRACE(TOPIC_DETAIL,"lpRemoteName=%s\n",resource[i].lpRemoteName);
+        FXTRACE(TOPIC_DETAIL,"lpComment=%s\n",resource[i].lpComment);
+        FXTRACE(TOPIC_DETAIL,"lpProvider=%s\n\n",resource[i].lpProvider);
 
         // Add remote name to list
         sharelist[count++]=resource[i].lpRemoteName;

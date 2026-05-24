@@ -3,7 +3,7 @@
 *                           O p e n G L   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -39,22 +39,22 @@ public:
   FXGLPoint(FXfloat x,FXfloat y,FXfloat z);
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Called by the viewer to get bounds for this object
-  virtual void bounds(FXRangef& box);
+  virtual void bounds(FXRangef& box) override;
 
   /// Draw this object in a viewer
-  virtual void draw(FXGLViewer* viewer);
+  virtual void draw(FXGLViewer* viewer) override;
 
   /// Draw this object for hit-testing purposes
-  virtual void hit(FXGLViewer* viewer);
+  virtual void hit(FXGLViewer* viewer) override;
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 #endif

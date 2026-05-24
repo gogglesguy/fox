@@ -3,7 +3,7 @@
 *                          S e m a p h o r e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,16 +62,16 @@ namespace FX {
 // Initialize semaphore with given count
 FXSemaphore::FXSemaphore(FXint count){
 #if defined(WIN32)
-  FXASSERT_STATIC(sizeof(data)>=sizeof(HANDLE));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(HANDLE));
   data[0]=(FXuval)CreateSemaphore(nullptr,count,0x7fffffff,nullptr);
 #elif (defined(__APPLE__) || defined(__minix))
   // If this fails on your machine, determine what value of
   // sizeof(pthread_cond_t) and sizeof(pthread_mutex_t) is
   // supposed to be and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t)));
-  FXASSERT_STATIC(sizeof(FXuval)*9 >= sizeof(pthread_cond_t));
-  FXASSERT_STATIC(sizeof(FXuval)*11 >= sizeof(pthread_mutex_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_mutex_t)=%d\n",sizeof(pthread_mutex_t));
+  FXSTATIC_ASSERT(sizeof(FXuval)*9 >= sizeof(pthread_cond_t));
+  FXSTATIC_ASSERT(sizeof(FXuval)*11 >= sizeof(pthread_mutex_t));
   data[0]=count;
   pthread_cond_init((pthread_cond_t*)&data[1],nullptr);
   pthread_mutex_init((pthread_mutex_t*)&data[10],nullptr);
@@ -79,8 +79,8 @@ FXSemaphore::FXSemaphore(FXint count){
   // If this fails on your machine, determine what value
   // of sizeof(sem_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(sem_t)=%d\n",sizeof(sem_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(sem_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(sem_t)=%d\n",sizeof(sem_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(sem_t));
   sem_init((sem_t*)data,0,(unsigned int)count);
 #endif
   }

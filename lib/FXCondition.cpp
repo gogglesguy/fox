@@ -3,7 +3,7 @@
 *                         C o n d i t i o n   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -43,14 +43,14 @@ FXCondition::FXCondition(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  FXASSERT_STATIC(sizeof(data)>=sizeof(CONDITION_VARIABLE));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(CONDITION_VARIABLE));
   InitializeConditionVariable((CONDITION_VARIABLE*)data);
 #elif defined(WIN32)
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)=%d\n",sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval)=%d\n",sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(CRITICAL_SECTION)+sizeof(HANDLE)+sizeof(HANDLE)+sizeof(FXuval));
   data[0]=(FXuval)CreateEvent(nullptr,0,0,nullptr);                   // Wakes one, autoreset
   data[1]=(FXuval)CreateEvent(nullptr,1,0,nullptr);                   // Wakes all, manual reset
   data[2]=0;                                                    // Blocked count
@@ -59,8 +59,8 @@ FXCondition::FXCondition(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_cond_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_cond_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_cond_t)=%d\n",sizeof(pthread_cond_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_cond_t));
   pthread_cond_init((pthread_cond_t*)data,nullptr);
 #endif
   }

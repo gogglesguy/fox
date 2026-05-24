@@ -3,7 +3,7 @@
 *                       P a t h   B o x   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2025 by Jeroen van der Zijp.   All Rights Reserved.             *
+* Copyright (C) 2025,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -155,7 +155,7 @@ FXPathBox::FXPathBox(){
 
 // Path box
 FXPathBox::FXPathBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h,FXint pl,FXint pr,FXint pt,FXint pb):FXFrame(p,opts,x,y,w,h,pl,pr,pt,pb),path(INITAILPATH){
-  FXTRACE((TOPIC_CONSTRUCT,"FXPathBox::FXPathBox %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXPathBox::FXPathBox %p\n",this);
   flags|=FLAG_ENABLED;
   textColor=getApp()->getForeColor();
   backColor=getApp()->getBackColor();
@@ -185,7 +185,7 @@ FXPathBox::FXPathBox(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXi
 
 // Create window
 void FXPathBox::create(){
-  FXTRACE((TOPIC_CREATION,"FXPathBox::create %p\n",this));
+  FXTRACE(TOPIC_CREATION,"FXPathBox::create %p\n",this);
   FXFrame::create();
   font->create();
   FXASSERT(icon);
@@ -202,7 +202,7 @@ void FXPathBox::create(){
 
 // Detach window
 void FXPathBox::detach(){
-  FXTRACE((TOPIC_CREATION,"FXPathBox::detach %p\n",this));
+  FXTRACE(TOPIC_CREATION,"FXPathBox::detach %p\n",this);
   FXFrame::detach();
   font->detach();
   foldericon->detach();
@@ -217,7 +217,7 @@ void FXPathBox::detach(){
 
 // Destroy window
 void FXPathBox::destroy(){
-  FXTRACE((TOPIC_CREATION,"FXPathBox::destroy %p\n",this));
+  FXTRACE(TOPIC_CREATION,"FXPathBox::destroy %p\n",this);
   FXFrame::destroy();
   foldericon->destroy();
   cdromicon->destroy();
@@ -634,7 +634,7 @@ long FXPathBox::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
     flags&=~FLAG_PRESSED;
     if(target && target->tryHandle(this,FXSEL(SEL_LEFTBUTTONRELEASE,message),ptr)) return 1;
     code=getPathComponent(event->win_x,event->win_y,beg,end);
-    FXTRACE((TOPIC_DEBUG,"FXPathBox::onLeftBtnRelease: \"%.*s\" code: %d beg: %d end: %d\n",end-beg,&path[beg],code,beg,end));
+    FXTRACE(TOPIC_DEBUG,"FXPathBox::onLeftBtnRelease: \"%.*s\" code: %d beg: %d end: %d\n",end-beg,&path[beg],code,beg,end);
     selectBeg=beg;
     selectEnd=end;
     update();
@@ -722,7 +722,7 @@ long FXPathBox::onMotion(FXObject*,FXSelector,void* ptr){
 
 
   code=getPathComponent(event->win_x,event->win_y,beg,end);
-//  FXTRACE((TOPIC_DETAIL,"FXPathBox::onMotion: %.*s code: %d beg: %d end: %d xx: %d ww: %d\n",end-beg,&path[beg],code,beg,end,xx,ww));
+//  FXTRACE(TOPIC_DETAIL,"FXPathBox::onMotion: %.*s code: %d beg: %d end: %d xx: %d ww: %d\n",end-beg,&path[beg],code,beg,end,xx,ww);
   if((code==1 || code==4) && (hiliteBeg!=beg || hiliteEnd!=end)){
     //update(padleft+border,border+padtop,width-border-border-padright-padright,border+padtop,height-border--border-padbottom-padtop);
     hiliteBeg=beg;
@@ -806,7 +806,7 @@ long FXPathBox::onCmdGetTip(FXObject*,FXSelector,void* ptr){
 long FXPathBox::onQueryTip(FXObject* sender,FXSelector sel,void* ptr){
   if(FXFrame::onQueryTip(sender,sel,ptr)) return 1;
 //FIXME//
-//FXTRACE((1,"FXDir::hasSubDirectories(%s) : %s\n",path.text(),FXDir::hasSubDirectories(path)?"true":"false"));
+//FXTRACE(1,"FXDir::hasSubDirectories(%s) : %s\n",path.text(),FXDir::hasSubDirectories(path)?"true":"false");
   if(flags&FLAG_TIP){
     if(tip.empty()){
       sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&path);
@@ -832,7 +832,7 @@ long FXPathBox::onQueryHelp(FXObject* sender,FXSelector sel,void* ptr){
 
 // Set directory
 void FXPathBox::setDirectory(const FXString& newpath,FXbool notify){
-  FXTRACE((TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",newpath.text(),notify));
+  FXTRACE(TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",newpath.text(),notify);
   FXString abspath(FXPath::absolute(newpath));
   if(!selectPathComponent(path,abspath,selectBeg,selectEnd)){
     path=abspath;
@@ -854,7 +854,7 @@ void FXPathBox::setDirectory(const FXString& newpath,FXbool notify){
 /*
 // Set directory
 void FXPathBox::setDirectory(const FXString& newpath,FXbool notify){
-  FXTRACE((TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",newpath.text(),notify));
+  FXTRACE(TOPIC_DETAIL,"FXDirBox::setDirectory(%s,%d)\n",newpath.text(),notify);
   FXString abspath(FXPath::absolute(newpath));
   if(path!=abspath){
     path=abspath;
@@ -962,7 +962,7 @@ void FXPathBox::load(FXStream& store){
 
 // Delete it
 FXPathBox::~FXPathBox(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXPathBox::~FXPathBox %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXPathBox::~FXPathBox %p\n",this);
   getApp()->removeTimeout(this,ID_TIPTIMER);
   if(!(options&PATHBOX_NO_OWN_ASSOC)) delete associations;
   font=(FXFont*)-1L;

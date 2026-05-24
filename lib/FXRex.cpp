@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1149,7 +1149,7 @@ FXRex::Error FXCompile::compile(FXchar *prog,const FXchar* p,FXint m){
   FXshort  smin=0;
   FXshort  smax=0;
 
-  FXASSERT_STATIC(OP_LAST<=256);
+  FXSTATIC_ASSERT(OP_LAST<=256);
 
   // Initialize parser data
   code=pc=prog;
@@ -1192,7 +1192,7 @@ FXRex::Error FXCompile::compile(FXchar *prog,const FXchar* p,FXint m){
   // Success if we got this far
   append(OP_PASS);
 
-  FXTRACE((TOPIC_DETAIL,"FXCompile::compile: code: %lu pc: %lu\n",(FXuval)code,(FXuval)pc));
+  FXTRACE(TOPIC_DETAIL,"FXCompile::compile: code: %lu pc: %lu\n",(FXuval)code,(FXuval)pc);
 
   // Code is too long
   if(code+32767<pc) return FXRex::ErrLong;
@@ -4992,19 +4992,19 @@ const FXchar *const FXRex::errors[]={
 
 // Construct empty regular expression object
 FXRex::FXRex(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRex::FXRex()\n");
   }
 
 
 // Copy regex object
 FXRex::FXRex(const FXRex& orig):code(orig.code){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(FXRex)\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRex::FXRex(FXRex)\n");
   }
 
 
 // Compile expression from pattern; fail if error
 FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern,mode,error));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern,mode,error);
   FXRex::Error err=parse(pattern,mode);
   if(error){ *error=err; }
   }
@@ -5012,7 +5012,7 @@ FXRex::FXRex(const FXchar* pattern,FXint mode,FXRex::Error* error){
 
 // Compile expression from pattern; fail if error
 FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern.text(),mode,error));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRex::FXRex(%s,%u,%p)\n",pattern.text(),mode,error);
   FXRex::Error err=parse(pattern.text(),mode);
   if(error){ *error=err; }
   }
@@ -5027,7 +5027,7 @@ FXRex::FXRex(const FXString& pattern,FXint mode,FXRex::Error* error){
 FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
   FXRex::Error err=ErrEmpty;
 
-  FXTRACE((TOPIC_DETAIL,"FXRex::parse(pattern=\"%s\",mode=%x)\n",pattern,mode));
+  FXTRACE(TOPIC_DETAIL,"FXRex::parse(pattern=\"%s\",mode=%x)\n",pattern,mode);
 
   // Error
   clear();
@@ -5044,12 +5044,12 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
       if((err=FXReverse::reverse(adjustedpattern.text(),pattern,mode))==ErrOK){
         FXCompile cs;
 
-        FXTRACE((TOPIC_DETAIL,"FXRex::parse: adjustedpattern: \"%s\"\n",adjustedpattern.text()));
+        FXTRACE(TOPIC_DETAIL,"FXRex::parse: adjustedpattern: \"%s\"\n",adjustedpattern.text());
 
         // Check syntax and count the bytes
         if((err=cs.compile(nullptr,adjustedpattern.text(),mode))==ErrOK){
 
-          FXTRACE((TOPIC_DETAIL,"FXRex::parse: cs.compile size: %lu\n",cs.size()));
+          FXTRACE(TOPIC_DETAIL,"FXRex::parse: cs.compile size: %lu\n",cs.size());
 
           // Compile code if we want to
           if(!(mode&FXRex::Syntax)){
@@ -5060,12 +5060,12 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
               // Now generate code for pattern
               if((err=cs.compile(code.text(),adjustedpattern.text(),mode))==ErrOK){
 
-                FXTRACE((TOPIC_DETAIL,"FXRex::parse: cs.compile size: %lu\n",cs.size()));
+                FXTRACE(TOPIC_DETAIL,"FXRex::parse: cs.compile size: %lu\n",cs.size());
 
 #ifdef TOPIC_REXDUMP
                 if(getTraceTopic(TOPIC_REXDUMP)){ dump(adjustedpattern.text(),code.text(),code.text()+code.length()); }
 #endif
-                FXTRACE((TOPIC_DETAIL,"FXRex::parse: OK\n\n"));
+                FXTRACE(TOPIC_DETAIL,"FXRex::parse: OK\n\n");
                 return ErrOK;
                 }
               }
@@ -5075,7 +5075,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
       }
     }
 
-  FXTRACE((TOPIC_DETAIL,"FXRex::parse: %s\n\n",getError(err)));
+  FXTRACE(TOPIC_DETAIL,"FXRex::parse: %s\n\n",getError(err));
   return err;
   }
 
@@ -5316,7 +5316,7 @@ void FXRex::clear(){
 
 // Clean up
 FXRex::~FXRex(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXRex::~FXRex()\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXRex::~FXRex()\n");
   clear();
   }
 

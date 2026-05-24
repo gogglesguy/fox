@@ -3,7 +3,7 @@
 *                             I m a g e    O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -206,7 +206,7 @@ FXImage::FXImage():data(nullptr),options(0){
 
 // Initialize
 FXImage::FXImage(FXApp* a,const FXColor *pix,FXuint opts,FXint w,FXint h):FXDrawable(a,w,h){
-  FXTRACE((TOPIC_CONSTRUCT,"FXImage::FXImage %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXImage::FXImage %p\n",this);
   FXASSERT((opts&~(IMAGE_OWNED|IMAGE_MASK))==0);
   visual=getApp()->getDefaultVisual();
   data=const_cast<FXColor*>(pix);
@@ -311,14 +311,14 @@ int FXImage::ReleaseDC(FXID hdc) const {
 void FXImage::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 
       // Initialize visual
       visual->create();
 
 #ifdef WIN32
 
-      FXASSERT_STATIC(sizeof(FXID)>=sizeof(HBITMAP));
+      FXSTATIC_ASSERT(sizeof(FXID)>=sizeof(HBITMAP));
 
       // Create a bitmap compatible with current display
       HDC hdc=::GetDC(GetDesktopWindow());
@@ -327,7 +327,7 @@ void FXImage::create(){
 
 #else
 
-      FXASSERT_STATIC(sizeof(FXID)>=sizeof(Pixmap));
+      FXSTATIC_ASSERT(sizeof(FXID)>=sizeof(Pixmap));
 
       // Make pixmap
       xid=XCreatePixmap(DISPLAY(getApp()),XDefaultRootWindow(DISPLAY(getApp())),FXMAX(width,1),FXMAX(height,1),visual->depth);
@@ -351,7 +351,7 @@ void FXImage::create(){
 void FXImage::detach(){
   visual->detach();
   if(xid){
-    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::detach %p\n",getClassName(),this);
     xid=0;
     }
   }
@@ -361,7 +361,7 @@ void FXImage::detach(){
 void FXImage::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 #ifdef WIN32
       DeleteObject(xid);
 #else
@@ -385,7 +385,7 @@ void FXImage::restore(){
     BITMAPINFO bmi;
     HDC hdcmem;
 
-    FXTRACE((TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this);
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
@@ -484,7 +484,7 @@ void FXImage::restore(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::restore image %p\n",getClassName(),this);
 
     // Check for legal size
     if(width<1 || height<1){ fxerror("%s::restore: illegal image size %dx%d.\n",getClassName(),width,height); }
@@ -522,7 +522,7 @@ void FXImage::restore(){
             shminfo.shmaddr=xim->data=(char*)shmat(shminfo.shmid,0,0);
             shminfo.readOnly=false;
             XShmAttach(DISPLAY(getApp()),&shminfo);
-            FXTRACE((TOPIC_DETAIL,"RGBPixmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+            FXTRACE(TOPIC_DETAIL,"RGBPixmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
             XShmGetImage(DISPLAY(getApp()),xid,xim,0,0,AllPlanes);
             XSync(DISPLAY(getApp()),False);
             }
@@ -539,17 +539,17 @@ void FXImage::restore(){
       // Should have succeeded
       FXASSERT(xim);
 
-      FXTRACE((TOPIC_DETAIL,"im width = %d\n",xim->width));
-      FXTRACE((TOPIC_DETAIL,"im height = %d\n",xim->height));
-      FXTRACE((TOPIC_DETAIL,"im format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((TOPIC_DETAIL,"im byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"im depth = %d\n",xim->depth));
-      FXTRACE((TOPIC_DETAIL,"im bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((TOPIC_DETAIL,"im bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE(TOPIC_DETAIL,"im width = %d\n",xim->width);
+      FXTRACE(TOPIC_DETAIL,"im height = %d\n",xim->height);
+      FXTRACE(TOPIC_DETAIL,"im format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap");
+      FXTRACE(TOPIC_DETAIL,"im byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"im bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"im bitmap_pad = %d\n",xim->bitmap_pad);
+      FXTRACE(TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"im depth = %d\n",xim->depth);
+      FXTRACE(TOPIC_DETAIL,"im bytes_per_line = %d\n",xim->bytes_per_line);
+      FXTRACE(TOPIC_DETAIL,"im bits_per_pixel = %d\n",xim->bits_per_pixel);
 
 
       {
@@ -638,7 +638,7 @@ void FXImage::restore(){
       // Destroy image
 #ifdef HAVE_XSHM_H
       if(shmi){
-        FXTRACE((TOPIC_DETAIL,"RGBPixmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+        FXTRACE(TOPIC_DETAIL,"RGBPixmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
         XShmDetach(DISPLAY(getApp()),&shminfo);
         XDestroyImage(xim);
         shmdt(shminfo.shmaddr);
@@ -670,7 +670,7 @@ void FXImage::render(){
     FXuchar *pixels;
     HDC hdcmem;
 
-    FXTRACE((TOPIC_CREATION,"%s::render %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::render %p\n",getClassName(),this);
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -734,7 +734,7 @@ void FXImage::render(){
 // True generic mode
 void FXImage::render_true_N_fast(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"True MSB/LSB N bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"True MSB/LSB N bpp render nearest\n");
   y=0;
   do{
     x=0;
@@ -751,7 +751,7 @@ void FXImage::render_true_N_fast(void *xim,FXuchar *img){
 // True generic mode
 void FXImage::render_true_N_dither(void *xim,FXuchar *img){
   FXint x,y,d;
-  FXTRACE((TOPIC_DETAIL,"True MSB/LSB N bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"True MSB/LSB N bpp render dither\n");
   y=0;
   do{
     x=0;
@@ -773,7 +773,7 @@ void FXImage::render_true_24(void *xim,FXuchar *img){
   FXPixel val;
   FXint w,h;
   if(((XImage*)xim)->byte_order==MSBFirst){    // MSB
-    FXTRACE((TOPIC_DETAIL,"True MSB 24bpp render\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB 24bpp render\n");
     h=height-1;
     do{
       w=width-1;
@@ -791,7 +791,7 @@ void FXImage::render_true_24(void *xim,FXuchar *img){
     while(--h>=0);
     }
   else{                             // LSB
-    FXTRACE((TOPIC_DETAIL,"True LSB 24bpp render\n"));
+    FXTRACE(TOPIC_DETAIL,"True LSB 24bpp render\n");
     h=height-1;
     do{
       w=width-1;
@@ -820,7 +820,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
 
   // Byte order matches
   if(((XImage*)xim)->byte_order == FOX_BIGENDIAN){
-    FXTRACE((TOPIC_DETAIL,"True MSB/LSB 32bpp render\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB/LSB 32bpp render\n");
     h=height-1;
     do{
       w=width-1;
@@ -837,7 +837,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
 
   // MSB Byte order
   else if(((XImage*)xim)->byte_order==MSBFirst){
-    FXTRACE((TOPIC_DETAIL,"True MSB 32bpp render\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB 32bpp render\n");
     h=height-1;
     do{
       w=width-1;
@@ -858,7 +858,7 @@ void FXImage::render_true_32(void *xim,FXuchar *img){
 
   // LSB Byte order
   else{
-    FXTRACE((TOPIC_DETAIL,"True LSB 32bpp render\n"));
+    FXTRACE(TOPIC_DETAIL,"True LSB 32bpp render\n");
     h=height-1;
     do{
       w=width-1;
@@ -888,7 +888,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
 
   // Byte order matches
   if(((XImage*)xim)->byte_order == FOX_BIGENDIAN){
-    FXTRACE((TOPIC_DETAIL,"True MSB/LSB 16bpp 5,6,5/5,5,5 render nearest\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB/LSB 16bpp 5,6,5/5,5,5 render nearest\n");
     h=height-1;
     do{
       w=width-1;
@@ -905,7 +905,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
 
   // MSB Byte order
   else if(((XImage*)xim)->byte_order==MSBFirst){
-    FXTRACE((TOPIC_DETAIL,"True MSB 16bpp 5,6,5/5,5,5 render nearest\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB 16bpp 5,6,5/5,5,5 render nearest\n");
     h=height-1;
     do{
       w=width-1;
@@ -924,7 +924,7 @@ void FXImage::render_true_16_fast(void *xim,FXuchar *img){
 
   // LSB Byte order
   else{
-    FXTRACE((TOPIC_DETAIL,"True LSB 16bpp 5,6,5/5,5,5 render nearest\n"));
+    FXTRACE(TOPIC_DETAIL,"True LSB 16bpp 5,6,5/5,5,5 render nearest\n");
     h=height-1;
     do{
       w=width-1;
@@ -952,7 +952,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
 
   // Byte order matches
   if(((XImage*)xim)->byte_order == FOX_BIGENDIAN){
-    FXTRACE((TOPIC_DETAIL,"True MSB/LSB 16bpp 5,6,5/5,5,5 render dither\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB/LSB 16bpp 5,6,5/5,5,5 render dither\n");
     h=height-1;
     do{
       w=width-1;
@@ -970,7 +970,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
 
   // MSB Byte order
   else if(((XImage*)xim)->byte_order==MSBFirst){
-    FXTRACE((TOPIC_DETAIL,"True MSB 16bpp 5,6,5/5,5,5 render dither\n"));
+    FXTRACE(TOPIC_DETAIL,"True MSB 16bpp 5,6,5/5,5,5 render dither\n");
     h=height-1;
     do{
       w=width-1;
@@ -990,7 +990,7 @@ void FXImage::render_true_16_dither(void *xim,FXuchar *img){
 
   // LSB Byte order
   else{
-    FXTRACE((TOPIC_DETAIL,"True LSB 16bpp 5,6,5/5,5,5 render dither\n"));
+    FXTRACE(TOPIC_DETAIL,"True LSB 16bpp 5,6,5/5,5,5 render dither\n");
     h=height-1;
     do{
       w=width-1;
@@ -1015,7 +1015,7 @@ void FXImage::render_true_8_fast(void *xim,FXuchar *img){
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXint w,h;
-  FXTRACE((TOPIC_DETAIL,"True MSB/LSB 8bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"True MSB/LSB 8bpp render nearest\n");
   h=height-1;
   do{
     w=width-1;
@@ -1036,7 +1036,7 @@ void FXImage::render_true_8_dither(void *xim,FXuchar *img){
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXint w,h,d;
-  FXTRACE((TOPIC_DETAIL,"True MSB/LSB 8bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"True MSB/LSB 8bpp render dither\n");
   h=height-1;
   do{
     w=width-1;
@@ -1060,7 +1060,7 @@ void FXImage::render_index_4_fast(void *xim,FXuchar *img){
   FXuint val,half;
   FXint w,h;
   if(((XImage*)xim)->byte_order==MSBFirst){    // MSB
-    FXTRACE((TOPIC_DETAIL,"Index MSB 4bpp render nearest\n"));
+    FXTRACE(TOPIC_DETAIL,"Index MSB 4bpp render nearest\n");
     h=height-1;
     do{
       w=width-1;
@@ -1078,7 +1078,7 @@ void FXImage::render_index_4_fast(void *xim,FXuchar *img){
     while(--h>=0);
     }
   else{                               // LSB
-    FXTRACE((TOPIC_DETAIL,"Index LSB 4bpp render nearest\n"));
+    FXTRACE(TOPIC_DETAIL,"Index LSB 4bpp render nearest\n");
     h=height-1;
     do{
       w=width-1;
@@ -1105,7 +1105,7 @@ void FXImage::render_index_4_dither(void *xim,FXuchar *img){
   FXuint val,half,d;
   FXint w,h;
   if(((XImage*)xim)->byte_order==MSBFirst){    // MSB
-    FXTRACE((TOPIC_DETAIL,"Index MSB 4bpp render dither\n"));
+    FXTRACE(TOPIC_DETAIL,"Index MSB 4bpp render dither\n");
     h=height-1;
     do{
       w=width-1;
@@ -1124,7 +1124,7 @@ void FXImage::render_index_4_dither(void *xim,FXuchar *img){
     while(--h>=0);
     }
   else{                               // LSB
-    FXTRACE((TOPIC_DETAIL,"Index LSB 4bpp render dither\n"));
+    FXTRACE(TOPIC_DETAIL,"Index LSB 4bpp render dither\n");
     h=height-1;
     do{
       w=width-1;
@@ -1150,7 +1150,7 @@ void FXImage::render_index_8_fast(void *xim,FXuchar *img){
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXint w,h;
-  FXTRACE((TOPIC_DETAIL,"Index MSB/LSB 8bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"Index MSB/LSB 8bpp render nearest\n");
   h=height-1;
   do{
     w=width-1;
@@ -1171,7 +1171,7 @@ void FXImage::render_index_8_dither(void *xim,FXuchar *img){
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXint w,h,d;
-  FXTRACE((TOPIC_DETAIL,"Index MSB/LSB 8bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"Index MSB/LSB 8bpp render dither\n");
   h=height-1;
   do{
     w=width-1;
@@ -1191,7 +1191,7 @@ void FXImage::render_index_8_dither(void *xim,FXuchar *img){
 // Render generic N bit index color mode
 void FXImage::render_index_N_fast(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"Index MSB/LSB N bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"Index MSB/LSB N bpp render nearest\n");
   y=0;
   do{
     x=0;
@@ -1208,7 +1208,7 @@ void FXImage::render_index_N_fast(void *xim,FXuchar *img){
 // Render generic N bit index color mode
 void FXImage::render_index_N_dither(void *xim,FXuchar *img){
   FXint x,y,d;
-  FXTRACE((TOPIC_DETAIL,"Index MSB/LSB N bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"Index MSB/LSB N bpp render dither\n");
   y=0;
   do{
     x=0;
@@ -1228,7 +1228,7 @@ void FXImage::render_gray_8_fast(void *xim,FXuchar *img){
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXint w,h;
-  FXTRACE((TOPIC_DETAIL,"Gray MSB/LSB 8bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"Gray MSB/LSB 8bpp render nearest\n");
   h=height-1;
   do{
     w=width-1;
@@ -1249,7 +1249,7 @@ void FXImage::render_gray_8_dither(void *xim,FXuchar *img){
   FXuchar *pix=(FXuchar*)((XImage*)xim)->data;
   FXuint jmp=((XImage*)xim)->bytes_per_line-width;
   FXint w,h;
-  FXTRACE((TOPIC_DETAIL,"Gray MSB/LSB 8bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"Gray MSB/LSB 8bpp render dither\n");
   h=height-1;
   do{
     w=width-1;
@@ -1268,7 +1268,7 @@ void FXImage::render_gray_8_dither(void *xim,FXuchar *img){
 // Render generic N bit gray mode
 void FXImage::render_gray_N_fast(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"Gray MSB/LSB N bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"Gray MSB/LSB N bpp render nearest\n");
   y=0;
   do{
     x=0;
@@ -1285,7 +1285,7 @@ void FXImage::render_gray_N_fast(void *xim,FXuchar *img){
 // Render generic N bit gray mode
 void FXImage::render_gray_N_dither(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"Gray MSB/LSB N bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"Gray MSB/LSB N bpp render dither\n");
   y=0;
   do{
     x=0;
@@ -1302,7 +1302,7 @@ void FXImage::render_gray_N_dither(void *xim,FXuchar *img){
 // Render monochrome mode
 void FXImage::render_mono_1_fast(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"Monochrome MSB/LSB 1bpp render nearest\n"));
+  FXTRACE(TOPIC_DETAIL,"Monochrome MSB/LSB 1bpp render nearest\n");
   y=0;
   do{
     x=0;
@@ -1319,7 +1319,7 @@ void FXImage::render_mono_1_fast(void *xim,FXuchar *img){
 // Render monochrome mode
 void FXImage::render_mono_1_dither(void *xim,FXuchar *img){
   FXint x,y;
-  FXTRACE((TOPIC_DETAIL,"Monochrome MSB/LSB 1bpp render dither\n"));
+  FXTRACE(TOPIC_DETAIL,"Monochrome MSB/LSB 1bpp render dither\n");
   y=0;
   do{
     x=0;
@@ -1344,7 +1344,7 @@ void FXImage::render(){
     XShmSegmentInfo shminfo;
 #endif
 
-    FXTRACE((TOPIC_CREATION,"%s::render image %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::render image %p\n",getClassName(),this);
 
     // Fill with pixels if there is data
     if(data && 0<width && 0<height){
@@ -1371,7 +1371,7 @@ void FXImage::render(){
             shminfo.shmaddr=xim->data=(char*)shmat(shminfo.shmid,0,0);
             shminfo.readOnly=false;
             XShmAttach(DISPLAY(getApp()),&shminfo);
-            FXTRACE((TOPIC_DETAIL,"RGBPixmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+            FXTRACE(TOPIC_DETAIL,"RGBPixmap XSHM attached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
             }
           }
         }
@@ -1389,17 +1389,17 @@ void FXImage::render(){
       // Should have succeeded
       FXASSERT(xim);
 
-      FXTRACE((TOPIC_DETAIL,"im width = %d\n",xim->width));
-      FXTRACE((TOPIC_DETAIL,"im height = %d\n",xim->height));
-      FXTRACE((TOPIC_DETAIL,"im format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap"));
-      FXTRACE((TOPIC_DETAIL,"im byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst"));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_pad = %d\n",xim->bitmap_pad));
-      FXTRACE((TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit));
-      FXTRACE((TOPIC_DETAIL,"im depth = %d\n",xim->depth));
-      FXTRACE((TOPIC_DETAIL,"im bytes_per_line = %d\n",xim->bytes_per_line));
-      FXTRACE((TOPIC_DETAIL,"im bits_per_pixel = %d\n",xim->bits_per_pixel));
+      FXTRACE(TOPIC_DETAIL,"im width = %d\n",xim->width);
+      FXTRACE(TOPIC_DETAIL,"im height = %d\n",xim->height);
+      FXTRACE(TOPIC_DETAIL,"im format = %s\n",xim->format==XYBitmap?"XYBitmap":xim->format==XYPixmap?"XYPixmap":"ZPixmap");
+      FXTRACE(TOPIC_DETAIL,"im byte_order = %s\n",(xim->byte_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"im bitmap_bit_order = %s\n",(xim->bitmap_bit_order==MSBFirst)?"MSBFirst":"LSBFirst");
+      FXTRACE(TOPIC_DETAIL,"im bitmap_pad = %d\n",xim->bitmap_pad);
+      FXTRACE(TOPIC_DETAIL,"im bitmap_unit = %d\n",xim->bitmap_unit);
+      FXTRACE(TOPIC_DETAIL,"im depth = %d\n",xim->depth);
+      FXTRACE(TOPIC_DETAIL,"im bytes_per_line = %d\n",xim->bytes_per_line);
+      FXTRACE(TOPIC_DETAIL,"im bits_per_pixel = %d\n",xim->bits_per_pixel);
 
       // Determine what to do
       switch(visual->getType()){
@@ -1488,7 +1488,7 @@ void FXImage::render(){
       if(shmi){
         XShmPutImage(DISPLAY(getApp()),xid,gc,xim,0,0,0,0,width,height,False);
         XSync(DISPLAY(getApp()),False);
-        FXTRACE((TOPIC_DETAIL,"RGBPixmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height));
+        FXTRACE(TOPIC_DETAIL,"RGBPixmap XSHM detached at memory=%p (%d bytes)\n",xim->data,xim->bytes_per_line*xim->height);
         XShmDetach(DISPLAY(getApp()),&shminfo);
         xim->data=nullptr;
         XDestroyImage(xim);
@@ -1526,7 +1526,7 @@ void FXImage::release(){
 void FXImage::resize(FXint w,FXint h){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((TOPIC_CREATION,"%s::resize(%d,%d)\n",getClassName(),w,h));
+  FXTRACE(TOPIC_CREATION,"%s::resize(%d,%d)\n",getClassName(),w,h);
   if(width!=w || height!=h){
 
     // Resize device dependent pixmap
@@ -1835,7 +1835,7 @@ static void scalenearest(FXColor *dst,const FXColor* src,FXint dw,FXint dh,FXint
 void FXImage::scale(FXint w,FXint h,FXint quality){
   if(w<1) w=1;
   if(h<1) h=1;
-  FXTRACE((TOPIC_CREATION,"%s::scale(%d,%d)\n",getClassName(),w,h));
+  FXTRACE(TOPIC_CREATION,"%s::scale(%d,%d)\n",getClassName(),w,h);
   if(w!=width || h!=height){
     if(data){
       FXint ow=width;
@@ -1924,7 +1924,7 @@ void FXImage::scale(FXint w,FXint h,FXint quality){
 
 // Mirror image horizontally and/or vertically
 void FXImage::mirror(FXbool horizontal,FXbool vertical){
-  FXTRACE((TOPIC_CREATION,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical));
+  FXTRACE(TOPIC_CREATION,"%s::mirror(%d,%d)\n",getClassName(),horizontal,vertical);
   if(horizontal || vertical){
     if(data){
       FXColor *paa,*pa,*pbb,*pb,t;
@@ -1962,7 +1962,7 @@ void FXImage::mirror(FXbool horizontal,FXbool vertical){
 
 // Rotate image by degrees ccw
 void FXImage::rotate(FXint degrees){
-  FXTRACE((TOPIC_CREATION,"%s::rotate(%d)\n",getClassName(),degrees));
+  FXTRACE(TOPIC_CREATION,"%s::rotate(%d)\n",getClassName(),degrees);
   degrees=(degrees+360)%360;
   if(degrees!=0 && width>1 && height>1){
     if(data){
@@ -2053,7 +2053,7 @@ void FXImage::crop(FXint x,FXint y,FXint w,FXint h,FXColor color){
   if(w<1) w=1;
   if(h<1) h=1;
   if(x>=width || y>=height || x+w<=0 || y+h<=0){ fxerror("%s::crop: bad arguments.\n",getClassName()); }
-  FXTRACE((TOPIC_CREATION,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h));
+  FXTRACE(TOPIC_CREATION,"%s::crop(%d,%d,%d,%d)\n",getClassName(),x,y,w,h);
   if(data){
     FXColor *pnn,*poo,*yyy,*pn,*po,*xx;
     FXint ow=width;
@@ -2347,7 +2347,7 @@ static void sheary(FXuchar *out,FXuchar* in,FXint width,FXint nheight,FXint ohei
 void FXImage::xshear(FXint shear,FXColor clr){
   FXint neww=width+((FXABS(shear)+255)>>8);
   FXint oldw=width;
-  FXTRACE((TOPIC_CREATION,"%s::xshear(%d)\n",getClassName(),shear));
+  FXTRACE(TOPIC_CREATION,"%s::xshear(%d)\n",getClassName(),shear);
   if(data){
     FXColor *olddata;
     if(!dupElms(olddata,data,width*height)){ throw FXMemoryException("unable to xshear image"); }
@@ -2366,7 +2366,7 @@ void FXImage::xshear(FXint shear,FXColor clr){
 void FXImage::yshear(FXint shear,FXColor clr){
   FXint newh=height+((FXABS(shear)+255)>>8);
   FXint oldh=height;
-  FXTRACE((TOPIC_CREATION,"%s::yshear(%d)\n",getClassName(),shear));
+  FXTRACE(TOPIC_CREATION,"%s::yshear(%d)\n",getClassName(),shear);
   if(data){
     FXColor *olddata;
     if(!dupElms(olddata,data,width*height)){ throw FXMemoryException("unable to yshear image"); }
@@ -2706,7 +2706,7 @@ void FXImage::load(FXStream& store){
 
 // Clean up
 FXImage::~FXImage(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXImage::~FXImage %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXImage::~FXImage %p\n",this);
   destroy();
   if(options&IMAGE_OWNED){freeElms(data);}
   data=(FXColor*)-1L;

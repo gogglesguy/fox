@@ -3,7 +3,7 @@
 *                  R e a d - W r i t e   L o c k   C l a s s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -52,15 +52,15 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(RWLOCK) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(SRWLOCK)=%d\n",sizeof(SRWLOCK)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(SRWLOCK));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(SRWLOCK)=%d\n",sizeof(SRWLOCK));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(SRWLOCK));
   InitializeSRWLock((SRWLOCK*)data);
 #elif defined(WIN32)
   // If this fails on your machine, determine what value
   // of sizeof(RWLOCK) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(RWLOCK));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(RWLOCK)=%d\n",sizeof(RWLOCK));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(RWLOCK));
   InitializeCriticalSection(((RWLOCK*)data)->mutex);
   InitializeCriticalSection(((RWLOCK*)data)->access);
   ((RWLOCK*)data)->readers=0;
@@ -68,8 +68,8 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_rwlock_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlockattr_t rwlockatt;
   pthread_rwlockattr_init(&rwlockatt);
   pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_WRITER_NP);
@@ -79,8 +79,8 @@ FXReadWriteLock::FXReadWriteLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_rwlock_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
   pthread_rwlock_init((pthread_rwlock_t*)data,nullptr);
 #endif
   }

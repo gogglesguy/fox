@@ -3,7 +3,7 @@
 *                      U T F - 1 6  T e x t   C o d e c                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2026 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,12 +32,12 @@ class FXAPI FXUTF16BECodec : public FXTextCodec {
   FXDECLARE(FXUTF16BECodec)
 public:
   FXUTF16BECodec(){}
-  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const;
-  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const;
-  virtual const FXchar* name() const;
-  virtual const FXchar* mimeName() const;
-  virtual FXint mibEnum() const;
-  virtual const FXchar* const* aliases() const;
+  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const override;
+  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const override;
+  virtual const FXchar* name() const override;
+  virtual const FXchar* mimeName() const override;
+  virtual FXint mibEnum() const override;
+  virtual const FXchar* const* aliases() const override;
   virtual ~FXUTF16BECodec(){}
   };
 
@@ -47,12 +47,12 @@ class FXAPI FXUTF16LECodec : public FXTextCodec {
   FXDECLARE(FXUTF16LECodec)
 public:
   FXUTF16LECodec(){}
-  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const;
-  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const;
-  virtual const FXchar* name() const;
-  virtual const FXchar* mimeName() const;
-  virtual FXint mibEnum() const;
-  virtual const FXchar* const* aliases() const;
+  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const override;
+  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const override;
+  virtual const FXchar* name() const override;
+  virtual const FXchar* mimeName() const override;
+  virtual FXint mibEnum() const override;
+  virtual const FXchar* const* aliases() const override;
   virtual ~FXUTF16LECodec(){}
   };
 
@@ -62,16 +62,16 @@ class FXAPI FXUTF16Codec : public FXTextCodec {
   FXDECLARE(FXUTF16Codec)
 public:
   FXUTF16Codec(){}
-  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const;
-  virtual FXint mb2utflen(const FXchar* src,FXint nsrc) const;
-  virtual FXint mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) const;
-  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const;
-  virtual FXint utf2mblen(const FXchar* src,FXint nsrc) const;
-  virtual FXint utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) const;
-  virtual const FXchar* name() const;
-  virtual const FXchar* mimeName() const;
-  virtual FXint mibEnum() const;
-  virtual const FXchar* const* aliases() const;
+  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const override;
+  virtual FXint mb2utflen(const FXchar* src,FXint nsrc) const override;
+  virtual FXint mb2utf(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) const override;
+  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const override;
+  virtual FXint utf2mblen(const FXchar* src,FXint nsrc) const override;
+  virtual FXint utf2mb(FXchar* dst,FXint ndst,const FXchar* src,FXint nsrc) const override;
+  virtual const FXchar* name() const override;
+  virtual const FXchar* mimeName() const override;
+  virtual FXint mibEnum() const override;
+  virtual const FXchar* const* aliases() const override;
   virtual ~FXUTF16Codec(){}
   };
 

@@ -3,7 +3,7 @@
 *                          P C X   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 by Janusz Ganczarski.   All Rights Reserved.          *
+* Copyright (C) 2001,2026 by Janusz Ganczarski.   All Rights Reserved.          *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -175,7 +175,7 @@ FXbool fxloadPCX(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         // Total number of pixels
         NumPixels=width*height;
 
-        FXTRACE((TOPIC_DETAIL,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding));
+        FXTRACE(TOPIC_DETAIL,"fxloadPCX: width=%d height=%d Version=%d BitsPerPixel=%d NPlanes=%d BytesPerLine=%d Encoding=%d\n",width,height,Version,BitsPerPixel,NPlanes,BytesPerLine,Encoding);
 
         // Scanline buffer
         if(allocElms(line,TotalBytes)){

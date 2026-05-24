@@ -3,7 +3,7 @@
 *                       D r a g   C o r n e r   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -57,14 +57,14 @@ public:
   /// Construct a drag corner
   FXDragCorner(FXComposite* p);
 
+  /// Create all of the server-side resources for this window
+  virtual void create() override;
+
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
-
-  /// Create all of the server-side resources for this window
-  virtual void create();
+  virtual FXint getDefaultHeight() override;
 
   /// Change highlight color
   void setHiliteColor(FXColor clr);
@@ -79,10 +79,10 @@ public:
   FXColor getShadowColor() const { return shadowColor; }
 
   /// Save drag corner to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load drag corner from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 }

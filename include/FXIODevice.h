@@ -3,7 +3,7 @@
 *                        I / O   D e v i c e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -50,19 +50,19 @@ public:
   FXInputHandle handle() const { return device; }
 
   /// Return true if open
-  virtual FXbool isOpen() const;
+  virtual FXbool isOpen() const override;
 
   /// Return access mode
-  virtual FXuint mode() const;
+  virtual FXuint mode() const override;
 
   /// Change access mode of open device
-  virtual FXbool mode(FXuint m);
+  virtual FXbool mode(FXuint m) override;
 
   /// Return permissions
-  virtual FXuint perms() const;
+  virtual FXuint perms() const override;
 
   /// Set permissions
-  virtual FXbool perms(FXuint p);
+  virtual FXbool perms(FXuint p) override;
 
   /// Attach existing device handle, taking ownership of the handle
   virtual FXbool attach(FXInputHandle h);
@@ -71,25 +71,25 @@ public:
   virtual FXbool detach();
 
   /// Read block of bytes, returning number of bytes read
-  virtual FXival readBlock(void* ptr,FXival count);
+  virtual FXival readBlock(void* ptr,FXival count) override;
 
   /// Write block of bytes, returning number of bytes written
-  virtual FXival writeBlock(const void* ptr,FXival count);
+  virtual FXival writeBlock(const void* ptr,FXival count) override;
 
   /// Truncate file
-  virtual FXlong truncate(FXlong sz);
+  virtual FXlong truncate(FXlong sz) override;
 
   /// Flush to disk
-  virtual FXbool flush();
+  virtual FXbool flush() override;
 
   /// Test if we're at the end; -1 if error
-  virtual FXint eof();
+  virtual FXint eof() override;
 
   /// Return size
-  virtual FXlong size();
+  virtual FXlong size() override;
 
   /// Close handle
-  virtual FXbool close();
+  virtual FXbool close() override;
 
   /// Check handle validity
   static FXbool valid(FXInputHandle hnd);

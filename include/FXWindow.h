@@ -3,7 +3,7 @@
 *                            W i n d o w   O b j e c t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -597,16 +597,16 @@ public:
   virtual void disable();
 
   /// Create all of the server-side resources for this window
-  virtual void create();
+  virtual void create() override;
 
   /// Attach foreign window handle to this window
   virtual void attach(FXID w);
 
   /// Detach the server-side resources for this window
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy the server-side resources for this window
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Set window shape by means of region
   virtual void setShape(const FXRegion& region);
@@ -638,7 +638,7 @@ public:
   * updating the server representation as well, if the window was realized.
   * Perform layout of the children when necessary.
   */
-  virtual void resize(FXint w,FXint h);
+  virtual void resize(FXint w,FXint h) override;
 
   /**
   * Move and resize the window immediately, in the parent's coordinate system.
@@ -830,7 +830,7 @@ public:
   void translateCoordinatesTo(FXint& tox,FXint& toy,const FXWindow* towindow,FXint fromx,FXint fromy) const;
 
   /// Set window background color
-  virtual void setBackColor(FXColor clr);
+  void setBackColor(FXColor clr);
 
   /// Get background color
   FXColor getBackColor() const { return backColor; }
@@ -849,10 +849,10 @@ public:
   virtual const FXchar* tr(const FXchar* text,const FXchar* hint=nullptr,FXint count=-1) const FX_FORMAT(2) ;
 
   /// Save window to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Restore window from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy window
   virtual ~FXWindow();

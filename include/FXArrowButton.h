@@ -3,7 +3,7 @@
 *                     A r r o w   B u t t o n   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -98,19 +98,19 @@ public:
   FXArrowButton(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=ARROW_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=DEFAULT_PAD,FXint pr=DEFAULT_PAD,FXint pt=DEFAULT_PAD,FXint pb=DEFAULT_PAD);
 
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Enable the button
-  virtual void enable();
+  virtual void enable() override;
 
   /// Disable the button
-  virtual void disable();
+  virtual void disable() override;
 
   /// Returns true because a button can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Set the button state (where true means the button is down)
   void setState(FXbool s);
@@ -155,10 +155,10 @@ public:
   void setArrowColor(FXColor clr);
 
   /// Save label to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load label from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXArrowButton();

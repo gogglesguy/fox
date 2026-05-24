@@ -3,7 +3,7 @@
 *                          V a r i a n t   T y p e                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -225,91 +225,91 @@ FXVariant& FXVariant::adopt(FXVariant& other){
 
 // Initialize null variant
 FXVariant::FXVariant():type(NullType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.u=0;
   }
 
 
 // Copy constructor
 FXVariant::FXVariant(const FXVariant& other):type(NullType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   assign(other);
   }
 
 
 // Construct and initialize with bool
 FXVariant::FXVariant(FXbool val):type(BoolType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.u=val;
   }
 
 
 // Construct and initialize with char
 FXVariant::FXVariant(FXchar val):type(CharType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.u=val;
   }
 
 
 // Construct and initialize with int
 FXVariant::FXVariant(FXint val):type(IntType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.i=val;
   }
 
 
 // Construct and initialize with unsigned int
 FXVariant::FXVariant(FXuint val):type(UIntType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.u=val;
   }
 
 
 // Construct and initialize with long
 FXVariant::FXVariant(FXlong val):type(LongType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.i=val;
   }
 
 
 // Construct and initialize with unsigned long
 FXVariant::FXVariant(FXulong val):type(ULongType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.u=val;
   }
 
 
 // Construct and initialize with float
 FXVariant::FXVariant(FXfloat val):type(FloatType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.d=(FXdouble)val;
   }
 
 
 // Construct and initialize with double
 FXVariant::FXVariant(FXdouble val):type(DoubleType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.d=val;
   }
 
 
 // Construct and initialize with pointer
 FXVariant::FXVariant(FXptr val):type(PointerType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   value.p=val;
   }
 
 
 // Construct and initialize with string
 FXVariant::FXVariant(const FXchar *val):type(StringType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   construct(reinterpret_cast<FXString*>(&value.p),val);
   }
 
 
 // Construct and initialize with string
 FXVariant::FXVariant(const FXString& val):type(StringType){
-  FXASSERT_STATIC(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
+  FXSTATIC_ASSERT(sizeof(value)>=sizeof(FXString) && sizeof(value)>=sizeof(FXVariantArray) &&  sizeof(value)>=sizeof(FXVariantMap));
   construct(reinterpret_cast<FXString*>(&value.p),val);
   }
 

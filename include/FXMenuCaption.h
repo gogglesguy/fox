@@ -3,7 +3,7 @@
 *                         M e n u C a p t i o n   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -89,22 +89,22 @@ public:
   FXMenuCaption(FXComposite* p,const FXString& text,FXIcon* ic=nullptr,FXuint opts=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Enable the menu
-  virtual void enable();
+  virtual void enable() override;
 
   /// Disable the menu
-  virtual void disable();
+  virtual void disable() override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Change text and hotkey for this menu
   void setTextAndHotKey(const FXString& hotkeytext);
@@ -176,10 +176,10 @@ public:
   const FXString& getTipText() const { return tip; }
 
   /// Save menu to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load menu from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXMenuCaption();

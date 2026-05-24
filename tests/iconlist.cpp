@@ -3,7 +3,7 @@
 *                           Test Icon List Widget                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -42,7 +42,7 @@ public:
     };
 public:
   IconListWindow(FXApp* a);
-  virtual void create();
+  virtual void create() override;
   virtual ~IconListWindow();
   };
 

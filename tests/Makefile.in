@@ -101,8 +101,8 @@ noinst_PROGRAMS = bitmapviewer$(EXEEXT) button$(EXEEXT) \
 	ratio$(EXEEXT) rex$(EXEEXT) scan$(EXEEXT) scribble$(EXEEXT) \
 	shutter$(EXEEXT) splitter$(EXEEXT) switcher$(EXEEXT) \
 	tabbook$(EXEEXT) table$(EXEEXT) thread$(EXEEXT) \
-	timefmt$(EXEEXT) unicode$(EXEEXT) variant$(EXEEXT) \
-	wizard$(EXEEXT) xml$(EXEEXT) gltest$(EXEEXT)
+	timefmt$(EXEEXT) unicode$(EXEEXT) units$(EXEEXT) \
+	variant$(EXEEXT) wizard$(EXEEXT) xml$(EXEEXT) gltest$(EXEEXT)
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -288,6 +288,10 @@ am_unicode_OBJECTS = unicode.$(OBJEXT)
 unicode_OBJECTS = $(am_unicode_OBJECTS)
 unicode_LDADD = $(LDADD)
 unicode_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
+am_units_OBJECTS = units.$(OBJEXT)
+units_OBJECTS = $(am_units_OBJECTS)
+units_LDADD = $(LDADD)
+units_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
 am_variant_OBJECTS = variant.$(OBJEXT)
 variant_OBJECTS = $(am_variant_OBJECTS)
 variant_LDADD = $(LDADD)
@@ -366,8 +370,8 @@ SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
 	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
 	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(timefmt_SOURCES) $(unicode_SOURCES) $(variant_SOURCES) \
-	$(wizard_SOURCES) $(xml_SOURCES)
+	$(timefmt_SOURCES) $(unicode_SOURCES) $(units_SOURCES) \
+	$(variant_SOURCES) $(wizard_SOURCES) $(xml_SOURCES)
 DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(calendar_SOURCES) $(codecs_SOURCES) $(console_SOURCES) \
 	$(datatarget_SOURCES) $(dctest_SOURCES) $(dialog_SOURCES) \
@@ -382,8 +386,8 @@ DIST_SOURCES = $(bitmapviewer_SOURCES) $(button_SOURCES) \
 	$(rex_SOURCES) $(scan_SOURCES) $(scribble_SOURCES) \
 	$(shutter_SOURCES) $(splitter_SOURCES) $(switcher_SOURCES) \
 	$(tabbook_SOURCES) $(table_SOURCES) $(thread_SOURCES) \
-	$(timefmt_SOURCES) $(unicode_SOURCES) $(variant_SOURCES) \
-	$(wizard_SOURCES) $(xml_SOURCES)
+	$(timefmt_SOURCES) $(unicode_SOURCES) $(units_SOURCES) \
+	$(variant_SOURCES) $(wizard_SOURCES) $(xml_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -593,6 +597,7 @@ dctest_SOURCES = dctest.cpp dippy.h
 half_SOURCES = half.cpp
 match_SOURCES = match.cpp
 unicode_SOURCES = unicode.cpp
+units_SOURCES = units.cpp
 parallel_SOURCES = parallel.cpp
 variant_SOURCES = variant.cpp
 math_SOURCES = math.cpp
@@ -814,6 +819,10 @@ unicode$(EXEEXT): $(unicode_OBJECTS) $(unicode_DEPENDENCIES) $(EXTRA_unicode_DEP
 	@rm -f unicode$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(unicode_OBJECTS) $(unicode_LDADD) $(LIBS)
 
+units$(EXEEXT): $(units_OBJECTS) $(units_DEPENDENCIES) $(EXTRA_units_DEPENDENCIES) 
+	@rm -f units$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(units_OBJECTS) $(units_LDADD) $(LIBS)
+
 variant$(EXEEXT): $(variant_OBJECTS) $(variant_DEPENDENCIES) $(EXTRA_variant_DEPENDENCIES) 
 	@rm -f variant$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(variant_OBJECTS) $(variant_LDADD) $(LIBS)
@@ -875,6 +884,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timefmt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/units.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/variant.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wizard.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml.Po@am__quote@

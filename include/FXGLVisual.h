@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -85,13 +85,13 @@ public:
   FXGLVisual(FXApp* a,FXuint flgs=VISUAL_DOUBLE_BUFFER);
 
   /// Create visual
-  virtual void create();
+  virtual void create() override;
 
   /// Detach visual
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy visual
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Get sizes for bit-planes
   FXint getRedSize() const { return redSize; }
@@ -148,10 +148,10 @@ public:
   static FXbool hasOpenGL(FXApp* application);
 
   /// Save visual info to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load visual info to a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLVisual();

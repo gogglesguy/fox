@@ -3,7 +3,7 @@
 *                         C o m p o s e - C o n t e x t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -63,10 +63,10 @@ public:
   FXComposeContext(FXApp* a,FXWindow* win=nullptr,FXSelector sel=0);
 
   /// Create resource
-  virtual void create();
+  virtual void create() override;
 
   /// Destroy resource
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Focus in
   void focusIn();

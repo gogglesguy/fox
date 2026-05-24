@@ -3,7 +3,7 @@
 *                                  Chart  Test                                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include "chart.h"
@@ -44,7 +44,7 @@ public:
     };
 public:
   ChartWindow(FXApp *a);
-  virtual void create();
+  virtual void create() override;
   virtual ~ChartWindow();
   };
 

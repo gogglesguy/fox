@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -159,7 +159,7 @@ protected:
   FXFileList();
   FXbool listItems(FXbool force,FXbool notify);
   FXString getSelectedFiles() const;
-  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr);
+  virtual FXIconItem *createItem(const FXString& text,FXIcon *big,FXIcon* mini,void* ptr) override;
   void delete_files(const FXString& files);
   void copy_files(const FXString& directory,const FXString& files);
   void move_files(const FXString& directory,const FXString& files);
@@ -278,13 +278,13 @@ public:
   FXFileList(FXComposite *p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy server-side resources
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Set current file; return true if success
   FXbool setCurrentFile(const FXString& file,FXbool notify=false);
@@ -407,10 +407,10 @@ public:
   FXIconSource* getIconSource() const { return iconloader; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXFileList();

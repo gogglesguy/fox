@@ -3,7 +3,7 @@
 *                         T o o l   T i p   W i d g e t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -288,7 +288,7 @@ long FXToolTip::onUpdate(FXObject* sender,FXSelector sel,void* ptr){
 
 // Pop the tool tip now
 long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DEBUG,"%s::onTipShow %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DEBUG,"%s::onTipShow %p\n",getClassName(),this);
   if(!label.empty()){
     autoplace();
     show();
@@ -306,7 +306,7 @@ long FXToolTip::onTipShow(FXObject*,FXSelector,void*){
 
 // Tip should hide now
 long FXToolTip::onTipHide(FXObject*,FXSelector,void*){
-  FXTRACE((TOPIC_DEBUG,"%s::onTipHide %p\n",getClassName(),this));
+  FXTRACE(TOPIC_DEBUG,"%s::onTipHide %p\n",getClassName(),this);
   hide();
   return 1;
   }

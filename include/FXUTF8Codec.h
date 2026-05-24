@@ -3,7 +3,7 @@
 *                      U T F - 8  T e x t   C o d e c                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
+* Copyright (C) 2002,2026 by L.Johnson & J.van der Zijp.  All Rights Reserved.  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -31,12 +31,12 @@ namespace FX {
 class FXAPI FXUTF8Codec : public FXTextCodec {
 public:
   FXUTF8Codec(){}
-  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const;
-  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const;
-  virtual const FXchar* name() const;
-  virtual const FXchar* mimeName() const;
-  virtual FXint mibEnum() const;
-  virtual const FXchar* const* aliases() const;
+  virtual FXint mb2wc(FXwchar& wc,const FXchar* src,FXint nsrc) const override;
+  virtual FXint wc2mb(FXchar* dst,FXint ndst,FXwchar wc) const override;
+  virtual const FXchar* name() const override;
+  virtual const FXchar* mimeName() const override;
+  virtual FXint mibEnum() const override;
+  virtual const FXchar* const* aliases() const override;
   virtual ~FXUTF8Codec(){}
   };
 

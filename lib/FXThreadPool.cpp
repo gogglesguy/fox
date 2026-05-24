@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -90,7 +90,7 @@ FXAutoThreadStorageKey FXThreadPool::reference;
 
 // Create thread pool
 FXThreadPool::FXThreadPool(FXuint sz):queue(sz),freeslots(sz),usedslots(0),stacksize(0),expiration(forever),maximum(FXThread::processors()),minimum(1),workers(0),running(0){
-  FXTRACE((TOPIC_DETAIL,"FXThreadPool::FXThreadPool(%d)\n",sz));
+  FXTRACE(TOPIC_DETAIL,"FXThreadPool::FXThreadPool(%d)\n",sz);
   }
 
 
@@ -181,7 +181,7 @@ FXbool FXThreadPool::startWorker(){
 // Start thread pool
 FXuint FXThreadPool::start(FXuint count){
   FXuint result=0;
-  FXTRACE((TOPIC_DETAIL,"FXThreadPool::start(%u)\n",count));
+  FXTRACE(TOPIC_DETAIL,"FXThreadPool::start(%u)\n",count);
   if(atomicBoolCas(&running,0,2)){
 
     // Start number of workers
@@ -302,7 +302,7 @@ FXbool FXThreadPool::waitFor(FXCompletion& comp){
 
 // Stop thread pool
 FXbool FXThreadPool::stop(){
-  FXTRACE((TOPIC_DETAIL,"FXThreadPool::stop()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXThreadPool::stop()\n");
   if(atomicBoolCas(&running,1,2)){
     FXint w=threads.count();
 
@@ -334,7 +334,7 @@ FXbool FXThreadPool::stop(){
 
 // Delete thread pool
 FXThreadPool::~FXThreadPool(){
-  FXTRACE((TOPIC_DETAIL,"FXThreadPool::~FXThreadPool()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXThreadPool::~FXThreadPool()\n");
   stop();
   }
 

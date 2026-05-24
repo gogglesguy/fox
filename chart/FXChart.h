@@ -3,7 +3,7 @@
 *                        C h a r t   B a s e   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -80,13 +80,13 @@ public:
   FXChart(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=CAPTION_ABOVE|CAPTION_SHOWN,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=4,FXint pr=4,FXint pt=4,FXint pb=4);
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Detach server-side resources
-  virtual void detach();
+  virtual void detach() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Change caption
   void setCaption(const FXString& cap);
@@ -161,10 +161,10 @@ public:
   FXString getTipText() const { return tip; }
 
   /// Save chart to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load chart from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXChart();

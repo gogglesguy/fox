@@ -3,7 +3,7 @@
 *                                T i m e   S t u f f                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2019,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2019,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -439,12 +439,12 @@ FXTime FXSystem::daylightSavingsActive(FXTime utc){
   struct tm tmresult;
   time_t tmp=(time_t)(utc/seconds);
   struct tm* ptm=localtime_r(&tmp,&tmresult);
-  FXTRACE((TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
+  FXTRACE(TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0);
   return ptm && ptm->tm_isdst!=0;
 #else
   time_t tmp=(time_t)(utc/seconds);
   struct tm* ptm=localtime(&tmp);
-  FXTRACE((TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0));
+  FXTRACE(TOPIC_DEBUG,"FXSystem::daylightSavingsActive(%lld) = %d\n",utc,ptm && ptm->tm_isdst!=0);
   return ptm && ptm->tm_isdst!=0;
 #endif
   }

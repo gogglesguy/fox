@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -125,13 +125,13 @@ public:
   void* getVisual() const { return visual; }
 
   /// Create visual
-  virtual void create();
+  virtual void create() override;
 
   /// Detach visual
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy visual
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Change option flags
   void setFlags(FXuint flgs){ flags=flgs; }
@@ -173,10 +173,10 @@ public:
   FXuint getMaxColors() const { return maxcolors; }
 
   /// Save visual information to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load visual information from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXVisual();

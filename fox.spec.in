@@ -77,7 +77,7 @@ PathFinder is a file browser application written using the FOX Toolkit.
 %package -n shutterbug
 Summary: Shutterbug Screenshot Utility
 Group: X11/Applications
-Version: 2.0.0
+Version: 3.1.0
 
 %description -n shutterbug
 Shutterbug is a FOX-based screenshot utility.

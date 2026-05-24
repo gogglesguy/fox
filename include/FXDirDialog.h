@@ -3,7 +3,7 @@
 *                D i r e c t o r y   S e l e c t i o n   D i a l o g            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -59,7 +59,7 @@ public:
   FXDirDialog(FXApp* a,const FXString& name,FXuint opts=0,FXint x=0,FXint y=0,FXint w=400,FXint h=300);
 
   /// Hide this window
-  virtual void hide();
+  virtual void hide() override;
 
   /// Change directory
   void setDirectory(const FXString& path);
@@ -107,10 +107,10 @@ public:
   static FXString getOpenDirectory(FXWindow* owner,const FXString& caption,const FXString& path);
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXDirDialog();

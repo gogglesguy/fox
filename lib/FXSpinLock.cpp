@@ -3,7 +3,7 @@
 *                           S p i n l o c k   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,16 +51,16 @@ FXSpinLock::FXSpinLock(){
   // If this fails on your machine, determine what value
   // of sizeof(pthread_mutex_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(OSSpinLock));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(OSSpinLock)=%d\n",sizeof(OSSpinLock));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(OSSpinLock));
   data[0]=data[1]=data[2]=data[3]=0;
   *((OSSpinLock*)data)=OS_SPINLOCK_INIT;
 #else
   // If this fails on your machine, determine what value
   // of sizeof(pthread_spinlock_t) is supposed to be on your
   // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE((TOPIC_CONSTRUCT,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t)));
-  FXASSERT_STATIC(sizeof(data)>=sizeof(pthread_spinlock_t));
+  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_spinlock_t)=%d\n",sizeof(pthread_spinlock_t));
+  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_spinlock_t));
   data[0]=data[1]=data[2]=data[3]=0;
   pthread_spin_init((pthread_spinlock_t*)(void*)data,PTHREAD_PROCESS_PRIVATE);
 #endif

@@ -3,7 +3,7 @@
 *                     S h e l l   W i n d o w   W i d g e t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,16 +56,16 @@ public:
 public:
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Mark this window's layout as dirty
-  virtual void recalc();
+  virtual void recalc() override;
 
   /// Move the focus to this window
-  virtual void setFocus();
+  virtual void setFocus() override;
 
   /// Remove the focus from this window
-  virtual void killFocus();
+  virtual void killFocus() override;
 
   /// Destroy shell
   virtual ~FXShell();

@@ -3,7 +3,7 @@
 *               S t r i n g   t o   D o u b l e   C o n v e r s i o n           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -641,7 +641,7 @@ FXdouble floatFromHex64(FXulong value,FXint binex){
         value>>=1;
         binex=(value>>52);
         }
-        
+
       // Normal return
       return Math::fpMake(value,binex);
       }
@@ -985,7 +985,7 @@ FXfloat floatFromHex32(FXulong value,FXint binex){
 
     // Underflow
     if(__likely(-22<=binex)){
-  
+
       // Check for overflow
       if(__unlikely(255<=binex)){
         return Math::fpMake(0x00000000u,255);
@@ -998,7 +998,7 @@ FXfloat floatFromHex32(FXulong value,FXint binex){
         value>>=1;
         binex=(value>>23);
         }
-  
+
       // Normal return
       return Math::fpMake((FXuint)value,binex);
       }

@@ -3,7 +3,7 @@
 *                       F o u r - W a y   S p l i t t e r                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -153,13 +153,13 @@ public:
   void setVSplit(FXint s);
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Get default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Get default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Return current splitter style
   FXuint getSplitterStyle() const;
@@ -180,10 +180,10 @@ public:
   FXuint getExpanded() const;
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
   };
 
 }

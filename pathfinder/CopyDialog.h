@@ -3,7 +3,7 @@
 *                       F i l e   C o p y   D i a l o g                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -45,7 +45,7 @@ public:
   FXString getNewName() const { return newname->getText(); }
 
   // Run modal invocation of the dialog
-  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR) override;
 
   // Destroy
   virtual ~CopyDialog();

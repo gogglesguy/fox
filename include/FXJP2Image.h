@@ -3,7 +3,7 @@
 *                   J P E G - 2 0 0 0   I m a g e   O b j e c t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2009,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2009,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,10 +56,10 @@ public:
   FXint getQuality() const { return quality; }
 
   /// Load pixels from stream in JPEG format
-  virtual FXbool savePixels(FXStream& store) const;
+  virtual FXbool savePixels(FXStream& store) const override;
 
   /// Save pixels into stream in JPEG format
-  virtual FXbool loadPixels(FXStream& store);
+  virtual FXbool loadPixels(FXStream& store) override;
 
   /// Destroy
   virtual ~FXJP2Image();

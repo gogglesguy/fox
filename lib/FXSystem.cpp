@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,7 @@
 #include "FXString.h"
 #include "FXIO.h"
 #include "FXFile.h"
+#include "FXPath.h"
 #include "FXProcess.h"
 #include "FXSystem.h"
 #include "FXStat.h"
@@ -326,10 +327,7 @@ FXString FXSystem::getCurrentDrive(){
   return FXString::null;
   }
 
-
 #endif
-
-
 
 
 // Get executable path
@@ -370,7 +368,49 @@ FXString FXSystem::getExecFilename(){
 
 // Return the home directory for the current user.
 FXString FXSystem::getHomeDirectory(){
-  return FXSystem::getUserDirectory(FXString::null);
+#if defined(WIN32)
+#ifdef UNICODE
+  FXnchar path[4096];
+  DWORD drivelen;
+  DWORD pathlen;
+
+  // We try %USERPROFILE% first
+  if((pathlen=GetEnvironmentVariableW(L"USERPROFILE",path,ARRAYNUMBER(path)))!=0){
+    return FXString(path,pathlen);
+    }
+
+  // Otherwise, try %HOMEDRIVE%%HOMEPATH%; this should be good for WinNT, Win2K according to MSDN
+  if((drivelen=GetEnvironmentVariableW(L"HOMEDRIVE",path,ARRAYNUMBER(path)))!=0){
+    if((pathlen=GetEnvironmentVariableW(L"HOMEPATH",&path[drivelen],ARRAYNUMBER(path)-drivelen))!=0){
+      return FXString(path,drivelen+pathlen);
+      }
+    }
+  return FXString::null;
+#else
+  FXchar path[4096];
+  DWORD drivelen;
+  DWORD pathlen;
+
+  // We try %USERPROFILE% first
+  if((pathlen=GetEnvironmentVariableA("USERPROFILE",path,ARRAYNUMBER(path)))!=0){
+    return FXString(path,pathlen);
+    }
+
+  // Otherwise, try %HOMEDRIVE%%HOMEPATH%; this should be good for WinNT, Win2K according to MSDN
+  if((drivelen=GetEnvironmentVariableA("HOMEDRIVE",path,ARRAYNUMBER(path)))!=0){
+    if((pathlen=GetEnvironmentVariableA("HOMEPATH",&path[drivelen],ARRAYNUMBER(path)-drivelen))!=0){
+      return FXString(path,drivelen+pathlen);
+      }
+    }
+  return FXString::null;
+#endif
+#else
+  const FXchar* str(getenv("HOME"));
+  if(str!=nullptr){
+    return FXString(str);
+    }
+  return FXString::null;
+#endif
   }
 
 
@@ -402,160 +442,89 @@ FXString FXSystem::getSystemDirectory(){
 #endif
   }
 
-
-/*
-
-BOOL WINAPI LookupAccountName(
-  _In_opt_   LPCTSTR lpSystemName,
-  _In_       LPCTSTR lpAccountName,
-  _Out_opt_  PSID Sid,
-  _Inout_    LPDWORD cbSid,
-  _Out_opt_  LPTSTR ReferencedDomainName,
-  _Inout_    LPDWORD cchReferencedDomainName,
-  _Out_      PSID_NAME_USE peUse
-);
-
-PSID GetUserSID(const FXString& name){
-  FXString user=name.empty()?currentUserName():name;
-  if(!user.empty()){
-    PSID   sid=nullptr;
-    DWORD  sid_size=0;
-    TCHAR *domain=nullptr;
-    DWORD  domain_size=0;
-    SID_NAME_USE use=SidTypeUnknown;
-
-    // First call to LookupAccountName to get the buffer sizes
-    if(LookupAccountNameA(nullptr,user.text(),sid,&sid_size,domain,&domain_size,&use)){
-
-      // Allocate
-      sid=(PSID)LocalAlloc(LMEM_FIXED,sid_size);
-      domain=new TCHAR [domain_size];
-
-      // Second call to LookupAccountName to get the actual account info
-      if(LookupAccountName(nullptr,user.text(),sid,&sid_size,domain,&domain_size,&use)){
-        delete [] domain;
-        return sid;
-        }
-
-      // Free
-      LocalFree(sid);
-      delete [] domain;
-      }
-    }
-  return nullptr;
-  }
-*/
-
-// Get home directory for a given user
-FXString FXSystem::getUserDirectory(const FXString& user){
 #if defined(WIN32)
 #ifdef UNICODE
-  if(user.empty()){
-    FXnchar path[4096];
-    FXnchar drive[256];
-    DWORD pathlen;
-    DWORD drivelen;
-    HKEY hKey;
-    LONG result;
-    if((pathlen=GetEnvironmentVariableW(L"USERPROFILE",path,ARRAYNUMBER(path)))>0){
-      return FXString(path,pathlen);
-      }
-    if((pathlen=GetEnvironmentVariableW(L"HOME",path,ARRAYNUMBER(path)))>0){
-      return FXString(path,pathlen);
-      }
-    if((pathlen=GetEnvironmentVariableW(L"HOMEPATH",path,ARRAYNUMBER(path)))>0){        // This should be good for WinNT, Win2K according to MSDN
-      FXString result("C:");
-      if((drivelen=GetEnvironmentVariableW(L"HOMEDRIVE",drive,ARRAYNUMBER(drive)))>0){
-        result.assign(drive,drivelen);
-        }
-      result.append(path,pathlen);
+
+static FXString getUserSID(const FXString& user){
+  FXnchar usr[512],sid[512],dom[512];
+  DWORD sidsize=ARRAYNUMBER(sid);
+  DWORD domsize=ARRAYNUMBER(dom);
+  SID_NAME_USE sidnameuse;
+  utf2ncs(usr,user.text(),ARRAYNUMBER(usr));
+  if(LookupAccountNameW(nullptr,usr,(SID*)sid,&sidsize,dom,&domsize,&sidnameuse)){
+    FXnchar* str=nullptr;
+    if(ConvertSidToStringSidW((SID*)sid,&str)){
+      FXString result(str);
+      LocalFree(str);
       return result;
-      }
-    if(RegOpenKeyExW(HKEY_CURRENT_USER,L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
-      result=RegQueryValueExW(hKey,L"Personal",nullptr,nullptr,(LPBYTE)path,&pathlen);        // Change "Personal" to "Desktop" if you want...
-      RegCloseKey(hKey);
-      if(result==ERROR_SUCCESS){
-        return FXString(path,pathlen);
-        }
       }
     }
   return FXString::null;
+  }
+
 #else
-  if(user.empty()){
-    FXchar path[4096];
-    FXchar drive[256];
-    DWORD pathlen;
-    DWORD drivelen;
-    HKEY hKey;
-    LONG result;
-    if((pathlen=GetEnvironmentVariableA("USERPROFILE",path,ARRAYNUMBER(path)))>0){
-      return FXString(path,pathlen);
-      }
-    if((pathlen=GetEnvironmentVariableA("HOME",path,ARRAYNUMBER(path)))>0){
-      return FXString(path,pathlen);
-      }
-    if((pathlen=GetEnvironmentVariableA("HOMEPATH",path,ARRAYNUMBER(path)))>0){         // This should be good for WinNT, Win2K according to MSDN
-      FXString result("C:");
-      if((drivelen=GetEnvironmentVariableA("HOMEDRIVE",drive,ARRAYNUMBER(drive)))>0){
-        result.assign(drive,drivelen);
-        }
-      result.append(path,pathlen);
+
+static FXString getUserSID(const FXString& user){
+  FXchar sid[512],dom[512];
+  DWORD sidsize=ARRAYNUMBER(sid);
+  DWORD domsize=ARRAYNUMBER(dom);
+  SID_NAME_USE sidnameuse;
+  if(LookupAccountNameA(nullptr,user.text(),(SID*)sid,&sidsize,dom,&domsize,&sidnameuse)){
+    FXchar* str=nullptr;
+    if(ConvertSidToStringSidA((SID*)sid,&str)){
+      FXString result(str);
+      LocalFree(str);
       return result;
-      }
-    if(RegOpenKeyExA(HKEY_CURRENT_USER,"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",0,KEY_READ,&hKey)==ERROR_SUCCESS){
-      result=RegQueryValueExA(hKey,"Personal",nullptr,nullptr,(LPBYTE)path,&pathlen);         // Change "Personal" to "Desktop" if you want...
-      RegCloseKey(hKey);
-      if(result==ERROR_SUCCESS){
-        return FXString(path,pathlen);
-        }
       }
     }
   return FXString::null;
+  }
+
 #endif
+#endif
+
+// Return the default directory for a given user
+// On Windows, first obtain the SID string from the user account, via LookupAccountName().
+// Next, we need to open registry key "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\<SID>".
+// Under this key, we'll find the ProfileImagePath, which is the user's home directory.
+// On Linux, things are substantially easier.
+FXString FXSystem::getUserDirectory(const FXString& user){
+  if(!user.empty()){
+#if defined(WIN32)
+    FXString sid=getUserSID(user);
+    FXString profile("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\"+sid);
+    HKEY     key;
+    if(RegOpenKeyExA(HKEY_LOCAL_MACHINE,profile.text(),0,KEY_READ,&key)==ERROR_SUCCESS){
+#ifdef UNICODE
+      FXnchar path[4096]; DWORD pathlen=ARRAYNUMBER(path);
+      if(RegQueryValueExW(key,L"ProfileImagePath",nullptr,nullptr,(LPBYTE)path,&pathlen)==ERROR_SUCCESS){
+        RegCloseKey(key);
+        return FXString(path,pathlen);
+        }
+#else
+      FXchar path[4096]; DWORD pathlen=ARRAYNUMBER(path);
+      if(RegQueryValueExA(key,"ProfileImagePath",nullptr,nullptr,(LPBYTE)path,&pathlen)==ERROR_SUCCESS){
+        RegCloseKey(key);
+        return FXString(path,pathlen);
+        }
+#endif
+      RegCloseKey(key);
+      }
 #elif defined(HAVE_GETPWNAM_R)
-  struct passwd pwdresult,*pwd;
-  const FXchar* str;
-  char buffer[1024];
-  if(user.empty()){
-    if((str=getenv("HOME"))!=nullptr){
-      return FXString(str);
-      }
-    if((str=getenv("USER"))!=nullptr || (str=getenv("LOGNAME"))!=nullptr){
-      if(getpwnam_r(str,&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
-        return FXString(pwd->pw_dir);
-        }
-      }
-    if(getpwuid_r(getuid(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
+    struct passwd pwdresult;
+    struct passwd *pwd;
+    FXchar buffer[1024];
+    if(getpwnam_r(user.text(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
       return FXString(pwd->pw_dir);
       }
-    return FXString::null;
-    }
-  if(getpwnam_r(user.text(),&pwdresult,buffer,sizeof(buffer),&pwd)==0 && pwd){
-    return FXString(pwd->pw_dir);
-    }
-  return FXString::null;
 #else
-  struct passwd *pwd;
-  const FXchar* str;
-  if(user.empty()){
-    if((str=getenv("HOME"))!=nullptr){
-      return FXString(str);
-      }
-    if((str=getenv("USER"))!=nullptr || (str=getenv("LOGNAME"))!=nullptr){
-      if((pwd=getpwnam(str))!=nullptr){
-        return FXString(pwd->pw_dir);
-        }
-      }
-    if((pwd=getpwuid(getuid()))!=nullptr){
+    struct passwd *pwd;
+    if((pwd=getpwnam(user.text()))!=nullptr){
       return FXString(pwd->pw_dir);
       }
-    return FXString::null;
-    }
-  if((pwd=getpwnam(user.text()))!=nullptr){
-    return FXString(pwd->pw_dir);
+#endif
     }
   return FXString::null;
-#endif
   }
 
 
@@ -597,7 +566,7 @@ FXint FXSystem::system(const FXString& cmd){
       GetEnvironmentVariableW(L"COMSPEC",cmd_exe,MAXPATHLEN);
 
       // Probably required
-     _flushall();
+      _flushall();
 
       // Kick off command
       DWORD dwCreationFlags = !GetConsoleWindow() ? CREATE_NO_WINDOW : 0;
@@ -635,7 +604,7 @@ FXint FXSystem::system(const FXString& cmd){
       cmd_arg[2]=' ';
 
       // Copy command
-      strncpy(&cmd_arg[3],cmd.text(),cmd.length());
+      copyElms(&cmd_arg[3],cmd.text(),cmd.length());
 
       // Path to cmd.exe
       GetEnvironmentVariableA("COMSPEC",cmd_exe,MAXPATHLEN);

@@ -3,7 +3,7 @@
 *                L o a d   I c o n   F r o m   E x e c u t a b l e              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2014,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2014,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -334,7 +334,7 @@ static FXbool scandata(FXStream& store,FXColor*& data,FXint& width,FXint& height
   FXlong pos=store.position();
   FXbool result=false;
 
-  FXTRACE((TOPIC_DETAIL,"scandata: %llu (%#llx)\n",start,start));
+  FXTRACE(TOPIC_DETAIL,"scandata: %llu (%#llx)\n",start,start);
 
   // Read resource data entry, at start
   store.position(start);
@@ -343,10 +343,10 @@ static FXbool scandata(FXStream& store,FXColor*& data,FXint& width,FXint& height
   store >> res.codePage;
   store >> res.reserved;
 
-  FXTRACE((TOPIC_DETAIL,"res.offsetToData: %u (%#x)\n",res.offsetToData,res.offsetToData));
-  FXTRACE((TOPIC_DETAIL,"res.size: %u\n",res.size));
-  FXTRACE((TOPIC_DETAIL,"res.codePage: %u\n",res.codePage));
-  FXTRACE((TOPIC_DETAIL,"res.reserved: %u\n",res.reserved));
+  FXTRACE(TOPIC_DETAIL,"res.offsetToData: %u (%#x)\n",res.offsetToData,res.offsetToData);
+  FXTRACE(TOPIC_DETAIL,"res.size: %u\n",res.size);
+  FXTRACE(TOPIC_DETAIL,"res.codePage: %u\n",res.codePage);
+  FXTRACE(TOPIC_DETAIL,"res.reserved: %u\n",res.reserved);
 
   // Bail if at end
   if(store.eof()) goto x;
@@ -359,7 +359,7 @@ static FXbool scandata(FXStream& store,FXColor*& data,FXint& width,FXint& height
   else if(ctx.wanted[0]==RST_ICON){
     result=fxloadICOStream(store,data,width,height);
     }
-  FXTRACE((TOPIC_DETAIL,"result: %u\n",result));
+  FXTRACE(TOPIC_DETAIL,"result: %u\n",result);
 x:store.position(pos);
   return result;
   }
@@ -381,12 +381,12 @@ static FXbool scanresources(FXStream& store,FXColor*& data,FXint& width,FXint& h
     store >> dir.numberOfNamedEntries;
     store >> dir.numberOfIdEntries;
 
-    FXTRACE((TOPIC_DETAIL,"%*sdir.characteristics: %#08x\n",lev<<2,"",dir.characteristics));
-    FXTRACE((TOPIC_DETAIL,"%*sdir.timeDateStamp: %u\n",lev<<2,"",dir.timeDateStamp));
-    FXTRACE((TOPIC_DETAIL,"%*sdir.majorVersion: %u\n",lev<<2,"",dir.majorVersion));
-    FXTRACE((TOPIC_DETAIL,"%*sdir.minorVersion: %u\n",lev<<2,"",dir.minorVersion));
-    FXTRACE((TOPIC_DETAIL,"%*sdir.numberOfNamedEntries: %u\n",lev<<2,"",dir.numberOfNamedEntries));
-    FXTRACE((TOPIC_DETAIL,"%*sdir.numberOfIdEntries: %u\n\n",lev<<2,"",dir.numberOfIdEntries));
+    FXTRACE(TOPIC_DETAIL,"%*sdir.characteristics: %#08x\n",lev<<2,"",dir.characteristics);
+    FXTRACE(TOPIC_DETAIL,"%*sdir.timeDateStamp: %u\n",lev<<2,"",dir.timeDateStamp);
+    FXTRACE(TOPIC_DETAIL,"%*sdir.majorVersion: %u\n",lev<<2,"",dir.majorVersion);
+    FXTRACE(TOPIC_DETAIL,"%*sdir.minorVersion: %u\n",lev<<2,"",dir.minorVersion);
+    FXTRACE(TOPIC_DETAIL,"%*sdir.numberOfNamedEntries: %u\n",lev<<2,"",dir.numberOfNamedEntries);
+    FXTRACE(TOPIC_DETAIL,"%*sdir.numberOfIdEntries: %u\n\n",lev<<2,"",dir.numberOfIdEntries);
 
     // We're still good?
     if(!store.eof()){
@@ -403,7 +403,7 @@ static FXbool scanresources(FXStream& store,FXColor*& data,FXint& width,FXint& h
         // Still good?
         if(store.eof()) goto x;
 
-        FXTRACE((TOPIC_DETAIL,"%*sentry.name: %u\n",lev<<2,"",entry.name));
+        FXTRACE(TOPIC_DETAIL,"%*sentry.name: %u\n",lev<<2,"",entry.name);
 
         // If don't care match or matching ID then check the rest, otherwise move on to next
         if(want==-1 || (!(entry.name&IMAGE_RESOURCE_NAME_IS_STRING) && (entry.name&0xFFFF)==(FXuint)want)){
@@ -429,7 +429,7 @@ x:  store.position(pos);
 FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint type,FXint id){
   FXbool result=false;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadEXE(data,width,height,type:%d,id:%d)\n\n",type,id));
+  FXTRACE(TOPIC_DETAIL,"fxloadEXE(data,width,height,type:%d,id:%d)\n\n",type,id);
 
   // Null out
   data=nullptr;
@@ -465,22 +465,22 @@ FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
     store.load(dos.res2,10);
     store >> dos.lfanew;                 // address of new EXE header
 
-    FXTRACE((TOPIC_DETAIL,"dos.magic: %#04x\n",dos.magic));
-    FXTRACE((TOPIC_DETAIL,"dos.cblp: %d\n",dos.cblp));
-    FXTRACE((TOPIC_DETAIL,"dos.cp: %d\n",dos.cp));
-    FXTRACE((TOPIC_DETAIL,"dos.crlc: %d\n",dos.crlc));
-    FXTRACE((TOPIC_DETAIL,"dos.cparhdr: %d\n",dos.cparhdr));
-    FXTRACE((TOPIC_DETAIL,"dos.minalloc: %d\n",dos.minalloc));
-    FXTRACE((TOPIC_DETAIL,"dos.maxalloc: %d\n",dos.maxalloc));
-    FXTRACE((TOPIC_DETAIL,"dos.ss: %d\n",dos.ss));
-    FXTRACE((TOPIC_DETAIL,"dos.sp: %d\n",dos.sp));
-    FXTRACE((TOPIC_DETAIL,"dos.csum: %d\n",dos.csum));
-    FXTRACE((TOPIC_DETAIL,"dos.ip: %d\n",dos.ip));
-    FXTRACE((TOPIC_DETAIL,"dos.cs: %d\n",dos.cs));
-    FXTRACE((TOPIC_DETAIL,"dos.lfarlc: %d\n",dos.lfarlc));
-    FXTRACE((TOPIC_DETAIL,"dos.oemid: %d\n",dos.oemid));
-    FXTRACE((TOPIC_DETAIL,"dos.oeminfo: %d\n",dos.oeminfo));
-    FXTRACE((TOPIC_DETAIL,"dos.lfanew: %d\n\n",dos.lfanew));
+    FXTRACE(TOPIC_DETAIL,"dos.magic: %#04x\n",dos.magic);
+    FXTRACE(TOPIC_DETAIL,"dos.cblp: %d\n",dos.cblp);
+    FXTRACE(TOPIC_DETAIL,"dos.cp: %d\n",dos.cp);
+    FXTRACE(TOPIC_DETAIL,"dos.crlc: %d\n",dos.crlc);
+    FXTRACE(TOPIC_DETAIL,"dos.cparhdr: %d\n",dos.cparhdr);
+    FXTRACE(TOPIC_DETAIL,"dos.minalloc: %d\n",dos.minalloc);
+    FXTRACE(TOPIC_DETAIL,"dos.maxalloc: %d\n",dos.maxalloc);
+    FXTRACE(TOPIC_DETAIL,"dos.ss: %d\n",dos.ss);
+    FXTRACE(TOPIC_DETAIL,"dos.sp: %d\n",dos.sp);
+    FXTRACE(TOPIC_DETAIL,"dos.csum: %d\n",dos.csum);
+    FXTRACE(TOPIC_DETAIL,"dos.ip: %d\n",dos.ip);
+    FXTRACE(TOPIC_DETAIL,"dos.cs: %d\n",dos.cs);
+    FXTRACE(TOPIC_DETAIL,"dos.lfarlc: %d\n",dos.lfarlc);
+    FXTRACE(TOPIC_DETAIL,"dos.oemid: %d\n",dos.oemid);
+    FXTRACE(TOPIC_DETAIL,"dos.oeminfo: %d\n",dos.oeminfo);
+    FXTRACE(TOPIC_DETAIL,"dos.lfanew: %d\n\n",dos.lfanew);
 
     // Expect MZ
     if((dos.magic==IMAGE_DOS_SIGNATURE) && !store.eof()){
@@ -500,14 +500,14 @@ FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
       store >> nt.fileHeader.characteristics;
 
       // Dump NT header
-      FXTRACE((TOPIC_DETAIL,"nt.signature: %#04x\n",nt.signature));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.machine: %4x\n",nt.fileHeader.machine));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.numberOfSections: %u\n",nt.fileHeader.numberOfSections));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.timeDateStamp: %u\n",nt.fileHeader.timeDateStamp));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.pointerToSymbolTable: %u\n",nt.fileHeader.pointerToSymbolTable));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.numberOfSymbols: %u\n",nt.fileHeader.numberOfSymbols));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.sizeOfOptionalHeader: %u\n",nt.fileHeader.sizeOfOptionalHeader));
-      FXTRACE((TOPIC_DETAIL,"nt.fileHeader.characteristics: %#04x\n\n",nt.fileHeader.characteristics));
+      FXTRACE(TOPIC_DETAIL,"nt.signature: %#04x\n",nt.signature);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.machine: %4x\n",nt.fileHeader.machine);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSections: %u\n",nt.fileHeader.numberOfSections);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.timeDateStamp: %u\n",nt.fileHeader.timeDateStamp);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.pointerToSymbolTable: %u\n",nt.fileHeader.pointerToSymbolTable);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSymbols: %u\n",nt.fileHeader.numberOfSymbols);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.sizeOfOptionalHeader: %u\n",nt.fileHeader.sizeOfOptionalHeader);
+      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.characteristics: %#04x\n\n",nt.fileHeader.characteristics);
 
       // Check NT signature
       if((nt.signature==IMAGE_NT_SIGNATURE) && !store.eof()){
@@ -544,16 +544,16 @@ FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
             // Bail if at end
             if(store.eof()) break;
 
-            FXTRACE((TOPIC_DETAIL,"sec%d.name: %.8s\n",s,sec.name));
-            FXTRACE((TOPIC_DETAIL,"sec%d.virtualSize: %u\n",s,sec.virtualSize));
-            FXTRACE((TOPIC_DETAIL,"sec%d.virtualAddress: %u\n",s,sec.virtualAddress));
-            FXTRACE((TOPIC_DETAIL,"sec%d.sizeOfRawData: %u\n",s,sec.sizeOfRawData));
-            FXTRACE((TOPIC_DETAIL,"sec%d.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData));
-            FXTRACE((TOPIC_DETAIL,"sec%d.pointerToRelocations: %u\n",s,sec.pointerToRelocations));
-            FXTRACE((TOPIC_DETAIL,"sec%d.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers));
-            FXTRACE((TOPIC_DETAIL,"sec%d.numberOfRelocations: %u\n",s,sec.numberOfRelocations));
-            FXTRACE((TOPIC_DETAIL,"sec%d.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers));
-            FXTRACE((TOPIC_DETAIL,"sec%d.characteristics: %#08x\n\n",s,sec.characteristics));
+            FXTRACE(TOPIC_DETAIL,"sec%d.name: %.8s\n",s,sec.name);
+            FXTRACE(TOPIC_DETAIL,"sec%d.virtualSize: %u\n",s,sec.virtualSize);
+            FXTRACE(TOPIC_DETAIL,"sec%d.virtualAddress: %u\n",s,sec.virtualAddress);
+            FXTRACE(TOPIC_DETAIL,"sec%d.sizeOfRawData: %u\n",s,sec.sizeOfRawData);
+            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData);
+            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRelocations: %u\n",s,sec.pointerToRelocations);
+            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers);
+            FXTRACE(TOPIC_DETAIL,"sec%d.numberOfRelocations: %u\n",s,sec.numberOfRelocations);
+            FXTRACE(TOPIC_DETAIL,"sec%d.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers);
+            FXTRACE(TOPIC_DETAIL,"sec%d.characteristics: %#08x\n\n",s,sec.characteristics);
 
             // Found the resource section in the pe file
             if(FXString::compare(sec.name,".rsrc")==0){

@@ -3,7 +3,7 @@
 *       P e r s i s t e n t   S t o r a g e   S t r e a m   C l a s s e s       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -861,7 +861,7 @@ FXStream& FXStream::addObject(const FXObject* v){
   if(v){
     void* ref=(void*)(FXuval)seq++;
     if(dir==FXStreamSave){
-      hash.insert(v,ref);
+      hash.insert(const_cast<FXObject*>(v),ref);
       }
     else if(dir==FXStreamLoad){
       hash.insert(ref,const_cast<FXObject*>(v));
@@ -886,7 +886,7 @@ FXStream& FXStream::saveObject(const FXObject* v){
       *this << zero;                            // Save special null-object tag
       return *this;
       }
-    ref=hash.at(v);                             // Reference from table
+    ref=hash.at(const_cast<FXObject*>(v));      // Reference from table
     tag=(FXuint)(FXuval)ref;
     if(tag){                                    // Already in table
       *this << tag;
@@ -900,11 +900,11 @@ FXStream& FXStream::saveObject(const FXObject* v){
       return *this;
       }
     ref=(void*)(FXuval)seq++;                   // New reference
-    hash.insert(v,ref);                         // Map object to reference
+    hash.insert(const_cast<FXObject*>(v),ref);  // Map object to reference
     *this << tag;                               // Save tag
     *this << zero;                              // Save escape code
     save(name,tag);                             // Save class name
-    FXTRACE((TOPIC_DETAIL,"%08ld: saveObject(%s)\n",(FXuval)pos,v->getClassName()));
+    FXTRACE(TOPIC_DETAIL,"%08ld: saveObject(%s)\n",(FXuval)pos,v->getClassName());
     v->save(*this);                             // Save object
     }
   return *this;
@@ -953,7 +953,7 @@ FXStream& FXStream::loadObject(FXObject*& v){
     ref=(void*)(FXuval)seq++;                   // New reference
     v=cls->makeInstance();                      // Make instance of class
     hash.insert(ref,v);                         // Map reference to object
-    FXTRACE((TOPIC_DETAIL,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName()));
+    FXTRACE(TOPIC_DETAIL,"%08ld: loadObject(%s)\n",(FXuval)pos,v->getClassName());
     v->load(*this);
     }
   return *this;

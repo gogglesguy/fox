@@ -3,7 +3,7 @@
 *                         R u l e r V i e w   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@ protected:
   FXString help;        // Help text
 protected:
   FXRulerView();
-  virtual void moveContents(FXint x,FXint y);
+  virtual void moveContents(FXint x,FXint y) override;
   virtual void drawBackground(FXDCWindow& dc);
   virtual void drawContents(FXDCWindow& dc);
 private:
@@ -79,31 +79,31 @@ public:
   FXRulerView(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Return content width
-  virtual FXint getContentWidth();
+  virtual FXint getContentWidth() override;
 
   /// Return content height
-  virtual FXint getContentHeight();
+  virtual FXint getContentHeight() override;
 
   /// Return visible area x position
-  virtual FXint getVisibleX() const;
+  virtual FXint getVisibleX() const override;
 
   /// Return visible area y position
-  virtual FXint getVisibleY() const;
+  virtual FXint getVisibleY() const override;
 
   /// Return visible area width
-  virtual FXint getVisibleWidth() const;
+  virtual FXint getVisibleWidth() const override;
 
   /// Return visible area height
-  virtual FXint getVisibleHeight() const;
+  virtual FXint getVisibleHeight() const override;
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Return a pointer to the horizontal ruler
   FXRuler* horizontalRuler() const { return hruler; }
@@ -264,10 +264,10 @@ public:
   const FXString& getTipText() const { return tip; }
 
   /// Save list to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load list from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy
   virtual ~FXRulerView();

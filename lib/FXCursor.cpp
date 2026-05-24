@@ -3,7 +3,7 @@
 *                         C u r s o r - O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -86,7 +86,7 @@ FXCursor::FXCursor(){
 
 // Make stock cursor
 FXCursor::FXCursor(FXApp* a,FXStockCursor curid):FXId(a){
-  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this);
   data=nullptr;
   width=0;
   height=0;
@@ -98,7 +98,7 @@ FXCursor::FXCursor(FXApp* a,FXStockCursor curid):FXId(a){
 
 // Make cursor from source and mask
 FXCursor::FXCursor(FXApp* a,const FXuchar* src,const FXuchar* msk,FXint w,FXint h,FXint hx,FXint hy):FXId(a){
-  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this);
   fxloadXBM(data,src,msk,w,h);
   width=w;
   height=h;
@@ -110,7 +110,7 @@ FXCursor::FXCursor(FXApp* a,const FXuchar* src,const FXuchar* msk,FXint w,FXint 
 
 // Make cursor from FXColor pixels
 FXCursor::FXCursor(FXApp* a,const FXColor *pix,FXint w,FXint h,FXint hx,FXint hy):FXId(a){
-  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXCursor::FXCursor %p\n",this);
   data=const_cast<FXColor*>(pix);
   width=w;
   height=h;
@@ -135,17 +135,17 @@ FXbool FXCursor::isColor() const {
 void FXCursor::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 #if defined(WIN32)      // WIN32
 
       // Mapping to standard WIN32 cursors
       const LPCTSTR stock[]={IDC_ARROW,IDC_ARROW,IDC_ARROW,IDC_IBEAM,IDC_WAIT,IDC_CROSS,IDC_SIZENS,IDC_SIZEWE,IDC_SIZEALL};
 
-      FXASSERT_STATIC(sizeof(FXID)>=sizeof(HCURSOR));
+      FXSTATIC_ASSERT(sizeof(FXID)>=sizeof(HCURSOR));
 
       // Building stock cursor
       if(options&CURSOR_STOCK){
-        FXTRACE((TOPIC_CREATION,"%s::create: stock cursor\n",getClassName()));
+        FXTRACE(TOPIC_CREATION,"%s::create: stock cursor\n",getClassName());
         xid=LoadCursor(nullptr,stock[options&CURSOR_STOCK]);
         }
 
@@ -162,7 +162,7 @@ void FXCursor::create(){
         OSVERSIONINFO osvi={sizeof(OSVERSIONINFO)};
         if(isColor() && GetVersionEx((OSVERSIONINFO*)&osvi) && (osvi.dwPlatformId==VER_PLATFORM_WIN32_NT) && (osvi.dwMajorVersion==5) && (osvi.dwMinorVersion>=0 || osvi.dwMajorVersion>5)){
           const BITMAPV4HEADER bi={sizeof(BITMAPV4HEADER),32,-32,1,32,BI_BITFIELDS,0,0,0,0,0,0x00FF0000,0x0000FF00,0x000000FF,0xFF000000,0,{{0,0,0},{0,0,0},{0,0,0}},0,0,0};
-          FXTRACE((TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE(TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height);
 
           // Make a DIB
           void *imgdata=0;
@@ -206,7 +206,7 @@ void FXCursor::create(){
           FXuchar tmpand[128];
           FXint   srcoffset=0;
           FXint   dstoffset=0;
-          FXTRACE((TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE(TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height);
           fillElms(tmpand,0xff,ARRAYNUMBER(tmpand));
           fillElms(tmpxor,0x00,ARRAYNUMBER(tmpxor));
           for(FXint j=0; j<height; j++){
@@ -230,11 +230,11 @@ void FXCursor::create(){
       // Mapping to standard X11 cursors
       const FXuint stock[]={XC_left_ptr,XC_left_ptr,XC_right_ptr,XC_xterm,XC_watch,XC_crosshair,XC_sb_h_double_arrow,XC_sb_v_double_arrow,XC_fleur};
 
-      FXASSERT_STATIC(sizeof(FXID)>=sizeof(Cursor));
+      FXSTATIC_ASSERT(sizeof(FXID)>=sizeof(Cursor));
 
       // Building stock cursor
       if(options&CURSOR_STOCK){
-        FXTRACE((TOPIC_CREATION,"%s::create: stock cursor\n",getClassName()));
+        FXTRACE(TOPIC_CREATION,"%s::create: stock cursor\n",getClassName());
         xid=XCreateFontCursor(DISPLAY(getApp()),stock[options&CURSOR_STOCK]);
         }
 
@@ -250,7 +250,7 @@ void FXCursor::create(){
         // We have support for color cursors and its a color cursor
 #ifdef HAVE_XCURSOR_H
         if(isColor() && XcursorSupportsARGB(DISPLAY(getApp()))){
-          FXTRACE((TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE(TOPIC_CREATION,"%s::create: custom color %dx%d cursor\n",getClassName(),width,height);
           XcursorImage *image=XcursorImageCreate(width,height);
           image->xhot=hotx;
           image->yhot=hoty;
@@ -278,7 +278,7 @@ void FXCursor::create(){
           FXint   dstbytes=(width+7)/8;
           FXint   srcoffset=0;
           FXint   dstoffset=0;
-          FXTRACE((TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
+          FXTRACE(TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height);
           color[0].pixel=BlackPixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
           color[1].pixel=WhitePixel(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp())));
           color[0].flags=DoRed|DoGreen|DoBlue;
@@ -322,7 +322,7 @@ void FXCursor::create(){
 // Detach cursor
 void FXCursor::detach(){
   if(xid){
-    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::detach %p\n",getClassName(),this);
     xid=0;
     }
   }
@@ -342,7 +342,7 @@ void FXCursor::release(){
 void FXCursor::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 #if defined(WIN32)
       DestroyCursor((HCURSOR)xid);
 #else
@@ -415,7 +415,7 @@ void FXCursor::load(FXStream& store){
 
 // Clean up
 FXCursor::~FXCursor(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXCursor::~FXCursor %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXCursor::~FXCursor %p\n",this);
   destroy();
   if(options&CURSOR_OWNED){freeElms(data);}
   data=(FXColor *)-1L;

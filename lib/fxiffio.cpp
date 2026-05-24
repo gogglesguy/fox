@@ -3,7 +3,7 @@
 *                          I F F   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -134,7 +134,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   // Read tag
   store >> tag;
 
-  FXTRACE((TOPIC_DETAIL,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255));
+  FXTRACE(TOPIC_DETAIL,"fxloadIFF tag=%c%c%c%c\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255);
 
   // Check for FORM tag
   if(tag==FORM || tag==FOR1 || tag==FOR2 || tag==FOR3 || tag==FOR4){
@@ -164,7 +164,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         // Empty block is a problem too
         if(size==0) goto x;
 
-        FXTRACE((TOPIC_DETAIL,"CHUNK %c%c%c%c POS=%ld SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size));
+        FXTRACE(TOPIC_DETAIL,"CHUNK %c%c%c%c POS=%ld SIZE=%d\n",(tag>>24)&255,(tag>>16)&255,(tag>>8)&255,tag&255,pos,size);
 
         // Bitmap header
         if(tag==BMHD){
@@ -200,7 +200,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         // Commodore AMiGa
         else if(tag==CAMG){
           store >> view;
-          FXTRACE((TOPIC_DETAIL,"view=%04x\n",view));
+          FXTRACE(TOPIC_DETAIL,"view=%04x\n",view);
           }
 
         // Body
@@ -213,7 +213,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         }
 
       // Wat voor vlees in de kuip?
-      FXTRACE((TOPIC_DETAIL,"fxloadIFF: Width=%d Height=%d planes=%d masking=%d compress=%d padding=%d\n",Width,Height,planes,masking,compress,padding));
+      FXTRACE(TOPIC_DETAIL,"fxloadIFF: Width=%d Height=%d planes=%d masking=%d compress=%d padding=%d\n",Width,Height,planes,masking,compress,padding);
 
       // Determine format
       if(planes==24){

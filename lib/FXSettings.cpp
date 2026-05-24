@@ -3,7 +3,7 @@
 *                          S e t t i n g s   C l a s s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -250,7 +250,7 @@ const FXStringDictionary& FXSettings::at(const FXchar* ky) const {
 
 // Parse filename
 FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
-  FXTRACE((TOPIC_DETAIL,"FXSettings::parseFile(%s,%d)\n",filename.text(),mrk));
+  FXTRACE(TOPIC_DETAIL,"FXSettings::parseFile(%s,%d)\n",filename.text(),mrk);
   FXFile file(filename,FXFile::Reading);
   if(file.isOpen()){
     FXString string;
@@ -265,7 +265,7 @@ FXbool FXSettings::parseFile(const FXString& filename,FXbool mrk){
 
 // Unparse registry file
 FXbool FXSettings::unparseFile(const FXString& filename){
-  FXTRACE((TOPIC_DETAIL,"FXSettings::unparseFile(%s)\n",filename.text()));
+  FXTRACE(TOPIC_DETAIL,"FXSettings::unparseFile(%s)\n",filename.text());
   FXFile file(filename,FXFile::Writing);
   if(file.isOpen()){
     FXString string;

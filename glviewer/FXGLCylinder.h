@@ -3,7 +3,7 @@
 *                     O p e n G L   C y l i n d e r    O b j e c t              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,7 +30,7 @@ public:
   FXfloat radius;
 protected:
   FXGLCylinder();
-  virtual void drawshape(FXGLViewer* viewer);
+  virtual void drawshape(FXGLViewer* viewer) override;
 public:
 
   /// Construct with specified origin, height and radius
@@ -43,7 +43,7 @@ public:
   FXGLCylinder(const FXGLCylinder& orig);
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Change radius
   virtual void setRadius(FXfloat r);
@@ -54,10 +54,10 @@ public:
   FXfloat getHeight() const { return height; }
 
   /// Save to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   virtual ~FXGLCylinder();
   };

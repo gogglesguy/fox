@@ -3,7 +3,7 @@
 *                           S l i d e r   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -104,22 +104,22 @@ public:
   FXRangeSlider(FXComposite* p,FXObject* tgt=nullptr,FXSelector sel=0,FXuint opts=RANGESLIDER_NORMAL,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=0,FXint pr=0,FXint pt=0,FXint pb=0);
 
   /// Return default width
-  virtual FXint getDefaultWidth();
+  virtual FXint getDefaultWidth() override;
 
   /// Return default height
-  virtual FXint getDefaultHeight();
+  virtual FXint getDefaultHeight() override;
 
   /// Returns true because a slider can receive focus
-  virtual FXbool canFocus() const;
+  virtual FXbool canFocus() const override;
 
   /// Perform layout
-  virtual void layout();
+  virtual void layout() override;
 
   /// Enable the slider
-  virtual void enable();
+  virtual void enable() override;
 
   /// Disable the slider
-  virtual void disable();
+  virtual void disable() override;
 
   /// Change slider values
   void setValue(FXint head,FXint value,FXbool notify=false);
@@ -176,10 +176,10 @@ public:
   const FXString& getTipText() const { return tip; }
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy the slider
   virtual ~FXRangeSlider();

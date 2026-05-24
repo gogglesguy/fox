@@ -3,7 +3,7 @@
 *           D o u b l e - P r e c i s i o n    R a n g e    C l a s s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -160,14 +160,12 @@ FXRanged& FXRanged::include(const FXRanged& box){
 
 // Include given sphere into this box
 FXRanged& FXRanged::include(const FXSphered& sphere){
-  FXVec3d lo(sphere.center.x-sphere.radius,sphere.center.y-sphere.radius,sphere.center.z-sphere.radius);
-  FXVec3d hi(sphere.center.x+sphere.radius,sphere.center.y+sphere.radius,sphere.center.z+sphere.radius);
-  lower.x=Math::fmin(lo.x,lower.x);
-  lower.y=Math::fmin(lo.y,lower.y);
-  lower.z=Math::fmin(lo.z,lower.z);
-  upper.x=Math::fmax(hi.x,upper.x);
-  upper.y=Math::fmax(hi.y,upper.y);
-  upper.z=Math::fmax(hi.z,upper.z);
+  lower.x=Math::fmin(lower.x,sphere.center.x-sphere.radius);
+  lower.y=Math::fmin(lower.y,sphere.center.y-sphere.radius);
+  lower.z=Math::fmin(lower.z,sphere.center.z-sphere.radius);
+  upper.x=Math::fmax(upper.x,sphere.center.x+sphere.radius);
+  upper.y=Math::fmax(upper.y,sphere.center.y+sphere.radius);
+  upper.z=Math::fmax(upper.z,sphere.center.z+sphere.radius);
   return *this;
   }
 

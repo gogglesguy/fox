@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -973,7 +973,7 @@ void FXGLViewer::updateProjection(){
   //  if(wvt.hither<distance-diameter) wvt.hither=distance-diameter;
 
     // New window
-    FXTRACE((TOPIC_DEBUG,"wvt.left=%g wvt.right=%g wvt.top=%g wvt.bottom=%g wvt.hither=%g wvt.yon=%g\n",wvt.left,wvt.right,wvt.top,wvt.bottom,wvt.hither,wvt.yon));
+    FXTRACE(TOPIC_DEBUG,"wvt.left=%g wvt.right=%g wvt.top=%g wvt.bottom=%g wvt.hither=%g wvt.yon=%g\n",wvt.left,wvt.right,wvt.top,wvt.bottom,wvt.hither,wvt.yon);
 
     // Size of a pixel in world and model
     worldpx=(wvt.right-wvt.left)/wvt.w;
@@ -984,7 +984,7 @@ void FXGLViewer::updateProjection(){
     ay=wvt.top-worldpx;
 
     // Report factors
-    FXTRACE((TOPIC_DEBUG,"worldpx=%g modelpx=%g\n",worldpx,modelpx));
+    FXTRACE(TOPIC_DEBUG,"worldpx=%g modelpx=%g\n",worldpx,modelpx);
 
     // Correction for perspective
     if(projection==PERSPECTIVE){
@@ -1007,28 +1007,28 @@ void FXGLViewer::updateTransform(){
   transform.scale(scale);
   transform.trans(-center);
   itransform=transform.invert();
-  //FXTRACE((TOPIC_DEBUG,"itrans=%11.8f %11.8f %11.8f %11.8f\n",itransform[0][0],itransform[0][1],itransform[0][2],itransform[0][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[1][0],itransform[1][1],itransform[1][2],itransform[1][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[2][0],itransform[2][1],itransform[2][2],itransform[2][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[3][0],itransform[3][1],itransform[3][2],itransform[3][3]));
-  //FXTRACE((TOPIC_DEBUG,"\n"));
-  //FXTRACE((TOPIC_DEBUG," trans=%11.8f %11.8f %11.8f %11.8f\n",transform[0][0],transform[0][1],transform[0][2],transform[0][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[1][0],transform[1][1],transform[1][2],transform[1][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[2][0],transform[2][1],transform[2][2],transform[2][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[3][0],transform[3][1],transform[3][2],transform[3][3]));
-  //FXTRACE((TOPIC_DEBUG,"\n"));
+  //FXTRACE(TOPIC_DEBUG,"itrans=%11.8f %11.8f %11.8f %11.8f\n",itransform[0][0],itransform[0][1],itransform[0][2],itransform[0][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[1][0],itransform[1][1],itransform[1][2],itransform[1][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[2][0],itransform[2][1],itransform[2][2],itransform[2][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",itransform[3][0],itransform[3][1],itransform[3][2],itransform[3][3]);
+  //FXTRACE(TOPIC_DEBUG,"\n");
+  //FXTRACE(TOPIC_DEBUG," trans=%11.8f %11.8f %11.8f %11.8f\n",transform[0][0],transform[0][1],transform[0][2],transform[0][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[1][0],transform[1][1],transform[1][2],transform[1][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[2][0],transform[2][1],transform[2][2],transform[2][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",transform[3][0],transform[3][1],transform[3][2],transform[3][3]);
+  //FXTRACE(TOPIC_DEBUG,"\n");
   //FXMat4f check=itransform*transform;
-  //FXTRACE((TOPIC_DEBUG," check=%11.8f %11.8f %11.8f %11.8f\n",check[0][0],check[0][1],check[0][2],check[0][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[1][0],check[1][1],check[1][2],check[1][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[2][0],check[2][1],check[2][2],check[2][3]));
-  //FXTRACE((TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[3][0],check[3][1],check[3][2],check[3][3]));
-  //FXTRACE((TOPIC_DEBUG,"\n"));
+  //FXTRACE(TOPIC_DEBUG," check=%11.8f %11.8f %11.8f %11.8f\n",check[0][0],check[0][1],check[0][2],check[0][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[1][0],check[1][1],check[1][2],check[1][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[2][0],check[2][1],check[2][2],check[2][3]);
+  //FXTRACE(TOPIC_DEBUG,"       %11.8f %11.8f %11.8f %11.8f\n",check[3][0],check[3][1],check[3][2],check[3][3]);
+  //FXTRACE(TOPIC_DEBUG,"\n");
   }
 
 
 // Set model bounding box
 FXbool FXGLViewer::setBounds(const FXRangef& r){
-//   FXTRACE((TOPIC_DETAIL,"xlo=%g xhi=%g ylo=%g yhi=%g zlo=%g zhi=%g\n",r.lower.x,r.upper.x,r.lower.y,r.upper.y,r.lower.z,r.upper.z));
+//   FXTRACE(TOPIC_DETAIL,"xlo=%g xhi=%g ylo=%g yhi=%g zlo=%g zhi=%g\n",r.lower.x,r.upper.x,r.lower.y,r.upper.y,r.lower.z,r.upper.z);
 
   // Model center
   center=r.center();
@@ -1443,72 +1443,72 @@ void FXGLViewer::setOp(FXuint o){
     switch(o){
       case HOVERING:
         setDragCursor(getDefaultCursor());
-        FXTRACE((TOPIC_DETAIL,"HOVERING\n"));
+        FXTRACE(TOPIC_DETAIL,"HOVERING\n");
         if(doesturbo) update();
         doesturbo=false;
         break;
       case PICKING:
-        FXTRACE((TOPIC_DETAIL,"PICKING\n"));
+        FXTRACE(TOPIC_DETAIL,"PICKING\n");
         setDragCursor(getDefaultCursor());
         break;
       case ROTATING:
-        FXTRACE((TOPIC_DETAIL,"ROTATING\n"));
+        FXTRACE(TOPIC_DETAIL,"ROTATING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_ROTATE_CURSOR));
         break;
       case POSTING:
-        FXTRACE((TOPIC_DETAIL,"POSTING\n"));
+        FXTRACE(TOPIC_DETAIL,"POSTING\n");
         setDragCursor(getDefaultCursor());
         break;
       case TRANSLATING:
-        FXTRACE((TOPIC_DETAIL,"TRANSLATING\n"));
+        FXTRACE(TOPIC_DETAIL,"TRANSLATING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_MOVE_CURSOR));
         break;
       case ZOOMING:
-        FXTRACE((TOPIC_DETAIL,"ZOOMING\n"));
+        FXTRACE(TOPIC_DETAIL,"ZOOMING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
         break;
       case FOVING:
-        FXTRACE((TOPIC_DETAIL,"FOVING\n"));
+        FXTRACE(TOPIC_DETAIL,"FOVING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
         break;
       case DRAGGING:
-        FXTRACE((TOPIC_DETAIL,"DRAGGING\n"));
+        FXTRACE(TOPIC_DETAIL,"DRAGGING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_MOVE_CURSOR));
         break;
       case TRUCKING:
-        FXTRACE((TOPIC_DETAIL,"TRUCKING\n"));
+        FXTRACE(TOPIC_DETAIL,"TRUCKING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_DRAGH_CURSOR));
         break;
       case GYRATING:
-        FXTRACE((TOPIC_DETAIL,"GYRATING\n"));
+        FXTRACE(TOPIC_DETAIL,"GYRATING\n");
         doesturbo=turbomode;
         setDragCursor(getApp()->getDefaultCursor(DEF_ROTATE_CURSOR));
         break;
       case DO_LASSOSELECT:
         if(mode==LASSOSELECT) return;
-        FXTRACE((TOPIC_DETAIL,"LASSOSELECT\n"));
+        FXTRACE(TOPIC_DETAIL,"LASSOSELECT\n");
         setDefaultCursor(getApp()->getDefaultCursor(DEF_CORNERNW_CURSOR));
         /// FIXME grab
         break;
       case LASSOSELECT:
-        FXTRACE((TOPIC_DETAIL,"LASSOSELECT\n"));
+        FXTRACE(TOPIC_DETAIL,"LASSOSELECT\n");
         setDefaultCursor(getDragCursor());
         setDragCursor(getApp()->getDefaultCursor(DEF_CORNERNW_CURSOR));
         break;
       case DO_LASSOZOOM:
         if(mode==LASSOZOOM) return;
-        FXTRACE((TOPIC_DETAIL,"LASSOZOOM\n"));
+        FXTRACE(TOPIC_DETAIL,"LASSOZOOM\n");
         setDefaultCursor(getApp()->getDefaultCursor(DEF_CORNERNW_CURSOR));
         /// FIXME grab
         break;
       case LASSOZOOM:
-        FXTRACE((TOPIC_DETAIL,"LASSOZOOM\n"));
+        FXTRACE(TOPIC_DETAIL,"LASSOZOOM\n");
         setDefaultCursor(getDragCursor());
         setDragCursor(getApp()->getDefaultCursor(DEF_CORNERNW_CURSOR));
         break;
@@ -1522,7 +1522,7 @@ void FXGLViewer::setOp(FXuint o){
 long FXGLViewer::onLeftBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  FXTRACE((TOPIC_DETAIL,"onLeftBtnPress Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onLeftBtnPress Mask=%08x\n",event->state);
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     grab();
@@ -1575,7 +1575,7 @@ long FXGLViewer::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
   FXGLObject *objects[2];
   FXint new_x,new_y,cx,cy,xl,xh,yl,yh;
   FXVec3f vec;
-  FXTRACE((TOPIC_DETAIL,"onLeftBtnRelease Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onLeftBtnRelease Mask=%08x\n",event->state);
   if(isEnabled()){
     ungrab();
     flags|=FLAG_UPDATE;
@@ -1659,7 +1659,7 @@ long FXGLViewer::onLeftBtnRelease(FXObject*,FXSelector,void* ptr){
 long FXGLViewer::onMiddleBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  FXTRACE((TOPIC_DETAIL,"onMiddleBtnPress Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onMiddleBtnPress Mask=%08x\n",event->state);
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     grab();
@@ -1679,7 +1679,7 @@ long FXGLViewer::onMiddleBtnPress(FXObject*,FXSelector,void* ptr){
 // Released middle mouse button
 long FXGLViewer::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
-  FXTRACE((TOPIC_DETAIL,"onMiddleBtnRelease Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onMiddleBtnRelease Mask=%08x\n",event->state);
   if(isEnabled()){
     ungrab();
     flags|=FLAG_UPDATE;
@@ -1712,7 +1712,7 @@ long FXGLViewer::onMiddleBtnRelease(FXObject*,FXSelector,void* ptr){
 long FXGLViewer::onRightBtnPress(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   flags&=~FLAG_TIP;
-  FXTRACE((TOPIC_DETAIL,"onRightBtnPress Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onRightBtnPress Mask=%08x\n",event->state);
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
   if(isEnabled()){
     grab();
@@ -1764,7 +1764,7 @@ long FXGLViewer::onRightBtnPress(FXObject*,FXSelector,void* ptr){
 long FXGLViewer::onRightBtnRelease(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXGLObject *hit;
-  FXTRACE((TOPIC_DETAIL,"onRightBtnRelease Mask=%08x\n",event->state));
+  FXTRACE(TOPIC_DETAIL,"onRightBtnRelease Mask=%08x\n",event->state);
   if(isEnabled()){
     ungrab();
     flags|=FLAG_UPDATE;
@@ -1936,9 +1936,9 @@ FXfloat curve(FXfloat x,FXfloat theta){
 long FXGLViewer::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
-    FXTRACE((TOPIC_DETAIL,"%s::onSpaceBallMotion Mask=%08x\n",getClassName(),event->state));
+    FXTRACE(TOPIC_DETAIL,"%s::onSpaceBallMotion Mask=%08x\n",getClassName(),event->state);
     if(target && target->tryHandle(this,FXSEL(SEL_SPACEBALLMOTION,message),ptr)) return 1;
-    //FXTRACE((TOPIC_DETAIL,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",event->values[0],event->values[1],event->values[2],event->values[3],event->values[4],event->values[5]));
+    //FXTRACE(TOPIC_DETAIL,"values: %+3d %+3d %+3d %+3d %+3d %+3d\n",event->values[0],event->values[1],event->values[2],event->values[3],event->values[4],event->values[5]);
     FXQuatf q;
     if(FXABS(event->values[3])>FXABS(event->values[4])){
       if(FXABS(event->values[3])>FXABS(event->values[5])){
@@ -1969,7 +1969,7 @@ long FXGLViewer::onKeyPress(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_TIP;
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
-    FXTRACE((TOPIC_KEYBOARD,"%s::onKeyPress keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state));
+    FXTRACE(TOPIC_KEYBOARD,"%s::onKeyPress keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state);
     if(target && target->tryHandle(this,FXSEL(SEL_KEYPRESS,message),ptr)) return 1;
     switch(event->code){
       case KEY_Shift_L:
@@ -2005,7 +2005,7 @@ long FXGLViewer::onKeyPress(FXObject*,FXSelector,void* ptr){
 long FXGLViewer::onKeyRelease(FXObject*,FXSelector,void* ptr){
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
-    FXTRACE((TOPIC_KEYBOARD,"%s::onKeyRelease keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state));
+    FXTRACE(TOPIC_KEYBOARD,"%s::onKeyRelease keysym=0x%04x state=%04x\n",getClassName(),event->code,event->state);
     if(target && target->tryHandle(this,FXSEL(SEL_KEYRELEASE,message),ptr)) return 1;
     switch(event->code){
       case KEY_Shift_L:
@@ -2717,7 +2717,7 @@ long FXGLViewer::onClipboardRequest(FXObject* sender,FXSelector sel,void* ptr){
 
   // Requested data from clipboard
   if(event->target==objectType){
-    FXTRACE((TOPIC_DETAIL,"requested objectType\n"));
+    FXTRACE(TOPIC_DETAIL,"requested objectType\n");
 //    FXMemoryStream stream;
 //    stream.open(nullptr,0,FXStreamSave);
 //    stream.takeBuffer(data,len);

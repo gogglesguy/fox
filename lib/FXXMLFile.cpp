@@ -3,7 +3,7 @@
 *                             X M L - F i l e   I / O                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2016,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2016,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -61,20 +61,20 @@ namespace FX {
 
 // Create XML file i/o object
 FXXMLFile::FXXMLFile(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile\n");
   }
 
 
 // Create XML file i/o object and open it
 FXXMLFile::FXXMLFile(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLFile::FXXMLFile(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz);
   open(filename,d,sz);
   }
 
 
 // Open XML file for operation
 FXbool FXXMLFile::open(const FXString& filename,Direction d,FXuval sz){
-  FXTRACE((TOPIC_DETAIL,"FXXMLFile::open(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz));
+  FXTRACE(TOPIC_DETAIL,"FXXMLFile::open(\"%s\",%s,%lu)\n",filename.text(),(d==Save)?"Save":(d==Load)?"Load":"Stop",sz);
   if(dir==Stop){
     FXchar *buffer;
     if(allocElms(buffer,sz)){
@@ -132,7 +132,7 @@ FXival FXXMLFile::flush(FXival){
 
 // Close stream and delete buffers
 FXbool FXXMLFile::close(){
-  FXTRACE((TOPIC_DETAIL,"FXXMLFile::close()\n"));
+  FXTRACE(TOPIC_DETAIL,"FXXMLFile::close()\n");
   FXchar *buffer=begptr;
   if(FXXML::close()){
     freeElms(buffer);
@@ -144,7 +144,7 @@ FXbool FXXMLFile::close(){
 
 // Close XML file
 FXXMLFile::~FXXMLFile(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXXMLFile::~FXXMLFile\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXXMLFile::~FXXMLFile\n");
   close();
   }
 

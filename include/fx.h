@@ -3,7 +3,7 @@
 *                   M a i n   F O X   I n c l u d e   F i l e                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or                 *
 * modify it under the terms of the GNU Lesser General Public                    *
@@ -23,11 +23,11 @@
 #define FX_H
 
 // Basic includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <math.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+#include <cmath>
+#include <cstring>
 
 // Intrinsics
 #if defined(WIN32)
@@ -116,6 +116,7 @@
 #include "FXStat.h"
 #include "FXDir.h"
 #include "FXDirVisitor.h"
+#include "FXGlobVisitor.h"
 #include "FXDate.h"
 #include "FXURL.h"
 #include "FXStringDictionary.h"
@@ -295,6 +296,7 @@
 #include "FXFontDialog.h"
 #include "FXUndoList.h"
 #include "FXRex.h"
+#include "FXUnits.h"
 #include "FXExpression.h"
 #include "FXText.h"
 #include "FXDataTarget.h"

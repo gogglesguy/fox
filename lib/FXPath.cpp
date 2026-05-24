@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -506,42 +506,43 @@ static FXString expandEnvironmentVariables(const FXString& file,FXint level){
   }
 
 
-// Perform tilde or environment variable expansion.
+// Perform tilde and environment variable expansion.
 // A prefix of the form "~" or "~user" is expanded to the (current) user's
 // home directory.
 // Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows)
 // are expanded by substituting the value of the variable, recusively up to
 // given maximum level.
-// On Windows, only environment variables are expanded.
 FXString FXPath::expand(const FXString& file,FXint level){
   if(!file.empty()){
     FXString result;
-#if defined(WIN32)
-    result=expandEnvironmentVariables(file,level);
-    return result;
-#else
     if(file[0]=='~'){
-      FXint e=1;
-      while(file[e] && file[e]!=PATHSEP){
-        if(file[e]=='\\' && file[e+1]) e++;
-        e++;
-        }
-      if(1<e){
-        result=FXSystem::getUserDirectory(file.mid(1,e-1));
-        if(e<file.length()){
-          result.append(expandEnvironmentVariables(file.mid(e,file.length()-e),level));
+      if(file[1] && file[1]!=PATHSEP){
+        FXint e=1;
+        do{
+          if(file[e]=='\\' && file[e+1]) ++e;
+          ++e;
           }
-        return result;
+        while(file[e] && file[e]!=PATHSEP);
+        result=FXSystem::getUserDirectory(file.mid(1,e-1));
+        if(!result.empty()){
+          if(e<file.length()){
+            result.append(expandEnvironmentVariables(file.mid(e,file.length()-e),level));
+            }
+          return result;
+          }
         }
-      result=FXSystem::getHomeDirectory();
-      if(e<file.length()){
-        result.append(expandEnvironmentVariables(file.mid(e,file.length()-e),level));
+      else{
+        result=FXSystem::getHomeDirectory();
+        if(!result.empty()){
+          if(1<file.length()){
+            result.append(expandEnvironmentVariables(file.mid(1,file.length()-1),level));
+            }
+          return result;
+          }
         }
-      return result;
       }
     result=expandEnvironmentVariables(file,level);
     return result;
-#endif
     }
   return FXString::null;
   }
@@ -739,24 +740,9 @@ FXString FXPath::convertPathList(const FXString& path){
 FXString FXPath::contract(const FXString& file,const FXString& user,const FXString& var){
   const FXchar legalcharacters[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
   if(!file.empty()){
-#if defined(WIN32)
-    FXString result(file);
-    if(!var.empty() && var.find_first_not_of(legalcharacters)<0){
-      FXString val=FXSystem::getEnvironment(var);
-      if(!val.empty()){
-        FXint pos=result.find(val);
-        if(0<=pos){
-          if((pos==0 || result[pos-1]==PATHSEP) && (pos+val.length()==result.length() || result[pos+val.length()]==PATHSEP)){
-            result.replace(pos,val.length(),"%"+var+"%");
-            }
-          }
-        }
-      }
-    return result;
-#else
     FXString result(file);
     if(FXPath::isAbsolute(result)){
-      FXString dir=FXSystem::getUserDirectory(user);
+      FXString dir=user.empty()?FXSystem::getHomeDirectory():FXSystem::getUserDirectory(user);
       if(!dir.empty()){
         if(FXString::compare(result,dir,dir.length())==0 && (dir.length()==result.length() || result[dir.length()]==PATHSEP)){
           result.replace(0,dir.length(),"~"+user);
@@ -769,13 +755,16 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
         FXint pos=result.find(val);
         if(0<=pos){
           if((pos==0 || result[pos-1]==PATHSEP) && (pos+val.length()==result.length() || result[pos+val.length()]==PATHSEP)){
+#if defined(WIN32)
+            result.replace(pos,val.length(),"%"+var+"%");
+#else
             result.replace(pos,val.length(),"$"+var);
+#endif
             }
           }
         }
       }
     return result;
-#endif
     }
   return FXString::null;
   }
@@ -1157,28 +1146,28 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
 
     // Drive letter same?
     if(Ascii::isLetter(base[0]) && base[1]==':'){
-      if(Ascii::toUpper(file[0])!=Ascii::toUpper(base[0])) goto x;
-      if(file[1]!=':') goto x;
+      if(Ascii::toUpper(file[0])!=Ascii::toUpper(base[0])) return file;
+      if(file[1]!=':') return file;
       p=2;
       q=2;
       }
 
     // Server and share same?
     else if(base[0]==PATHSEP && base[1]==PATHSEP){
-      if(file[0]!=PATHSEP || file[1]!=PATHSEP) goto x;
+      if(file[0]!=PATHSEP || file[1]!=PATHSEP) return file;
       p=2;
       q=2;
       while(base[p] && base[p]!=PATHSEP){
-        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) goto x;
+        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) return file;
         p++;
         q++;
         }
       if(base[p]==PATHSEP){
-        if(file[q]!=PATHSEP) goto x;
+        if(file[q]!=PATHSEP) return file;
         p++;
         q++;
         while(base[p] && base[p]!=PATHSEP){
-          if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) goto x;
+          if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) return file;
           p++;
           q++;
           }
@@ -1257,7 +1246,7 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
       return ".";
       }
     }
-x:return file;
+  return file;
   }
 
 
@@ -1275,7 +1264,7 @@ FXString FXPath::relative(const FXString& file){
 //  Base       File         Result      Comment
 //  /a/b/c     /a/b/c/d      yes        /a/b/c/d is under directory /a/b/c
 //  /a/b/c     /a/b          no         /a/b is NOT under directory /a/b/c
-//  a/b        a/b/c         yes        ./a/b/c is under directory ./a/b
+//  ./a/b      ./a/b/c       yes        ./a/b/c is under directory ./a/b
 //  a          b             no         ./b is NOT under ./a
 //  a/b        a/c           no         ./a/c is NOT under ./a/b
 //  /a/b/c     c             no         ./c is NOT (necessarily) under /a/b/c
@@ -1395,7 +1384,7 @@ b:    if(file[q]=='.'){
     }
   return false;
   }
-
+ 
 /*******************************************************************************/
 
 // Return path to directory above input directory name
@@ -1461,16 +1450,16 @@ FXbool FXPath::isTopDirectory(const FXString& file){
 FXbool FXPath::isHidden(const FXString& file){
   if(!file.empty()){
 #ifdef UNICODE
-    FXuint attrs;
+    WIN32_FILE_ATTRIBUTE_DATA attr;
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
-    if((attrs=::GetFileAttributesW(unifile))!=INVALID_FILE_ATTRIBUTES){
-      return (attrs&FILE_ATTRIBUTE_HIDDEN)!=0;
+    if(GetFileAttributesExW(unifile,GetFileExInfoStandard,&attr)){
+      return (attr.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN)!=0;
       }
 #else
-    FXuint attrs;
-    if((attrs=::GetFileAttributesA(file.text()))!=INVALID_FILE_ATTRIBUTES){
-      return (attrs&FILE_ATTRIBUTE_HIDDEN)!=0;
+    WIN32_FILE_ATTRIBUTE_DATA attr;
+    if(GetFileAttributesExA(file.text(),GetFileExInfoStandard,&attr)){
+      return (attr.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN)!=0;
       }
 #endif
     }
@@ -1918,6 +1907,7 @@ nrm:    result[p++]=c;                  // Append it
       }
     FXASSERT(p<=result.length());
 fin:result.trunc(p);
+    return result;
     }
   return FXString::null;
   }
@@ -2469,30 +2459,33 @@ FXString FXPath::unique(const FXString& file){
 // Search pathlist for file.
 // If the file is absolute, return it.
 // If the file is relative, make it absolute w.r.t. current directory, and return it.
-// Otherwise, check each expanded component of pathlist and return the absolute path
-// under the component of pathlist where the file is found.
+// Otherwise, check each component of expanded path list and return the absolute path
+// under the component of path list where the file is found.
 // If file was empty string, isn't found, or doesn't exist, return the empty string.
-FXString FXPath::search(const FXString& pathlist,const FXString& file){
+FXString FXPath::search(const FXString& list,const FXString& file){
   if(!file.empty()){
-    FXString path;
-    FXint beg=0;
-    FXint end=0;
     if(FXPath::isAbsolute(file)){
       if(FXStat::exists(file)) return file;
       return FXString::null;
       }
     if(FXPath::isRelative(file)){
-      path=FXPath::absolute(file);
+      FXString path=FXPath::absolute(file);
       if(FXStat::exists(path)) return path;
       return FXString::null;
       }
-    while(pathlist[end]){
-      while(pathlist[end]==PATHLISTSEP) end++;
-      beg=end;
-      while(pathlist[end] && pathlist[end]!=PATHLISTSEP) end++;
-      if(beg==end) break;
-      path=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)),file);
-      if(FXStat::exists(path)) return path;
+    if(!list.empty()){
+      FXString paths(FXPath::expand(list));
+      FXString path;
+      FXint beg=0;
+      FXint end=0;
+      while(end<paths.length()){
+        while(end<paths.length() && paths[end]!=PATHLISTSEP) ++end;
+        if(beg<end){
+          path=FXPath::absolute(paths.mid(beg,end-beg),file);
+          if(FXStat::exists(path)) return path;
+          }
+        beg=++end;
+        }
       }
     }
   return FXString::null;
@@ -2502,39 +2495,29 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
 
 // Relativize file to path list.
 // If file is not absolute, its already relative, so just return file.
-// Otherwise, check if file is under one of the components of pathlist.
-// If there is more than one such component, keep the shortest path.
-// Ensure that whatever the final relative path ends up being, it
-// still references the same file when searching pathlist for it.
+// Otherwise, check if file is inside one of the folders of path list.
 // If not located under any component of pathlist, then just keep the
 // absolute path; it can not be relativized to the given list.
-FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
-  if(FXPath::isAbsolute(file)){
-    FXString result(file);
+FXString FXPath::relativize(const FXString& list,const FXString& file){
+  FXString result(file);
+  if(FXPath::isAbsolute(result)){
+    FXString paths(FXPath::expand(list));
     FXString base;
-    FXString res;
-    FXint length=2147483647;
     FXint beg=0;
     FXint end=0;
-    while(pathlist[end]){
-      while(pathlist[end]==PATHLISTSEP) end++;
-      beg=end;
-      while(pathlist[end] && pathlist[end]!=PATHLISTSEP) end++;
-      if(beg==end) break;
-      base=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)));
-      if(FXPath::isInside(base,file)){
-        res=FXPath::relative(base,file);
-        if(res.length()<length){
-          if(FXPath::search(pathlist,res)==file){
-            length=res.length();
-            result=res;
-            }
+    while(end<paths.length()){
+      while(end<paths.length() && paths[end]!=PATHLISTSEP) ++end;
+      if(beg<end){
+        base=paths.mid(beg,end-beg);
+        if(FXPath::isInside(base,file)){
+          result=FXPath::relative(base,file);
+          break;
           }
         }
+      beg=++end;
       }
-    return result;
     }
-  return file;
+  return result;
   }
 
 /*******************************************************************************/

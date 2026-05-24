@@ -3,7 +3,7 @@
 *                      M a p p e d   F i l e   C l a s s                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2023,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2023,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,7 +51,7 @@ public:
   FXptr open(const FXString& filename,FXuint m=FXIO::Reading,FXuint perm=FXIO::AllReadWrite,FXlong len=0,FXlong off=0);
 
   /// Return true if serial access only
-  virtual FXbool isSerial() const;
+  virtual FXbool isSerial() const override;
 
   /// Return pointer to memory area
   FXptr data() const { return mempointer; }
@@ -63,13 +63,13 @@ public:
   FXlong offset() const { return memoffset; }
 
   /// Return size
-  virtual FXlong size();
+  virtual FXlong size() override;
 
   /// Flush to disk
-  virtual FXbool flush();
+  virtual FXbool flush() override;
 
   /// Close file, and also the map
-  virtual FXbool close();
+  virtual FXbool close() override;
 
   /// Return memory mapping granularity
   static FXival granularity();

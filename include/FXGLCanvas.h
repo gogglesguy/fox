@@ -3,7 +3,7 @@
 *                G L  C a n v a s   W i n d o w   W i d g e t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -75,13 +75,13 @@ public:
   FXGLContext* getContext() const { return context; }
 
   /// Create all of the server-side resources for this window
-  virtual void create();
+  virtual void create() override;
 
   /// Detach the server-side resources for this window
-  virtual void detach();
+  virtual void detach() override;
 
   /// Destroy the server-side resources for this window
-  virtual void destroy();
+  virtual void destroy() override;
 
   /// Make OpenGL context current prior to performing OpenGL commands
   virtual FXbool makeCurrent();
@@ -99,10 +99,10 @@ public:
   FXbool isShared() const;
 
   /// Save object to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLCanvas();

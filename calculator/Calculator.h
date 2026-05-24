@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -356,10 +356,10 @@ public:
   Calculator(FXApp* a);
 
   // Close the window and save registry
-  virtual FXbool close(FXbool notify=false);
+  virtual FXbool close(FXbool notify=false) override;
 
   /// Create
-  virtual void create();
+  virtual void create() override;
 
   /// Set digit color
   void setDigitColor(FXColor clr);

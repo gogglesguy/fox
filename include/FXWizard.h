@@ -3,7 +3,7 @@
 *                           W i z a r d   W i d g e t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -115,10 +115,10 @@ public:
   FXint getCurrentPanel() const;
 
   /// Save to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   // Destroy
   virtual ~FXWizard();

@@ -3,7 +3,7 @@
 *                        P r e f e r e n c e s   D i a l o g                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -309,7 +309,7 @@ void Preferences::readFileExtension(const FXString& ext){
     FXString string;
     FXint index;
 
-    FXTRACE((1,"association=%s\n",association.text()));
+    FXTRACE(1,"association=%s\n",association.text());
 
     // Get command and description names
     filecommand=association.section(';',0);
@@ -394,7 +394,7 @@ void Preferences::writeFileExtension(const FXString& ext){
         }
       }
 
-    FXTRACE((1,"association=%s\n",association.text()));
+    FXTRACE(1,"association=%s\n",association.text());
 
     // Write to filetypes key
     getApp()->reg().writeStringEntry("FILETYPES",ext.text(),association.text());

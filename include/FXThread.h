@@ -3,7 +3,7 @@
 *                          T h r e a d   S u p p o r t                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -179,6 +179,11 @@ public:
   * Get steady time in nanoseconds since some arbitrary start time.
   */
   static FXTime steadytime();
+
+  /**
+  * Return time spent processing using cpu.
+  */
+  static FXTime cputime();
 
   /**
   * Return time in processor ticks.

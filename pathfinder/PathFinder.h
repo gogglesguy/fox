@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -117,9 +117,6 @@ protected:
   FXbool              preview;		        // Preview mode
   FXbool              blending;		        // Icon blending
   FXbool              scaling;                  // Image scaled
-#if defined(DIRWATCH)
-  FXDirWatch dirwatch; // FIXME
-#endif
 protected:
   PathFinderMain();
   FXbool haveSelectedFiles() const;
@@ -277,10 +274,10 @@ public:
   PathFinderMain(FXApp* a);
 
   // Create
-  virtual void create();
+  virtual void create() override;
 
   // Closed window
-  virtual FXbool close(FXbool notify=false);
+  virtual FXbool close(FXbool notify=false) override;
 
   // Change file name
   void setFilename(const FXString& path);

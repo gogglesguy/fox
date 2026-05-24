@@ -150,6 +150,7 @@ FXGIFImage.h \
 FXGLCanvas.h \
 FXGLContext.h \
 FXGLObject.h \
+FXGlobVisitor.h \
 FXGLViewer.h \
 FXGLVisual.h \
 FXGauge.h \
@@ -331,6 +332,7 @@ FXTreeList.h \
 FXTreeListBox.h \
 FXTriStateButton.h \
 FXUndoList.h \
+FXUnits.h \
 FXURL.h \
 FXVariant.h \
 FXVariantArray.h \

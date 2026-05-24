@@ -3,7 +3,7 @@
 *                       F i l e   S t r e a m   C l a s s                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,8 +33,8 @@ class FXAPI FXFileStream : public FXStream {
 protected:
   FXFile file;
 protected:
-  virtual FXuval writeBuffer(FXuval count);
-  virtual FXuval readBuffer(FXuval count);
+  virtual FXuval writeBuffer(FXuval count) override;
+  virtual FXuval readBuffer(FXuval count) override;
 private:
   FXFileStream(const FXFileStream&);
   FXFileStream& operator=(const FXFileStream&);
@@ -53,13 +53,13 @@ public:
   FXbool open(const FXString& filename,FXStreamDirection save_or_load=FXStreamLoad,FXuval size=8192UL);
 
   /// Close file stream
-  virtual FXbool close();
+  virtual FXbool close() override;
 
   /// Get position
   FXlong position() const { return FXStream::position(); }
 
   /// Move to position
-  virtual FXbool position(FXlong offset,FXWhence whence=FXFromStart);
+  virtual FXbool position(FXlong offset,FXWhence whence=FXFromStart) override;
 
   /// Save single items to stream
   FXFileStream& operator<<(const FXuchar& v){ FXStream::operator<<(v); return *this; }

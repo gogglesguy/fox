@@ -3,7 +3,7 @@
 *                             T h r e a d   P o o l                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -83,7 +83,7 @@ private:
 private:
   FXbool startWorker();
   void runWhile(FXCompletion& comp,FXTime timeout);
-  virtual FXint run();
+  virtual FXint run() override;
 private:
   FXThreadPool(const FXThreadPool&);
   FXThreadPool &operator=(const FXThreadPool&);

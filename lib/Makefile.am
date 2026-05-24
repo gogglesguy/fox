@@ -84,10 +84,16 @@ $(top_srcdir)/lib/bigfolderopen.gif \
 $(top_srcdir)/lib/bigharddisk.gif \
 $(top_srcdir)/lib/bignetdrive.gif \
 $(top_srcdir)/lib/bignethood.gif \
-$(top_srcdir)/lib/bookmrk_gif.gif \
+$(top_srcdir)/lib/bookadd.bmp \
+$(top_srcdir)/lib/bookclr.gif \
 $(top_srcdir)/lib/bookclr_gif.gif \
-$(top_srcdir)/lib/bookset_gif.gif \
 $(top_srcdir)/lib/bookdel_gif.gif \
+$(top_srcdir)/lib/bookdel.bmp \
+$(top_srcdir)/lib/bookmrk_gif.gif \
+$(top_srcdir)/lib/booknxt_gif.gif \
+$(top_srcdir)/lib/bookprv_gif.gif \
+$(top_srcdir)/lib/bookset.gif \
+$(top_srcdir)/lib/bookset_gif.gif \
 $(top_srcdir)/lib/clearentry.gif \
 $(top_srcdir)/lib/cmymode.gif \
 $(top_srcdir)/lib/dialmode.gif \
@@ -292,6 +298,7 @@ FXGIFImage.cpp \
 FXGLCanvas.cpp \
 FXGLContext.cpp \
 FXGLObject.cpp \
+FXGlobVisitor.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGauge.cpp \
@@ -471,6 +478,7 @@ FXTreeList.cpp \
 FXTreeListBox.cpp \
 FXTriStateButton.cpp \
 FXUndoList.cpp \
+FXUnits.cpp \
 FXURL.cpp \
 FXVariant.cpp \
 FXVariantArray.cpp \

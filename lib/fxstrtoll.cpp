@@ -3,7 +3,7 @@
 *        S t r i n g   t o   S i g n e d   L o n g   C o n v e r s i o n        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -78,15 +78,16 @@ FXlong __strtoll(const FXchar *s,const FXchar** e,FXint base,FXbool* ok){
       }
 
     // Check for '0x...', '0b...', or '00...'
-    if(s[0]=='0' && base!=10){
-      if((s[1]|0x20)=='x'){
-        if(__likely(base==16 || !base)){ base=16; s+=2; }
+    if(s[0]=='0'){
+      ++s;
+      if((s[0]|32)=='x'){
+        if(base==0 || base==16){ base=16; ++s; }
         }
-      else if((s[1]|0x20)=='b'){
-        if(__likely(base==2 || !base)){ base=2; s+=2; }
+      else if((s[0]|32)=='b'){
+        if(base==0 || base==2){ base=2; ++s; }
         }
       else{
-        base=8;
+        if(base==0){ base=8; }
         }
       }
 

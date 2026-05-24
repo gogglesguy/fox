@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -55,7 +55,7 @@
 #endif
 
 
-// FOX_BIGENDIAN is byte order
+// Byte order definition
 #if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define FOX_BIGENDIAN 0
 #elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
@@ -581,9 +581,9 @@ enum {
 * In addition, the condition is checked even if code is never executed.
 */
 #if (defined(__cplusplus) && (__cplusplus >= 201103L)) || (defined(_MSC_VER) && (_MSC_VER >= 1600))
-#define FXASSERT_STATIC(expr) static_assert(expr,#expr)
+#define FXSTATIC_ASSERT(expr) static_assert(expr,#expr)
 #else
-#define FXASSERT_STATIC(expr) FXASSERT(expr)
+#define FXSTATIC_ASSERT(expr) FXASSERT(expr)
 #endif
 
 
@@ -601,18 +601,17 @@ enum {
 * printed to the output.
 * When compiling your application for release, all trace statements
 * are compiled out, just like FXASSERT.
-* A statement like: FXTRACE((10,"The value of x=%d\n",x)) will
+* A statement like: FXTRACE(10,"The value of x=%d\n",x) will
 * generate output only if the trace topic 10 is enabled.
-* Note the double parentheses!
 * Trace topics may be set by command line parameter "-tracetopics"
 * followed by a comma-separeted list of topic ranges.  For example,
 * parameter "-tracetopics 1000:1023,0:3" selects topics 1000 through
 * 1023, and topics 0 through 3.
 */
 #ifndef NDEBUG
-#define FXTRACE(arguments) FX::fxtrace arguments
+#define FXTRACE(topic, ...) FX::fxtrace(topic, __VA_ARGS__)
 #else
-#define FXTRACE(arguments) ((void)0)
+#define FXTRACE(topic, ...) ((void)0)
 #endif
 
 /**

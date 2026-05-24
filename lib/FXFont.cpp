@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -197,7 +197,7 @@ static FXuint CharSet2FXFontEncoding(BYTE lfCharSet){
 
 // Try find matching font
 void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint wantsize,FXuint wantweight,FXuint wantslant,FXuint wantsetwidth,FXuint wantencoding,FXuint wanthints,FXint res){
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res);
   TEXTMETRIC *font;
   LOGFONT lf;
   FXchar buffer[256];
@@ -407,7 +407,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FcBool     sc;
   FcMatrix   matrix;
 
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res);
 
   // Create pattern object
   pattern=FcPatternCreate();
@@ -562,10 +562,10 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   fnt=XftFontOpenPattern(DISPLAY(getApp()),p);
   xid=(FXID)fnt;
 
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: fnt(%p)->ascent            = %d\n",fnt,fnt->ascent));
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: fnt(%p)->descent           = %d\n",fnt,fnt->descent));
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: fnt(%p)->height            = %d\n",fnt,fnt->height));
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: fnt(%p)->max_advance_width = %d\n",fnt,fnt->max_advance_width));
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: fnt(%p)->ascent            = %d\n",fnt,fnt->ascent);
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: fnt(%p)->descent           = %d\n",fnt,fnt->descent);
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: fnt(%p)->height            = %d\n",fnt,fnt->height);
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: fnt(%p)->max_advance_width = %d\n",fnt,fnt->max_advance_width);
 
   // Destroy pattern
   FcPatternDestroy(pattern);
@@ -758,7 +758,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
   FXdouble c,s,a;
   XFontStruct *fs;
 
-  FXTRACE((TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res));
+  FXTRACE(TOPIC_DETAIL,"FXFont::match: wantfamily=%s wantforge=%s wantsize=%d wantweight=%d wantslant=%d wantsetwidth=%d wantencoding=%d wanthints=%d res=%d\n",wantfamily.text(),wantforge.text(),wantsize,wantweight,wantslant,wantsetwidth,wantencoding,wanthints,res);
 
   // Get fonts matching the pattern
   __snprintf(candidate,sizeof(candidate),"-%s-%s-*-*-*-*-*-%s-*-*-*-*-*-*",wantforge.empty()?"*":wantforge.text(),wantfamily.empty()?"*":wantfamily.text(),(hints&FXFont::Rotatable)?"[1 0 0 1]":"*");
@@ -781,7 +781,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
     // Match them
     for(f=0; f<nfontnames; f++){
 
-      //FXTRACE((TOPIC_DETAIL,"FXFont::match: font=%s\n",fontnames[f]));
+      //FXTRACE(TOPIC_DETAIL,"FXFont::match: font=%s\n",fontnames[f]);
 
       // Break apart into fields
       fxstrlcpy(candidate,fontnames[f],sizeof(candidate));
@@ -893,7 +893,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         dsize=Math::iabs(FXint(size-wantsize));
         }
 
-      FXTRACE((TOPIC_DETAIL,"FXFont::match: %4d: dweight=%-3d dsize=%3d dslant=%d dsetwidth=%d dscalable=%d dpolymorph=%d xres=%-3d yres=%-3d xlfd=\"%s\"\n",f,dweight,dsize,dslant,dsetwidth,dscalable,dpolymorph,xres,yres,fontnames[f]));
+      FXTRACE(TOPIC_DETAIL,"FXFont::match: %4d: dweight=%-3d dsize=%3d dslant=%d dsetwidth=%d dscalable=%d dpolymorph=%d xres=%-3d yres=%-3d xlfd=\"%s\"\n",f,dweight,dsize,dslant,dsetwidth,dscalable,dpolymorph,xres,yres,fontnames[f]);
 
       // But I'm NOT drinking any fucking Merlot!
       if((dencoding<bencoding) || ((dencoding==bencoding) && ((drotatable<brotatable) || ((drotatable==brotatable) && ((dpitch<bpitch) || ((dpitch==bpitch) && ((dsize<bsize) || ((dsize==bsize) && ((dweight<bweight) || ((dweight==bweight) && ((dslant<bslant) || ((dslant==bslant) && ((dsetwidth<bsetwidth) || ((dsetwidth==bsetwidth) && ((dscalable<bscalable) || ((dscalable==bscalable) && (dpolymorph<bpolymorph))))))))))))))))){
@@ -929,7 +929,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
     // Got a font?
     if(0<=b){
 
-      FXTRACE((TOPIC_DETAIL,"FXFont::match: bweight=%-3d bsize=%3d bslant=%d bsetwidth=%d bscalable=%d bpolymorph=%d bxres=%-3d byres=%-3d xlfd=\"%s\"\n",bweight,bsize,bslant,bsetwidth,bscalable,bpolymorph,bxres,byres,fontnames[b]));
+      FXTRACE(TOPIC_DETAIL,"FXFont::match: bweight=%-3d bsize=%3d bslant=%d bsetwidth=%d bscalable=%d bpolymorph=%d bxres=%-3d byres=%-3d xlfd=\"%s\"\n",bweight,bsize,bslant,bsetwidth,bscalable,bpolymorph,bxres,byres,fontnames[b]);
 
       // Keep desired font name
       fxstrlcpy(xlfd,fontnames[b],sizeof(xlfd));
@@ -973,7 +973,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
         // Create scaled font
         __snprintf(xlfd,sizeof(xlfd),"-%s-%s-%s-%s-%s-%s-*-%d-%d-%d-%s-*-%s",field[0],field[1],field[2],field[3],field[4],field[5],(res*actualSize)/byres,bxres,byres,field[10],field[12]);
 
-        FXTRACE((TOPIC_DETAIL,"FXFont::match: XLoadQueryFont(\"%s\")\n",xlfd));
+        FXTRACE(TOPIC_DETAIL,"FXFont::match: XLoadQueryFont(\"%s\")\n",xlfd);
 
         // Load normal scaled font
         fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
@@ -1002,7 +1002,7 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
       // Simple case for horizontally drawn fonts
       else{
 
-        FXTRACE((TOPIC_DETAIL,"FXFont::match: XLoadQueryFont(\"%s\")\n",xlfd));
+        FXTRACE(TOPIC_DETAIL,"FXFont::match: XLoadQueryFont(\"%s\")\n",xlfd);
 
         // Load normal scaled font
         fs=XLoadQueryFont(DISPLAY(getApp()),xlfd);
@@ -1014,13 +1014,13 @@ void* FXFont::match(const FXString& wantfamily,const FXString& wantforge,FXuint 
           if(((XFontStruct*)font)->properties[b].name==XA_FONT){
             char *fn=XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].card32);
             fxstrlcpy(candidate,fn,sizeof(candidate));
-            FXTRACE((TOPIC_DETAIL,"FXFont::match: FONT = %s\n",candidate));
+            FXTRACE(TOPIC_DETAIL,"FXFont::match: FONT = %s\n",candidate);
             xlfdSplit(field,candidate);
             XFree(fn);
-            FXTRACE((TOPIC_DETAIL,"FXFont::match: mat  = %s\n",field[6]));
+            FXTRACE(TOPIC_DETAIL,"FXFont::match: mat  = %s\n",field[6]);
             }
           else{
-            FXTRACE((TOPIC_DETAIL,"FXFont::match: %d (%s) = %d\n",((XFontStruct*)font)->properties[b].name,XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].name),((XFontStruct*)font)->properties[b].card32));
+            FXTRACE(TOPIC_DETAIL,"FXFont::match: %d (%s) = %d\n",((XFontStruct*)font)->properties[b].name,XGetAtomName(DISPLAY(getApp()),((XFontStruct*)font)->properties[b].name),((XFontStruct*)font)->properties[b].card32);
             }
           }
         }
@@ -1043,7 +1043,7 @@ FXIMPLEMENT(FXFont,FXId,nullptr,0)
 
 // Deserialization
 FXFont::FXFont(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this);
   wantedSize=0;
   actualSize=0;
   wantedWeight=0;
@@ -1066,7 +1066,7 @@ FXFont::FXFont(){
 
 // Construct font from given font description
 FXFont::FXFont(FXApp* a,const FXString& string):FXId(a){
-  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this);
   wantedSize=0;
   actualSize=0;
   wantedWeight=0;
@@ -1090,7 +1090,7 @@ FXFont::FXFont(FXApp* a,const FXString& string):FXId(a){
 
 // Construct a font with given family name, size in points, weight, slant, character set encoding, setwidth, and hints
 FXFont::FXFont(FXApp* a,const FXString& face,FXuint size,FXuint weight,FXuint slant,FXuint encoding,FXuint setwidth,FXuint h):FXId(a),wantedName(face){
-  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this);
   wantedSize=10*size;
   wantedWeight=weight;
   wantedSlant=slant;
@@ -1113,7 +1113,7 @@ FXFont::FXFont(FXApp* a,const FXString& face,FXuint size,FXuint weight,FXuint sl
 
 // Construct font from font description
 FXFont::FXFont(FXApp* a,const FXFontDesc& fontdesc):FXId(a),wantedName(fontdesc.face){
-  FXTRACE((TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXFont::FXFont %p\n",this);
   wantedSize=fontdesc.size;
   wantedWeight=fontdesc.weight;
   wantedSlant=fontdesc.slant;
@@ -1153,13 +1153,13 @@ FXString FXFont::getFoundry() const {
 void FXFont::create(){
   if(!xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::create %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::create %p\n",getClassName(),this);
 
 #if defined(WIN32)              ///// WIN32 /////
 
       FXString family=getFamily();
 
-      FXTRACE((TOPIC_CREATION,"%s::create: win32 font\n",getClassName()));
+      FXTRACE(TOPIC_CREATION,"%s::create: win32 font\n",getClassName());
 
       // Try to match with specified family and foundry
       if(!family.empty()){
@@ -1179,7 +1179,7 @@ void FXFont::create(){
       // Override screen resolution via registry
       res=getApp()->reg().readUIntEntry("SETTINGS","screenres",100);
 
-      FXTRACE((TOPIC_CREATION,"%s::create: xft font\n",getClassName()));
+      FXTRACE(TOPIC_CREATION,"%s::create: xft font\n",getClassName());
 
       // Try to match with specified family and foundry
       if(!family.empty()){
@@ -1205,7 +1205,7 @@ void FXFont::create(){
       // Override screen resolution via registry
       res=getApp()->reg().readUIntEntry("SETTINGS","screenres",100);
 
-      FXTRACE((TOPIC_CREATION,"%s::create: xlfd font\n",getClassName()));
+      FXTRACE(TOPIC_CREATION,"%s::create: xlfd font\n",getClassName());
 
       // X11 font specification
       if(hints&FXFont::X11){
@@ -1297,8 +1297,8 @@ void FXFont::create(){
 #endif
 
       // What was really matched
-      FXTRACE((TOPIC_CREATION,"wantedName=%s wantedSize=%d wantedWeight=%d wantedSlant=%d wantedSetwidth=%d wantedEncoding=%d\n",wantedName.text(),wantedSize,wantedWeight,wantedSlant,wantedSetwidth,wantedEncoding));
-      FXTRACE((TOPIC_CREATION,"actualName=%s actualSize=%d actualWeight=%d actualSlant=%d actualSetwidth=%d actualEncoding=%d\n",actualName.text(),actualSize,actualWeight,actualSlant,actualSetwidth,actualEncoding));
+      FXTRACE(TOPIC_CREATION,"wantedName=%s wantedSize=%d wantedWeight=%d wantedSlant=%d wantedSetwidth=%d wantedEncoding=%d\n",wantedName.text(),wantedSize,wantedWeight,wantedSlant,wantedSetwidth,wantedEncoding);
+      FXTRACE(TOPIC_CREATION,"actualName=%s actualSize=%d actualWeight=%d actualSlant=%d actualSetwidth=%d actualEncoding=%d\n",actualName.text(),actualSize,actualWeight,actualSlant,actualSetwidth,actualEncoding);
       }
     }
   }
@@ -1307,7 +1307,7 @@ void FXFont::create(){
 // Detach font
 void FXFont::detach(){
   if(xid){
-    FXTRACE((TOPIC_CREATION,"%s::detach %p\n",getClassName(),this));
+    FXTRACE(TOPIC_CREATION,"%s::detach %p\n",getClassName(),this);
 
 #if defined(WIN32)              ///// WIN32 /////
 
@@ -1341,7 +1341,7 @@ void FXFont::detach(){
 void FXFont::destroy(){
   if(xid){
     if(getApp()->isInitialized()){
-      FXTRACE((TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this));
+      FXTRACE(TOPIC_CREATION,"%s::destroy %p\n",getClassName(),this);
 
 #if defined(WIN32)              ///// WIN32 /////
 
@@ -1580,9 +1580,9 @@ FXint FXFont::getFontWidth() const {
 #if defined(WIN32)              ///// WIN32 /////
     return ((TEXTMETRIC*)font)->tmMaxCharWidth;
 #elif defined(HAVE_XFT_H)       ///// XFT /////
-    //FXTRACE((TOPIC_DETAIL,"FXFont::getFontWidth() : \n"));
-    //FXTRACE((TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0)));
-    //FXTRACE((TOPIC_DETAIL,"  result: %d\n",((XftFont*)font)->max_advance_width));
+    //FXTRACE(TOPIC_DETAIL,"FXFont::getFontWidth() : \n");
+    //FXTRACE(TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0));
+    //FXTRACE(TOPIC_DETAIL,"  result: %d\n",((XftFont*)font)->max_advance_width);
     return ((XftFont*)font)->max_advance_width;
 #else                           ///// XLFD /////
     return ((XFontStruct*)font)->max_bounds.width;
@@ -1601,9 +1601,9 @@ FXint FXFont::getFontHeight() const {
 //    XGlyphInfo extent;
 //    XftTextExtents8(DISPLAY(getApp()),(XftFont*)font,(const FcChar8*)"W",1,&extent);
 //    return extent.height+extent.y;
-    //FXTRACE((TOPIC_DETAIL,"FXFont::getFontHeight() : \n"));
-    //FXTRACE((TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0)));
-    //FXTRACE((TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->ascent+((XftFont*)font)->descent));
+    //FXTRACE(TOPIC_DETAIL,"FXFont::getFontHeight() : \n");
+    //FXTRACE(TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0));
+    //FXTRACE(TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->ascent+((XftFont*)font)->descent);
     return ((XftFont*)font)->ascent+((XftFont*)font)->descent;
 #else                           ///// XLFD /////
     return ((XFontStruct*)font)->ascent+((XFontStruct*)font)->descent;
@@ -1619,9 +1619,9 @@ FXint FXFont::getFontAscent() const {
 #if defined(WIN32)              ///// WIN32 /////
     return ((TEXTMETRIC*)font)->tmAscent;
 #elif defined(HAVE_XFT_H)       ///// XFT /////
-    //FXTRACE((TOPIC_DETAIL,"FXFont::getFontAscent() : \n"));
-    //FXTRACE((TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0)));
-    //FXTRACE((TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->ascent));
+    //FXTRACE(TOPIC_DETAIL,"FXFont::getFontAscent() : \n");
+    //FXTRACE(TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0));
+    //FXTRACE(TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->ascent);
     return ((XftFont*)font)->ascent;
 #else                           ///// XLFD /////
     return ((XFontStruct*)font)->ascent;
@@ -1637,9 +1637,9 @@ FXint FXFont::getFontDescent() const {
 #if defined(WIN32)              ///// WIN32 /////
     return ((TEXTMETRIC*)font)->tmDescent;
 #elif defined(HAVE_XFT_H)       ///// XFT /////
-    //FXTRACE((TOPIC_DETAIL,"FXFont::getFontDescent() : \n"));
-    //FXTRACE((TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0)));
-    //FXTRACE((TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->descent));
+    //FXTRACE(TOPIC_DETAIL,"FXFont::getFontDescent() : \n");
+    //FXTRACE(TOPIC_DETAIL,"  angle  : %.2f\n",angle*(1.0/64.0));
+    //FXTRACE(TOPIC_DETAIL,"  result : %d\n",((XftFont*)font)->descent);
     return ((XftFont*)font)->descent;
 #else                           ///// XLFD /////
     return ((XFontStruct*)font)->descent;
@@ -1732,15 +1732,15 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
     if(angle){
       extents.xOff=(FXint)(0.5+Math::sqrt((FXdouble)(extents.xOff*extents.xOff+extents.yOff*extents.yOff)));
       }
-    //FXTRACE((TOPIC_DETAIL,"FXFont::getTextWidth(\"%.*s\") : \n",length,string));
-    //FXTRACE((TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0)));
-    //FXTRACE((TOPIC_DETAIL,"  width:  %d\n",extents.width));
-    //FXTRACE((TOPIC_DETAIL,"  height: %d\n",extents.height));
-    //FXTRACE((TOPIC_DETAIL,"  x:      %d\n",extents.x));
-    //FXTRACE((TOPIC_DETAIL,"  y:      %d\n",extents.y));
-    //FXTRACE((TOPIC_DETAIL,"  xOff:   %d\n",extents.xOff));
-    //FXTRACE((TOPIC_DETAIL,"  yOff:   %d\n",extents.yOff));
-    //FXTRACE((TOPIC_DETAIL,"  result: %d\n",extents.xOff));
+    //FXTRACE(TOPIC_DETAIL,"FXFont::getTextWidth(\"%.*s\") : \n",length,string);
+    //FXTRACE(TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0));
+    //FXTRACE(TOPIC_DETAIL,"  width:  %d\n",extents.width);
+    //FXTRACE(TOPIC_DETAIL,"  height: %d\n",extents.height);
+    //FXTRACE(TOPIC_DETAIL,"  x:      %d\n",extents.x);
+    //FXTRACE(TOPIC_DETAIL,"  y:      %d\n",extents.y);
+    //FXTRACE(TOPIC_DETAIL,"  xOff:   %d\n",extents.xOff);
+    //FXTRACE(TOPIC_DETAIL,"  yOff:   %d\n",extents.yOff);
+    //FXTRACE(TOPIC_DETAIL,"  result: %d\n",extents.xOff);
     return extents.xOff;
 */
 #else                           ///// XLFD /////
@@ -1806,15 +1806,15 @@ FXint FXFont::getTextHeight(const FXchar *string,FXuint length) const {
 //    XGlyphInfo extents;
 //    XftTextExtentsUtf8(DISPLAY(getApp()),(XftFont*)font,(const FcChar8*)string,length,&extents);
 //    return extents.height; // TODO: Is this correct?
-//    FXTRACE((TOPIC_DETAIL,"FXFont::getTextHeight(\"%.*s\") : \n",length,string));
-//    FXTRACE((TOPIC_DETAIL,"  width:  %d\n",extents.width));
-//    FXTRACE((TOPIC_DETAIL,"  height: %d\n",extents.height));
-//    FXTRACE((TOPIC_DETAIL,"  x:      %d\n",extents.x));
-//    FXTRACE((TOPIC_DETAIL,"  y:      %d\n",extents.y));
-//    FXTRACE((TOPIC_DETAIL,"  xOff:   %d\n",extents.xOff));
-//    FXTRACE((TOPIC_DETAIL,"  yOff:   %d\n",extents.yOff));
-//    FXTRACE((TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0)));
-//    FXTRACE((TOPIC_DETAIL,"  result: %d\n",((XftFont*)font)->ascent+((XftFont*)font)->descent));
+//    FXTRACE(TOPIC_DETAIL,"FXFont::getTextHeight(\"%.*s\") : \n",length,string);
+//    FXTRACE(TOPIC_DETAIL,"  width:  %d\n",extents.width);
+//    FXTRACE(TOPIC_DETAIL,"  height: %d\n",extents.height);
+//    FXTRACE(TOPIC_DETAIL,"  x:      %d\n",extents.x);
+//    FXTRACE(TOPIC_DETAIL,"  y:      %d\n",extents.y);
+//    FXTRACE(TOPIC_DETAIL,"  xOff:   %d\n",extents.xOff);
+//    FXTRACE(TOPIC_DETAIL,"  yOff:   %d\n",extents.yOff);
+//    FXTRACE(TOPIC_DETAIL,"  angle : %.2f\n",angle*(1.0/64.0));
+//    FXTRACE(TOPIC_DETAIL,"  result: %d\n",((XftFont*)font)->ascent+((XftFont*)font)->descent);
     // Patch from ivan.markov@wizcom.bg
     return ((XftFont*)font)->ascent+((XftFont*)font)->descent;
 #else                           ///// XLFD /////
@@ -2206,11 +2206,11 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
   // Realloc to shrink the block
   resizeElms(fonts,numfonts);
 
-//   FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: %d fonts:\n",numfonts));
+//   FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: %d fonts:\n",numfonts);
 //   for(FXuint f=0; f<numfonts; f++){
-//     FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: Font=%s weight=%d slant=%d size=%3d setwidth=%d encoding=%d\n",fonts[f].face,fonts[f].weight,fonts[f].slant,fonts[f].size,fonts[f].setwidth,fonts[f].encoding));
+//     FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: Font=%s weight=%d slant=%d size=%3d setwidth=%d encoding=%d\n",fonts[f].face,fonts[f].weight,fonts[f].slant,fonts[f].size,fonts[f].setwidth,fonts[f].encoding);
 //     }
-//   FXTRACE((TOPIC_DETAIL,"\n\n"));
+//   FXTRACE(TOPIC_DETAIL,"\n\n");
 
   return true;
   }
@@ -2250,7 +2250,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
   // Get foundry part of name
   foundry=face.section("[]",1);
 
-  FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: family=\"%s\" foundry=\"%s\" weight=%d slant=%d setwidth=%d encoding=%d hints=%x\n",family.text(),foundry.text(),wt,sl,sw,en,h));
+  FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: family=\"%s\" foundry=\"%s\" weight=%d slant=%d setwidth=%d encoding=%d hints=%x\n",family.text(),foundry.text(),wt,sl,sw,en,h);
 
   // Screen resolution may be overidden by registry
   res=FXApp::instance()->reg().readUIntEntry("SETTINGS","screenres",100);
@@ -2347,7 +2347,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
             // Get the encoding
             encoding=FONTENCODING_UNICODE;
 
-            FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: wt=%2d sl=%d sw=%3d en=%5d sz=%3d sc=%4x pi=%d name=%s\n",weight,slant,setwidth,encoding,size,scalable,pitch,fullname));
+            FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: wt=%2d sl=%d sw=%3d en=%5d sz=%3d sc=%4x pi=%d name=%s\n",weight,slant,setwidth,encoding,size,scalable,pitch,fullname);
 
             // Skip if pitch does not match
             if((h&FXFont::Mono) && (pitch!=FXFont::Mono)) continue;
@@ -2434,7 +2434,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
   // Get foundry part of name
   foundry=face.section("[]",1);
 
-  FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: family=\"%s\" foundry=\"%s\" weight=%d slant=%d setwidth=%d encoding=%d hints=%x\n",family.text(),foundry.text(),wt,sl,sw,en,h));
+  FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: family=\"%s\" foundry=\"%s\" weight=%d slant=%d setwidth=%d encoding=%d hints=%x\n",family.text(),foundry.text(),wt,sl,sw,en,h);
 
   // Match RAW X11
   if(h&FXFont::X11){
@@ -2473,7 +2473,7 @@ FXbool FXFont::listFonts(FXFontDesc*& fonts,FXuint& numfonts,const FXString& fac
       pitch=xlfdPitch(field[10]);
       encoding=xlfdEncoding(field[12]);
 
-      FXTRACE((TOPIC_DETAIL,"FXFont::listFonts: wt=%2d sl=%d sw=%3d en=%5d pt=%3d sc=%4x po=%4x ro=%4x xlfd=%s\n",weight,slant,setwidth,encoding,points,scalable,polymorph,rotatable,fontnames[f]));
+      FXTRACE(TOPIC_DETAIL,"FXFont::listFonts: wt=%2d sl=%d sw=%3d en=%5d pt=%3d sc=%4x po=%4x ro=%4x xlfd=%s\n",weight,slant,setwidth,encoding,points,scalable,polymorph,rotatable,fontnames[f]);
 
       // The font can be rendered at any resolution
       if(xres==0 && yres==0){ xres=res; yres=res; }
@@ -3012,7 +3012,7 @@ void FXFont::load(FXStream& store){
 
 // Clean up
 FXFont::~FXFont(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXFont::~FXFont %p\n",this));
+  FXTRACE(TOPIC_CONSTRUCT,"FXFont::~FXFont %p\n",this);
   destroy();
   }
 

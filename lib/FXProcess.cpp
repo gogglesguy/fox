@@ -3,7 +3,7 @@
 *                         P r o c e s s   S u p p o r t                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -146,7 +146,7 @@ namespace FX {
 
 // Initialize process
 FXProcess::FXProcess():pid(0),input(nullptr),output(nullptr),errors(nullptr){
-  FXTRACE((TOPIC_CONSTRUCT,"FXProcess::FXProcess\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXProcess::FXProcess\n");
   }
 
 
@@ -439,7 +439,7 @@ static FXchar* enviroblock(const FXchar *const *env){
   FXchar* result=nullptr;
   if(env){
     const FXchar **tmp;
-    FXint size=0,n=0,s,d;
+    FXint size=0,n=0,s,d,l;
     while(env[n]) n++;
     if(callocElms(tmp,n+1)){
       for(s=0; s<n; ++s){
@@ -449,7 +449,9 @@ static FXchar* enviroblock(const FXchar *const *env){
       qsort((void*)tmp,(size_t)s,sizeof(const FXchar*),comparison);
       if(allocElms(result,size+2)){
         for(s=d=0; s<n; ++s){
-          d+=strlen(strncpy(&result[d],tmp[s],size-d))+1;
+          l=strlen(tmp[s])+1;
+          copyElms(&result[d],tmp[s],l);
+          d+=l;
           }
         result[d+0]=0;
         result[d+1]=0;
@@ -781,7 +783,7 @@ FXbool FXProcess::wait(FXint& code){
 
 // Delete
 FXProcess::~FXProcess(){
-  FXTRACE((TOPIC_CONSTRUCT,"FXProcess::~FXProcess\n"));
+  FXTRACE(TOPIC_CONSTRUCT,"FXProcess::~FXProcess\n");
   if(pid){
 #if defined(WIN32)
     ::CloseHandle((HANDLE)pid);

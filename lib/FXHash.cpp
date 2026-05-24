@@ -3,7 +3,7 @@
 *                       H a s h   T a b l e   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2003,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2003,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -77,7 +77,7 @@
 
 #define EMPTY     (const_cast<Entry*>((const Entry*)(__hash__empty__+3)))
 #define HASH(x)   ((FXival)(x)^(((FXival)(x))>>13))
-#define VOID      ((const void*)-1L)
+#define VOID      ((void*)-1L)
 #define LEGAL(p)  ((p)!=nullptr && (p)!=VOID)
 #define BSHIFT    5
 
@@ -129,7 +129,7 @@ FXbool FXHash::resize(FXival n){
   FXASSERT((n-used())>0);       // At least one free slot
   if(elbat.no(n)){
     if(1<elbat.no() && 1<no()){
-      const void* ky;
+      void* ky;
       void* da;
       FXuval p,b,x;
       FXival i;
@@ -158,15 +158,15 @@ FXbool FXHash::resize(FXival n){
 
 // Make empty table
 FXHash::FXHash():table(EMPTY){
-  FXASSERT_STATIC(sizeof(FXHash)==sizeof(void*));
-  FXASSERT_STATIC(sizeof(Entry)<=sizeof(FXival)*2);
+  FXSTATIC_ASSERT(sizeof(FXHash)==sizeof(void*));
+  FXSTATIC_ASSERT(sizeof(Entry)<=sizeof(FXival)*2);
   }
 
 
 // Construct from another table
 FXHash::FXHash(const FXHash& other):table(EMPTY){
-  FXASSERT_STATIC(sizeof(FXHash)==sizeof(void*));
-  FXASSERT_STATIC(sizeof(Entry)<=sizeof(FXival)*2);
+  FXSTATIC_ASSERT(sizeof(FXHash)==sizeof(void*));
+  FXSTATIC_ASSERT(sizeof(Entry)<=sizeof(FXival)*2);
   if(__likely(1<other.no() && no(other.no()))){
     copyElms(table,other.table,no());
     free(other.free());
@@ -197,7 +197,7 @@ FXHash& FXHash::adopt(FXHash& other){
 
 
 // Find position of given key
-FXival FXHash::find(const void* ky) const {
+FXival FXHash::find(void* ky) const {
   if(__likely(LEGAL(ky))){
     FXuval p,b,x;
     p=b=HASH(ky);
@@ -212,7 +212,7 @@ FXival FXHash::find(const void* ky) const {
 
 
 // Return reference to slot assocated with given key
-void*& FXHash::at(const void* ky){
+void*& FXHash::at(void* ky){
   if(__likely(LEGAL(ky))){
     FXuval p,b,h,x;
     p=b=h=HASH(ky);
@@ -238,7 +238,7 @@ x:  return table[x].data;
 
 
 // Return constant reference to slot assocated with given key
-void *const& FXHash::at(const void* ky) const {
+void *const& FXHash::at(void* ky) const {
   if(__likely(LEGAL(ky))){
     FXuval p,b,x;
     p=b=HASH(ky);
@@ -253,7 +253,7 @@ void *const& FXHash::at(const void* ky) const {
 
 
 // Remove association from the table
-void* FXHash::remove(const void* ky){
+void* FXHash::remove(void* ky){
   void* old=nullptr;
   if(__likely(LEGAL(ky))){
     FXuval p,b,x;

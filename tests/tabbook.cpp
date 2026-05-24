@@ -3,7 +3,7 @@
 *                                 Test Tab Book                                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -60,7 +60,7 @@ public:
     };
 public:
   TabBookWindow(FXApp* a);
-  virtual void create();
+  virtual void create() override;
   virtual ~TabBookWindow();
   };
 

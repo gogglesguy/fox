@@ -3,7 +3,7 @@
 *                          M e m o r y   M a p   T e s t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -38,9 +38,9 @@ void printusage(){
 int main(int argc,char** argv){
   FXString filename=FXString::null;
   ACTION action=TEST_READ;
-  long index;
-  long length=0;
-  long offset=0;
+  FXival index;
+  FXival length=0;
+  FXival offset=0;
   char* base;
 
   // What to test
@@ -65,7 +65,7 @@ int main(int argc,char** argv){
     }
 
   // Get size
-  if(sscanf(argv[2],"%ld",&length)<1){
+  if(sscanf(argv[2],"%td",&length)<1){
     printusage();
     exit(0);
     }
@@ -90,11 +90,11 @@ int main(int argc,char** argv){
       exit(1);
       }
 
-    fprintf(stderr,"actual length = %ld\n",map.length());
+    fprintf(stderr,"actual length = %td\n",map.length());
 
     // Touch it
     for(index=0; index<map.length(); index++){
-      if(base[index]!='Z') fprintf(stderr,"base[%ld]=%d\n",index,base[index]);
+      if(base[index]!='Z') fprintf(stderr,"base[%td]=%d\n",index,base[index]);
       }
 
     // Wait for return
@@ -124,7 +124,7 @@ int main(int argc,char** argv){
       }
 
 
-    fprintf(stderr,"actual length = %ld\n",map.length());
+    fprintf(stderr,"actual length = %td\n",map.length());
     fxmessage("base: %p\n", base);
 
     // Write it

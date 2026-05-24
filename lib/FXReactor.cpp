@@ -3,7 +3,7 @@
 *                            R e a c t o r   C l a s s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -476,7 +476,7 @@ FXbool FXReactor::dispatch(FXTime blocking,FXuint flags){
       if(current==WAIT_IO_COMPLETION) return false;
 
       // Bad stuff happened
-      if(current==WAIT_FAILED || current>=WAIT_ABANDONED_0){
+      if(current==(FXint)WAIT_FAILED || current>=(FXint)WAIT_ABANDONED_0){
         throw FXFatalException("FXReactor::dispatch: error waiting on handles.");
         }
       }

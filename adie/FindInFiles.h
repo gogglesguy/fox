@@ -3,7 +3,7 @@
 *                    F i n d   P a t t e r n   I n   F i l e s                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -54,7 +54,7 @@ public:
   FXlong getLimit() const { return limit; }
 
   // Visit given file and scan it
-  virtual FXuint visit(const FXString& path);
+  virtual FXuint visit(const FXString& path) override;
   };
 
 
@@ -152,10 +152,10 @@ public:
   Adie* getApp() const { return (Adie*)FXDialogBox::getApp(); }
 
   /// Create server-side resources
-  virtual void create();
+  virtual void create() override;
 
   /// Close the window, return true if actually closed
-  virtual FXbool close(FXbool notify=false);
+  virtual FXbool close(FXbool notify=false) override;
 
   /// Called by visitor to see if we should continue processing
   FXbool continueProcessing();

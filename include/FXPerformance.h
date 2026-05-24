@@ -3,7 +3,7 @@
 *                    P e r f o r m a n c e   C o u n t e r                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2009,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2009,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #ifndef FXPERFORMANCE_H
 #define FXPERFORMANCE_H

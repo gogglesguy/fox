@@ -3,7 +3,7 @@
 *                          U t i l i t y - F u n c t i o n s                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -94,12 +94,12 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
   else if(style&TEXT_ATTACH_RIGHT) xx=x-tw;
   else xx=x-tw/2;
 
-  //FXTRACE((1," x=%d y=%d xx=%d yy=%d ",x,y,xx,yy));
+  //FXTRACE(1," x=%d y=%d xx=%d yy=%d ",x,y,xx,yy);
 
   // Draw text
   switch(angle){
     case 1:         // Bottom to top
-      //FXTRACE((1," Case 1: %s w=%d h=%d ",string.text(),tw,th));
+      //FXTRACE(1," Case 1: %s w=%d h=%d ",string.text(),tw,th);
       beg=0;
       tx=xx+dc.getFont()->getFontAscent();
       do{
@@ -108,7 +108,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
         if(style&TEXT_JUSTIFY_LEFT) ty=yy-th;
         else if(style&TEXT_JUSTIFY_RIGHT) ty=yy+dc.getFont()->getTextWidth(&string[beg],end-beg);
         else ty=yy+th/2+dc.getFont()->getTextWidth(&string[beg],end-beg)/2;
-        //FXTRACE((1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent()));
+        //FXTRACE(1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent());
         dc.drawText(tx,ty,&string[beg],end-beg);
         tx+=dc.getFont()->getFontHeight();
         beg=end+1;
@@ -116,7 +116,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
       while(end<string.length());
       break;
     case 2:        // Right to left
-      //FXTRACE((1," Case 2: %s w=%d h=%d ",string.text(),tw,th));
+      //FXTRACE(1," Case 2: %s w=%d h=%d ",string.text(),tw,th);
       beg=0;
       ty=yy+th-dc.getFont()->getFontAscent();
       do{
@@ -125,7 +125,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
         if(style&TEXT_JUSTIFY_LEFT) tx=xx+tw;
         else if(style&TEXT_JUSTIFY_RIGHT) tx=xx+dc.getFont()->getTextWidth(&string[beg],end-beg);
         else tx=xx+tw/2+dc.getFont()->getTextWidth(&string[beg],end-beg)/2;
-        //FXTRACE((1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent()));
+        //FXTRACE(1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent());
         dc.drawText(tx,ty,&string[beg],end-beg);
         ty-=dc.getFont()->getFontHeight();
         beg=end+1;
@@ -133,7 +133,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
       while(end<string.length());
       break;
     case 3:        // Top to bottom
-      //FXTRACE((1," Case 3: %s w=%d h=%d ",string.text(),tw,th));
+      //FXTRACE(1," Case 3: %s w=%d h=%d ",string.text(),tw,th);
       beg=0;
       tx=xx+tw-dc.getFont()->getFontAscent();
       do{
@@ -142,7 +142,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
         if(style&TEXT_JUSTIFY_LEFT) ty=yy;
         else if(style&TEXT_JUSTIFY_RIGHT) ty=yy+th-dc.getFont()->getTextWidth(&string[beg],end-beg);
         else ty=yy+th/2-dc.getFont()->getTextWidth(&string[beg],end-beg)/2;
-        //FXTRACE((1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent()));
+        //FXTRACE(1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent());
         dc.drawText(tx,ty,&string[beg],end-beg);
         tx-=dc.getFont()->getFontHeight();
         beg=end+1;
@@ -150,7 +150,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
       while(end<string.length());
       break;
     default:            // Left to right
-      //FXTRACE((1," Case 4: %s w=%d h=%d ",string.text(),tw,th));
+      //FXTRACE(1," Case 4: %s w=%d h=%d ",string.text(),tw,th);
       beg=0;
       ty=yy+dc.getFont()->getFontAscent();
       do{
@@ -159,7 +159,7 @@ void drawText(FXDC& dc,const FXString& string,FXint x,FXint y,FXuint style){
         if(style&TEXT_JUSTIFY_LEFT) tx=xx;
         else if(style&TEXT_JUSTIFY_RIGHT) tx=xx+tw-dc.getFont()->getTextWidth(&string[beg],end-beg);
         else tx=xx+tw/2-dc.getFont()->getTextWidth(&string[beg],end-beg)/2;
-        //FXTRACE((1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent()));
+        //FXTRACE(1," tx=%d ty=%d a=%d\n",tx,ty,dc.getFont()->getFontAscent());
         dc.drawText(tx,ty,&string[beg],end-beg);
         ty+=dc.getFont()->getFontHeight();
         beg=end+1;

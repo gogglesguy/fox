@@ -3,7 +3,7 @@
 *             D y n a m i c   L i n k   L i b r a r y   S u p p o r t           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -231,13 +231,13 @@ FXDLL FXDLL::dll(void* addr){
 #if defined(WIN32)              // WIN32
   MEMORY_BASIC_INFORMATION mbi;
   if(VirtualQuery((const void*)addr,&mbi,sizeof(mbi))){
-    //FXTRACE((TOPIC_DETAIL,"BaseAddress       = %p\n",mbi.BaseAddress));
-    //FXTRACE((TOPIC_DETAIL,"AllocationBase    = %p\n",mbi.AllocationBase));
-    //FXTRACE((TOPIC_DETAIL,"AllocationProtect = 0x%x\n",mbi.AllocationProtect));
-    //FXTRACE((TOPIC_DETAIL,"RegionSize        = %d\n",mbi.RegionSize));
-    //FXTRACE((TOPIC_DETAIL,"State             = 0x%x\n",mbi.State));
-    //FXTRACE((TOPIC_DETAIL,"Protect           = 0x%x\n",mbi.Protect));
-    //FXTRACE((TOPIC_DETAIL,"Type              = 0x%x\n",mbi.Type));
+    //FXTRACE(TOPIC_DETAIL,"BaseAddress       = %p\n",mbi.BaseAddress);
+    //FXTRACE(TOPIC_DETAIL,"AllocationBase    = %p\n",mbi.AllocationBase);
+    //FXTRACE(TOPIC_DETAIL,"AllocationProtect = 0x%x\n",mbi.AllocationProtect);
+    //FXTRACE(TOPIC_DETAIL,"RegionSize        = %d\n",mbi.RegionSize);
+    //FXTRACE(TOPIC_DETAIL,"State             = 0x%x\n",mbi.State);
+    //FXTRACE(TOPIC_DETAIL,"Protect           = 0x%x\n",mbi.Protect);
+    //FXTRACE(TOPIC_DETAIL,"Type              = 0x%x\n",mbi.Type);
     return FXDLL(mbi.AllocationBase);
     }
 #elif defined(HAVE_SHL_LOAD)    // HP-UX
@@ -247,10 +247,10 @@ FXDLL FXDLL::dll(void* addr){
 #else                           // POSIX
   Dl_info info;
   if(dladdr(addr,&info)){
-    //FXTRACE((TOPIC_DETAIL,"dli_fname = %s\n",info.dli_fname));
-    //FXTRACE((TOPIC_DETAIL,"dli_fbase = %p\n",info.dli_fbase));
-    //FXTRACE((TOPIC_DETAIL,"dli_sname = %s\n",info.dli_sname));
-    //FXTRACE((TOPIC_DETAIL,"dli_saddr = %p\n",info.dli_saddr));
+    //FXTRACE(TOPIC_DETAIL,"dli_fname = %s\n",info.dli_fname);
+    //FXTRACE(TOPIC_DETAIL,"dli_fbase = %p\n",info.dli_fbase);
+    //FXTRACE(TOPIC_DETAIL,"dli_sname = %s\n",info.dli_sname);
+    //FXTRACE(TOPIC_DETAIL,"dli_saddr = %p\n",info.dli_saddr);
     return FXDLL(dlopen(info.dli_fname,RTLD_NOLOAD|RTLD_NOW|RTLD_GLOBAL));
     }
 #endif

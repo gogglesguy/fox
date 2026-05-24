@@ -3,7 +3,7 @@
 *                             O p t i o n   M e n u                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -272,7 +272,7 @@ long FXOption::onKeyRelease(FXObject*,FXSelector,void* ptr){
 long FXOption::onHotKeyPress(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_TIP;
   handle(this,FXSEL(SEL_FOCUS_SELF,0),ptr);
-  FXTRACE((TOPIC_KEYBOARD,"FXOption::onHotKeyPress\n"));
+  FXTRACE(TOPIC_KEYBOARD,"FXOption::onHotKeyPress\n");
   return 1;
   }
 
@@ -280,7 +280,7 @@ long FXOption::onHotKeyPress(FXObject*,FXSelector,void* ptr){
 // Hot key combination released
 long FXOption::onHotKeyRelease(FXObject*,FXSelector,void* ptr){
   flags&=~FLAG_TIP;
-  FXTRACE((TOPIC_KEYBOARD,"FXOption::onHotKeyRelease\n"));
+  FXTRACE(TOPIC_KEYBOARD,"FXOption::onHotKeyRelease\n");
   if(isEnabled()){
     getParent()->handle(this,FXSEL(SEL_COMMAND,ID_UNPOST),this);
     if(target) target->tryHandle(this,FXSEL(SEL_COMMAND,message),ptr);

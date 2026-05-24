@@ -3,7 +3,7 @@
 *                           D r a w a b l e   A r e a                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,10 +72,10 @@ public:
   virtual void resize(FXint w,FXint h);
 
   /// Save object to stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load object from stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Cleanup
   virtual ~FXDrawable();

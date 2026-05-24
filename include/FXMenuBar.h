@@ -3,7 +3,7 @@
 *                             M e n u B a r   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -62,7 +62,7 @@ public:
   FXMenuBar(FXComposite* p,FXuint opts,FXint x=0,FXint y=0,FXint w=0,FXint h=0,FXint pl=3,FXint pr=3,FXint pt=2,FXint pb=2,FXint hs=DEFAULT_SPACING,FXint vs=DEFAULT_SPACING);
 
   /// Returns true if specified coordinate (in parent's coordinate system) is in menubar
-  virtual FXbool contains(FXint parentx,FXint parenty) const;
+  virtual FXbool contains(FXint parentx,FXint parenty) const override;
   };
 
 }

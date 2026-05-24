@@ -3,7 +3,7 @@
 *                          M o d e l i n e   P a r s e r                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2017,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2017,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -155,24 +155,24 @@ FXbool Modeline::parseEmacsModeline(const FXchar* ptr){
   const FXchar* end=ptr;
   FXString key;
   FXString val;
-  
+
   // Skip to end
   while(*end && !(*end=='-' && *(end+1)=='*' && *(end+2)=='-')){
     end++;
     }
-    
+
   // Parse stuff in between
   while(ptr<end){
-    
+
     // Skip white space
     while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
-    
+
     // Parse string
     beg=ptr;
     while(ptr<end && !(*ptr==' ' || *ptr=='\t' || *ptr==':')){
       ptr++;
       }
-      
+
     // Set value
     val.assign(beg,ptr-beg);
 

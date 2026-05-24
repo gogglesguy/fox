@@ -3,7 +3,7 @@
 *                         D o c k   S i t e   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -787,7 +787,7 @@ void FXDockSite::resizeToolBar(FXDockBar* bar,FXint barx,FXint bary,FXint barw,F
     FXint top,bottom,left,right,expand,require,w,h,mbw,mbh,t;
     FXWindow *begin,*end,*c;
 
-    //FXTRACE((TOPIC_DETAIL,"barx=%d bary=%d barw=%d barh=%d\n",barx,bary,barw,barh));
+    //FXTRACE(TOPIC_DETAIL,"barx=%d bary=%d barw=%d barh=%d\n",barx,bary,barw,barh);
 
     // Interior
     top=border+padtop;

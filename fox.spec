@@ -1,5 +1,5 @@
 %define name fox
-%define version 1.7.89
+%define version 1.7.90
 %define release 1
 
 %global debug_package %{nil}
@@ -10,7 +10,7 @@ Version: %{version}
 Release: %{release}
 License: LGPL+Addendum
 Group: System Environment/Libraries
-Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.89.tar.gz
+Source: ftp://ftp.fox-toolkit.org/pub/fox-1.7.90.tar.gz
 URL: http://www.fox-toolkit.org
 Packager: Jeroen van der Zijp <jeroen@fox-toolkit.net>
 BuildRoot: %{_tmppath}/%{name}-buildroot
@@ -77,7 +77,7 @@ PathFinder is a file browser application written using the FOX Toolkit.
 %package -n shutterbug
 Summary: Shutterbug Screenshot Utility
 Group: X11/Applications
-Version: 2.0.0
+Version: 3.1.0
 
 %description -n shutterbug
 Shutterbug is a FOX-based screenshot utility.
@@ -118,10 +118,10 @@ rm -rf ${RPM_BUILD_ROOT}/usr/fox
 %defattr(-,root,root)
 %{_libdir}/libFOX-1.7.so
 %{_libdir}/libFOX-1.7.so.0
-%{_libdir}/libFOX-1.7.so.0.0.89
+%{_libdir}/libFOX-1.7.so.0.0.90
 %{_libdir}/libCHART-1.7.so
 %{_libdir}/libCHART-1.7.so.0
-%{_libdir}/libCHART-1.7.so.0.0.89
+%{_libdir}/libCHART-1.7.so.0.0.90
 %{_libdir}/pkgconfig/fox17.pc
 
 %doc doc

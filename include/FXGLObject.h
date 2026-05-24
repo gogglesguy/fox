@@ -3,7 +3,7 @@
 *                           O p e n G L   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -98,25 +98,25 @@ public:
   FXGLObjectList& getList(){ return list; }
 
   /// Return bounding box
-  virtual void bounds(FXRangef& box);
+  virtual void bounds(FXRangef& box) override;
 
   /// Draw into viewer
-  virtual void draw(FXGLViewer* viewer);
+  virtual void draw(FXGLViewer* viewer) override;
 
   /// Hit in viewer
-  virtual void hit(FXGLViewer* viewer);
+  virtual void hit(FXGLViewer* viewer) override;
 
   /// Copy this object
-  virtual FXGLObject* copy();
+  virtual FXGLObject* copy() override;
 
   /// Identify object by means of path
-  virtual FXGLObject* identify(FXuint* path);
+  virtual FXGLObject* identify(FXuint* path) override;
 
   /// Return true if group can be dragged
-  virtual FXbool canDrag() const;
+  virtual FXbool canDrag() const override;
 
   /// Drag group object
-  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty);
+  virtual FXbool drag(FXGLViewer* viewer,FXint fx,FXint fy,FXint tx,FXint ty) override;
 
   /// Return number of children
   FXival no() const { return list.no(); }
@@ -155,8 +155,8 @@ public:
   void clear(){ list.clear(); }
 
   /// Stream save and load
-  virtual void save(FXStream& store) const;
-  virtual void load(FXStream& store);
+  virtual void save(FXStream& store) const override;
+  virtual void load(FXStream& store) override;
 
   /// Destructor
   virtual ~FXGLGroup();

@@ -84,7 +84,7 @@ public:
   ShutterWindow(FXApp* a);
 
   // Initialize
-  virtual void create();
+  virtual void create() override;
 
   virtual ~ShutterWindow();
   };

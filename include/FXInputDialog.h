@@ -3,7 +3,7 @@
 *                         I n p u t   D i a l o g   B o x                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -86,7 +86,7 @@ public:
   void getLimits(FXdouble& lo,FXdouble& hi){ lo=limlo; hi=limhi; }
 
   /// Run modal invocation of the dialog
-  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR) override;
 
   /**
   * Prompt for a string, start with the initial value.

@@ -138,37 +138,25 @@ Using a file browser such as PathFinder or other Konqueror or other XDND compati
 
 Opening a Selected Filename.
 
-Selecting any filename, possibly in another application, and invoking the 'File' / 'Open Selected' menu, or the 'Open Selected' toolbar button causes the editor to open the selected file.  If more than the filename alone is selected, the additional text may be subject to various interpretations.  When the selected filename is of the form:
+Selecting any filename, possibly in another application, and invoking the 'File' / 'Open Selected' menu, or the 'Open Selected' toolbar button causes the editor to open the selected file.  If more than the filename alone is selected, the additional text may be subject to various interpretations.  When the selected string is of the form:
 
-   #include "filname.h"
+   #include "filename.h"
 
 or:
 
    #include <filename.h>
 
-The editor will search for this file in the same directory as the currently loaded file, and if not found there, look into a sequence of (possibly relative) search paths. [You can specify the list of search paths to search by entering a list of absolute or relative pathnames into the 'Preferences' dialog, under the 'Miscellaneous' sub panel]. When the selected filename is of the form:
+The editor will parse the filename from the string and open it in the same directory as the currently loaded file, and if not found there, look into a sequence of (possibly relative) search paths. [You can specify the list of search paths to search by entering a list of absolute or relative pathnames into the 'Preferences' dialog, under the 'Miscellaneous' sub panel]. When the selected filename is of the form:
 
-   filename.cpp:177
+   filename.cpp(177)
 
 or:
 
    filename.cpp:177:9
 
 or:
+   filename.cpp:177
 
-  filename.cpp(177)
-
-or:
-
-  filename.cpp, line 177
-
-or:
-
-  File = filename.cpp, Line = 177
-
-or:
-
-  filename.cpp:
 
 The editor will not only load the filename, but also jump to the given line number (and column number, if available).  In the case column number is available, it will also place the cursor on the 9-column of line 177.  If this file has already been loaded, the editor will simply jump to the given line number in the already open file, and bring the window to the front.
 This option is very useful when fixing compiler errors.  Various other popular compiler error or warning formats are supported besides GCC.
@@ -518,9 +506,9 @@ Key:	Action:
   Ctl+Shift+>	Move current line down.
   Ctl-D	Copy current line.
   Ctl+A	Select all text.
-  Ctl+K	Delete current line.
   Ctl+X	Cut selected text to clipboard.
   Ctl+C	Copy selected text to clipboard.
+  Ctl+K	Delete line.
   Ctl+V	Paste text from clipboard.
 
 

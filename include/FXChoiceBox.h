@@ -3,7 +3,7 @@
 *                            C h o i c e   B o x                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -70,7 +70,7 @@ public:
   FXChoiceBox(FXApp* app,const FXString& caption,const FXString& text,FXIcon* icon,const FXString& choices,FXuint opts=0,FXint x=0,FXint y=0,FXint w=0,FXint h=0);
 
   /// Run modal invocation of the dialog
-  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR);
+  virtual FXuint execute(FXuint placement=PLACEMENT_CURSOR) override;
 
   /**
   * Show a modal choice dialog.
@@ -106,10 +106,10 @@ public:
 
 
   /// Save choice box to a stream
-  virtual void save(FXStream& store) const;
+  virtual void save(FXStream& store) const override;
 
   /// Load choice box from a stream
-  virtual void load(FXStream& store);
+  virtual void load(FXStream& store) override;
 
   /// Destroy choice box
   virtual ~FXChoiceBox();

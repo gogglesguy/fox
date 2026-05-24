@@ -3,7 +3,7 @@
 *                           Device Context Tester                               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <string.h>
@@ -1399,7 +1399,7 @@ long DCTestWindow::onCmdPrint(FXObject*,FXSelector,void*){
   FXPrinter printer;
   if(dlg.execute()){
     dlg.getPrinter(printer);
-    FXTRACE((100,"Printer = %s\n",printer.name.text()));
+    FXTRACE(100,"Printer = %s\n",printer.name.text());
     FXDCPrint pdc(getApp());
     if(!pdc.beginPrint(printer)){
       FXMessageBox::error(this,MBOX_OK,"Printer Error","Unable to print");

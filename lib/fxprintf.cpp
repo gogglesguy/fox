@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -83,7 +83,7 @@
   - Conversion specifiers:
 
      'd'        Decimal integer conversion.
-     'b'        Binary integer conversion.
+     'b' or 'B' Binary integer conversion.
      'i'        Integer conversion from octal, hex, or decimal number.
      'o'        Octal integer conversion.
      'u'        Unsigned decimal integer conversion.
@@ -1358,6 +1358,7 @@ flg:    switch(ch){
           case 'u':
           case 'd':
           case 'i':
+          case 'B':
           case 'b':
           case 'o':
           case 'X':
@@ -1625,6 +1626,8 @@ flg:  switch(ch){
           if(precision>MAXPRECISION) precision=MAXPRECISION;
           str=fmtlng(buffer,len,value,precision,flags);
           break;
+        case 'B':
+          flags|=FLG_UPPER;
         case 'b':
           flags|=FLG_BIN|FLG_UNSIGNED;
           if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position

@@ -3,7 +3,7 @@
 *                      O p e n G L   C u b e   O b j e c t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2026 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -32,7 +32,7 @@ FXIMPLEMENT(FXGLCube,FXGLShape,nullptr,0)
 
 // Create cube
 FXGLCube::FXGLCube():width(1.0f),height(1.0f),depth(1.0f){
-  FXTRACE((100,"FXGLCube::FXGLCube\n"));
+  FXTRACE(100,"FXGLCube::FXGLCube\n");
   range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
@@ -40,7 +40,7 @@ FXGLCube::FXGLCube():width(1.0f),height(1.0f),depth(1.0f){
 // Create cube
 FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE),width(w),height(h),depth(d){
-  FXTRACE((100,"FXGLCube::FXGLCube\n"));
+  FXTRACE(100,"FXGLCube::FXGLCube\n");
   range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
@@ -48,14 +48,14 @@ FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d):
 // Create initialized line
 FXGLCube::FXGLCube(FXfloat x,FXfloat y,FXfloat z,FXfloat w,FXfloat h,FXfloat d,const FXMaterial& mtl):
   FXGLShape(x,y,z,SHADING_SMOOTH|STYLE_SURFACE,mtl,mtl),width(w),height(h),depth(d){
-  FXTRACE((100,"FXGLCube::FXGLCube\n"));
+  FXTRACE(100,"FXGLCube::FXGLCube\n");
   range.set(-0.5f*width,0.5f*width,-0.5f*height,0.5f*height,-0.5f*depth,0.5f*depth);
   }
 
 
 // Copy constructor
 FXGLCube::FXGLCube(const FXGLCube& orig):FXGLShape(orig){
-  FXTRACE((100,"FXGLCube::FXGLCube\n"));
+  FXTRACE(100,"FXGLCube::FXGLCube\n");
   width=orig.width;
   height=orig.height;
   depth=orig.depth;
@@ -174,6 +174,6 @@ void FXGLCube::load(FXStream& store){
 
 // Destroy
 FXGLCube::~FXGLCube(){
-  FXTRACE((100,"FXGLCube::~FXGLCube\n"));
+  FXTRACE(100,"FXGLCube::~FXGLCube\n");
   }
 

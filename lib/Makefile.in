@@ -171,15 +171,15 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXFileStream.lo FXFoldingList.lo FXFont.lo FXFontDialog.lo \
 	FXFontSelector.lo FXFrame.lo FXGIFCursor.lo FXGIFIcon.lo \
 	FXGIFImage.lo FXGLCanvas.lo FXGLContext.lo FXGLObject.lo \
-	FXGLViewer.lo FXGLVisual.lo FXGauge.lo FXGradientBar.lo \
-	FXGroupBox.lo FXGZFileStream.lo FXhalf.lo FXHash.lo \
-	FXHeader.lo FXHorizontalFrame.lo FXICOIcon.lo FXICOImage.lo \
-	FXIFFIcon.lo FXIFFImage.lo FXIcon.lo FXIconCache.lo \
-	FXIconList.lo FXIconSource.lo FXId.lo FXImage.lo \
-	FXImageFrame.lo FXImageView.lo FXInputDialog.lo FXINI.lo \
-	FXINIFile.lo FXIO.lo FXIOBuffer.lo FXIODevice.lo FXJP2Icon.lo \
-	FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo FXJSON.lo \
-	FXJSONFile.lo FXJSONString.lo FXKnob.lo FXLabel.lo \
+	FXGlobVisitor.lo FXGLViewer.lo FXGLVisual.lo FXGauge.lo \
+	FXGradientBar.lo FXGroupBox.lo FXGZFileStream.lo FXhalf.lo \
+	FXHash.lo FXHeader.lo FXHorizontalFrame.lo FXICOIcon.lo \
+	FXICOImage.lo FXIFFIcon.lo FXIFFImage.lo FXIcon.lo \
+	FXIconCache.lo FXIconList.lo FXIconSource.lo FXId.lo \
+	FXImage.lo FXImageFrame.lo FXImageView.lo FXInputDialog.lo \
+	FXINI.lo FXINIFile.lo FXIO.lo FXIOBuffer.lo FXIODevice.lo \
+	FXJP2Icon.lo FXJP2Image.lo FXJPGIcon.lo FXJPGImage.lo \
+	FXJSON.lo FXJSONFile.lo FXJSONString.lo FXKnob.lo FXLabel.lo \
 	FXLFQueue.lo FXList.lo FXListBox.lo FXLocale.lo \
 	FXMainWindow.lo FXMappedFile.lo FXMat2d.lo FXMat2f.lo \
 	FXMat3d.lo FXMat3f.lo FXMat4d.lo FXMat4f.lo FXMatrix.lo \
@@ -216,11 +216,11 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo \
 	FXToolBarShell.lo FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo \
 	FXTranslator.lo FXTreeList.lo FXTreeListBox.lo \
-	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVariant.lo \
-	FXVariantArray.lo FXVariantMap.lo FXVec2d.lo FXVec2f.lo \
-	FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
-	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
-	FXWizard.lo FXWorker.lo FXWSQueue.lo FXXBMIcon.lo \
+	FXTriStateButton.lo FXUndoList.lo FXUnits.lo FXURL.lo \
+	FXVariant.lo FXVariantArray.lo FXVariantMap.lo FXVec2d.lo \
+	FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo \
+	FXVerticalFrame.lo FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo \
+	FXWindow.lo FXWizard.lo FXWorker.lo FXWSQueue.lo FXXBMIcon.lo \
 	FXXBMImage.lo FXXML.lo FXXMLFile.lo FXXMLString.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxbase85.lo \
 	fxchar.lo fxcpuid.lo fxcrc.lo fxbmpio.lo fxcompose.lo \
@@ -534,10 +534,16 @@ $(top_srcdir)/lib/bigfolderopen.gif \
 $(top_srcdir)/lib/bigharddisk.gif \
 $(top_srcdir)/lib/bignetdrive.gif \
 $(top_srcdir)/lib/bignethood.gif \
-$(top_srcdir)/lib/bookmrk_gif.gif \
+$(top_srcdir)/lib/bookadd.bmp \
+$(top_srcdir)/lib/bookclr.gif \
 $(top_srcdir)/lib/bookclr_gif.gif \
-$(top_srcdir)/lib/bookset_gif.gif \
 $(top_srcdir)/lib/bookdel_gif.gif \
+$(top_srcdir)/lib/bookdel.bmp \
+$(top_srcdir)/lib/bookmrk_gif.gif \
+$(top_srcdir)/lib/booknxt_gif.gif \
+$(top_srcdir)/lib/bookprv_gif.gif \
+$(top_srcdir)/lib/bookset.gif \
+$(top_srcdir)/lib/bookset_gif.gif \
 $(top_srcdir)/lib/clearentry.gif \
 $(top_srcdir)/lib/cmymode.gif \
 $(top_srcdir)/lib/dialmode.gif \
@@ -740,6 +746,7 @@ FXGIFImage.cpp \
 FXGLCanvas.cpp \
 FXGLContext.cpp \
 FXGLObject.cpp \
+FXGlobVisitor.cpp \
 FXGLViewer.cpp \
 FXGLVisual.cpp \
 FXGauge.cpp \
@@ -919,6 +926,7 @@ FXTreeList.cpp \
 FXTreeListBox.cpp \
 FXTriStateButton.cpp \
 FXUndoList.cpp \
+FXUnits.cpp \
 FXURL.cpp \
 FXVariant.cpp \
 FXVariantArray.cpp \
@@ -1220,6 +1228,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGLVisual.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGZFileStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGauge.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGlobVisitor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGradientBar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXGroupBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXHash.Plo@am__quote@
@@ -1398,6 +1407,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUTF32Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUTF8Codec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUndoList.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXUnits.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariant.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariantArray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXVariantMap.Plo@am__quote@
