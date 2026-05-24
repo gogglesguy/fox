@@ -321,7 +321,7 @@ language "C++"
   # File patterns for this language mode
   filesmatch "*.C,*.cpp,*.cc,*.cxx,*.c++,*.cu,*.H,*.hpp,*.hh,*.hxx,*.h++,*.h,*.cuh,*.ino"
 
-  contextlines 1
+  contextlines 40
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
@@ -341,6 +341,11 @@ language "C++"
     open  "(?<=^=======\n)"
     close "^>>>>>>>.*?\n"
   end
+
+  # Banner comment
+  #rule "Banner"
+  #  pattern  "^/\*{80}+\n(\*.{79}+\*\n)++\*{80}+/$"
+  #end
 
   # C++ style comment
   rule "CPPDocComment"
@@ -2624,6 +2629,47 @@ language "Configure"
     rule "ControlEscape"
       pattern     "\\."
       style       "fuchsia"
+    end
+  end
+end
+
+
+# GNU configure scripts
+language "YAML"
+  filesmatch "*.yaml,*.yml"
+  contentsmatch "%YAML"
+  contextlines 1
+  rule "Comment"
+    open        "#"
+    close       "$"
+  end
+  rule "special"
+    pattern  "(^---|^\.\.\.|^%YAML|^%TAG)"
+  end
+  rule "type"
+    pattern  "\<(binary|bool|float|int|map|null|omap|seq|set|str)\>"
+  end
+  rule "constant"
+    pattern  "\<(YES|yes|Y|y|ON|on|TRUE|True|true|NO|no|N|n|OFF|off|FALSE|False|false)\>"
+  end
+  rule "statement"
+    pattern  "(^\s*- |:\s)"
+  end
+  rule "identifier"
+    pattern  "\<\l\w+\>"
+  end
+  rule "String"
+    open  "\""
+    close "\""
+    rule "Escape"
+      pattern     "\\."
+    end
+  end
+  rule "String"
+    open  "'"
+    close "'"
+    rule "Escape"
+      pattern     "\\."
     end
   end
 end

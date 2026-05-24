@@ -3,7 +3,7 @@
 *                            D a t e   C l a s s                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -101,6 +101,26 @@ FXDate::FXDate(FXint yr,FXint dy){
 // Initialize with year, month, and day of month
 FXDate::FXDate(FXint yr,FXint mo,FXint dy){
   setDate(yr,mo,dy);
+  }
+
+
+// Set date to 1st day of year 
+void FXDate::setDate(FXint yr){
+  julian=(1461*(yr+4799))/4-(3*((yr+4899)/100))/4-31738;
+  }
+
+
+// Get year from date
+void FXDate::getDate(FXint& yr) const {
+  FXint l,n,i,j;
+  l=julian+68569;
+  n=(4*l)/146097;
+  l=l-(146097*n+3)/4;
+  i=(4000*(l+1))/1461001;
+  l=l-(1461*i)/4+31;
+  j=(80*l)/2447;
+  l=j/11;
+  yr=100*(n-49)+i+l;
   }
 
 

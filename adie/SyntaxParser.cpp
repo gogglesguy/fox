@@ -92,6 +92,9 @@
 
 */
 
+#define TOPIC_PARSE     106
+#define TOPIC_DETAIL    107
+
 /*******************************************************************************/
 
 // Rule types
@@ -106,7 +109,7 @@ enum {
 
 // Initialize parser
 SyntaxParser::SyntaxParser(const FXchar* pat,const FXchar* frm):from(frm),head(pat),tail(pat),token(TK_END),line(1){
-  FXTRACE((10,"SyntaxParser::SyntaxParser(%p,%p)\n",pat,frm));
+  FXTRACE((TOPIC_PARSE,"SyntaxParser::SyntaxParser(%p,%p)\n",pat,frm));
   }
 
 
@@ -157,7 +160,7 @@ FXuint SyntaxParser::gettok(){
       while(Ascii::isWord(*tail)){
         tok=((tok<<5)+tok) ^ (FXuchar)*tail++;
         }
-      FXTRACE((20,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
+      FXTRACE((TOPIC_DETAIL,"hash(%s) = %u\n",FXString(head,tail-head).text(),tok));
       return tok;
       }
     return TK_ERROR;                    // Error
@@ -490,6 +493,12 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       break;
       }
 
+    // Sanity check
+    if(!(contextlines>0 || contextchars>0)){
+      fxwarning("%s:%d: error: contextlines and contextchars can not both be zero.\n",from,line);
+      return false;
+      }
+      
     // Create language
     syntax=new Syntax(name,group);
     syntax->setPatterns(filesmatch);
@@ -504,19 +513,19 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
     syntax->setTabMode(tabmode);
     syntax->setStripSpaces(strip);
 
-    FXTRACE((11,"name=%s\n",name.text()));
-    FXTRACE((11,"group=%s\n",group.text()));
-    FXTRACE((11,"filesmatch=%s\n",filesmatch.text()));
-    FXTRACE((11,"contentsmatch=%s\n",contentsmatch.text()));
-    FXTRACE((11,"delimiters=%s\n",delimiters.text()));
-    FXTRACE((11,"contextlines=%d\n",contextlines));
-    FXTRACE((11,"contextchars=%d\n",contextchars));
-    FXTRACE((11,"autoindent=%d\n",autoindent));
-    FXTRACE((11,"wrapwidth=%d\n",wrapwidth));
-    FXTRACE((11,"tabwidth=%d\n",tabwidth));
-    FXTRACE((11,"wrapmode=%d\n",wrapmode));
-    FXTRACE((11,"tabmode=%d\n",tabmode));
-    FXTRACE((11,"strip=%d\n",strip));
+    FXTRACE((TOPIC_DETAIL,"name=%s\n",name.text()));
+    FXTRACE((TOPIC_DETAIL,"group=%s\n",group.text()));
+    FXTRACE((TOPIC_DETAIL,"filesmatch=%s\n",filesmatch.text()));
+    FXTRACE((TOPIC_DETAIL,"contentsmatch=%s\n",contentsmatch.text()));
+    FXTRACE((TOPIC_DETAIL,"delimiters=%s\n",delimiters.text()));
+    FXTRACE((TOPIC_DETAIL,"contextlines=%d\n",contextlines));
+    FXTRACE((TOPIC_DETAIL,"contextchars=%d\n",contextchars));
+    FXTRACE((TOPIC_DETAIL,"autoindent=%d\n",autoindent));
+    FXTRACE((TOPIC_DETAIL,"wrapwidth=%d\n",wrapwidth));
+    FXTRACE((TOPIC_DETAIL,"tabwidth=%d\n",tabwidth));
+    FXTRACE((TOPIC_DETAIL,"wrapmode=%d\n",wrapmode));
+    FXTRACE((TOPIC_DETAIL,"tabmode=%d\n",tabmode));
+    FXTRACE((TOPIC_DETAIL,"strip=%d\n",strip));
 
     // Add new syntax to list
     syntaxes.append(syntax);
@@ -532,7 +541,7 @@ FXbool SyntaxParser::parseLanguage(SyntaxList& syntaxes){
       return false;
       }
     token=gettok();
-    FXTRACE((11,"\n\n"));
+    FXTRACE((TOPIC_DETAIL,"\n\n"));
     return true;
     }
   return false;
@@ -565,7 +574,7 @@ FXbool SyntaxParser::parse(SyntaxList& syntaxes,const FXString& patterns){
 // Parse file and return syntaxes found in it; return false if problem.
 FXbool SyntaxParser::parseFile(SyntaxList& syntaxes,const FXString& filename){
   FXFile file(filename,FXIO::Reading);
-  FXTRACE((11,"SyntaxParser::parseFile(%s)\n",filename.text()));
+  FXTRACE((TOPIC_DETAIL,"SyntaxParser::parseFile(%s)\n",filename.text()));
   if(file.isOpen()){
     FXString patterns;
     patterns.length(file.size());
@@ -580,5 +589,5 @@ FXbool SyntaxParser::parseFile(SyntaxList& syntaxes,const FXString& filename){
 
 // Clean up
 SyntaxParser::~SyntaxParser(){
-  FXTRACE((10,"SyntaxParser::~SyntaxParser()\n"));
+  FXTRACE((TOPIC_PARSE,"SyntaxParser::~SyntaxParser()\n"));
   }

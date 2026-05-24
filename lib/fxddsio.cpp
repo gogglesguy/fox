@@ -3,7 +3,7 @@
 *                          D D S   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1639,7 +1639,7 @@ FXbool fxsaveDDS(FXStream& store,FXColor* data,FXint width,FXint height,FXint de
   dds.header.dwLinearSize=width*height*depth*4;
   dds.header.dwDepth=depth;
   dds.header.dwMipMapCount=1;
-  memset(dds.header.dwReserved1,0,sizeof(dds.header.dwReserved1));
+  clearElms(dds.header.dwReserved1,11);
   dds.header.ddpf.dwSize=sizeof(DDSPixelFormat);
   dds.header.ddpf.dwFlags=DDPF_RGB;
   dds.header.ddpf.dwFourCC=0;

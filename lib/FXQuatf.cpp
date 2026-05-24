@@ -3,7 +3,7 @@
 *              S i n g l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -46,6 +46,7 @@
   - Typically, |Q| == 1.  But this is not always a given.
   - Repeated operations should periodically fix Q to maintain |Q| == 1, using
     the adjust() API.
+  - FIXME maybe refine exp() and log() as non-members.
 */
 
 using namespace FX;
@@ -56,7 +57,7 @@ namespace FX {
 
 // Construct from rotation axis and angle in radians
 FXQuatf::FXQuatf(const FXVec3f& axis,FXfloat phi){
-  setAxisAngle(axis,phi);
+  setRotate(axis,phi);
   }
 
 
@@ -85,8 +86,52 @@ FXQuatf::FXQuatf(const FXVec3f& rot){
   }
 
 
+// Set quaternion from axis and cos, sin of angle.
+void FXQuatf::setRotate(const FXVec3f& axis,FXfloat cosang,FXfloat sinang){
+  FXfloat mag2(axis.length2());
+  FXASSERT(-1.0f<=cosang && cosang<=1.0f);
+  FXASSERT(-1.0f<=sinang && sinang<=1.0f);
+  if(__likely(0.0f<mag2)){
+    FXfloat mag(Math::sqrt(mag2));
+    FXfloat s(Math::copysign(Math::sqrt(0.5f*(1.0f-cosang))/mag,sinang));
+    FXfloat c(Math::sqrt(0.5f*(1.0f+cosang)));
+    x=axis.x*s;
+    y=axis.y*s;
+    z=axis.z*s;
+    w=c;
+    }
+  else{
+    x=0.0f;
+    y=0.0f;
+    z=0.0f;
+    w=1.0f;
+    }
+  }
+
+
+// Obtain axis and sin and cos of angle
+void FXQuatf::getRotate(FXVec3f& axis,FXfloat& cosang,FXfloat& sinang) const {
+  FXfloat sxs(x*x+y*y+z*z);
+  if(0.0f<sxs){
+    FXfloat s(Math::sqrt(sxs));
+    axis.x=x/s;
+    axis.y=y/s;
+    axis.z=z/s;
+    cosang=w*w-sxs;
+    sinang=2.0f*s*w;
+    }
+  else{
+    axis.x=1.0f;
+    axis.y=0.0f;
+    axis.z=0.0f;
+    cosang=1.0f;
+    sinang=0.0f;
+    }
+  }
+
+
 // Set axis and angle
-void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
+void FXQuatf::setRotate(const FXVec3f& axis,FXfloat phi){
   FXfloat mag2(axis.length2());
   if(__likely(0.0f<mag2)){
     FXfloat arg(0.5f*phi);
@@ -109,7 +154,7 @@ void FXQuatf::setAxisAngle(const FXVec3f& axis,FXfloat phi){
 
 // Obtain axis and angle
 // Remeber that: q = sin(A/2)*(x*i+y*j+z*k)+cos(A/2)
-void FXQuatf::getAxisAngle(FXVec3f& axis,FXfloat& phi) const {
+void FXQuatf::getRotate(FXVec3f& axis,FXfloat& phi) const {
   FXfloat mag2(x*x+y*y+z*z);
   if(0.0f<mag2){
     FXfloat mag(Math::sqrt(mag2));
@@ -154,6 +199,21 @@ void FXQuatf::setRotation(const FXVec3f& rot){
   }
 
 
+// Get rotation vector from quaternion
+FXVec3f FXQuatf::getRotation() const {
+  FXVec3f rot(0.0f,0.0f,0.0f);
+  FXfloat mag2(x*x+y*y+z*z);
+  if(0.0f<mag2){
+    FXfloat mag(Math::sqrt(mag2));
+    FXfloat phi(2.0f*Math::atan2(mag,w)/mag);
+    rot.x=x*phi*mag;
+    rot.y=y*phi*mag;
+    rot.z=z*phi*mag;
+    }
+  return rot;
+  }
+
+
 // Set unit quaternion to modified rodrigues parameters.
 // Modified Rodrigues parameters are defined as MRP = tan(theta/4)*E,
 // where theta is rotation angle (radians), and E is unit axis of rotation.
@@ -180,18 +240,78 @@ FXVec3f FXQuatf::getMRP() const {
   }
 
 
-// Get rotation vector from quaternion
-FXVec3f FXQuatf::getRotation() const {
-  FXVec3f rot(0.0f,0.0f,0.0f);
-  FXfloat mag2(x*x+y*y+z*z);
-  if(0.0f<mag2){
-    FXfloat mag(Math::sqrt(mag2));
-    FXfloat phi(2.0f*Math::atan2(mag,w)/mag);
-    rot.x=x*phi*mag;
-    rot.y=y*phi*mag;
-    rot.z=z*phi*mag;
-    }
-  return rot;
+// Set rotation about x-axis by cos, sin of angle
+// We avoid lots of trig by using half-angle formulas:
+//
+//                       ________________
+//                      /  1 - cos(phi)
+//   sin(phi/2)  =  \  /  --------------
+//                   \/         2
+//                       ________________
+//                      /  1 + cos(phi)
+//   cos(phi/2)  =  \  /  --------------
+//                   \/         2
+//
+// Except for a correction to the signs; it evolves that
+// we only need to correct the first one; the cosine being
+// an even function will not need correction.
+//
+void FXQuatf::setXRotate(FXfloat cosang,FXfloat sinang){
+  FXASSERT(-1.0f<=cosang && cosang<=1.0f);
+  FXASSERT(-1.0f<=sinang && sinang<=1.0f);
+  x=Math::copysign(Math::sqrt(0.5f*(1.0f-cosang)),sinang);
+  y=0.0f;
+  z=0.0f;
+  w=Math::sqrt(0.5f*(1.0f+cosang));
+  }
+
+
+// Set quaternion to rotation about x-axis by angle ang.
+void FXQuatf::setXRotate(FXfloat ang){
+  x=Math::sin(0.5f*ang);
+  y=0.0f;
+  z=0.0f;
+  w=Math::cos(0.5f*ang);
+  }
+
+
+// Set rotation about y-axis by cos, sin of angle
+void FXQuatf::setYRotate(FXfloat cosang,FXfloat sinang){
+  FXASSERT(-1.0f<=cosang && cosang<=1.0f);
+  FXASSERT(-1.0f<=sinang && sinang<=1.0f);
+  x=0.0f;
+  y=Math::copysign(Math::sqrt(0.5f*(1.0f-cosang)),sinang);
+  z=0.0f;
+  w=Math::sqrt(0.5f*(1.0f+cosang));
+  }
+
+
+// Set quaternion to rotation about y-axis by angle ang.
+void FXQuatf::setYRotate(FXfloat ang){
+  x=0.0f;
+  y=Math::sin(0.5f*ang);
+  z=0.0f;
+  w=Math::cos(0.5f*ang);
+  }
+
+
+// Set rotation about z-axis by cos, sin of angle
+void FXQuatf::setZRotate(FXfloat cosang,FXfloat sinang){
+  FXASSERT(-1.0f<=cosang && cosang<=1.0f);
+  FXASSERT(-1.0f<=sinang && sinang<=1.0f);
+  x=0.0f;
+  y=0.0f;
+  z=Math::copysign(Math::sqrt(0.5f*(1.0f-cosang)),sinang);
+  w=Math::sqrt(0.5f*(1.0f+cosang));
+  }
+
+
+// Set quaternion to rotation about z-axis by angle ang.
+void FXQuatf::setZRotate(FXfloat ang){
+  x=0.0f;
+  y=0.0f;
+  z=Math::sin(0.5f*ang);
+  w=Math::cos(0.5f*ang);
   }
 
 
@@ -543,7 +663,6 @@ FXQuatf& FXQuatf::adjust(){
     }
   return *this;
   }
-
 
 /*******************************************************************************/
 

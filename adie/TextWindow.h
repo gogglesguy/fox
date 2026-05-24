@@ -83,7 +83,7 @@ protected:
   FXTime               filetime;                // Original modtime of file
   FXbool               filenameset;             // Filename is set
   FXString             delimiters;              // Text delimiters
-  FXString             searchpaths;             // Search paths for files
+  FXString             searchpath;              // Search paths for files
   ShellCommand        *shellCommand;            // Running shell command, if any
   FXint                initialwidth;            // Initial width
   FXint                initialheight;           // Initial height
@@ -159,6 +159,7 @@ private:
   FXbool createDoc(const FXString& file);
   FXbool saveDoc();
   FXbool saveDocAs();
+  FXbool renameTo();
   FXbool saveDocTo();
   FXbool reloadDoc();
   FXbool openDoc();
@@ -184,6 +185,8 @@ public:
   long onCmdSwitch(FXObject*,FXSelector,void*);
   long onCmdReload(FXObject*,FXSelector,void*);
   long onUpdReload(FXObject*,FXSelector,void*);
+  long onCmdRename(FXObject*,FXSelector,void*);
+  long onUpdRename(FXObject*,FXSelector,void*);
   long onCmdSave(FXObject*,FXSelector,void*);
   long onUpdSave(FXObject*,FXSelector,void*);
   long onCmdSaveAs(FXObject*,FXSelector,void*);
@@ -323,8 +326,8 @@ public:
   long onUpdToggleBrowser(FXObject*,FXSelector,void*);
   long onCmdToggleHidden(FXObject*,FXSelector,void*);
   long onUpdToggleHidden(FXObject*,FXSelector,void*);
-  long onCmdSearchPaths(FXObject*,FXSelector,void*);
-  long onUpdSearchPaths(FXObject*,FXSelector,void*);
+  long onCmdSearchPath(FXObject*,FXSelector,void*);
+  long onUpdSearchPath(FXObject*,FXSelector,void*);
   long onCmdFindInFiles(FXObject*,FXSelector,void*);
   long onQueryTextTip(FXObject*,FXSelector,void*);
   long onLoggerRightMouse(FXObject*,FXSelector,void*);
@@ -414,6 +417,7 @@ public:
     ID_OPEN_RECENT,
     ID_SWITCH,
     ID_RELOAD,
+    ID_RENAME,
     ID_SAVE,
     ID_SAVEAS,
     ID_SAVETO,
@@ -531,7 +535,7 @@ public:
     ID_TOGGLE_BROWSER,
     ID_TOGGLE_DOTFILES,
     ID_FINDFILES,
-    ID_SEARCHPATHS,
+    ID_SEARCHPATH,
     ID_EXPRESSION,
     ID_GOTO_LINE,
     ID_GOTO_SELECTED,
@@ -652,10 +656,10 @@ public:
   FXString getPatternList() const;
 
   // Set search paths
-  void setSearchPaths(const FXString& paths);
+  void setSearchPath(const FXString& path);
 
   // Get search paths
-  FXString getSearchPaths() const;
+  FXString getSearchPath() const;
 
   // Search for file using search paths
   FXString searchForFile(const FXString& file);
@@ -694,6 +698,12 @@ public:
   // Read/write view
   void readView(const FXString& file);
   void writeView(const FXString& file);
+
+  // Append filename to recently used files list
+  void appendRecentlyUsed(const FXString& file);
+
+  // Remove filename from recently used file list
+  void removeRecentlyUsed(const FXString& file);
 
   // Start incremental search
   void startISearch();

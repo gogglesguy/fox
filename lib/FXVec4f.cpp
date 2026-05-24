@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,7 +42,6 @@ namespace FX {
 
 // Convert from vector to color
 FXColor colorFromVec4f(const FXVec4f& vec){
-  FXColor res;
 
   // Scale and convert to integer:      000000AA 000000BB 000000GG 000000RR
   __m128i uuuu=_mm_cvtps_epi32(_mm_mul_ps(_mm_loadu_ps(&vec[0]),_mm_set1_ps(255.0f)));
@@ -51,10 +50,9 @@ FXColor colorFromVec4f(const FXVec4f& vec){
   __m128i bbbb=_mm_shuffle_epi8(uuuu,_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,0,4,8));
 
   // Assign to output
-  res=_mm_cvtsi128_si32(bbbb);
-  return res;
+  return _mm_cvtsi128_si32(bbbb);
   }
-
+ 
 
 // Convert from color to vector
 FXVec4f colorToVec4f(FXColor clr){
@@ -75,8 +73,9 @@ FXVec4f colorToVec4f(FXColor clr){
 
 // Convert from vector to color
 FXColor colorFromVec4f(const FXVec4f& vec){
-  return FXRGBA((vec.x*255.0f+0.5f),(vec.y*255.0f+0.5f),(vec.z*255.0f+0.5f),(vec.w*255.0f+0.5f));
+  return FXRGBA(Math::lrint(vec.x*255.0f),Math::lrint(vec.y*255.0f),Math::lrint(vec.z*255.0f),Math::lrint(vec.w*255.0f));
   }
+
 
 // Convert from color to vector
 FXVec4f colorToVec4f(FXColor clr){
@@ -95,14 +94,6 @@ FXfloat dot(const FXVec4f& u,const FXVec4f& v){
 #else
   return u*v;
 #endif
-  }
-
-
-// Normalize vector
-FXVec4f normalize(const FXVec4f& v){
-  FXfloat m=v.length2();
-  if(__likely(m)){ return v*Math::rsqrt(m); }
-  return v;
   }
 
 

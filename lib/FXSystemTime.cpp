@@ -3,7 +3,7 @@
 *                                T i m e   S t u f f                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2019,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2019,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,6 +54,10 @@ const FXchar FXSystem::defaultTimeFormat[]="%m/%d/%Y %H:%M:%S";
 
 // ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hhmm) formatting string
 const FXchar FXSystem::isoTimeFormat[]="%FT%T%z";
+
+
+// Accurate time format (yyyy-mm-dd hh:mm:ss.ssssss) formatting string
+const FXchar FXSystem::mainTimeFormat[]="%Y-%m-%d %H:%M:%S.%fu";
 
 
 // Cumulative days of the year, for non-leap-years and leap-years

@@ -3,7 +3,7 @@
 *                          S e t t i n g s   C l a s s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -294,7 +294,25 @@ FXbool FXSettings::parse(const FXString& str,FXbool mrk){
 
     // Parse section name
     if(str[p]=='['){
+#if 0
+      b=p++;
 
+      // Scan over section name
+      while(str[p] && str[p]!=']' && str[p]!='\r' && str[p]!='\n'){
+        if(Ascii::isControl(str[p])){ fxwarning("%d: control character in section name.\n",lineno); goto nxt; }
+        if(str[p]=='\\' && str[p+1]==']') p++;          // For backward compatibility, only ']' needs escape
+        ++p;
+        }
+
+      // Check errors
+      if(str[p]!=']'){ fxwarning("%d: expected ']' to close section name.\n",lineno); goto nxt; }
+
+      e=++p;
+
+      // Grab name
+      section=FXString::unescape(str.mid(b,e-b),'[',']');
+#endif
+#if 1
       b=++p;
 
       // Scan over section name
@@ -310,6 +328,7 @@ FXbool FXSettings::parse(const FXString& str,FXbool mrk){
 
       // Grab name
       section=str.mid(b,e-b);
+#endif
       }
 
     // Parse name-value pair
@@ -393,7 +412,14 @@ FXbool FXSettings::unparse(FXString& str) const {
           if(!data(sec).empty(ent) && data(sec).mark(ent)){
 
             // Write section name if not written yet
+            // Technically, we should escape section-key if it contains
+            // special characters like '[' or ']', or some control characters.
+            // But we weren't escaping things in the past.  So problem is to
+            // escape such that older program still read it correctly. Before,
+            // the '\' and '[' were OK to embed into section-key...
             if(!flg){
+//              str.append(FXString::escape(key(sec),'[',']',0));
+//              str.append(ENDLINE);
               str.append("[");
               str.append(key(sec));      // FIXME should escape group
               str.append("]" ENDLINE);

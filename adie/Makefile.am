@@ -66,6 +66,7 @@ $(top_srcdir)/adie/print_gif.gif \
 $(top_srcdir)/adie/quit_gif.gif \
 $(top_srcdir)/adie/redo_gif.gif \
 $(top_srcdir)/adie/reload_gif.gif \
+$(top_srcdir)/adie/rename_gif.gif \
 $(top_srcdir)/adie/replace_gif.gif \
 $(top_srcdir)/adie/revert_gif.gif \
 $(top_srcdir)/adie/save_gif.gif \

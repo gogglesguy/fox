@@ -3,7 +3,7 @@
 *                     FOX Definitions, Types, and Macros                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -36,12 +36,14 @@
 #define PATHLISTSEP ';'
 #define PATHLISTSEPSTRING ";"
 #define ISPATHSEP(c) ((c)=='\\' || (c)=='/')
+#define ISPATHCOMP(c) ((c) && (c)!='/' && (c)!='\\')
 #else
 #define PATHSEP '/'
 #define PATHSEPSTRING "/"
 #define PATHLISTSEP ':'
 #define PATHLISTSEPSTRING ":"
 #define ISPATHSEP(c) ((c)=='/')
+#define ISPATHCOMP(c) ((c) && (c)!='/')
 #endif
 
 
@@ -53,7 +55,7 @@
 #endif
 
 
-// FOX_BIGENDIAN is byte order 
+// FOX_BIGENDIAN is byte order
 #if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define FOX_BIGENDIAN 0
 #elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)

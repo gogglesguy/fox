@@ -3,7 +3,7 @@
 *                   V a r i a n t   a n d   J S O N   T e s t s                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2013,2023 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2013,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

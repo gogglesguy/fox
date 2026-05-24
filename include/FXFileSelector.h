@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,6 +33,7 @@ class FXFileList;
 class FXTextField;
 class FXComboBox;
 class FXDirBox;
+class FXPathBox;
 class FXButton;
 class FXMenuButton;
 class FXIcon;
@@ -52,6 +53,7 @@ enum {
   SELECTFILE_DIRECTORY        /// Existing directory, including '.' or '..'
   };
 
+#define PATHBOX 1
 
 /// File selection widget
 class FXAPI FXFileSelector : public FXPacker {
@@ -60,12 +62,17 @@ protected:
   FXFileList        *filebox;           // File list widget
   FXTextField       *filename;          // File name entry field
   FXComboBox        *filefilter;        // Combobox for pattern list
+ // FXComboBox        *encodinglist;      // Combobox for encoding list
   FXMenuPane        *bookmarkmenu;      // Menu for bookmarks
   FXHorizontalFrame *navbuttons;        // Navigation buttons
   FXHorizontalFrame *fileboxframe;      // Frame around file list
   FXMatrix          *entryblock;        // Entry block
   FXCheckButton     *readonly;          // Open file as read only
+#if defined(PATHBOX)
+  FXPathBox         *dirbox;            // Directory hierarchy list
+#else
   FXDirBox          *dirbox;            // Directory hierarchy list
+#endif
   FXButton          *accept;            // Accept button
   FXButton          *cancel;            // Cancel button
   FXIcon            *updiricon;         // Up directory icon
@@ -106,7 +113,6 @@ public:
   long onCmdItemDeselected(FXObject*,FXSelector,void*);
   long onCmdDirectoryUp(FXObject*,FXSelector,void*);
   long onUpdDirectoryUp(FXObject*,FXSelector,void*);
-  long onUpdDirTree(FXObject*,FXSelector,void*);
   long onCmdDirTree(FXObject*,FXSelector,void*);
   long onCmdHome(FXObject*,FXSelector,void*);
   long onCmdWork(FXObject*,FXSelector,void*);
@@ -255,6 +261,12 @@ public:
 
   /// Return file list style
   FXuint getFileBoxStyle() const;
+
+  /// Change File List sorting order
+  void setSortOrder(FXuint order);
+
+  /// Return File List sorting order
+  FXuint getSortOrder() const;
 
   /// Return true if showing hidden files
   FXbool showHiddenFiles() const;

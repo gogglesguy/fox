@@ -144,7 +144,7 @@ $(OutputPath)reswrap.exe -i icons.h -o icons.cpp bigicons.bmp blocks_gif.gif boo
     <Link>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;foxlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;mpr.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;foxlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
   </ItemDefinitionGroup>
@@ -191,7 +191,7 @@ $(OutputPath)reswrap.exe -i icons.h -o icons.cpp bigicons.bmp blocks_gif.gif boo
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;foxlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;Mpr.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;foxlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
     </Link>
     <CustomBuildStep>

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -35,23 +35,42 @@ namespace FXPath {
     };
 
   /**
-  * Return root of absolute path; on Unix, this is just "/". On
-  * Windows, this is "\", "\\Janes PC\" or "C:\".
-  * Returns the empty string if the given path is not absolute.
+  * Return root of absolute path; on Unix, this is just "/".
+  * On Windows, this is of the form "C:\", "\\Server\Share\",
+  * or "\", for paths starting with these strings.
+  * The empty string is returned if the path is not absolute.
   */
   extern FXAPI FXString root(const FXString& file);
 
   /**
-  * Return share name from Windows UNC filename, if any.
-  * For example, share("\\Janes PC\Janes Documents\Document.doc")
-  * returns "Janes PC".
+  * Return share name part from Windows UNC filename.
+  * For example, the share() of "\\Server\Share\Document.doc"
+  * yields "\\Server\Share".
+  * The empty string is returned if path is not a network share.
   */
   extern FXAPI FXString share(const FXString& file);
 
   /**
+  * Return server part from Windows UNC filename.
+  * For example, the server() of "\\Server\Share\Document.doc"
+  * yields "\\Server".
+  * The empty string is returned if path is not a network share.
+  */
+  extern FXAPI FXString server(const FXString& file);
+
+  /**
+  * Return the drive letter in front of file name.
+  * Returns empty string if no drive letter present.
+  */
+  extern FXAPI FXString drive(const FXString& file);
+
+  /**
   * Return the directory part of the path name.
-  * Note that directory("/bla/bla/") is "/bla/bla" and NOT "/bla".
+  * Note that directory() of "/bla/bla/") is "/bla/bla" and 
+  * NOT "/bla".
   * However, directory("/bla/bla") is "/bla" as we expect!
+  * The "\\Server\Share\", "C:\" or "\" ("/" for Linux) are the
+  * top of that path's file system, and will not be dropped.
   */
   extern FXAPI FXString directory(const FXString& file);
 
@@ -75,8 +94,9 @@ namespace FXPath {
   * This returns the string after the last '.' in the last
   * path-component of the file, provided that the '.' was not
   * the first character of the path-component.
-  * For example, extension("/usr/share/icons/folder.png") returns "png",
-  * but the call to extension("../path.name/.bashrc") returns "".
+  * For example, extension() of "/usr/share/icons/folder.png"
+  * returns "png", but extension() of "../path.name/.bashrc"
+  * yields "".
   */
   extern FXAPI FXString extension(const FXString& file);
 
@@ -86,26 +106,32 @@ namespace FXPath {
   extern FXAPI FXString stripExtension(const FXString& file);
 
   /**
-  * Return the drive letter prefixing this file name (if any).
-  */
-  extern FXAPI FXString drive(const FXString& file);
-
-  /**
   * Perform tilde or environment variable expansion.
-  * A prefix of the form ~ or ~user is expanded to the user's home directory.
-  * Environment variables of the form $HOME or ${HOME} are expanded by
-  * substituting the value of the variable, recusively up to given level.
-  * On Windows, only environment variables of the form %HOME% are expanded.
+  * A prefix of the form "~" or "~user" is expanded to the (current) user's 
+  * home directory.
+  * Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows) 
+  * are expanded by substituting the value of the variable, recusively up to 
+  * given maximum level.
+  * On Windows, only environment variables are expanded.
   */
   extern FXAPI FXString expand(const FXString& file,FXint level=4);
 
   /**
-  * Convert a foreign path(s) or paths to local conventions,
-  * replacing environment variables etc.
+  * Convert a foreign path or path-list to local conventions, changing path
+  * separators "/" and "\", %VAR% and $VAR or ${VAR}, and path-list 
+  * separators such as ":" and ";" and so on.
+  * Parts of the path identifying drive letters or network shares are
+  * not available on all systems, and may be modified in the conversion.
   */
   extern FXAPI FXString convert(const FXString& path);
 
-  /// Contract path based on user name and environment variable
+  /**
+  * Contract path based on user name and environment variable.
+  * The contract() function is in some sense the reverse of expand(): 
+  * directory-part may be changed to "~" or "~user" when a username is 
+  * given [on Unix systems only], while other parts between path-separators
+  * may be replaced by $var when a environment variable name is given. 
+  */
   extern FXAPI FXString contract(const FXString& file,const FXString& user=FXString::null,const FXString& var=FXString::null);
 
   /**
@@ -114,6 +140,7 @@ namespace FXPath {
   * as this is important in other functions.  Finally, returned path should
   * be non-empty unless the input path was empty, and pathological paths
   * will be fixed.
+  * The result is a shorter, canonical form of the original path.
   */
   extern FXAPI FXString simplify(const FXString& file);
 
@@ -144,22 +171,50 @@ namespace FXPath {
   /// Return true if input directory is a top-level directory
   extern FXAPI FXbool isTopDirectory(const FXString& file);
 
-  /// Return true if input path is a file share
+  /**
+  * Return true if input path is a file share of the form
+  * "\\server\share".
+  */
   extern FXAPI FXbool isShare(const FXString& file);
 
-  /// Return true if input path is a hidden file or directory
+  /**
+  * Return true if input path is a file server of the form
+  * "\\server".
+  */
+  extern FXAPI FXbool isServer(const FXString& file);
+
+  /**
+  * Return true if input path is a hidden file or directory.
+  */
   extern FXAPI FXbool isHidden(const FXString& file);
 
-  /// Return valid part of absolute path
+  /**
+  * Return valid part of absolute path, i.e. leading
+  * part of the path up to the first non-existing component.
+  */
   extern FXAPI FXString validPath(const FXString& file);
 
-  /// Return true if path is valid
+  /**
+  * Return true if path is valid, i.e. all components
+  * of the path exist.
+  */
   extern FXAPI FXbool isValidPath(const FXString& file);
 
-  /// Enquote filename to make safe for shell
+  /**
+  * Enquote filename to make safe for shell.
+  * If force is true, the return value will be quoted; otherwise,
+  * quoting will be performed if file contains spaces or tabs, or
+  * if the file is empty.
+  * If not quoted, some special characters may need to be escaped.
+  * The quoting rules on Windows are byzantine, and output may
+  * look complicated.
+  */
   extern FXAPI FXString enquote(const FXString& file,FXbool force=false);
 
-  /// Dequote filename to get original again
+  /**
+  * Dequote filename to get original again, and previously escaped
+  * characters will be unescaped.
+  */
   extern FXAPI FXString dequote(const FXString& file);
 
   /**

@@ -454,6 +454,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif biga
     <ClInclude Include="..\..\include\FXParallel.h" />
     <ClInclude Include="..\..\include\FXParseBuffer.h" />
     <ClInclude Include="..\..\include\FXPath.h" />
+    <ClInclude Include="..\..\include\FXPathBox.h" />
     <ClInclude Include="..\..\include\FXPCXIcon.h" />
     <ClInclude Include="..\..\include\FXPCXImage.h" />
     <ClInclude Include="..\..\include\FXPerformance.h" />
@@ -826,6 +827,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif biga
     <ClCompile Include="..\..\lib\FXParseBuffer.cpp" />
     <ClCompile Include="..\..\lib\fxparsegeometry.cpp" />
     <ClCompile Include="..\..\lib\FXPath.cpp" />
+    <ClCompile Include="..\..\lib\FXPathBox.cpp" />
     <ClCompile Include="..\..\lib\FXPCXIcon.cpp" />
     <ClCompile Include="..\..\lib\FXPCXImage.cpp" />
     <ClCompile Include="..\..\lib\fxpcxio.cpp" />
@@ -997,14 +999,9 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif biga
     <Image Include="..\..\lib\bigharddisk.gif" />
     <Image Include="..\..\lib\bignetdrive.gif" />
     <Image Include="..\..\lib\bignethood.gif" />
-    <Image Include="..\..\lib\bookadd.bmp" />
-    <Image Include="..\..\lib\bookclr.gif" />
     <Image Include="..\..\lib\bookclr_gif.gif" />
-    <Image Include="..\..\lib\bookdel.bmp" />
     <Image Include="..\..\lib\bookdel_gif.gif" />
     <Image Include="..\..\lib\bookmrk_gif.gif" />
-    <Image Include="..\..\lib\booknxt_gif.gif" />
-    <Image Include="..\..\lib\bookprv_gif.gif" />
     <Image Include="..\..\lib\bookset.gif" />
     <Image Include="..\..\lib\bookset_gif.gif" />
     <Image Include="..\..\lib\clearentry.gif" />

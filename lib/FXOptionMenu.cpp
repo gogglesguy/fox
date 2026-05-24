@@ -3,7 +3,7 @@
 *                             O p t i o n   M e n u                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -124,7 +124,7 @@ FXint FXOption::getDefaultWidth(){
   if(!label.empty()){
     tw=labelWidth(label);
     }
-  if (options&OPTIONMENU_NOGLYPH){
+  if(options&OPTIONMENU_NOGLYPH){
     iw=0;
     }
   if(icon){
@@ -142,7 +142,7 @@ FXint FXOption::getDefaultHeight(){
   if(!label.empty()){
     th=labelHeight(label);
     }
-  if (options&OPTIONMENU_NOGLYPH){
+  if(options&OPTIONMENU_NOGLYPH){
     ih=0;
     }
   if(icon){
@@ -162,7 +162,7 @@ long FXOption::onPaint(FXObject*,FXSelector,void* ptr){
     tw=labelWidth(label);
     th=labelHeight(label);
     }
-  if (options&OPTIONMENU_NOGLYPH){
+  if(options&OPTIONMENU_NOGLYPH){
     iw=0;
     ih=0;
     }
@@ -457,27 +457,26 @@ long FXOptionMenu::onPaint(FXObject*,FXSelector,void* ptr){
 
   // Toolbar style
   if(options&OPTIONMENU_TOOLBAR){
-    if(options&(FRAME_RAISED|FRAME_SUNKEN) && isEnabled() && underCursor()) {
-        if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
-        else drawRaisedRectangle(dc,0,0,width,height);
+    if(options&(FRAME_RAISED|FRAME_SUNKEN) && isEnabled() && underCursor()){
+      if(options&FRAME_THICK) drawDoubleRaisedRectangle(dc,0,0,width,height);
+      else drawRaisedRectangle(dc,0,0,width,height);
 
-        // Draw background
-        dc.setForeground(backColor);
-        dc.fillRectangle(border,border,width-border*2,height-border*2);
-        }
-    else {
-        dc.setForeground(backColor);
-        dc.fillRectangle(0,0,width,height);
-        }
+      // Draw background
+      dc.setForeground(backColor);
+      dc.fillRectangle(border,border,width-border*2,height-border*2);
+      }
+    else{
+      dc.setForeground(backColor);
+      dc.fillRectangle(0,0,width,height);
+      }
     }
-  else {
+  else{
     drawFrame(dc,0,0,width,height);
 
     // Draw background
     dc.setForeground(backColor);
     dc.fillRectangle(border,border,width-border*2,height-border*2);
     }
-
 
   // Position text & icon
   if(!label.empty()){
@@ -492,8 +491,6 @@ long FXOptionMenu::onPaint(FXObject*,FXSelector,void* ptr){
     iw=icon->getWidth();
     ih=icon->getHeight();
     }
-
-
 
   just_x(tx,ix,tw,iw);
   just_y(ty,iy,th,ih);

@@ -3,7 +3,7 @@
 *                            L i s t   W i d g e t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -468,6 +468,12 @@ public:
 
   /// Change list style
   void setListStyle(FXuint style);
+
+  /// Change selection mode
+  void setSelectMode(FXuint mode);
+
+  /// Return current selection mode
+  FXuint getSelectMode() const;
 
   /// Set the status line help text for this list
   void setHelpText(const FXString& text);

@@ -3,7 +3,7 @@
 *                  P a t h   N a m e   M a n i p u l a t i o n                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2000,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -63,7 +63,27 @@
       -  Must not begin with $
       -  Uppercase only filename.
 
-  - Deal with Windows paths "\\?\" long pathname convention.
+  - Some examples of Windows paths:
+
+      "C:\temp\test-file.txt"           File "test-file.txt" in folder "temp" on drive "C:".
+
+      "\\Server\Share\Test\Foo.txt"     File "Foo.txt" in "Test" on share "Share" of server "Server".
+
+      "\\Server\C$\"                    Root directory "\" on drive "C:" on Server "Server".
+
+      "\\127.0.0.1\C$\temp\file.txt"    You can see there may be dots in server name!!
+
+      "\\LOCALHOST\C$\temp\file.txt"    Special "\\LOCALHOST\C$" maps to "C:".
+
+      "\\.\UNC\LOCALHOST\C$\temp\file.txt"      This is just nuts.
+
+      "\\.\C:\temp\file.txt"            DOS device path.
+
+      "\\?\C:\temp\file.txt"            DOS device path.
+
+      "\\.\CON"                         Devices like LPT1, COM1, etc.
+
+  - Paths "\\?\" are supposedly long pathnames on Windows.
 
   - On Windows environment variables:
 
@@ -78,6 +98,9 @@
       - The first character of the name must not be numeric.
 */
 
+#define TOPIC_DETAIL  1019
+
+
 using namespace FX;
 
 /*******************************************************************************/
@@ -85,58 +108,55 @@ using namespace FX;
 namespace FX {
 
 
-// Return root of given path, including share name or drive letter
+#if defined(WIN32)
+
+// Return root of absolute path.
+// On Windows, this is of the form "C:\", "\", or "\\Server\Share\",
+// for paths starting with these strings.
+// The empty string is returned if the path is not absolute.
 FXString FXPath::root(const FXString& file){
-  if(!file.empty()){
-#if defined(WIN32)
-    FXString result(file);
-    FXint p=0,q=0;
-    if(ISPATHSEP(result[q])){                                   // UNC
-      result[p++]=PATHSEP; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
-        while(result[q]){
-          if(ISPATHSEP(result[q])){ result[p++]=PATHSEP; break; }
-          result[p++]=result[q++];
+  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])){
+    return FXString(&file[0],3);
+    }
+  if(ISPATHSEP(file[0]) && !ISPATHSEP(file[1])){
+    return FXString(&file[0],1);
+    }
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      if(ISPATHSEP(file[p])){
+        p++;
+        if(ISPATHCOMP(file[p])){
+          p++;
+          while(ISPATHCOMP(file[p])) p++;
+          if(ISPATHSEP(file[p])){
+            return FXString(&file[0],p+1);
+            }
           }
         }
-      return result.trunc(p);
       }
-    if(Ascii::isLetter(result[q]) && result[q+1]==':'){         // C:
-      result[p++]=result[q++]; result[p++]=':'; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP;
-        }
-      return result.trunc(p);
-      }
-#else
-    if(ISPATHSEP(file[0])){
-      return PATHSEPSTRING;
-      }
-#endif
     }
   return FXString::null;
   }
 
-/*******************************************************************************/
 
-#if defined(WIN32)
-
-// Return share name from Windows UNC filename
+// Return share name part from Windows UNC filename.
+// For example, the share() of "\\Server\Share\Document.doc"
+// yields "\\Server\Share".
+// The empty string is returned if path is not a network share.
 FXString FXPath::share(const FXString& file){
-  if(!file.empty()){
-    FXint f,n;
-    if(ISPATHSEP(file[0])){                                   // UNC
-      if(ISPATHSEP(file[1])){
-        n=2;
-        while(ISPATHSEP(file[n])) n++;
-        f=n;
-        while(file[n]){
-          if(ISPATHSEP(file[n])) break;
-          n++;
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      if(ISPATHSEP(file[p])){
+        p++;
+        if(ISPATHCOMP(file[p])){
+          p++;
+          while(ISPATHCOMP(file[p])) p++;
+          return FXString(&file[0],p);
           }
-        return FXString(&file[f],n-f);
         }
       }
     }
@@ -144,21 +164,113 @@ FXString FXPath::share(const FXString& file){
   }
 
 
-// Check if file represents a file share
+// Return server part from Windows UNC filename.
+// For example, the server() of "\\Server\Share\Document.doc"
+// yields "\\Server".
+// The empty string is returned if path is not a network share.
+FXString FXPath::server(const FXString& file){
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      return FXString(&file[0],p);
+      }
+    }
+  return FXString::null;
+  }
+
+
+// Return the drive letter in front of file name.
+// Returns empty string if no drive letter present.
+FXString FXPath::drive(const FXString& file){
+  if(Ascii::isLetter(file[0]) && file[1]==':'){
+    return FXString(&file[0],2);
+    }
+  return FXString::null;
+  }
+
+
+// Return true if path is the form "\\Server\Share".
 FXbool FXPath::isShare(const FXString& file){
-  return ISPATHSEP(file[0]) && ISPATHSEP(file[1]) && file.find(PATHSEP,2)<0;
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      if(ISPATHSEP(file[p])){
+        p++;
+        if(ISPATHCOMP(file[p])){
+          p++;
+          while(file[p]){
+            if(ISPATHSEP(file[p])) return false;
+            p++;
+            }
+          return true;
+          }
+        }
+      }
+    }
+  return false;
+  }
+
+
+// Return true if path is of the form "\\Server".
+FXbool FXPath::isServer(const FXString& file){
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(file[p]){
+        if(ISPATHSEP(file[p])) return false;
+        p++;
+        }
+      return true;
+      }
+    }
+  return false;
   }
 
 #else
 
-// Return share name from Windows UNC filename
+// Return root of absolute path; on Unix, this is just "/".
+// The empty string is returned if the path is not absolute.
+FXString FXPath::root(const FXString& file){
+  if(ISPATHSEP(file[0])){
+    return PATHSEPSTRING;
+    }
+  return FXString::null;
+  }
+
+
+// Return share name part of filename.
+// Always empty string on Linux.
 FXString FXPath::share(const FXString&){
   return FXString::null;
   }
 
 
+// Return server name part filename.
+// Always empty string on Linux.
+FXString FXPath::server(const FXString&){
+  return FXString::null;
+  }
+
+
+// Return drive letter prefix "C:".
+// Always empty string on Linux.
+FXString FXPath::drive(const FXString&){
+  return FXString::null;
+  }
+
+
 // Check if file represents a file share
+// Always false on Linux.
 FXbool FXPath::isShare(const FXString&){
+  return false;
+  }
+
+
+// Return true if input path is a file server
+// Always false on Linux.
+FXbool FXPath::isServer(const FXString&){
   return false;
   }
 
@@ -169,41 +281,35 @@ FXbool FXPath::isShare(const FXString&){
 // Return directory part of pathname, assuming full pathname.
 // Note that directory("/bla/bla/") is "/bla/bla" and NOT "/bla".
 // However, directory("/bla/bla") is "/bla" as we expect!
+// The "\\Server\Share\", "C:\" or "\" ("/" for Linux) are the
+// top of that path's file system, and will not be dropped.
 FXString FXPath::directory(const FXString& file){
   if(!file.empty()){
-    FXString result(file);
-    FXint p=0,q=0,s;
+    FXint p=0,s;
 #if defined(WIN32)
-    if(ISPATHSEP(result[q])){                                   // UNC
-      result[p++]=PATHSEP; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){ p=2; }
+    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+      if(ISPATHCOMP(file[2])){
+        s=3;
+        while(ISPATHCOMP(file[s])) s++;
+        if(ISPATHSEP(file[s])){
+          s++;
+          if(ISPATHCOMP(file[s])){
+            s++;
+            while(ISPATHCOMP(file[s])) s++;
+            p=s;
+            }
+          }
         }
-      }
-    else if(Ascii::isLetter(result[q]) && result[q+1]==':'){    // C:
-      result[p++]=result[q++]; result[p++]=':'; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
-        }
-      }
-#else
-    if(ISPATHSEP(result[q])){
-      result[p++]=PATHSEP; q++;
-      while(ISPATHSEP(result[q])) q++;
       }
 #endif
+    if(ISPATHSEP(file[p])) p++;
     s=p;
-    while(result[q]){
-      if(ISPATHSEP(result[q])){
-        result[s=p++]=PATHSEP;
-        while(ISPATHSEP(result[q])) q++;
-        continue;
-        }
-      result[p++]=result[q++];
+    while(file[p]){
+      if(ISPATHSEP(file[p])){ s=p++; continue; }
+      p++;
       }
-    return result.trunc(s);
+    return FXString(&file[0],s);
     }
   return FXString::null;
   }
@@ -215,16 +321,30 @@ FXString FXPath::directory(const FXString& file){
 // However, name("/bla/bla") is "bla" as we expect!
 FXString FXPath::name(const FXString& file){
   if(!file.empty()){
-    FXint n=0,f;
+    FXint s=0,p;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
-#endif
-    f=n;
-    while(file[n]){
-      if(ISPATHSEP(file[n])) f=n+1;
-      n++;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
+    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+      if(ISPATHCOMP(file[2])){
+        p=3;
+        while(ISPATHCOMP(file[p])) p++;
+        if(ISPATHSEP(file[p])){
+          p++;
+          if(ISPATHCOMP(file[p])){
+            p++;
+            while(ISPATHCOMP(file[p])) p++;
+            s=p;
+            }
+          }
+        }
       }
-    return FXString(&file[f],n-f);
+#endif
+    p=s;
+    while(file[s]){
+      if(ISPATHSEP(file[s])) p=s+1;
+      s++;
+      }
+    return FXString(&file[p],s-p);
     }
   return FXString::null;
   }
@@ -239,22 +359,36 @@ FXString FXPath::name(const FXString& file){
 //  /path/.aa       -> .aa
 FXString FXPath::stem(const FXString& file){
   if(!file.empty()){
-    FXint i=0,f,e,b;
+    FXint s=0,p,b,e;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':') i=2;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
+    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+      if(ISPATHCOMP(file[2])){
+        p=3;
+        while(ISPATHCOMP(file[p])) p++;
+        if(ISPATHSEP(file[p])){
+          p++;
+          if(ISPATHCOMP(file[p])){
+            p++;
+            while(ISPATHCOMP(file[p])) p++;
+            s=p;
+            }
+          }
+        }
+      }
 #endif
-    f=i;
-    while(file[i]){
-      if(ISPATHSEP(file[i])) f=i+1;
-      i++;
+    p=s;
+    while(file[s]){
+      if(ISPATHSEP(file[s])) p=s+1;
+      s++;
       }
-    b=f;
-    if(file[b]=='.') b++;     // Leading '.'
-    e=i;
-    while(b<i){
-      if(file[--i]=='.'){ e=i; break; }
+    b=p;
+    e=s;
+    if(file[p]=='.') p++;     // Stuff following leading '.' is NOT an extension
+    while(p<s){
+      if(file[--s]=='.'){ e=s; break; }
       }
-    return FXString(&file[f],e-f);
+    return FXString(&file[b],e-b);
     }
   return FXString::null;
   }
@@ -269,21 +403,35 @@ FXString FXPath::stem(const FXString& file){
 //  /path/.aa       -> ""
 FXString FXPath::extension(const FXString& file){
   if(!file.empty()){
-    FXint n=0,f,e,i;
+    FXint s=0,p,b,e;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':') n=2;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
+    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+      if(ISPATHCOMP(file[2])){
+        p=3;
+        while(ISPATHCOMP(file[p])) p++;
+        if(ISPATHSEP(file[p])){
+          p++;
+          if(ISPATHCOMP(file[p])){
+            p++;
+            while(ISPATHCOMP(file[p])) p++;
+            s=p;
+            }
+          }
+        }
+      }
 #endif
-    f=n;
-    while(file[n]){
-      if(ISPATHSEP(file[n])) f=n+1;
-      n++;
+    p=s;
+    while(file[s]){
+      if(ISPATHSEP(file[s])) p=s+1;
+      s++;
       }
-    if(file[f]=='.') f++;     // Leading '.'
-    e=i=n;
-    while(f<i){
-      if(file[--i]=='.'){ e=i+1; break; }
+    b=e=s;
+    if(file[p]=='.') p++;     // Stuff following leading '.' is NOT an extension
+    while(p<s){
+      if(file[--s]=='.'){ b=s+1; break; }
       }
-    return FXString(&file[e],n-e);
+    return FXString(&file[b],e-b);
     }
   return FXString::null;
   }
@@ -298,70 +446,38 @@ FXString FXPath::extension(const FXString& file){
 //  /path/.aa       -> /path/.aa
 FXString FXPath::stripExtension(const FXString& file){
   if(!file.empty()){
-    FXString result(file);
-    FXint p=0,q=0,s,e;
+    FXint s=0,p,e;
 #if defined(WIN32)
-    if(ISPATHSEP(result[q])){                                   // UNC
-      result[p++]=PATHSEP; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
+    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+      if(ISPATHCOMP(file[2])){
+        p=3;
+        while(ISPATHCOMP(file[p])) p++;
+        if(ISPATHSEP(file[p])){
+          p++;
+          if(ISPATHCOMP(file[p])){
+            p++;
+            while(ISPATHCOMP(file[p])) p++;
+            s=p;
+            }
+          }
         }
-      }
-    else if(Ascii::isLetter(result[q]) && result[q+1]==':'){    // C:
-      result[p++]=result[q++];
-      result[p++]=':'; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
-        }
-      }
-#else
-    if(ISPATHSEP(result[q])){
-      result[p++]=PATHSEP; q++;
-      while(ISPATHSEP(result[q])) q++;
       }
 #endif
-    s=p;
-    while(result[q]){
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; s=p;
-        while(ISPATHSEP(result[q])) q++;
-        continue;
-        }
-      result[p++]=result[q++];
+    p=s;
+    while(file[s]){
+      if(ISPATHSEP(file[s])) p=s+1;
+      s++;
       }
-    if(result[s]=='.') s++;     // Leading '.'
-    e=p;
-    while(s<p){
-      if(result[--p]=='.'){ e=p; break; }
+    e=s;
+    if(file[p]=='.') p++;     // Stuff following leading '.' is NOT an extension
+    while(p<s){
+      if(file[--s]=='.'){ e=s; break; }
       }
-    return result.trunc(e);
+    return FXString(&file[0],e);
     }
   return FXString::null;
   }
-
-/*******************************************************************************/
-
-#if defined(WIN32)
-
-// Return drive letter prefix "c:"
-FXString FXPath::drive(const FXString& file){
-  if(Ascii::isLetter(file[0]) && file[1]==':'){
-    FXchar buffer[3]={Ascii::toLower(file[0]),':','\0'};
-    return FXString(buffer,2);
-    }
-  return FXString::null;
-  }
-
-#else
-
-// Return drive letter prefix "c:"
-FXString FXPath::drive(const FXString&){
-  return FXString::null;
-  }
-
-#endif
 
 /*******************************************************************************/
 
@@ -374,7 +490,7 @@ static FXString expandEnvironmentVariables(const FXString& file,FXint level){
     r=e;
     if(file[e++]=='%'){       // %VAR%
       b=e;
-      while(Ascii::isAlphaNumeric(file[e]) || file[e]=='_') e++;
+      while(Ascii::isWord(file[e])) e++;
       if(file[e]=='%' && b<e && 0<level){
         result.append(&file[s],r-s);
         result.append(expandEnvironmentVariables(FXSystem::getEnvironment(file.mid(b,e-b)),level-1));
@@ -390,7 +506,7 @@ static FXString expandEnvironmentVariables(const FXString& file,FXint level){
       b=e;
       if(file[e]=='{'){       // ${VAR}...
         b=++e;
-        while(Ascii::isAlphaNumeric(file[e]) || file[e]=='_') e++;
+        while(Ascii::isWord(file[e])) e++;
         if(file[e]=='}' && b<e && 0<level){
           result.append(&file[s],r-s);
           result.append(expandEnvironmentVariables(FXSystem::getEnvironment(file.mid(b,e-b)),level-1));
@@ -398,7 +514,7 @@ static FXString expandEnvironmentVariables(const FXString& file,FXint level){
           }
         }
       else{                   // $VAR...
-        while(Ascii::isAlphaNumeric(file[e]) || file[e]=='_') e++;
+        while(Ascii::isWord(file[e])) e++;
         if(b<e && 0<level){
           result.append(&file[s],r-s);
           result.append(expandEnvironmentVariables(FXSystem::getEnvironment(file.mid(b,e-b)),level-1));
@@ -414,27 +530,40 @@ static FXString expandEnvironmentVariables(const FXString& file,FXint level){
 
 
 // Perform tilde or environment variable expansion.
-// A prefix of the form ~ or ~user is expanded to the user's home directory.
-// Environment variables of the form $HOME or ${HOME} are expanded by
-// substituting the value of the variable, recusively up to given level.
-// On Windows, only environment variables of the form %HOME% are expanded.
+// A prefix of the form "~" or "~user" is expanded to the (current) user's
+// home directory.
+// Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows)
+// are expanded by substituting the value of the variable, recusively up to
+// given maximum level.
+// On Windows, only environment variables are expanded.
 FXString FXPath::expand(const FXString& file,FXint level){
   if(!file.empty()){
+    FXString result;
 #if defined(WIN32)
-    return expandEnvironmentVariables(file,level);
+    result=expandEnvironmentVariables(file,level);
+    return result;
 #else
     if(file[0]=='~'){
       FXint e=1;
-      while(file[e] && file[e]!='/'){
+      while(ISPATHCOMP(file[e])){
         if(file[e]=='\\' && file[e+1]) e++;
         e++;
         }
       if(1<e){
-        return FXSystem::getUserDirectory(file.mid(1,e-1))+expandEnvironmentVariables(file.mid(e,file.length()-e),level);
+        result=FXSystem::getUserDirectory(file.mid(1,e-1));
+        if(e<file.length()){
+          result.append(expandEnvironmentVariables(file.mid(e,file.length()-e),level));
+          }
+        return result;
         }
-      return FXSystem::getHomeDirectory()+expandEnvironmentVariables(file.mid(e,file.length()-e),level);
+      result=FXSystem::getHomeDirectory();
+      if(e<file.length()){
+        result.append(expandEnvironmentVariables(file.mid(e,file.length()-e),level));
+        }
+      return result;
       }
-    return expandEnvironmentVariables(file,level);
+    result=expandEnvironmentVariables(file,level);
+    return result;
 #endif
     }
   return FXString::null;
@@ -442,172 +571,174 @@ FXString FXPath::expand(const FXString& file,FXint level){
 
 /*******************************************************************************/
 
-// Convert a foreign path or paths to local conventions.
-//
-// When converting from foreign to local Windows filename conventions:
-//
-//  - Replace '/' with '\' for path separator.
-//  - Replace ':' with ';' for pathlist separator, except when
-//    identified as drive letter at start of filename.
-//  - Replace $ENVVAR and ${ENVVAR} with %ENVVAR%.
-//
-// When converting foreign to local UNIX filename conventions:
-//
-//  - Replace '\' with '/' for path separator.
-//  - Replace ';' with ':' for pathlist separator, except when
-//    identified as drive letter at start of filename; in that case,
-//    drive letter is removed; drive letter syntax not supported on UNIX.
-//  - Remove '\\hostname' file share designation, as syntax not supported.
-//  - Replace %ENVVAR% with ${ENVVAR}.
-//
-// Limitations: filenames with escaped characters obviously would not
-// convert properly; we welcome suggestions in this department.
-FXString FXPath::convert(const FXString& path){
-  if(!path.empty()){
-    FXString result; FXint b=0,e=0,h=1,p;
 #if defined(WIN32)
-    while(path[e]){
-      if(path[e]=='/'){                                 // Path separator
-        result.append(&path[b],e-b);
-        result.append(PATHSEP);
-        b=++e;
-        h=0;
-        continue;
-        }
-      if(Ascii::isLetter(path[e]) && path[e+1]==':' && h){      // Drive letter "C:"
-        e+=2;
-        h=0;
-        continue;
-        }
-      if(path[e]==':'){                                 // Pathlist separator
-        result.append(&path[b],e-b);
-        result.append(PATHLISTSEP);
-        b=++e;
-        h=1;
-        continue;
-        }
-      if(path[e]==';'){                                 // Pathlist separator
-        ++e;
-        h=1;
-        continue;
-        }
-      h=0;
-      if(path[e]=='$'){                                 // Environment variable
-        ++e;
-        if(path[e]=='{'){                               // ${VAR}...
-          p=++e;
-          while(Ascii::isAlphaNumeric(path[e]) || path[e]=='_') e++;
-          if(path[e]=='}'){
-            if(p<e){
-              result.append(&path[b],p-b-2);
-              result.append('%');
-              result.append(path.mid(p,e-p));
-              result.append('%');
-              b=e+1;
-              }
-            ++e;
-            }
-          }
-        else{                                           // $VAR...
-          p=e;
-          while(Ascii::isAlphaNumeric(path[e]) || path[e]=='_') e++;
-          if(p<e){
-            result.append(&path[b],p-b-1);
-            result.append('%');
-            result.append(path.mid(p,e-p));
-            result.append('%');
-            b=e;
-            }
-          }
-        continue;
-        }
-      e++;
-      }
-    result.append(&path[b],e-b);
-#else
-    while(path[e]){
-      if(path[e]=='\\'){                                // Path separator
-        result.append(&path[b],e-b);
-        b=++e;
-        if(path[e]=='\\' && h){                         // Strip "\\hostname" component.
-          e++;
-          while(path[e] && path[e]!='\\') e++;
-          b=e;
-          h=0;
+
+// Convert a Unix path or paths to Windows conventions:
+//
+//  - Replace "/" with "\" for path separator.
+//  - Replace ":" with ";" for pathlist separator.
+//  - Replace "${ENVVAR}" or "$ENVVAR" with "%ENVVAR%", which takes
+//    one extra character for every SINGLE $.
+//
+// Maybe also, if path starting with a single "/":
+//
+//  - Insert "C:" drive letter at the front, OR
+//  - Insert "\\Server\Share" at the front, based on current directory.
+//
+FXString FXPath::convert(const FXString& path){
+  FXString result;
+  if(!path.empty()){
+    if(result.length(path.length()+path.contains('$'))){        // Size estimate
+      FXint p=0,q=0,s;
+      while(path[q]){
+        if(path[q]=='/'){                                       // Path separator
+          result[p++]=PATHSEP;
+          q++;
           continue;
           }
-        result.append(PATHSEP);
-        h=0;
-        continue;
-        }
-      if(Ascii::isLetter(path[e]) && path[e+1]==':' && h){   // Strip "C:" drive letter
-        result.append(&path[b],e-b);
-        b=e=e+2;
-        h=0;
-        continue;
-        }
-      if(path[e]==';'){                                 // Pathlist separator
-        result.append(&path[b],e-b);
-        result.append(PATHLISTSEP);
-        b=++e;
-        h=1;
-        continue;
-        }
-      if(path[e]==':'){                                 // Pathlist separator
-        ++e;
-        h=1;
-        continue;
-        }
-      h=0;
-      if(path[e]=='%'){                                 // Environment variable
-        p=++e;
-        while(Ascii::isAlphaNumeric(path[e]) || path[e]=='_') e++;
-        if(path[e]=='%'){
-          if(p<e){
-            result.append(&path[b],p-b-1);
-            result.append("${");
-            result.append(&path[p],e-p);
-            result.append("}");
-            b=e+1;
-            }
-          ++e;
+        if(path[q]==':'){                                       // Pathlist separator
+          result[p++]=';';
+          q++;
+          continue;
           }
-        continue;
+        if(path[q]=='$'){                                       // Possible variable
+          s=q+1;
+          if(path[s]=='{'){
+            s++;
+            while(Ascii::isWord(path[s])) s++;
+            if(path[s]=='}' && q+2<s){                          // Non-empty ${VARIABLE}
+              result[p++]='%';
+              q+=2;
+              do{
+                result[p++]=path[q++];
+                }
+              while(q<s);
+              result[p++]='%';
+              q++;
+              continue;
+              }
+            }
+          else{
+            while(Ascii::isWord(path[s])) s++;
+            if(q+1<s){                                          // Non-empty $VARIABLE
+              result[p++]='%';
+              q+=1;
+              do{
+                result[p++]=path[q++];
+                }
+              while(q<s);
+              result[p++]='%';
+              continue;
+              }
+            }
+          }
+        result[p++]=path[q++];                                  // Normal character
         }
-      e++;
+      FXASSERT(p<=result.length());
+      result.trunc(p);
       }
-    result.append(&path[b],e-b);
-#endif
-    return result;
     }
-  return FXString::null;
+  return result;
   }
+
+#else
+
+// Convert Windows path or paths to unix conventions:
+//
+//  - Remove drive letter of the form "C:" at the front.
+//  - Remove file share of the form "\\Server\Share" at the front.
+//  - Replace "\" with "/" for path separator.
+//  - Replace ";" with ":" for pathlist separator.
+//  - Replace "%ENVVAR%" with "${ENVVAR}", which takes one extra
+//    character for every PAIR of %'s.
+//
+FXString FXPath::convert(const FXString& path){
+  FXString result;
+  if(!path.empty()){
+    if(result.length(path.length()+path.contains('%')/2)){      // Size estimate
+      FXint p=0,q=0,s;
+      if(Ascii::isLetter(path[0]) && path[1]==':'){             // Strip "C:"
+        q=2;
+        }
+      else if(path[0]=='\\' && path[1]=='\\'){                  // Strip "\\Server\Share"
+        if(path[2] && path[2]!='\\'){
+          s=3;
+          while(path[s] && path[s]!='\\') s++;
+          if(path[s]=='\\'){
+            s++;
+            if(path[s] && path[s]!='\\'){
+              s++;
+              while(path[s] && path[s]!='\\') s++;
+              q=s;
+              }
+            }
+          }
+        }
+      while(path[q]){
+        if(path[q]=='\\'){                                    // Path separator
+          result[p++]=PATHSEP;
+          q++;
+          continue;
+          }
+        if(path[q]==';'){                                     // Pathlist separator
+          result[p++]=':';
+          q++;
+          continue;
+          }
+        if(path[q]=='%'){                                     // Environment variable
+          s=q+1;
+          while(Ascii::isWord(path[s])) s++;
+          if(path[s]=='%' && q+1<s){                          // Non-empty %VARIABLE%
+            result[p++]='$';
+            result[p++]='{';
+            q+=1;
+            do{
+              result[p++]=path[q++];
+              }
+            while(q<s);
+            result[p++]='}';
+            q++;
+            continue;
+            }
+          }
+        result[p++]=path[q++];                                // Normal character
+        }
+      FXASSERT(p<=result.length());
+      result.trunc(p);
+      }
+    }
+  return result;
+  }
+
+#endif
 
 /*******************************************************************************/
 
-// Contract path based on environment variable
+// Contract path based on an environment variable.
 //
 // For example, on UNIX:
 //
-//   /home/jeroen/junk                  -> ~/junk
-//   /home/someoneelse/junk             -> ~someoneelse/junk
-//   /usr/local/ACE_wrappers/TAO        -> $ACE_ROOT/TAO
+//   "/home/jeroen/junk"                -> "~/junk"
+//   "/home/someoneelse/junk"           -> "~someoneelse/junk"
+//   "/usr/local/ACE_wrappers/TAO"      -> "$ACE_ROOT/TAO"
 //
 // On Windows:
 //
-//   /usr/local/ACE_wrappers/TAO        -> %ACE_ROOT%/TAO
+//   "C:\usr\local\ACE_wrappers\TAO"    -> "%ACE_ROOT%\TAO"
 //
 FXString FXPath::contract(const FXString& file,const FXString& user,const FXString& var){
   const FXchar legalcharacters[]="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
   if(!file.empty()){
 #if defined(WIN32)
     FXString result(file);
-    if(var.find_first_not_of(legalcharacters)<0){
+    if(!var.empty() && var.find_first_not_of(legalcharacters)<0){
       FXString val=FXSystem::getEnvironment(var);
       if(!val.empty()){
         FXint pos=result.find(val);
-        if(((0==pos) || (0<pos && ISPATHSEP(result[pos-1]))) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
-          result.replace(pos,val.length(),"%"+var+"%");
+        if(0<=pos){
+          if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+            result.replace(pos,val.length(),"%"+var+"%");
+            }
           }
         }
       }
@@ -615,17 +746,21 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 #else
     FXString result(file);
     if(FXPath::isAbsolute(result)){
-      FXString val=FXSystem::getUserDirectory(user);
-      if(!val.empty() && FXString::compare(result,val,val.length())==0 && ((result.length()==val.length()) || ISPATHSEP(result[val.length()]))){
-        result.replace(0,val.length(),"~"+user);
+      FXString dir=FXSystem::getUserDirectory(user);
+      if(!dir.empty()){
+        if(FXString::compare(result,dir,dir.length())==0 && (dir.length()==result.length() || ISPATHSEP(result[dir.length()]))){
+          result.replace(0,dir.length(),"~"+user);
+          }
         }
       }
-    if(var.find_first_not_of(legalcharacters)<0){
+    if(!var.empty() && var.find_first_not_of(legalcharacters)<0){
       FXString val=FXSystem::getEnvironment(var);
       if(!val.empty()){
         FXint pos=result.find(val);
-        if(((0==pos) || (0<pos && ISPATHSEP(result[pos-1]))) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
-          result.replace(pos,val.length(),"$"+var);
+        if(0<=pos){
+          if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+            result.replace(pos,val.length(),"$"+var);
+            }
           }
         }
       }
@@ -638,10 +773,11 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 /*******************************************************************************/
 
 // Simplify a file path; the path will remain relative if it was relative,
-// or absolute if it was absolute.  Trailing "/" will be preserved as
-// this is important in other functions.  Finally, returned path should
-// be non-empty unless the input path was empty.
-// Pathological paths will be fixed.
+// or absolute if it was absolute.  Also, a trailing "/" will be preserved
+// as this is important in other functions.  Finally, returned path should
+// be non-empty unless the input path was empty, and pathological paths
+// will be fixed.
+// The result is a shorter, canonical form of the original path.
 //
 // Examples:
 //
@@ -686,32 +822,40 @@ FXString FXPath::simplify(const FXString& file){
     FXint components[64];
     FXint c=0,p=0,q=0,s;
 #if defined(WIN32)
-    if(ISPATHSEP(result[q])){                                   // UNC
-      result[p++]=PATHSEP; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
-        }
+    if(Ascii::isLetter(result[q]) && result[q+1]==':'){
+      result[p++]=result[q];
+      result[p++]=':';
+      q+=2;
       }
-    else if(Ascii::isLetter(result[q]) && result[q+1]==':'){    // C:
-      result[p++]=result[q++];
-      result[p++]=':'; q++;
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
+    else if(ISPATHSEP(result[q]) && ISPATHSEP(result[q+1])){
+      result[p++]=PATHSEP;
+      result[p++]=PATHSEP;
+      q+=2;
+      if(ISPATHCOMP(result[q])){
+        while(ISPATHCOMP(result[q])){
+          result[p++]=result[q++];
+          }
+        if(ISPATHSEP(result[q])){
+          result[p++]=PATHSEP;
+          q++;
+          if(ISPATHCOMP(result[q])){
+            while(ISPATHCOMP(result[q])){
+              result[p++]=result[q++];
+              }
+            }
+          }
         }
-      }
-#else
-    if(ISPATHSEP(result[q])){
-      result[p++]=PATHSEP; q++;
-      while(ISPATHSEP(result[q])) q++;
       }
 #endif
-    s=p;
+    if(ISPATHSEP(result[q])){                   // Keep root
+      while(ISPATHSEP(result[q])) q++;          // Eat duplicate path separators
+      result[p++]=PATHSEP;
+      }
+    s=p;                                        // We can not back up past this point
     while(result[q]){
       if(result[q]=='.'){
         if(result[q+1]=='\0'){                  // '.'
-          q+=1;
+          q++;
           if(s<p && ISPATHSEP(result[p-1])){    // Back up over '/' if not first
             p--;
             }
@@ -722,18 +866,18 @@ FXString FXPath::simplify(const FXString& file){
           }
         if(ISPATHSEP(result[q+1])){             // './'
           q+=2;
-          while(ISPATHSEP(result[q])) q++;
+          while(ISPATHSEP(result[q])) q++;      // Eat duplicate path separators
           if(p==0 && result[q]=='\0'){          // Output './' if it would be empty otherwise
             result[p++]='.';
             result[p++]=PATHSEP;
             }
-          continue;
+          continue;                             // Otherwise, eat the './'
           }
         if(result[q+1]=='.'){
           if(result[q+2]=='\0'){                // '..'
             q+=2;
             if(c==0){                           // No prior path component
-              if(s) continue;                   // Pathological: can't go up from root
+              if(s) continue;                   // Pathological: can't go above root
               result[p++]='.';                  // Leading '..'
               result[p++]='.';
               continue;
@@ -749,9 +893,9 @@ FXString FXPath::simplify(const FXString& file){
             }
           if(ISPATHSEP(result[q+2])){           // '../'
             q+=3;
-            while(ISPATHSEP(result[q])) q++;
-            if(c==0){
-              if(s) continue;                   // Pathological: can't go up from root
+            while(ISPATHSEP(result[q])) q++;    // Eat duplicate path separators
+            if(c==0){                           // No prior path component
+              if(s) continue;                   // Pathological: can't go above root
               result[p++]='.';                  // Leading '../'
               result[p++]='.';
               result[p++]=PATHSEP;
@@ -762,38 +906,58 @@ FXString FXPath::simplify(const FXString& file){
               result[p++]='.';
               result[p++]=PATHSEP;
               }
-            continue;
+            continue;                           // Otherwise, eat the '../'
             }
           }
         }
       if(__unlikely(c>=64)) return file;        // Insanely many components (not simplified)
       components[c++]=p;                        // Remember backup point
-      while(result[q] && !ISPATHSEP(result[q])){
+      while(result[q] && !ISPATHSEP(result[q])){// Advance to end of component
         result[p++]=result[q++];
         }
-      if(ISPATHSEP(result[q])){
-        result[p++]=PATHSEP; q++;
-        while(ISPATHSEP(result[q])) q++;
+      if(ISPATHSEP(result[q])){                 // A path separator
+        while(ISPATHSEP(result[q])) q++;        // Eat duplicate path separators
+        result[p++]=PATHSEP;                    // Copy it
         }
       }
-    return result.trunc(p);
+    return result.trunc(p);                     // Reached the end
     }
   return FXString::null;
   }
 
 /*******************************************************************************/
 
-// Return absolute path name
-FXString FXPath::absolute(const FXString& file){
 #if defined(WIN32)
-  if(!((ISPATHSEP(file[0]) && ISPATHSEP(file[1])) || (Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])))){
+
+// Return absolute path name.
+// If file started with "\" but is not fully qualified i.e. has
+// no drive letter ["C:"] or file share prefix ["\\Server\Share"],
+// then just prefix the current directory's root in front of the
+// file to complete it.
+// Otherwise, place the current directory in front, and simplify
+// the result to obtain canonical path.
+FXString FXPath::absolute(const FXString& file){
+  if(!FXPath::isAbsolute(file)){
+    FXString result(FXSystem::getCurrentDirectory());
     if(ISPATHSEP(file[0])){
-      return FXPath::simplify(FXSystem::getCurrentDrive()+file);
+      if(Ascii::isLetter(result[0]) && result[1]==':'){
+        result.trunc(2);
+        }
+      else if(ISPATHSEP(result[0]) && ISPATHSEP(result[1])){
+        if(ISPATHCOMP(result[2])){
+          FXint p=3;
+          while(ISPATHCOMP(result[p])) p++;
+          if(ISPATHSEP(result[p])){
+            p++;
+            if(ISPATHCOMP(result[p])){
+              p++;
+              while(ISPATHCOMP(result[p])) p++;
+              result.trunc(p);
+              }
+            }
+          }
+        }
       }
-    if(Ascii::isLetter(file[0]) && file[1]==':'){
-      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));
-      }
-    FXString result(FXSystem::getCurrentDirectory());
     if(!file.empty()){
       if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
       result.append(file);
@@ -801,31 +965,70 @@ FXString FXPath::absolute(const FXString& file){
     return FXPath::simplify(result);
     }
   return FXPath::simplify(file);
-#else
-  if(!ISPATHSEP(file[0])){
-    FXString result(FXSystem::getCurrentDirectory());
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
-    return FXPath::simplify(result);
-    }
-  return FXPath::simplify(file);
-#endif
   }
 
-/*******************************************************************************/
+
+// Return absolute path from base directory and file name.
+// If file started with "\" but is not fully qualified i.e. has
+// no drive letter ["C:"] or file share prefix ["\\Server\Share"],
+// then just prefix the base-directory's root in front of the
+// file to complete it.
+// Otherwise, place the base-directory in front, and simplify
+// the result to obtain canonical path.
+FXString FXPath::absolute(const FXString& base,const FXString& file){
+  if(!FXPath::isAbsolute(file)){
+    FXString result(FXPath::absolute(base));
+    if(ISPATHSEP(file[0])){
+      if(Ascii::isLetter(result[0]) && result[1]==':'){
+        result.trunc(2);
+        }
+      else if(ISPATHSEP(result[0]) && ISPATHSEP(result[1])){
+        if(ISPATHCOMP(result[2])){
+          FXint p=3;
+          while(ISPATHCOMP(result[p])) p++;
+          if(ISPATHSEP(result[p])){
+            p++;
+            if(ISPATHCOMP(result[p])){
+              p++;
+              while(ISPATHCOMP(result[p])) p++;
+              result.trunc(p);
+              }
+            }
+          }
+        }
+      }
+    if(!file.empty()){
+      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      result.append(file);
+      }
+    return FXPath::simplify(result);
+    }
+  return FXPath::simplify(file);
+  }
+
+#else
+
+// Return absolute path name
+// If file is not absolute, place the current directory in
+// front, and simplify the result to obtain canonical path.
+FXString FXPath::absolute(const FXString& file){
+  if(!FXPath::isAbsolute(file)){
+    FXString result(FXSystem::getCurrentDirectory());
+    if(!file.empty()){
+      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      result.append(file);
+      }
+    return FXPath::simplify(result);
+    }
+  return FXPath::simplify(file);
+  }
+
 
 // Return absolute path from base directory and file name
+// If file is not absolute, place the base-directory in
+// front, and simplify the result to obtain canonical path.
 FXString FXPath::absolute(const FXString& base,const FXString& file){
-#if defined(WIN32)
-  if(!((ISPATHSEP(file[0]) && ISPATHSEP(file[1])) || (Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])))){
-    if(ISPATHSEP(file[0])){
-      return FXPath::simplify(FXSystem::getCurrentDrive()+file);
-      }
-    if(Ascii::isLetter(file[0]) && file[1]==':'){
-      return FXPath::simplify(file.left(2)+PATHSEPSTRING+file.right(file.length()-2));
-      }
+  if(!FXPath::isAbsolute(file)){
     FXString result(FXPath::absolute(base));
     if(!file.empty()){
       if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
@@ -834,18 +1037,9 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
     return FXPath::simplify(result);
     }
   return FXPath::simplify(file);
-#else
-  if(!ISPATHSEP(file[0])){
-    FXString result(FXPath::absolute(base));
-    if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
-      result.append(file);
-      }
-    return FXPath::simplify(result);
-    }
-  return FXPath::simplify(file);
-#endif
   }
+
+#endif
 
 /*******************************************************************************/
 
@@ -880,51 +1074,87 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 //  /          /a/b         a/b         Branch point is /
 //  /p/q       /a/b         ../../a/b   Branch point is /
 //
-// Note that absolute(base,relative(base,file)) should be equal to file
-// [after simplify()].
 FXString FXPath::relative(const FXString& base,const FXString& file){
   if(!base.empty() && !file.empty()){
+    FXint p=0,q=0,bp=0,bq=0;
 
-    // Base and file either both absolute or both relative
-    if(FXPath::isAbsolute(base) == FXPath::isAbsolute(file)){
-      FXint p=0,q=0,bp=0,bq=0;
-
-      // Find branch point
 #if defined(WIN32)
-      while(base[p] && file[q]){
-        if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
-          bp=p; while(ISPATHSEP(base[p])) p++;    // Eat multiple slashes
-          bq=q; while(ISPATHSEP(file[q])) q++;
-          continue;
-          }
-        if(Ascii::toLower(base[p])==Ascii::toLower(file[q])){
+
+    // Drive letter same?
+    if(Ascii::isLetter(base[0]) && base[1]==':'){
+      if(Ascii::toUpper(file[0])!=Ascii::toUpper(base[0])) goto x;
+      if(file[1]!=':') goto x;
+      p=2;
+      q=2;
+      }
+
+    // Server and share same?
+    else if(ISPATHSEP(base[0]) && ISPATHSEP(base[1])){
+      if(!ISPATHSEP(file[0]) || !ISPATHSEP(file[1])) goto x;
+      p=2;
+      q=2;
+      while(ISPATHCOMP(base[p])){
+        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) goto x;
+        p++;
+        q++;
+        }
+      if(ISPATHSEP(base[p])){
+        if(!ISPATHSEP(file[q])) goto x;
+        p++;
+        q++;
+        while(ISPATHCOMP(base[p])){
+          if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) goto x;
           p++;
           q++;
-          continue;
           }
-        break;
         }
+      }
+
+    // Find branch point
+    while(base[p] && file[q]){
+      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
+        bp=p; while(ISPATHSEP(base[p])) p++;  // Eat multiple slashes
+        bq=q; while(ISPATHSEP(file[q])) q++;
+        continue;
+        }
+      if(Ascii::toLower(base[p])==Ascii::toLower(file[q])){
+        p++;
+        q++;
+        continue;
+        }
+      break;
+      }
+
 #else
-      while(base[p] && file[q]){
-        if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
-          bp=p; while(ISPATHSEP(base[p])) p++;    // Eat multiple slashes
-          bq=q; while(ISPATHSEP(file[q])) q++;
-          continue;
-          }
-        if(base[p]==file[q]){
-          p++;
-          q++;
-          continue;
-          }
-        break;
+
+    // Find branch point
+    while(base[p] && file[q]){
+      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
+        bp=p; while(ISPATHSEP(base[p])) p++;  // Eat multiple slashes
+        bq=q; while(ISPATHSEP(file[q])) q++;
+        continue;
         }
+      if(base[p]==file[q]){
+        p++;
+        q++;
+        continue;
+        }
+      break;
+      }
+
 #endif
+
+   // Base and file should be either both absolute or both relative.
+   // The branch point MUST be at a proper head, i.e. at least a
+   // "C:\" or "\\Server\Share\" on Windows ["/" on Linux] if it is
+   // an absolute path.
+   if(ISPATHSEP(base[bq])==ISPATHSEP(file[bq])){
 
       // Check if common prefix extends to the end of the base-path.
       // If the file-path ends in "/", the final component is a directory,
       // in which case it is OK to return ".".  Otherwise we prefer
       // to prefix the file-part with "../".
-      if(ISPATHSEP(file[q]) && (base[p]=='\0' || ISPATHSEP(base[p]))){
+      if((base[p]=='\0' || ISPATHSEP(base[p])) && ISPATHSEP(file[q])){
         bp=p;
         bq=q;
         }
@@ -940,7 +1170,7 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
         while(base[bp]){
           while(ISPATHSEP(base[bp])) bp++;
           if(base[bp]){
-            while(base[bp] && !ISPATHSEP(base[bp])) bp++;
+            while(ISPATHCOMP(base[bp])) bp++;
             result.append(".." PATHSEPSTRING);
             }
           }
@@ -952,7 +1182,7 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
       return ".";
       }
     }
-  return file;
+x:return file;
   }
 
 
@@ -992,85 +1222,94 @@ FXbool FXPath::isInside(const FXString& base,const FXString& file){
   if(!base.empty() && !file.empty()){
     FXint p=0,q=0,v=0;
 #if defined(WIN32)
-    if(ISPATHSEP(base[p])){
-      if(!ISPATHSEP(file[q])) return false;
-      p++;
-      q++;
+    // Drive letter same?
+    if(Ascii::isLetter(base[0]) && base[1]==':'){
+      if(Ascii::toUpper(file[0])!=Ascii::toUpper(base[0])) return false;
+      if(file[1]!=':') return false;
+      p=2;
+      q=2;
+      }
+
+    // Server and share same?
+    else if(ISPATHSEP(base[0]) && ISPATHSEP(base[1])){
+      if(!ISPATHSEP(file[0])) return false;
+      if(!ISPATHSEP(file[1])) return false;
+      p=2;
+      q=2;
+      while(ISPATHCOMP(base[p])){
+        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) return false;
+        p++;
+        q++;
+        }
       if(ISPATHSEP(base[p])){
         if(!ISPATHSEP(file[q])) return false;
         p++;
         q++;
+        while(ISPATHCOMP(base[p])){
+          if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) return false;
+          p++;
+          q++;
+          }
         }
       }
-    else if(Ascii::isLetter(base[p]) && base[p+1]==':'){
-      if((Ascii::toLower(base[p])!=Ascii::toLower(file[q])) || (file[q+1]!=':')) return false;
-      p+=2;
-      q+=2;
-      }
+
+    // Process potentially non-canonical, case-insensitive paths
     while(base[p]){
       if(ISPATHSEP(base[p])){
         if(!ISPATHSEP(file[q])) return false;
-        p++;
-        q++;
-        while(ISPATHSEP(base[p])) p++;
-        while(ISPATHSEP(file[q])) q++;
+        while(ISPATHSEP(base[p])) p++;                          // Eat '/'
+        while(ISPATHSEP(file[q])) q++;                          // Eat '/'
         }
 a:    if(base[p]=='.'){
-        if(base[p+1]=='\0'){ p+=1; goto a; }
-        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }
+        if(base[p+1]=='\0'){ p+=1; goto a; }                    // Eat '.'
+        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }               // Eat './'
         if(base[p+1]=='.'){
-          if(base[p+2]=='\0'){ p+=2; v++; goto a; }
-          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }
+          if(base[p+2]=='\0'){ p+=2; v++; goto a; }             // Eat '..'
+          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }        // Eat '../'
           }
         }
 b:    if(file[q]=='.'){
-        if(file[q+1]=='\0'){ q+=1; goto b; }
-        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }
+        if(file[q+1]=='\0'){ q+=1; goto b; }                    // Eat '.'
+        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }               // Eat './'
         if(file[q+1]=='.'){
-          if(file[q+2]=='\0'){ q+=2; v--; goto b; }
-          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }
+          if(file[q+2]=='\0'){ q+=2; v--; goto b; }             // Eat '..'
+          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }        // Eat '../'
           }
         }
       if(v<0) return false;
-      while(base[p] && !ISPATHSEP(base[p])){
-        if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) return false;
+      while(ISPATHCOMP(base[p])){
+        if(Ascii::toUpper(base[p])!=Ascii::toUpper(file[q])) return false;
         p++;
         q++;
         }
       }
     return true;
 #else
-    if(ISPATHSEP(base[p])){
-      if(!ISPATHSEP(file[q])) return false;
-      p++;
-      q++;
-      }
+    // Process potentially non-canonical paths
     while(base[p]){
       if(ISPATHSEP(base[p])){
         if(!ISPATHSEP(file[q])) return false;
-        p++;
-        q++;
-        while(ISPATHSEP(base[p])) p++;
-        while(ISPATHSEP(file[q])) q++;
+        while(ISPATHSEP(base[p])) p++;                          // Eat '/'
+        while(ISPATHSEP(file[q])) q++;                          // Eat '/'
         }
 a:    if(base[p]=='.'){
-        if(base[p+1]=='\0'){ p+=1; goto a; }
-        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }
+        if(base[p+1]=='\0'){ p+=1; goto a; }                    // Eat '.'
+        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }               // Eat './'
         if(base[p+1]=='.'){
-          if(base[p+2]=='\0'){ p+=2; v++; goto a; }
-          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }
+          if(base[p+2]=='\0'){ p+=2; v++; goto a; }             // Eat '..'
+          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }        // Eat '../'
           }
         }
 b:    if(file[q]=='.'){
-        if(file[q+1]=='\0'){ q+=1; goto b; }
-        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }
+        if(file[q+1]=='\0'){ q+=1; goto b; }                    // Eat '.'
+        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }               // Eat './'
         if(file[q+1]=='.'){
-          if(file[q+2]=='\0'){ q+=2; v--; goto b; }
-          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }
+          if(file[q+2]=='\0'){ q+=2; v--; goto b; }             // Eat '..'
+          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }        // Eat '../'
           }
         }
       if(v<0) return false;
-      while(base[p] && !ISPATHSEP(base[p])){
+      while(ISPATHCOMP(base[p])){
         if(base[p]!=file[q]) return false;
         p++;
         q++;
@@ -1101,10 +1340,26 @@ FXString FXPath::upLevel(const FXString& file){
 /*******************************************************************************/
 
 // Check if file represents absolute pathname
-// Which means '/blabla' or '\blabla' or 'c:\blabla'
+// On Linux, this means first character is "/".
+// On Windows, this means "C:\", or "\\Server\Share\".
 FXbool FXPath::isAbsolute(const FXString& file){
 #if defined(WIN32)
-  return ISPATHSEP(file[0]) || (Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2]));
+  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])) return true;
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      if(ISPATHSEP(file[p])){
+        p++;
+        if(ISPATHCOMP(file[p])){
+          p++;
+          while(ISPATHCOMP(file[p])) p++;
+          if(ISPATHSEP(file[p])) return true;
+          }
+        }
+      }
+    }
+  return false;
 #else
   return ISPATHSEP(file[0]);
 #endif
@@ -1112,8 +1367,8 @@ FXbool FXPath::isAbsolute(const FXString& file){
 
 
 // Return true if file name is relative
-// Which means '.' or './blabla' or '..' or '../blabla'.
-// But '.blabla' is NOT relative.
+// Which means "." or "./blabla" or ".." or "../blabla".
+// But ".blabla" is NOT relative.
 FXbool FXPath::isRelative(const FXString& file){
   return file[0]=='.' && ((file[1]=='\0' || ISPATHSEP(file[1])) || (file[1]=='.' && (file[2]=='\0' || ISPATHSEP(file[2]))));
   }
@@ -1121,9 +1376,36 @@ FXbool FXPath::isRelative(const FXString& file){
 /*******************************************************************************/
 
 // Does file represent topmost directory
+//
+// On Windows, isTopDirectory() returns true for paths of the form:
+//
+//   "\"
+//   "C:\"
+//   "\\Server\Share\"
+//
+// On Linux, isTopDirectory() returns true for paths of the form:
+//
+//   "/"
+//
 FXbool FXPath::isTopDirectory(const FXString& file){
 #if defined(WIN32)
-  return (ISPATHSEP(file[0]) && (file[1]=='\0' || (ISPATHSEP(file[1]) && file[2]=='\0'))) || (Ascii::isLetter(file[0]) && file[1]==':' && (file[2]=='\0' || (ISPATHSEP(file[2]) && file[3]=='\0')));
+  if(ISPATHSEP(file[0]) && file[1]=='\0') return true;
+  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2]) && file[3]=='\0') return true;
+  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
+    if(ISPATHCOMP(file[2])){
+      FXint p=3;
+      while(ISPATHCOMP(file[p])) p++;
+      if(ISPATHSEP(file[p])){
+        p++;
+        if(ISPATHCOMP(file[p])){
+          p++;
+          while(ISPATHCOMP(file[p])) p++;
+          if(ISPATHSEP(file[p]) && file[p+1]=='\0') return true;
+          }
+        }
+      }
+    }
+  return false;
 #else
   return ISPATHSEP(file[0]) && file[1]=='\0';
 #endif
@@ -1136,17 +1418,19 @@ FXbool FXPath::isTopDirectory(const FXString& file){
 // Return true if input path is a hidden file or directory
 FXbool FXPath::isHidden(const FXString& file){
   if(!file.empty()){
-    FXuint attrs;
 #ifdef UNICODE
+    FXuint attrs;
     FXnchar unifile[MAXPATHLEN];
     utf2ncs(unifile,file.text(),MAXPATHLEN);
-    attrs=::GetFileAttributesW(unifile);
-#else
-    attrs=::GetFileAttributesA(file.text());
-#endif
-    if(attrs!=INVALID_FILE_ATTRIBUTES){
+    if((attrs=::GetFileAttributesW(unifile))!=INVALID_FILE_ATTRIBUTES){
       return (attrs&FILE_ATTRIBUTE_HIDDEN)!=0;
       }
+#else
+    FXuint attrs;
+    if((attrs=::GetFileAttributesA(file.text()))!=INVALID_FILE_ATTRIBUTES){
+      return (attrs&FILE_ATTRIBUTE_HIDDEN)!=0;
+      }
+#endif
     }
   return false;
   }
@@ -1194,7 +1478,7 @@ FXbool FXPath::isValidPath(const FXString& file){
 #if defined(WIN32)           // WINDOWS
 
 // Enquote filename to make safe for shell
-// Enclose with double quotes is needed:
+// Enclose with double quotes if needed:
 //   - If force=true
 //   - If white space before, in, or after letters
 //   - If filename is empty
@@ -2111,6 +2395,7 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
       while(pathlist[end] && pathlist[end]!=PATHLISTSEP) end++;
       if(beg==end) break;
       path=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)),file);
+      FXTRACE((TOPIC_DETAIL,"FXPath::search: try: %s\n",path.text()));
       if(FXStat::exists(path)) return path;
       }
     }

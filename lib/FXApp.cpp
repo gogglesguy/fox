@@ -3,7 +3,7 @@
 *                     A p p l i c a t i o n   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -344,7 +344,7 @@ FXApp* FXApp::app=nullptr;
 
 
 // Copyright information
-const FXuchar FXApp::copyright[]="Copyright (C) 1997,2024 Jeroen van der Zijp. All Rights Reserved.";
+const FXuchar FXApp::copyright[]="Copyright (C) 1997,2025 Jeroen van der Zijp. All Rights Reserved.";
 
 
 // Conversion
@@ -4214,11 +4214,11 @@ static FXColor getSystemColor(FXuint which){
 #if defined(WIN32)
 static void getSystemFont(FXFontDesc& fontdesc){
   NONCLIENTMETRICS ncm;
-  memset(&ncm,0,sizeof(NONCLIENTMETRICS));
+  clearElms(&ncm,1);
   ncm.cbSize=sizeof(NONCLIENTMETRICS);
 #if (WINVER >= 0x0600)                          // Fix from: Daniel Stine <robodanny@gmail.com>
   OSVERSIONINFO osvi;                           // Adjust size based on operating system version
-  memset(&osvi,0,sizeof(osvi));                 // So get run-time operating system version first
+  clearElms(&osvi,1);                           // So get run-time operating system version first
   osvi.dwOSVersionInfoSize=sizeof(osvi);        // if headers include new member iPaddedBorderWidth
   GetVersionEx(&osvi);                          // in NONCLIENTMETRICS struct
   if(osvi.dwMajorVersion<6) ncm.cbSize-=sizeof(ncm.iPaddedBorderWidth);

@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   V i s i t o r                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -168,22 +168,22 @@ FXuint FXGlobVisitor::traverse(const FXString& path,const FXString& wild,FXuint 
 
 // Enter directory
 FXuint FXGlobVisitor::enter(const FXString& path){
-  FXuint mode=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
+  FXuint matching=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
 #ifdef WIN32
-  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,mode));
+  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXStat::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,matching));
 #else
-  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXPath::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,mode));
+  return !(options&FXDir::NoDirs) && ((options&FXDir::HiddenDirs) || !FXPath::isHidden(path)) && ((options&FXDir::AllDirs) || FXPath::match(path,wildcard,matching));
 #endif
   }
 
 
 // Handle file
 FXuint FXGlobVisitor::visit(const FXString& path){
-  FXuint mode=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
+  FXuint matching=(options&FXDir::CaseFold)?(FXPath::NoEscape|FXPath::CaseFold):(FXPath::NoEscape);
 #ifdef WIN32
-  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,mode));
+  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXStat::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,matching));
 #else
-  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,mode));
+  return !(options&FXDir::NoFiles) && ((options&FXDir::HiddenFiles) || !FXPath::isHidden(path)) && ((options&FXDir::AllFiles) || FXPath::match(path,wildcard,matching));
 #endif
   }
 

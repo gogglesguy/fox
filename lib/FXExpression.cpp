@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -46,7 +46,12 @@
 #define TOPIC_DETAIL    1001
 //#define TOPIC_EXPDUMP   1015          // Debugging expression code
 
-#define MAXSTACKDEPTH   128
+#define MAXSTACKDEPTH   128             // Maximum stack depth
+
+#define NOTFOUND        -1              // Symbol not found
+#define BADCONST        -2              // Bad constant value
+#define BADCOMMA        -3              // Expected comma
+#define CONSTANT        -4              // Constant symbol
 
 // Access to argument
 #if defined(__i386__) || defined(__x86_64__)            // No alignment limits on shorts
@@ -116,6 +121,7 @@ enum {
   TK_ASIN       = 3610325U,
   TK_ASINH      = 119140637U,
   TK_ATAN       = 3615258U,
+  TK_ATAN2      = 119303528U,
   TK_ATANH      = 119303474U,
   TK_CBRT       = 3520359U,
   TK_CEIL       = 3523203U,
@@ -136,21 +142,20 @@ enum {
   TK_LOG        = 114052U,
   TK_LOG2       = 3763766U,
   TK_LOG10      = 124204261U,
+  TK_MAX        = 121748U,
+  TK_MIN        = 121482U,
   TK_NEAR       = 3985784U,
+  TK_POW        = 119176U,
+  TK_ROUND      = 136616002U,
   TK_SIN        = 124308U,
   TK_SINH       = 4102268U,
   TK_SQR        = 123536U,
   TK_SQRT       = 4076772U,
-  TK_ROUND      = 136616002U,
-  TK_TRUNC      = 133596670U,
   TK_TAN        = 123227U,
   TK_TANH       = 4066515U,
+  TK_TRUNC      = 133596670U,
   TK_WRAP       = 4221012U,
   TK_WRAP4      = 139293408U,
-  TK_MAX        = 121748U,
-  TK_MIN        = 121482U,
-  TK_POW        = 119176U,
-  TK_ATAN2      = 119303528U,
   };
 
 
@@ -265,7 +270,7 @@ public:
   FXExpression::Error element();
 
   // Variable lookup
-  FXint lookup(const FXchar* sym,FXival len) const;
+  FXint lookup(FXdouble& value,const FXchar* sym,FXival len) const;
 
   // Code generation
   FXuchar* opcode(FXuchar op);
@@ -474,7 +479,7 @@ FXExpression::Error FXCompile::primary(){
 // Element
 FXExpression::Error FXCompile::element(){
   FXExpression::Error err;
-  FXdouble num;
+  FXdouble num=0.0;
   FXuchar op;
   FXbool ok;
   FXint v;
@@ -504,9 +509,10 @@ FXExpression::Error FXCompile::element(){
       number(num);
       break;
     case TK_INT:
-      num=(FXdouble)__strtoll(head,nullptr,10,&ok);
-      opcode(OP_NUM);
+      //num=(FXdouble)__strtoll(head,nullptr,10,&ok);
+      num=__strtod(head,nullptr,&ok);           // FIXME Avoid arbitrary limit on number of digits or switch int->real if too big?
       if(!ok) return FXExpression::ErrToken;
+      opcode(OP_NUM);
       number(num);
       break;
     case TK_REAL:
@@ -673,10 +679,18 @@ mono: gettok();
       op=OP_WRAP4;
       goto mono;
     default:
-      v=lookup(head,tail-head);
-      if(v<0) return FXExpression::ErrIdent;
-      opcode(OP_VAR);
-      opcode(v);
+      v=lookup(num,head,tail-head);
+      if(v==NOTFOUND) return FXExpression::ErrIdent;
+      if(v==BADCONST) return FXExpression::ErrConst;
+      if(v==BADCOMMA) return FXExpression::ErrComma;
+      if(v==CONSTANT){          // Add symbolic constant
+        opcode(OP_NUM);
+        number(num);
+        }
+      else{                     // Add reference to variable
+        opcode(OP_VAR);
+        opcode((FXuchar)v);
+        }
       break;
     case TK_EOF:
     case TK_TIMES:
@@ -706,23 +720,39 @@ mono: gettok();
   }
 
 
-// Lookup symbol
-FXint FXCompile::lookup(const FXchar* sym,FXival len) const{
+// Lookup symbol in list vars: (variable | constant=<value>)*
+// Keep track which variable is assigned which slot, observing that
+// constants do not take a slot, as they're inlined in the code.
+FXint FXCompile::lookup(FXdouble& value,const FXchar* sym,FXival len) const{
   if(vars){
     const FXchar* beg=vars;
     const FXchar* end=vars;
-    FXint which=0;
+    const FXchar* ptr;
+    FXint which=-1;
+    FXbool ok;
     while(*end){
       beg=end;
-      while(*end && *end!=',') end++;
-      if((end-beg)==len){
-        if(equalElms(sym,beg,len)) return which;
+      while(*end && *end!=',' && *end!='=') end++;
+      ptr=end;
+      if(*end=='='){
+        value=__strtod(end+1,&end,&ok);
+        if(!ok) return BADCONST;                // Bad constant
+        which--;
         }
-      if(*end==',') end++;
       which++;
+      if((ptr-beg)==len){
+        if(equalElms(sym,beg,len)){
+          if(*ptr=='=') return CONSTANT;        // Constant
+          return which;
+          }
+        }
+      if(*end){
+        if(*end!=',') return BADCOMMA;          // Comma missing
+        end++;
+        }
       }
     }
-  return -1;
+  return NOTFOUND;                              // Symbol not found
   }
 
 
@@ -1003,6 +1033,7 @@ const FXchar *const FXExpression::errors[]={
   "Expected comma",
   "Unknown identifier",
   "Expected colon",
+  "Bad constant value",
   "Expression too long",
   };
 
@@ -1026,6 +1057,14 @@ FXExpression::FXExpression(const FXExpression& orig):code(EMPTY){
 FXExpression::FXExpression(const FXchar* expression,const FXchar* variables,FXExpression::Error* error):code(EMPTY){
   FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression,variables,error));
   FXExpression::Error err=parse(expression,variables);
+  if(error){ *error=err; }
+  }
+
+
+// Compile expression from pattern; fail if error
+FXExpression::FXExpression(const FXString& expression,const FXchar* variables,FXExpression::Error* error):code(EMPTY){
+  FXTRACE((TOPIC_CONSTRUCT,"FXExpression::FXExpression(%s,%s,%p)\n",expression.text(),variables,error));
+  FXExpression::Error err=parse(expression.text(),variables);
   if(error){ *error=err; }
   }
 
@@ -1067,7 +1106,7 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
   clear();
 
   // If not empty, parse expression
-  if(expression){
+  if(expression && *expression){
 
     // Create compile engine
     FXCompile cs(nullptr,expression,variables);
@@ -1077,6 +1116,7 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
       FXuchar *prog;
 
       // Allocate new code
+      err=FXExpression::ErrMemory;
       if(allocElms(prog,cs.size())){
 
         // Create compile engine
@@ -1103,6 +1143,12 @@ FXExpression::Error FXExpression::parse(const FXchar* expression,const FXchar* v
       }
     }
   return err;
+  }
+
+
+// Parse expression, return error code if syntax error is found
+FXExpression::Error FXExpression::parse(const FXString& expression,const FXchar* variables){
+  return parse(expression.text(),variables);
   }
 
 

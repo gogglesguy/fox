@@ -3,7 +3,7 @@
 *                      J P E G    I n p u t / O u t p u t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2000,2024 by David Tyree.   All Rights Reserved.                *
+* Copyright (C) 2000,2025 by David Tyree.   All Rights Reserved.                *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -193,7 +193,7 @@ FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   buffer[0]=nullptr;
 
   // initialize the jpeg data structure;
-  memset(&srcinfo,0,sizeof(srcinfo));
+  clearElms(&srcinfo,1);
   jpeg_create_decompress(&srcinfo);
 
   // setup the error handler
@@ -341,7 +341,7 @@ FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FX
   if(!allocElms(buffer[0],width*3)) return false;
 
   // Specify the error manager
-  memset(&dstinfo,0,sizeof(dstinfo));
+  clearElms(&dstinfo,1);
   dstinfo.err=jpeg_std_error(&jerr.error_mgr);
   jerr.error_mgr.error_exit=fatal_error;
 

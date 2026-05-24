@@ -3,7 +3,7 @@
 *              T h e   P a t h F i n d e r   F i l e   B r o w s e r            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -347,7 +347,7 @@ PathFinderMain::PathFinderMain(FXApp* a):FXMainWindow(a,"PathFinder",nullptr,nul
   switcher=new FXSwitcher(group2,LAYOUT_FILL_X|LAYOUT_FILL_Y, 0,0,0,0, 0,0,0,0);
 
   // File List
-  filelist=new FXFileList(switcher,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_MINI_ICONS|ICONLIST_AUTOSIZE|FILELIST_NO_OWN_ASSOC);
+  filelist=new FXFileList(switcher,this,ID_FILELIST,FILELIST_NO_PARENT|FILELIST_NO_OWN_ASSOC|ICONLIST_MINI_ICONS|ICONLIST_AUTOSIZE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   filelist->horizontalScrollBar()->setWheelLines(1);
   filelist->setAssociations(associations,false,true);
   filelist->dropEnable();
@@ -1367,7 +1367,7 @@ long PathFinderMain::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"PathFinder",nullptr,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s %s).\nCopyright (C) 2000,2024 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__,__TIME__),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nPathFinder File Manager, version %d.%d.%d.\n\nPathFinder is a simple and speedy file manager with drag and drop support.\n\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d (%s %s).\nCopyright (C) 2000,2025 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,FOX_MAJOR,FOX_MINOR,FOX_LEVEL,__DATE__,__TIME__),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),nullptr,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);

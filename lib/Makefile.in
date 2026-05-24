@@ -189,37 +189,38 @@ am_libFOX_1_7_la_OBJECTS = $(am__objects_1) FX4Splitter.lo \
 	FXMenuSeparator.lo FXMenuTitle.lo FXMessageBox.lo \
 	FXMessageChannel.lo FXMetaClass.lo FXMutex.lo FXObject.lo \
 	FXObjectList.lo FXOptionMenu.lo FXPacker.lo FXParseBuffer.lo \
-	FXPath.lo FXPCXIcon.lo FXPCXImage.lo FXPerformance.lo \
-	FXPicker.lo FXPipe.lo FXPNGIcon.lo FXPNGImage.lo FXPopup.lo \
-	FXPoint.lo FXPPMIcon.lo FXPPMImage.lo FXPrintDialog.lo \
-	FXProcess.lo FXProgressBar.lo FXProgressDialog.lo FXPtrList.lo \
-	FXPtrQueue.lo FXQOIFIcon.lo FXQOIFImage.lo FXQuatd.lo \
-	FXQuatf.lo FXRadioButton.lo FXRandom.lo FXRangef.lo \
-	FXRanged.lo FXRangeSlider.lo FXRASIcon.lo FXRASImage.lo \
-	FXReactor.lo FXReadWriteLock.lo FXRealSlider.lo \
-	FXRealSpinner.lo FXRecentFiles.lo FXRectangle.lo FXRegion.lo \
-	FXRegistry.lo FXReplaceDialog.lo FXReverseDictionary.lo \
-	FXRex.lo FXRGBIcon.lo FXRGBImage.lo FXRootWindow.lo FXRuler.lo \
-	FXRulerView.lo FXScopedThread.lo FXScrollArea.lo \
-	FXScrollBar.lo FXScrollPane.lo FXScrollWindow.lo \
-	FXSearchDialog.lo FXSemaphore.lo FXSemaQueue.lo FXSeparator.lo \
-	FXSettings.lo FXShell.lo FXShutter.lo FXSize.lo FXSlider.lo \
-	FXSocket.lo FXSpheref.lo FXSphered.lo FXSpinner.lo \
-	FXSpinLock.lo FXSplashWindow.lo FXSplitter.lo FXSpring.lo \
-	FXStat.lo FXStatusBar.lo FXStatusLine.lo FXStream.lo \
-	FXString.lo FXStringDictionary.lo FXSwitcher.lo FXSystem.lo \
-	FXSystemTime.lo FXSystemTimeFormat.lo FXSystemTimeParse.lo \
-	FXTabBar.lo FXTabBook.lo FXTabItem.lo FXTable.lo \
-	FXTaskGroup.lo FXText.lo FXTextCodec.lo FXTextField.lo \
-	FXTGAIcon.lo FXTGAImage.lo FXThread.lo FXThreadPool.lo \
-	FXTIFIcon.lo FXTIFImage.lo FXToggleButton.lo FXToolBar.lo \
-	FXToolBarGrip.lo FXToolBarShell.lo FXToolBarTab.lo \
-	FXToolTip.lo FXTopWindow.lo FXTranslator.lo FXTreeList.lo \
-	FXTreeListBox.lo FXTriStateButton.lo FXUndoList.lo FXURL.lo \
-	FXVariant.lo FXVariantArray.lo FXVariantMap.lo FXVec2d.lo \
-	FXVec2f.lo FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo \
-	FXVerticalFrame.lo FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo \
-	FXWindow.lo FXWizard.lo FXWorker.lo FXWSQueue.lo FXXBMIcon.lo \
+	FXPath.lo FXPathBox.lo FXPCXIcon.lo FXPCXImage.lo \
+	FXPerformance.lo FXPicker.lo FXPipe.lo FXPNGIcon.lo \
+	FXPNGImage.lo FXPopup.lo FXPoint.lo FXPPMIcon.lo FXPPMImage.lo \
+	FXPrintDialog.lo FXProcess.lo FXProgressBar.lo \
+	FXProgressDialog.lo FXPtrList.lo FXPtrQueue.lo FXQOIFIcon.lo \
+	FXQOIFImage.lo FXQuatd.lo FXQuatf.lo FXRadioButton.lo \
+	FXRandom.lo FXRangef.lo FXRanged.lo FXRangeSlider.lo \
+	FXRASIcon.lo FXRASImage.lo FXReactor.lo FXReadWriteLock.lo \
+	FXRealSlider.lo FXRealSpinner.lo FXRecentFiles.lo \
+	FXRectangle.lo FXRegion.lo FXRegistry.lo FXReplaceDialog.lo \
+	FXReverseDictionary.lo FXRex.lo FXRGBIcon.lo FXRGBImage.lo \
+	FXRootWindow.lo FXRuler.lo FXRulerView.lo FXScopedThread.lo \
+	FXScrollArea.lo FXScrollBar.lo FXScrollPane.lo \
+	FXScrollWindow.lo FXSearchDialog.lo FXSemaphore.lo \
+	FXSemaQueue.lo FXSeparator.lo FXSettings.lo FXShell.lo \
+	FXShutter.lo FXSize.lo FXSlider.lo FXSocket.lo FXSpheref.lo \
+	FXSphered.lo FXSpinner.lo FXSpinLock.lo FXSplashWindow.lo \
+	FXSplitter.lo FXSpring.lo FXStat.lo FXStatusBar.lo \
+	FXStatusLine.lo FXStream.lo FXString.lo FXStringDictionary.lo \
+	FXSwitcher.lo FXSystem.lo FXSystemTime.lo \
+	FXSystemTimeFormat.lo FXSystemTimeParse.lo FXTabBar.lo \
+	FXTabBook.lo FXTabItem.lo FXTable.lo FXTaskGroup.lo FXText.lo \
+	FXTextCodec.lo FXTextField.lo FXTGAIcon.lo FXTGAImage.lo \
+	FXThread.lo FXThreadPool.lo FXTIFIcon.lo FXTIFImage.lo \
+	FXToggleButton.lo FXToolBar.lo FXToolBarGrip.lo \
+	FXToolBarShell.lo FXToolBarTab.lo FXToolTip.lo FXTopWindow.lo \
+	FXTranslator.lo FXTreeList.lo FXTreeListBox.lo \
+	FXTriStateButton.lo FXUndoList.lo FXURL.lo FXVariant.lo \
+	FXVariantArray.lo FXVariantMap.lo FXVec2d.lo FXVec2f.lo \
+	FXVec3d.lo FXVec3f.lo FXVec4d.lo FXVec4f.lo FXVerticalFrame.lo \
+	FXVisual.lo FXWEBPIcon.lo FXWEBPImage.lo FXWindow.lo \
+	FXWizard.lo FXWorker.lo FXWSQueue.lo FXXBMIcon.lo \
 	FXXBMImage.lo FXXML.lo FXXMLFile.lo FXXMLString.lo \
 	FXXPMIcon.lo FXXPMImage.lo fxascii.lo fxbase64.lo fxbase85.lo \
 	fxchar.lo fxcpuid.lo fxcrc.lo fxbmpio.lo fxcompose.lo \
@@ -813,6 +814,7 @@ FXOptionMenu.cpp \
 FXPacker.cpp \
 FXParseBuffer.cpp \
 FXPath.cpp \
+FXPathBox.cpp \
 FXPCXIcon.cpp \
 FXPCXImage.cpp \
 FXPerformance.cpp \
@@ -1294,6 +1296,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPacker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXParseBuffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPath.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPathBox.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPerformance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPicker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FXPipe.Plo@am__quote@

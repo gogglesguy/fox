@@ -3,7 +3,7 @@
 *                              M a t h   T e s t                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2023 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -88,30 +88,6 @@ struct SPAccuracy {
   };
 
 
-// Function names
-static const char *const names[]={
-  "fabs",
-  "ceil",
-  "floor",
-  "round",
-  "trunc",
-  "nearbyint",
-  "rint",
-  "sinh",
-  "cosh",
-  "tanh"
-  "asinh",
-  "acosh",
-  "atanh",
-  "expm1",
-  "exp2",
-  "exp10",
-  "log1p",
-  "log2"
-  };
-
-
-
 // log1p()
 #if defined(NO_LOG1P)
 FXdouble log1p(FXdouble x){ return ::log(1.0+x); }
@@ -167,6 +143,106 @@ FXfloat log2f(FXfloat x){ return ::log(x)*1.442695040888963407359924681001892137
 #endif
 
 
+/// Fast single precision error function ~3.0E-7
+FXfloat erfast(FXfloat x){
+  const FXfloat a6=0.0000430638f;
+  const FXfloat a5=0.0002765672f;
+  const FXfloat a4=0.0001520143f;
+  const FXfloat a3=0.0092705272f;
+  const FXfloat a2=0.0422820123f;
+  const FXfloat a1=0.0705230784f;
+  const FXfloat a0=1.0000000000f;
+  FXfloat t=Math::fabs(x);
+  FXfloat y=(((((a6*t+a5)*t+a4)*t+a3)*t+a2)*t+a1)*t+a0;
+  y=y*y;
+  y=y*y;
+  y=y*y;
+  y=y*y;
+  y=a0-a0/y;
+  return Math::copysign(y,x);
+  }
+
+
+
+// Testing erf():
+FXdouble my_erf(FXdouble a){
+  FXdouble t=Math::fabs(a);
+  FXdouble s=a*a;
+  FXdouble r,u;
+
+  if(t>=1.0){
+    // max ulp error = 0.97749 (USE_EXPM1 = 1); 1.05364 (USE_EXPM1 = 0)
+    r=fma(-5.6271698391213282e-18,t, 4.8565951797366214e-16);   // -0x1.9f363ba3b515dp-58, 0x1.17f6b1d68f44bp-51
+    u=fma(-1.9912968283386570e-14,t, 5.1614612434698227e-13);   // -0x1.66b85b7fbd01ap-46, 0x1.22907eebc22e0p-41
+    r=fma(r,s,u);
+    u=fma(-9.4934693745934645e-12,t, 1.3183034417605052e-10);   // -0x1.4e0591fd97592p-37, 0x1.21e5e2d8544d1p-33
+    r=fma(r,s,u);
+    u=fma(-1.4354030030292210e-09,t, 1.2558925114413972e-08);   // -0x1.8a8f81b7e0e84p-30, 0x1.af85793b93d2fp-27
+    r=fma(r,s,u);
+    u=fma(-8.9719702096303798e-08,t, 5.2832013824348913e-07);   // -0x1.8157db0edbfa8p-24, 0x1.1ba3c453738fdp-21
+    r=fma(r,s,u);
+    u=fma(-2.5730580226082933e-06,t, 1.0322052949676148e-05);   // -0x1.595999b7e922dp-19, 0x1.5a59c27b3b856p-17
+    r=fma(r,s,u);
+    u=fma(-3.3555264836700767e-05,t, 8.4667486930266041e-05);   // -0x1.197b61ee37123p-15, 0x1.631f0597f62b8p-14
+    r=fma(r,s,u);
+    u=fma(-1.4570926486271945e-04,t, 7.1877160107954648e-05);   // -0x1.319310dfb8583p-13, 0x1.2d798353da894p-14
+    r=fma(r,s,u);
+    u=fma( 4.9486959714661590e-04,t,-1.6221099717135270e-03);   //  0x1.037445e25d3e5p-11,-0x1.a939f51db8c06p-10
+    r=fma(r,s,u);
+    u=fma( 1.6425707149019379e-04,t, 1.9148914196620660e-02);   //  0x1.5878d80188695p-13, 0x1.39bc5e0e9e09ap-6
+    r=fma(r,s,u);
+    r=fma(r,t,-1.0277918343487560e-1);                          // -0x1.a4fbc8f8ff7dap-4
+    r=fma(r,t,-6.3661844223699315e-1);                          // -0x1.45f2da3ae06f8p-1
+    r=fma(r,t,-1.2837929411398119e-1);                          // -0x1.06ebb92d9ffa8p-3
+    r=fma(r,t,-t);
+    r=Math::expm1(r);
+    r=Math::copysign(r,a);
+    }
+  else{
+    // max ulp error = 1.01912
+    r=        -7.7794684889591997e-10;                          // -0x1.abae491c44131p-31
+    r=fma(r,s, 1.3710980398024347e-8);                          //  0x1.d71b0f1b10071p-27
+    r=fma(r,s,-1.6206313758492398e-7);                          // -0x1.5c0726f04dbc7p-23
+    r=fma(r,s, 1.6447131571278227e-6);                          //  0x1.b97fd3d9927cap-20
+    r=fma(r,s,-1.4924712302009488e-5);                          // -0x1.f4ca4d6f3e232p-17
+    r=fma(r,s, 1.2055293576900605e-4);                          //  0x1.f9a2baa8fedc2p-14
+    r=fma(r,s,-8.5483259293144627e-4);                          // -0x1.c02db03dd71bbp-11
+    r=fma(r,s, 5.2239776061185055e-3);                          //  0x1.565bccf92b31ep-8
+    r=fma(r,s,-2.6866170643111514e-2);                          // -0x1.b82ce311fa94bp-6
+    r=fma(r,s, 1.1283791670944182e-1);                          //  0x1.ce2f21a040d14p-4
+    r=fma(r,s,-3.7612638903183515e-1);                          // -0x1.812746b0379bcp-2
+    r=fma(r,s, 1.2837916709551256e-1);                          //  0x1.06eba8214db68p-3
+    r=fma(r,a,a);
+    }
+  return r;
+  }
+
+
+
+// Function names
+static const char *const names[]={
+  "fabs",
+  "ceil",
+  "floor",
+  "round",
+  "trunc",
+  "nearbyint",
+  "rint",
+  "sinh",
+  "cosh",
+  "tanh"
+  "asinh",
+  "acosh",
+  "atanh",
+  "expm1",
+  "exp2",
+  "exp10",
+  "log1p",
+  "log2",
+  "erf",
+  };
+
+
 // Double function list
 static const DBLFUNS dblfuns[]={
   {Math::fabs,      fabs},
@@ -187,6 +263,7 @@ static const DBLFUNS dblfuns[]={
   {Math::exp10,     exp10},
   {Math::log1p,     log1p},
   {Math::log2,      log2},
+  {Math::erf,       my_erf},
   };
 
 
@@ -210,6 +287,7 @@ static const FLTFUNS fltfuns[]={
   {Math::exp10,     exp10f},
   {Math::log1p,     log1pf},
   {Math::log2,      log2f},
+  {Math::erf,       erfast},
   };
 
 
@@ -530,8 +608,10 @@ int main(int argc,char *argv[]){
       }
     return 0;
     }
-/*
-*/
+
+  // Error function
+  testFloat(Math::erf,erfast,"erff");
+  testDouble(Math::erf,my_erf,"erf");
 
   // Hyperbolic sine, cosine, tangent
   testDouble(Math::sinh,sinh,"sinh");

@@ -3,7 +3,7 @@
 *                         C o l o r R i n g   W i d g e t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -298,7 +298,7 @@ void FXColorRing::updatering(){
 
           // Compute color
           fxhsv_to_rgb(r,g,b,Math::atan2((FXfloat)ry,(FXfloat)rx)*rtod+180.0f,1.0f,1.0f);
-          dial->setPixel(x,y,FXRGB(255.0f*r,255.0f*g,255.0f*b));
+          dial->setPixel(x,y,FXRGB(Math::lrint(255.0f*r),Math::lrint(255.0f*g),Math::lrint(255.0f*b)));
           continue;
           }
 
@@ -311,7 +311,7 @@ void FXColorRing::updatering(){
 
           // Compute color
           fxhsv_to_rgb(r,g,b,hsv[0],s,v);
-          dial->setPixel(x,y,FXRGB(255.0f*r,255.0f*g,255.0f*b));
+          dial->setPixel(x,y,FXRGB(Math::lrint(255.0f*r),Math::lrint(255.0f*g),Math::lrint(255.0f*b)));
           continue;
           }
         }

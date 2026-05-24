@@ -3,7 +3,7 @@
 *                     P o p u p   W i n d o w   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -704,7 +704,7 @@ void FXPopup::popup(FXWindow* grabto,FXint x,FXint y,FXint w,FXint h){
   // Get monitor info if we have this API
   monitor=MonitorFromRect(&rect,MONITOR_DEFAULTTOPRIMARY);
   if(monitor){
-    memset(&minfo,0,sizeof(minfo));
+    clearElms(&minfo,1);
     minfo.cbSize=sizeof(minfo);
     GetMonitorInfo(monitor,&minfo);
     rx=minfo.rcWork.left;

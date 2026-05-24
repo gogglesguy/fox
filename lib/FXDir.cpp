@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -152,6 +152,46 @@ FXbool FXDir::next(FXString& name){
   }
 
 
+// Go to next directory entry and return its name and mode flags
+FXbool FXDir::next(FXString& name,FXuint& mode){
+  if(isOpen()){
+#if defined(_WIN32)
+    if(alias_cast<SPACE>(space)->first || FindNextFile(alias_cast<SPACE>(space)->handle,&alias_cast<SPACE>(space)->result)){
+      alias_cast<SPACE>(space)->first=false;
+      name.assign(alias_cast<SPACE>(space)->result.cFileName);
+      mode=FXIO::AllFull;
+      if(alias_cast<SPACE>(space)->result.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) mode|=FXIO::Directory; else mode|=FXIO::File;
+      if(alias_cast<SPACE>(space)->result.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) mode|=FXIO::Hidden;
+      if(alias_cast<SPACE>(space)->result.dwFileAttributes&FILE_ATTRIBUTE_DEVICE) mode|=FXIO::Device;
+      if(alias_cast<SPACE>(space)->result.dwFileAttributes&FILE_ATTRIBUTE_READONLY) mode&=~FXIO::AllWrite;
+      return true;
+      }
+#else
+    if((alias_cast<SPACE>(space)->dp=readdir(alias_cast<SPACE>(space)->handle))!=nullptr){
+      name.assign(alias_cast<SPACE>(space)->dp->d_name);
+      mode=0;
+#if defined(_DIRENT_HAVE_D_TYPE)
+      switch(alias_cast<SPACE>(space)->dp->d_type){
+        case DT_REG: mode|=FXIO::File; break;
+        case DT_DIR: mode|=FXIO::Directory; break;
+        case DT_LNK: mode|=FXIO::SymLink; break;
+        case DT_FIFO:mode|=FXIO::Fifo; break;
+        case DT_SOCK:mode|=FXIO::Socket; break;
+        case DT_BLK: mode|=FXIO::Block; break;
+        case DT_CHR: mode|=FXIO::Character; break;
+        case DT_UNKNOWN: break;
+        }
+#endif
+      return true;
+      }
+#endif
+    }
+  name=FXString::null;
+  mode=0;
+  return false;
+  }
+
+
 // Close directory
 void FXDir::close(){
   if(isOpen()){
@@ -213,7 +253,7 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 
   // Get directory stream pointer
   if(dir.isOpen()){
-    FXuint    mode=(flags&CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
+    FXuint    matching=(flags&CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
     FXString *newlist;
     FXint     size=0;
     FXint     count=0;
@@ -235,18 +275,18 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
 #ifdef WIN32
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,mode)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (data.isHidden() && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (data.isHidden() && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
 
 #else
 
       // Filter out files; a bit tricky...
-      if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,mode)))) continue;
+      if(!data.isDirectory() && ((flags&NoFiles) || (name[0]=='.' && !(flags&HiddenFiles)) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
 
       // Filter out directories; even more tricky!
-      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,mode)))) continue;
+      if(data.isDirectory() && ((flags&NoDirs) || (name[0]=='.' && !(flags&HiddenDirs)) || ((name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0))) && (flags&NoParent)) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
 
 #endif
 
@@ -270,39 +310,114 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
   }
 
 
+
 // List drives, i.e. roots of directory trees.
 FXint FXDir::listDrives(FXString*& drivelist){
   FXint count=0;
 #ifdef WIN32
-  FXchar drives[256];
-  clearElms(drives,ARRAYNUMBER(drives));
-  GetLogicalDriveStringsA(ARRAYNUMBER(drives),drives);
-  drivelist=new FXString [33];
-  for(const FXchar* drive=drives; *drive && count<32; drive++){
-    drivelist[count].assign(drive);
-    while(*drive) drive++;
-    count++;
+  FXnchar drives[256];
+  if(GetLogicalDriveStringsW(ARRAYNUMBER(drives),drives)){
+    drivelist=new FXString[33];
+    for(const FXnchar* drive=drives; *drive && count<32; drive++){
+      drivelist[count].assign(drive);
+      while(*drive) drive++;
+      count++;
+      }
     }
 #else
-  drivelist=new FXString [2];
+  drivelist=new FXString[2];
   drivelist[count++].assign(PATHSEP);
 #endif
   return count;
   }
 
 
-#if 0
-
+// List file shares
 FXint FXDir::listShares(FXString*& sharelist){
-  FXint count=0;
 #ifdef WIN32
+  FXint count=0;
+  HANDLE handle;
+/*
+  NETRESOURCEW host={
+     RESOURCE_GLOBALNET,
+     RESOURCETYPE_DISK,
+     RESOURCEDISPLAYTYPE_SERVER,
+     RESOURCEUSAGE_CONNECTABLE,
+     nullptr,
+     nullptr,
+     nullptr,
+     nullptr
+     };
+*/
+  // Open network enumeration
+  sharelist=nullptr;
+  if(WNetOpenEnum(RESOURCE_CONNECTED,RESOURCETYPE_DISK,0,nullptr,&handle)==NO_ERROR){
+    NETRESOURCEW  resource[16384+sizeof(NETRESOURCEW)-1/sizeof(NETRESOURCEW)];
+    while(1){
+      DWORD size=sizeof(resource);
+      DWORD entries=-1;
+
+      // Zero buffer
+      clearElms(resource,2048);
+
+      // Next batch of NETRESOURCE structs
+      DWORD result=WNetEnumResourceW(handle,&entries,resource,&size);
+
+      FXTRACE((TOPIC_DETAIL,"WNetEnumResourceW=%d\n",result));
+
+      if(result==ERROR_NO_NETWORK){ break; }            // No network available
+      if(result==ERROR_MORE_DATA){ break; }             // Buffer was too small; size has required size
+      if(result==ERROR_NO_MORE_ITEMS){ break; }         // No more items
+      if(result==ERROR_INVALID_HANDLE){ break; }        // Invalid handle
+      if(result==ERROR_EXTENDED_ERROR){ break; }        // Extended error
+      if(result!=NO_ERROR) break;
+
+      // List needs to grow
+      if(0<entries){
+        FXString* oldlist=sharelist;
+        sharelist=new FXString [count+entries+1];
+        for(FXint j=0; j<count; j++){
+          sharelist[j].adopt(oldlist[j]);
+          }
+        delete [] oldlist;
+        }
+
+      // Pile on newly found entries
+      for(DWORD i=0; i<entries; i++){
+
+        // Dump what we found
+        // struct NETRESOURCEA {
+        //   DWORD dwScope;           // Indicates the scope of the enumeration
+        //   DWORD dwType;            // Indicates the resource type
+        //   DWORD dwDisplayType;     // Set by the provider to indicate what display type a user interface
+        //   DWORD dwUsage;           // A bitmask that indicates how you can enumerate information
+        //   LPSTR lpLocalName;       // Contains the name of a redirected device.
+        //   LPSTR lpRemoteName;      // Contains a remote network name.
+        //   LPSTR lpComment;         // Provider-supplied comment associated with item
+        //   LPSTR lpProvider;        // Name of the provider
+        //   };
+        FXTRACE((TOPIC_DETAIL,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?"));
+        FXTRACE((TOPIC_DETAIL,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?"));
+        FXTRACE((TOPIC_DETAIL,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?"));
+        FXTRACE((TOPIC_DETAIL,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?"));
+        FXTRACE((TOPIC_DETAIL,"lpLocalName=%s\n",resource[i].lpLocalName));
+        FXTRACE((TOPIC_DETAIL,"lpRemoteName=%s\n",resource[i].lpRemoteName));
+        FXTRACE((TOPIC_DETAIL,"lpComment=%s\n",resource[i].lpComment));
+        FXTRACE((TOPIC_DETAIL,"lpProvider=%s\n\n",resource[i].lpProvider));
+
+        // Add remote name to list
+        sharelist[count++]=resource[i].lpRemoteName;
+        }
+      }
+    WNetCloseEnum(handle);
+    }
+  return count;
 #else
   sharelist=new FXString [2];
-  sharelist[count++].assign(PATHSEP);
+  sharelist[0].assign(PATHSEP);
+  return 1;
 #endif
-  return count;
   }
-#endif
 
 
 // Create a directories recursively
@@ -317,347 +432,67 @@ FXbool FXDir::createDirectories(const FXString& path,FXuint perm){
   }
 
 
+#define EXPERIMENTAL 1
+
+// Check for subdirectories
+FXbool FXDir::hasSubDirectories(const FXString& path){
+  FXbool result=false;
+  if(!path.empty()){
+#if defined(WIN32)
+#ifdef UNICODE
+    FXnchar buffer[MAXPATHLEN+2];
+    utf2ncs(buffer,path.text(),MAXPATHLEN);
+    wcsncat(buffer,TEXT("\\*"),MAXPATHLEN+2);
+#else
+    FXchar buffer[MAXPATHLEN+2];
+    fxstrlcpy(buffer,path.text(),MAXPATHLEN);
+    fxstrlcat(buffer,"\\*",MAXPATHLEN+2);
+#endif
+    WIN32_FIND_DATA ffd;
+    HANDLE hfnd;
+    if((hfnd=FindFirstFile(buffer,&ffd))!=INVALID_HANDLE_VALUE){
+      do{
+        if((ffd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && !(ffd.cFileName[0]=='.' && (ffd.cFileName[1]=='\0' || (ffd.cFileName[1]=='.' && ffd.cFileName[2]=='\0')))){
+          result=true;
+          break;
+          }
+        }
+      while(FindNextFile(hfnd,&ffd)!=0);
+      FindClose(hfnd);
+      }
+#else
+#if defined(EXPERIMENTAL)
+    struct stat info;
+    if(stat(path.text(),&info)==0){
+      // If number of hard-links is >2, then besides parent and current
+      // directory (.), it also has another link (..) from a subdirectory.
+      // However it may depend on type of file system so mileage may vary.
+      result=S_ISDIR(info.st_mode) && (2<info.st_nlink);
+      }
+#else
+    DIR *dir=opendir(path.text());
+    if(dir){
+      struct dirent *ent;
+      struct stat info;
+      while((ent=readdir(dir))!=nullptr){
+        if(ent->d_name[0]=='.' && (ent->d_name[1]=='\0' || (ent->d_name[1]=='.' && ent->d_name[2]=='\0'))) continue;
+        if(ent->d_type==DT_DIR){ result=true; break; }
+        if(stat(ent->d_name,&info)==0 && S_ISDIR(info.st_mode)){ result=true; break; }
+        }
+      closedir(dir);
+      }
+#endif
+#endif
+    }
+  return result;
+  }
+
+
 // Cleanup
 FXDir::~FXDir(){
   close();
   }
 
-
 }
 
 
-
-
-#if 0
-
-// List all the files in directory
-FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& pattern,FXuint flags){
-  FXuint matchmode=FILEMATCH_FILE_NAME|FILEMATCH_NOESCAPE;
-  FXString pathname;
-  FXString name;
-  FXString *newlist;
-  FXint count=0;
-  FXint size=0;
-  WIN32_FIND_DATA ffData;
-  DWORD nCount,nSize,i,j;
-  HANDLE hFindFile,hEnum;
-  FXchar server[200];
-
-  // Initialize to empty
-  filelist=nullptr;
-
-/*
-  // Each drive is a root on windows
-  if(path.empty()){
-    FXchar letter[4];
-    letter[0]='a';
-    letter[1]=':';
-    letter[2]=PATHSEP;
-    letter[3]='\0';
-    filelist=new FXString[28];
-    for(DWORD mask=GetLogicalDrives(); mask; mask>>=1,letter[0]++){
-      if(mask&1) list[count++]=letter;
-      }
-    filelist[count++]=PATHSEPSTRING PATHSEPSTRING;    // UNC for file shares
-    return count;
-    }
-*/
-/*
-  // A UNC name was given of the form "\\" or "\\server"
-  if(ISPATHSEP(path[0]) && ISPATHSEP(path[1]) && path.find(PATHSEP,2)<0){
-    NETRESOURCE host;
-
-    // Fill in
-    host.dwScope=RESOURCE_GLOBALNET;
-    host.dwType=RESOURCETYPE_DISK;
-    host.dwDisplayType=RESOURCEDISPLAYTYPE_GENERIC;
-    host.dwUsage=RESOURCEUSAGE_CONTAINER;
-    host.lpLocalName=nullptr;
-    host.lpRemoteName=(char*)path.text();
-    host.lpComment=nullptr;
-    host.lpProvider=nullptr;
-
-    // Open network enumeration
-    if(WNetOpenEnum((path[2]?RESOURCE_GLOBALNET:RESOURCE_CONTEXT),RESOURCETYPE_DISK,0,(path[2]?&host:nullptr),&hEnum)==NO_ERROR){
-      NETRESOURCE resource[16384/sizeof(NETRESOURCE)];
-      FXTRACE((TOPIC_DETAIL,"Enumerating=%s\n",path.text()));
-      while(1){
-        nCount=-1;    // Read as many as will fit
-        nSize=sizeof(resource);
-        if(WNetEnumResource(hEnum,&nCount,resource,&nSize)!=NO_ERROR) break;
-        for(i=0; i<nCount; i++){
-
-          // Dump what we found
-          FXTRACE((TOPIC_DETAIL,"dwScope=%s\n",resource[i].dwScope==RESOURCE_CONNECTED?"RESOURCE_CONNECTED":resource[i].dwScope==RESOURCE_GLOBALNET?"RESOURCE_GLOBALNET":resource[i].dwScope==RESOURCE_REMEMBERED?"RESOURCE_REMEMBERED":"?"));
-          FXTRACE((TOPIC_DETAIL,"dwType=%s\n",resource[i].dwType==RESOURCETYPE_ANY?"RESOURCETYPE_ANY":resource[i].dwType==RESOURCETYPE_DISK?"RESOURCETYPE_DISK":resource[i].dwType==RESOURCETYPE_PRINT?"RESOURCETYPE_PRINT":"?"));
-          FXTRACE((TOPIC_DETAIL,"dwDisplayType=%s\n",resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_DOMAIN?"RESOURCEDISPLAYTYPE_DOMAIN":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SERVER?"RESOURCEDISPLAYTYPE_SERVER":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_SHARE?"RESOURCEDISPLAYTYPE_SHARE":resource[i].dwDisplayType==RESOURCEDISPLAYTYPE_GENERIC?"RESOURCEDISPLAYTYPE_GENERIC":resource[i].dwDisplayType==6?"RESOURCEDISPLAYTYPE_NETWORK":resource[i].dwDisplayType==7?"RESOURCEDISPLAYTYPE_ROOT":resource[i].dwDisplayType==8?"RESOURCEDISPLAYTYPE_SHAREADMIN":resource[i].dwDisplayType==9?"RESOURCEDISPLAYTYPE_DIRECTORY":resource[i].dwDisplayType==10?"RESOURCEDISPLAYTYPE_TREE":resource[i].dwDisplayType==11?"RESOURCEDISPLAYTYPE_NDSCONTAINER":"?"));
-          FXTRACE((TOPIC_DETAIL,"dwUsage=%s\n",resource[i].dwUsage==RESOURCEUSAGE_CONNECTABLE?"RESOURCEUSAGE_CONNECTABLE":resource[i].dwUsage==RESOURCEUSAGE_CONTAINER?"RESOURCEUSAGE_CONTAINER":"?"));
-          FXTRACE((TOPIC_DETAIL,"lpLocalName=%s\n",resource[i].lpLocalName));
-          FXTRACE((TOPIC_DETAIL,"lpRemoteName=%s\n",resource[i].lpRemoteName));
-          FXTRACE((TOPIC_DETAIL,"lpComment=%s\n",resource[i].lpComment));
-          FXTRACE((TOPIC_DETAIL,"lpProvider=%s\n\n",resource[i].lpProvider));
-
-          // Grow list
-          if(count+1>=size){
-            size=size?(size<<1):256;
-            newlist=new FXString[size];
-            for(j=0; j<count; j++) newlist[j]=list[j];
-            delete [] filelist;
-            filelist=newlist;
-            }
-
-          // Add remote name to list
-          filelist[count]=resource[i].lpRemoteName;
-          count++;
-          }
-        }
-      WNetCloseEnum(hEnum);
-      }
-    return count;
-    }
-*/
-  // Folding case
-  if(flags&LIST_CASEFOLD) matchmode|=FILEMATCH_CASEFOLD;
-
-  // Copy directory name
-  pathname=path;
-  if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
-  pathname+="*";
-
-  // Open directory
-  hFindFile=FindFirstFile(pathname.text(),&ffData);
-  if(hFindFile!=INVALID_HANDLE_VALUE){
-
-    // Loop over directory entries
-    do{
-
-      // Get name
-      name=ffData.cFileName;
-
-      // Filter out files; a bit tricky...
-      if(!(ffData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && ((flags&LIST_NO_FILES) || ((ffData.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) && !(flags&LIST_HIDDEN_FILES)) || (!(flags&LIST_ALL_FILES) && !match(pattern,name,matchmode)))) continue;
-
-      // Filter out directories; even more tricky!
-      if((ffData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && ((flags&LIST_NO_DIRS) || ((ffData.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) && !(flags&LIST_HIDDEN_DIRS)) || (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0 && (flags&LIST_NO_PARENT)))) || (!(flags&LIST_ALL_DIRS) && !match(pattern,name,matchmode)))) continue;
-
-      // Grow list
-      if(count+1>=size){
-        size=size?(size<<1):256;
-        newlist=new FXString[size];
-        for(int f=0; f<count; f++){
-          newlist[f].adopt(filelist[f]);
-          }
-        delete [] filelist;
-        filelist=newlist;
-        }
-
-      // Add to list
-      filelist[count++]=name;
-      }
-    while(FindNextFile(hFindFile,&ffData));
-    FindClose(hFindFile);
-    }
-  return count;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void fxenumWNetContainerResource(NETRESOURCE* netResource,FXObjectListOf<FXStringObject>& netResourceList,DWORD openEnumScope){
-//  Comments are mine, unless indicated otherwise. - Daniël Hörchner <dbjh@gmx.net>
-//
-//  Passing the value RESOURCE_GLOBALNET for openEnumScope will make this
-//  function search recursively through the network shares for disk resources.
-//  Passing the value RESOURCE_CONTEXT will make this function list the servers
-//  in the network neighbourhood.
-  DWORD retVal;
-  HANDLE handle;
-
-  //  WNetEnumResource() reports containers as being disk resources if
-  //  WNetOpenEnum() is called with RESOURCETYPE_DISK. This does not happen if
-  //  it's called with RESOURCETYPE_ANY.
-  //  BTW RESOURCETYPE_DISK does not guarantee that only disk resources are
-  //  reported (I also get a printer container in the list).
-  if((retVal=WNetOpenEnum(openEnumScope,RESOURCETYPE_DISK,0,netResource,&handle))!=NO_ERROR){
-    // we get here also if access was denied to enumerate the container
-    FXTRACE((TOPIC_DETAIL,"ERROR: WNetOpenEnum() (%d)\n", retVal));
-    return;
-    }
-
-  NETRESOURCE *netResources;
-  DWORD netResourcesSize=16*1024;               // 16 kB is a good size, according to MSDN
-  if ((netResources=(NETRESOURCE *)malloc(netResourcesSize))==nullptr){
-    FXTRACE((TOPIC_DETAIL,"ERROR: Not enough memory for NETRESOURCE structures\n"));
-    WNetCloseEnum(handle);
-    return;
-    }
-
-  do{
-
-    DWORD nEntries=(DWORD)-1;
-    retVal=WNetEnumResource(handle,&nEntries,netResources,&netResourcesSize);
-    // netResourcesSize is not modified if the buffer is large enough
-
-    if(retVal==ERROR_MORE_DATA){
-      // MSDN info is not correct; ERROR_MORE_DATA means the buffer was too
-      //  small for a _single_ entry
-      // netResourcesSize (now) contains required size
-      if((netResources=(NETRESOURCE *)realloc(netResources,netResourcesSize))==nullptr){
-        FXTRACE((TOPIC_DETAIL,"ERROR: Reallocation for NETRESOURCE structures failed\n"));
-        WNetCloseEnum(handle);
-        return;
-        }
-      nEntries=(DWORD)-1;
-      retVal=WNetEnumResource(handle,&nEntries,netResources,&netResourcesSize);
-      }
-
-    if(retVal!=NO_ERROR && retVal!=ERROR_NO_MORE_ITEMS){
-      char *str;
-      switch (retVal){
-        case ERROR_MORE_DATA: str="more data"; break; // shouldn't happen
-        case ERROR_INVALID_HANDLE: str="invalid handle"; break;
-        case ERROR_NO_NETWORK: str="no network"; break;
-        case ERROR_EXTENDED_ERROR: str="extended error"; break;
-        default: str="unknown";
-        }
-      FXTRACE((TOPIC_DETAIL,"ERROR: Network enum error: %s (%d)\n",str,retVal));
-      free(netResources);
-      WNetCloseEnum(handle);
-      return;
-      }
-
-    for(DWORD n=0; n < nEntries; n++){
-      FXbool isContainer=false;
-
-      // if RESOURCE_CONTEXT was passed to WNetOpenEnum(), dwScope will be
-      //  RESOURCE_GLOBALNET
-      if(netResources[n].dwScope==RESOURCE_GLOBALNET && (netResources[n].dwUsage&RESOURCEUSAGE_CONTAINER)){
-        isContainer=true;
-
-        //  If RESOURCE_CONTEXT was passed to WNetOpenEnum(), the first entry is
-        //  a "self reference". For example, starting from the network root one
-        //  can find a container entry with lpComment "Entire Network"
-        //  (lpRemoteName and lpLocalName are nullptr for me). This container
-        //  contains an entry with the same properties. In order to avoid getting
-        //  into an infinite loop, we must handle this case.
-        //  However, trying to enumerate normal containers while RESOURCE_CONTEXT
-        //  was used causes WNetOpenEnum() to return ERROR_INVALID_PARAMETER.
-        if(netResources[n].lpRemoteName){
-          netResourceList.append(new FXStringObject(((FXString)netResources[n].lpRemoteName)+PATHSEP));
-          if(openEnumScope!=RESOURCE_CONTEXT){
-            fxenumWNetContainerResource(&netResources[n],netResourceList,openEnumScope);
-            }
-          }
-        }
-
-      // Using the variable isContainer is necessary if WNetOpenEnum() is
-      //  called with RESOURCETYPE_DISK. See above.
-      if(netResources[n].dwType==RESOURCETYPE_DISK && !isContainer){
-        netResourceList.append(new FXStringObject(((FXString)netResources[n].lpRemoteName)+PATHSEP));
-        }
-      }
-    }
-  while(retVal!=ERROR_NO_MORE_ITEMS);
-
-  free(netResources);
-  WNetCloseEnum(handle);                        // it makes no sense to check for NO_ERROR
-  }
-
-
-
-
-
-
-  // Folding case
-  if(flags&LIST_CASEFOLD) matchmode|=FILEMATCH_CASEFOLD;
-
-  if(FXFile::isShareServer(path)){
-    pathname=path;
-    // pathname must not have an ending back slash or else
-    //  fxenumWNetContainerResource() (WNetOpenEnum()) will fail
-    if(ISPATHSEP(pathname[pathname.length()-1])) pathname.trunc(pathname.length()-1);
-    NETRESOURCE netResource;
-    memset(&netResource,0,sizeof(NETRESOURCE));
-    netResource.lpRemoteName=(char *)pathname.text();
-
-    FXObjectListOf<FXStringObject> netResourceList;
-    // a share server can only provide shares, which are similar to directories
-    if(!(flags&LIST_NO_DIRS))
-      fxenumWNetContainerResource(&netResource,netResourceList,RESOURCE_GLOBALNET);
-
-    for(int n=0; n < netResourceList.no(); n++){
-      // Get name
-      name=*netResourceList[n];
-      if(ISPATHSEP(name[name.length()-1])) name.trunc(name.length()-1);
-      name=FXFile::name(name);
-
-      // Filter out directories
-      if(!(flags&LIST_ALL_DIRS) && !match(pattern,name,matchmode)) continue;
-
-      // Grow list
-      if(count+1>=size){
-        size=size?(size<<1):256;
-        newlist=new FXString[size];
-        for(int f=0; f<count; f++) newlist[f]=filelist[f];
-        delete [] filelist;
-        filelist=newlist;
-        }
-
-      // Add to list
-      filelist[count++]=name;
-      }
-    for(int n=0; n < netResourceList.no(); n++) delete netResourceList[n];
-    netResourceList.clear();
-    }
-  else{
-    // Copy directory name
-    pathname=path;
-    if(!ISPATHSEP(pathname[pathname.length()-1])) pathname+=PATHSEPSTRING;
-    pathname+="*";
-
-    // Open directory
-    hFindFile=FindFirstFile(pathname.text(),&ffData);
-    if(hFindFile!=INVALID_HANDLE_VALUE){
-
-      // Loop over directory entries
-      do{
-
-        // Get name
-        name=ffData.cFileName;
-
-        // Filter out files; a bit tricky...
-        if(!(ffData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && ((flags&LIST_NO_FILES) || ((ffData.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) && !(flags&LIST_HIDDEN_FILES)) || (!(flags&LIST_ALL_FILES) && !match(pattern,name,matchmode)))) continue;
-
-        // Filter out directories; even more tricky!
-        if((ffData.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) && ((flags&LIST_NO_DIRS) || ((ffData.dwFileAttributes&FILE_ATTRIBUTE_HIDDEN) && !(flags&LIST_HIDDEN_DIRS)) || (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0 && (flags&LIST_NO_PARENT)))) || (!(flags&LIST_ALL_DIRS) && !match(pattern,name,matchmode)))) continue;
-
-        // Grow list
-        if(count+1>=size){
-          size=size?(size<<1):256;
-          newlist=new FXString[size];
-          for(int f=0; f<count; f++) newlist[f]=filelist[f];
-          delete [] filelist;
-          filelist=newlist;
-          }
-
-        // Add to list
-        filelist[count++]=name;
-        }
-      while(FindNextFile(hFindFile,&ffData));
-      FindClose(hFindFile);
-      }
-    }
-  return count;
-  }
-
-#endif

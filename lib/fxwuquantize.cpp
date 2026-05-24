@@ -3,7 +3,7 @@
 *                     W U   C o l o r   Q u a n t i z a t i o n                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxmath.h"
+#include "FXElement.h"
 
 /*
   Notes:
@@ -91,7 +92,7 @@ static void histogram(WU& wu,const FXColor *data,FXint size){
   FXint r,g,b,inr,ing,inb,i;
 
   // Clear counters
-  memset(&wu,0,sizeof(wu));
+  clearElms(&wu,1);
 
   // Build histogram
   for(i=0; i<size; ++i){

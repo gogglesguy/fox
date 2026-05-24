@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -51,6 +51,9 @@ namespace FXSystem {
 
   /// ISO 8601 time format (yyyy-mm-ddThh:mm:ss+hh:mm) formatting string
   extern FXAPI const FXchar isoTimeFormat[];
+
+  /// Accurate time format (yyyy-mm-dd hh:mm:ss.ssssss) formatting string
+  extern FXAPI const FXchar mainTimeFormat[];
 
 
   /// Format system time to string
@@ -151,17 +154,18 @@ namespace FXSystem {
   extern FXAPI FXbool setEnvironment(const FXString& name,const FXString& value);
 
 
+  /// Set the current working directory
+  extern FXAPI FXbool setCurrentDirectory(const FXString& path);
+
   /// Get the current working directory
   extern FXAPI FXString getCurrentDirectory();
 
-  /// Set the current working directory
-  extern FXAPI FXbool setCurrentDirectory(const FXString& path);
+  /// Set the current drive (for Win32 systems)
+  extern FXAPI FXbool setCurrentDrive(const FXString& prefix);
 
   /// Return the current drive (for Win32 systems)
   extern FXAPI FXString getCurrentDrive();
 
-  /// Set the current drive (for Win32 systems)
-  extern FXAPI FXbool setCurrentDrive(const FXString& prefix);
 
 
   /// Get executable path

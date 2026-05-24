@@ -3,7 +3,7 @@
 *                        C o l o r W h e e l   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -203,7 +203,7 @@ void FXColorWheel::updatedial(){
     for(FXint x=0; x<dial->getWidth(); x++){
       if(xytohs(h,s,x,y)){
         fxhsv_to_rgb(r,g,b,h,s,hsv[2]);
-        dial->setPixel(x,y,FXRGB(255.0f*r,255.0f*g,255.0f*b));
+        dial->setPixel(x,y,FXRGB(Math::lrint(r*255.0f),Math::lrint(g*255.0f),Math::lrint(b*255.0f)));
         }
       else{
         dial->setPixel(x,y,backColor);

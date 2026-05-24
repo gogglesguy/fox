@@ -3,7 +3,7 @@
 *                               I c o n - O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -112,7 +112,7 @@ FXshort FXIcon::guessthresh() const {
     FXint med=(width*height)>>1;
     FXint i,j,cum;
     FXint frequency[766];
-    memset(frequency,0,sizeof(frequency));
+    clearElms(frequency,ARRAYNUMBER(frequency));
     for(i=0; i<width*height; ++i){
       frequency[((const FXuchar*)(data+i))[2]+((const FXuchar*)(data+i))[1]+((const FXuchar*)(data+i))[0]]++;
       }

@@ -3,7 +3,7 @@
 *                          C o l o r   S e l e c t o r                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -657,7 +657,7 @@ long FXColorSelector::onCmdWell(FXObject*,FXSelector,void*){
 
 // Update main well
 void FXColorSelector::updateWell(){
-  well->setRGBA(FXRGBA((int)(rgba[0]*255.0f),(int)(rgba[1]*255.0f),(int)(rgba[2]*255.0f),(int)(rgba[3]*255.0f)));
+  well->setRGBA(FXRGBA(Math::lrint(rgba[0]*255.0f),Math::lrint(rgba[1]*255.0f),Math::lrint(rgba[2]*255.0f),Math::lrint(rgba[3]*255.0f)));
   }
 
 /*******************************************************************************/

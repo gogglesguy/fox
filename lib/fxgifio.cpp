@@ -3,7 +3,7 @@
 *                        G I F   I n p u t / O u t p u t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -578,7 +578,7 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
   store << c1;                          // Write the Code size
 
   // Clear hash table
-  memset(hashtab,0xff,sizeof(hashtab));
+  fillElms(hashtab,0xff,ARRAYNUMBER(hashtab));
   freecode=clearcode+2;
 
   // Output clear code
@@ -640,7 +640,7 @@ FXbool fxsaveGIF(FXStream& store,const FXColor *data,FXint width,FXint height,FX
       outbits+=codesize;
 
       // Clear hash table
-      memset(hashtab,0xff,sizeof(hashtab));
+      fillElms(hashtab,0xff,ARRAYNUMBER(hashtab));
       freecode=clearcode+2;
       codesize=initcodesize+1;
       }

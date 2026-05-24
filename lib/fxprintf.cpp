@@ -3,7 +3,7 @@
 *                  V a r a r g s   P r i n t f   R o u t i n e s                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -146,16 +146,19 @@ enum {
 
 // Conversion flags
 enum {
-  FLG_DEFAULT  = 0,     // Default option
-  FLG_BLANK    = 1,     // Print blank if positive
-  FLG_SIGN     = 2,     // Always show sign
-  FLG_ZERO     = 4,     // Pad with zeroes if numeric
-  FLG_LEFT     = 8,     // Left aligned
-  FLG_ALTER    = 16,    // Alternate form
-  FLG_UPPER    = 32,    // Use upper case
-  FLG_UNSIGNED = 64,    // Unsigned
-  FLG_THOUSAND = 128,   // Print comma's for thousands
-  FLG_DOTSEEN  = 256    // Dot was seen
+  FLG_DEC      = 0,     // Base 10
+  FLG_HEX      = 1,     // Base 16
+  FLG_OCT      = 2,     // Base 8
+  FLG_BIN      = 3,     // Base 2
+  FLG_THOU     = 4,     // Thousands
+  FLG_BLANK    = 8,     // Print blank if positive
+  FLG_SIGN     = 16,    // Always show sign
+  FLG_ZERO     = 32,    // Pad with zeroes if numeric
+  FLG_LEFT     = 64,    // Left aligned
+  FLG_ALTER    = 128,   // Alternate form
+  FLG_UPPER    = 256,   // Use upper case
+  FLG_UNSIGNED = 512,   // Unsigned
+  FLG_DOTSEEN  = 1024   // Dot was seen
   };
 
 
@@ -172,30 +175,30 @@ enum{MAXDECDIGS=19};
 enum{MAXHEXDIGS=14};
 
 // Hexadecimal digits
-const FXchar lower_digits[]="0123456789abcdef";
-const FXchar upper_digits[]="0123456789ABCDEF";
+static const FXchar lower_digits[]="0123456789abcdef";
+static const FXchar upper_digits[]="0123456789ABCDEF";
 
 
-static FXdouble scalepos1[32] = {
+static const FXdouble scalepos1[32] = {
   1.0E+18, 1.0E+19, 1.0E+20, 1.0E+21, 1.0E+22, 1.0E+23, 1.0E+24, 1.0E+25,
   1.0E+26, 1.0E+27, 1.0E+28, 1.0E+29, 1.0E+30, 1.0E+31, 1.0E+32, 1.0E+33,
   1.0E+34, 1.0E+35, 1.0E+36, 1.0E+37, 1.0E+38, 1.0E+39, 1.0E+40, 1.0E+41,
   1.0E+42, 1.0E+43, 1.0E+44, 1.0E+45, 1.0E+46, 1.0E+47, 1.0E+48, 1.0E+49
   };
 
-static FXdouble scaleneg1[32] = {
+static const FXdouble scaleneg1[32] = {
   1.0E+18, 1.0E+17, 1.0E+16, 1.0E+15, 1.0E+14, 1.0E+13, 1.0E+12, 1.0E+11,
   1.0E+10, 1.0E+09, 1.0E+08, 1.0E+07, 1.0E+06, 1.0E+05, 1.0E+04, 1.0E+03,
   1.0E+02, 1.0E+01, 1.0E+00, 1.0E-01, 1.0E-02, 1.0E-03, 1.0E-04, 1.0E-05,
   1.0E-06, 1.0E-07, 1.0E-08, 1.0E-09, 1.0E-10, 1.0E-11, 1.0E-12, 1.0E-13
   };
 
-static FXdouble scalepos2[10] = {
+static const FXdouble scalepos2[10] = {
   1.0E+00,  1.0E+32,  1.0E+64,  1.0E+96,  1.0E+128,
   1.0E+160, 1.0E+192, 1.0E+224, 1.0E+256, 1.0E+288
   };
 
-static FXdouble scaleneg2[10] = {
+static const FXdouble scaleneg2[10] = {
   1.0E-00,  1.0E-32,  1.0E-64,  1.0E-96,  1.0E-128,
   1.0E-160, 1.0E-192, 1.0E-224, 1.0E-256, 1.0E-288
   };
@@ -208,7 +211,7 @@ extern FXAPI FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,
 /*******************************************************************************/
 
 // 10^x where x=0...19
-static FXulong tenToThe[20]={
+static const FXulong tenToThe[20]={
   FXULONG(1),
   FXULONG(10),
   FXULONG(100),
@@ -448,7 +451,7 @@ static FXchar* fmtfrc(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
       // Whip out digits
       while(0<=decimal && *p){
         *ptr++=*p++;
-        if(flags&FLG_THOUSAND){
+        if(flags&FLG_THOU){
           if(decimal%3==0 && decimal!=0) *ptr++=',';
           }
         --decimal;
@@ -457,7 +460,7 @@ static FXchar* fmtfrc(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
       // Zeros
       while(0<=decimal){
         *ptr++='0';
-        if(flags&FLG_THOUSAND){
+        if(flags&FLG_THOU){
           if(decimal%3==0 && decimal!=0) *ptr++=',';
           }
         --decimal;
@@ -584,7 +587,7 @@ static FXchar* fmtexp(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
     // In exponent mode, add one before decimal point; add up to
     // two more digits if engineering mode also in effect.
     extra=0;
-    if(flags&FLG_THOUSAND){
+    if(flags&FLG_THOU){
       extra=(decimal+600)%3;
       }
 
@@ -594,7 +597,7 @@ static FXchar* fmtexp(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
     //fprintf(stderr,"number: % 30.20lE  decimal: %4d  precision: %2d  extra: %2d str: %s\n",number,decimal,precision,extra,p);
 
     // Up to 3 digits before decimal
-    if(flags&FLG_THOUSAND){
+    if(flags&FLG_THOU){
 
       // Extra digits before decimal
       extra=(decimal+600)%3;
@@ -780,7 +783,7 @@ static FXchar* fmtgen(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
       *ptr++=*p++;
 
       // One or two more before decimal point
-      if(flags&FLG_THOUSAND){
+      if(flags&FLG_THOU){
         while((decimal+600)%3 && *p){
           --precision;
           --decimal;
@@ -854,7 +857,7 @@ static FXchar* fmtgen(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
         while(0<=decimal && *p){
           --precision;
           *ptr++=*p++;
-          if(flags&FLG_THOUSAND){
+          if(flags&FLG_THOU){
             if(decimal%3==0 && decimal!=0) *ptr++=',';
             }
           --decimal;
@@ -863,7 +866,7 @@ static FXchar* fmtgen(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
         // Zeros
         while(0<=decimal){
           *ptr++='0';
-          if(flags&FLG_THOUSAND){
+          if(flags&FLG_THOU){
             if(decimal%3==0 && decimal!=0) *ptr++=',';
             }
           --decimal;
@@ -1136,7 +1139,7 @@ static FXchar* fmthex(FXchar* buffer,FXint& len,FXdouble number,FXint precision,
 /*******************************************************************************/
 
 // Convert long value
-static FXchar* fmtlng(FXchar* buffer,FXint& len,FXlong value,FXint base,FXint precision,FXint flags){
+static FXchar* fmtlng(FXchar* buffer,FXint& len,FXlong value,FXint precision,FXint flags){
   FXchar *end=buffer+CONVERTSIZE-1;
   FXchar *ptr=end;
 
@@ -1147,9 +1150,9 @@ static FXchar* fmtlng(FXchar* buffer,FXint& len,FXlong value,FXint base,FXint pr
   if(0<precision || value){
     const FXchar *digits=(flags&FLG_UPPER)?upper_digits:lower_digits;
     FXulong number=value;
-    FXchar sign=0;
-    FXint digs=0;
     FXulong n;
+    FXchar  sign=0;
+    FXint   digs=0;
 
     // Deal with sign
     if(!(flags&FLG_UNSIGNED)){
@@ -1165,53 +1168,90 @@ static FXchar* fmtlng(FXchar* buffer,FXint& len,FXlong value,FXint base,FXint pr
         }
       }
 
-    // Output decimal with thousands separator
-    if(flags&FLG_THOUSAND){
+    // Output number with given base
+    switch(flags&(FLG_DEC|FLG_HEX|FLG_OCT|FLG_BIN|FLG_THOU)){
+    case FLG_DEC:                        // Output plain decimal
+      do{
+        --precision;
+        n=number/10;
+        *--ptr='0'+(number-n*10);
+        number=n;
+        }
+      while(number);
+      while(0<precision){               // Pad with zeros if needed
+        --precision;
+        *--ptr='0';
+        }
+      break;
+    case FLG_DEC|FLG_THOU:              // Output decimal with thousands separator
       do{
         ++digs;
         --precision;
         n=number/10;
-        *--ptr=digits[number-n*10];
+        *--ptr='0'+(number-n*10);
         number=n;
         if(digs%3==0 && number) *--ptr=',';
         }
       while(number);
-      while(0<precision){       // Pad with spaces
+      while(0<precision){             // Pad with spaces
         if(digs%3==0 && precision) *--ptr=' ';
         ++digs;
         --precision;
         *--ptr=' ';
         }
-      }
-
-    // Output with arbitrary base
-    else{
+      break;
+    case FLG_HEX:                        // Output hex
+    case FLG_HEX|FLG_THOU:
       do{
         --precision;
-        n=number/base;
-        *--ptr=digits[number-n*base];
-        number=n;
+        *--ptr=digits[number&15];
+        number>>=4;
         }
       while(number);
-      while(0<precision){       // Pad with zeros if needed
+      while(0<precision){               // Pad with zeros if needed
         --precision;
         *--ptr='0';
         }
-      }
-
-    // Alternate form
-    if(flags&FLG_ALTER){
-      if(base==8 && *ptr!='0'){           // Prepend '0'
+      if((flags&FLG_ALTER) && value){
+        *--ptr=(flags&FLG_UPPER)?'X':'x';       // Prepend '0x'
         *--ptr='0';
         }
-      else if(base==16 && value){         // Prepend '0x'
-        *--ptr=(flags&FLG_UPPER)?'X':'x';
+      break;
+    case FLG_OCT:                      // Output octal
+    case FLG_OCT|FLG_THOU:
+      do{
+        --precision;
+        *--ptr='0'+(number&7);
+        number>>=3;
+        }
+      while(number);
+      while(0<precision){               // Pad with zeros if needed
+        --precision;
         *--ptr='0';
         }
-      else if(base==2 && value){          // Prepend '0b'
-        *--ptr=(flags&FLG_UPPER)?'B':'b';
+      if((flags&FLG_ALTER) && *ptr!='0'){
+        *--ptr='0';                             // Prepend '0'
+        }
+      break;
+    case FLG_BIN:                       // Output binary
+    case FLG_BIN|FLG_THOU:
+      do{
+        --precision;
+        *--ptr='0'+(number&1);
+        number>>=1;
+        }
+      while(number);
+      while(0<precision){               // Pad with zeros if needed
+        --precision;
         *--ptr='0';
         }
+      if((flags&FLG_ALTER) && value){
+        *--ptr=(flags&FLG_UPPER)?'B':'b';       // Prepend '0b'
+        *--ptr='0';
+        }
+      break;
+    default:
+      __unreachable();
       }
 
     // Prepend sign
@@ -1424,7 +1464,7 @@ FXint __vsnprintf(FXchar* string,FXint length,const FXchar* format,va_list args)
 
       // Default settings
       modifier=ARG_DEFAULT;
-      flags=FLG_DEFAULT;
+      flags=FLG_DEC;
       precision=-1;
       width=-1;
       pos=-1;
@@ -1448,7 +1488,7 @@ flg:  switch(ch){
           ch=*fmt++;
           goto flg;
         case '\'':                                      // Print thousandths
-          flags|=FLG_THOUSAND;
+          flags|=FLG_THOU;
           ch=*fmt++;
           goto flg;
         case '.':                                       // Precision follows
@@ -1558,7 +1598,7 @@ flg:  switch(ch){
             }
           if(precision<0) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,10,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         case 'd':
         case 'i':
@@ -1583,11 +1623,10 @@ flg:  switch(ch){
             }
           if(precision<0) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,10,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         case 'b':
-          flags|=FLG_UNSIGNED;
-          flags&=~FLG_THOUSAND;
+          flags|=FLG_BIN|FLG_UNSIGNED;
           if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
             value=(FXulong)va_arg(ag,FXuint);
@@ -1609,11 +1648,10 @@ flg:  switch(ch){
             }
           if(precision<0) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,2,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         case 'o':
-          flags|=FLG_UNSIGNED;
-          flags&=~FLG_THOUSAND;
+          flags|=FLG_OCT|FLG_UNSIGNED;
           if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
             value=(FXulong)va_arg(ag,FXuint);
@@ -1635,13 +1673,12 @@ flg:  switch(ch){
             }
           if(precision<0) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,8,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         case 'X':
           flags|=FLG_UPPER;
         case 'x':
-          flags|=FLG_UNSIGNED;
-          flags&=~FLG_THOUSAND;
+          flags|=FLG_HEX|FLG_UNSIGNED;
           if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           if(modifier==ARG_DEFAULT){                    // 32-bit always
             value=(FXulong)va_arg(ag,FXuint);
@@ -1663,7 +1700,7 @@ flg:  switch(ch){
             }
           if(precision<0) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,16,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         case 'F':
           flags|=FLG_UPPER;
@@ -1744,13 +1781,12 @@ flg:  switch(ch){
           continue;                                     // No printout
         case 'p':
           flags&=~FLG_ZERO;
-          flags&=~FLG_THOUSAND;
-          flags|=FLG_ALTER;
+          flags|=FLG_HEX|FLG_ALTER;
           if(0<pos) vadvance(ag,args,format,pos);       // Advance ag to position
           value=(FXulong)va_arg(ag,FXuval);
           if(precision<1) precision=1;
           if(precision>MAXPRECISION) precision=MAXPRECISION;
-          str=fmtlng(buffer,len,value,16,precision,flags);
+          str=fmtlng(buffer,len,value,precision,flags);
           break;
         default:                                        // Format error
           goto x;

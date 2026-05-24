@@ -3,7 +3,7 @@
 *                 R e g u l a r   E x p r e s s i o n   C l a s s               *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1854,7 +1854,7 @@ FXRex::Error FXCompile::atom(FXshort& flags,FXshort& smin,FXshort& smax){
         pat++;
         }
       if(((ch=*pat)=='*' || ch=='+' || ch=='?' || ch=='{') && savepat+1<pat){
-        pat--;
+        pat--;                                          // FIXME should we back up one UTF8 character?
         }
       len=pat-savepat;
       if(1<len){
@@ -5033,7 +5033,7 @@ FXRex::Error FXRex::parse(const FXchar* pattern,FXint mode){
   clear();
 
   // Check
-  if(pattern){
+  if(pattern && *pattern){
     FXString adjustedpattern;
 
     // Allocate adjusted pattern

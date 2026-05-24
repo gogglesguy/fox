@@ -3,7 +3,7 @@
 *                    I R I S   R G B   I n p u t / O u t p u t                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2002,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2002,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -385,11 +385,11 @@ FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
       store << minpix;            // PIXMIN (4)
       store << maxpix;            // PIXMAX (4)
       store << dummy;             // DUMMY (4)
-      memset(temp,0,80);          // Clean it
-      memcpy(temp,"IRIS RGB",8);  // Write name
+      clearElms(temp,80);         // Clean it
+      copyElms(temp,"IRIS RGB",8);// Write name
       store.save(temp,80);        // IMAGENAME (80)
-      store << colormap;             // COLORMAP (4)
-      memset(temp,0,404);         // Clean it
+      store << colormap;          // COLORMAP (4)
+      clearElms(temp,404);        // Clean it
       store.save(temp,404);       // DUMMY (404)
 
       // Copy

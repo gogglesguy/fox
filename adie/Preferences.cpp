@@ -218,13 +218,13 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   new FXHorizontalSeparator(miscellaneouspane,SEPARATOR_LINE|LAYOUT_FILL_X);
   FXMatrix *matrix3=new FXMatrix(miscellaneouspane,2,MATRIX_BY_COLUMNS|LAYOUT_FILL_X,0,0,0,0, 4,4,4,4, 4, 4);
 
-  new FXLabel(matrix3,tr("Search paths:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
-  searchtext=new FXTextField(matrix3,10,own,TextWindow::ID_SEARCHPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+  new FXLabel(matrix3,tr("Search path:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  searchtext=new FXTextField(matrix3,10,own,TextWindow::ID_SEARCHPATH,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
   searchtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where include files are to be found.\nPaths are subjected to tilde and environment variable expansion."));
   searchtext->setHelpText(tr("Change file search path."));
 
   new FXLabel(matrix3,tr("Syntax path:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
-  syntaxtext=new FXTextField(matrix3,10,getApp(),Adie::ID_SYNTAXPATHS,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+  syntaxtext=new FXTextField(matrix3,10,getApp(),Adie::ID_SYNTAXPATH,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
   syntaxtext->setTipText(tr("List of directories separated by a '" PATHLISTSEPSTRING "' where syntax file is to be found."));
   syntaxtext->setHelpText(tr("Change syntax file search path."));
 

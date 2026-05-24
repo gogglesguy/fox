@@ -3,7 +3,7 @@
 *                     D i r e c t o r y   B o x   O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -139,6 +139,7 @@ void FXDirBox::create(){
 
 // Detach disconnects the icons
 void FXDirBox::detach(){
+  FXTreeListBox::detach();
   foldericon->detach();
   cdromicon->detach();
   harddiskicon->detach();
@@ -146,12 +147,12 @@ void FXDirBox::detach(){
   floppyicon->detach();
   nethoodicon->detach();
   zipdiskicon->detach();
-  FXTreeListBox::detach();
   }
 
 
 // Destroy zaps the icons
 void FXDirBox::destroy(){
+  FXTreeListBox::destroy();
   foldericon->destroy();
   cdromicon->destroy();
   harddiskicon->destroy();
@@ -159,7 +160,6 @@ void FXDirBox::destroy(){
   floppyicon->destroy();
   nethoodicon->destroy();
   zipdiskicon->destroy();
-  FXTreeListBox::destroy();
   }
 
 

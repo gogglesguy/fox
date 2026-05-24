@@ -3,7 +3,7 @@
 *         M i s c e l l a n e o u s   S y s t e m   F u n c t i o n s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -250,23 +250,6 @@ FXbool FXSystem::setEnvironment(const FXString& name,const FXString& value){
   }
 
 
-// Get current working directory
-FXString FXSystem::getCurrentDirectory(){
-#if defined(WIN32)
-  TCHAR buffer[MAXPATHLEN];
-  if(GetCurrentDirectory(MAXPATHLEN,buffer)){
-    return FXString(buffer);
-    }
-#else
-  FXchar buffer[MAXPATHLEN];
-  if(getcwd(buffer,MAXPATHLEN)){
-    return FXString(buffer);
-    }
-#endif
-  return FXString::null;
-  }
-
-
 // Change current directory
 FXbool FXSystem::setCurrentDirectory(const FXString& path){
   if(!path.empty()){
@@ -286,13 +269,17 @@ FXbool FXSystem::setCurrentDirectory(const FXString& path){
   }
 
 
-// Get current drive prefix "a:", if any
-// This is the same method as used in VC++ CRT.
-FXString FXSystem::getCurrentDrive(){
+// Get current working directory
+FXString FXSystem::getCurrentDirectory(){
 #if defined(WIN32)
+  TCHAR buffer[MAXPATHLEN];
+  if(GetCurrentDirectory(MAXPATHLEN,buffer)){
+    return FXString(buffer);
+    }
+#else
   FXchar buffer[MAXPATHLEN];
-  if(GetCurrentDirectoryA(MAXPATHLEN,buffer) && Ascii::isLetter((FXuchar)buffer[0]) && buffer[1]==':'){
-    return FXString(buffer,2);
+  if(getcwd(buffer,MAXPATHLEN)){
+    return FXString(buffer);
     }
 #endif
   return FXString::null;
@@ -314,6 +301,17 @@ FXbool FXSystem::setCurrentDrive(const FXString& prefix){
   return false;
   }
 
+// Get current drive prefix "a:", if any
+// This is the same method as used in VC++ CRT.
+FXString FXSystem::getCurrentDrive(){
+  FXchar buffer[MAXPATHLEN];
+  if(GetCurrentDirectoryA(MAXPATHLEN,buffer) && Ascii::isLetter((FXuchar)buffer[0]) && buffer[1]==':'){
+    return FXString(buffer,2);
+    }
+  return FXString::null;
+  }
+
+
 #else
 
 // Change current drive prefix "a:"
@@ -321,7 +319,17 @@ FXbool FXSystem::setCurrentDrive(const FXString&){
   return true;
   }
 
+
+// Get current drive prefix "a:", if any
+// This is the same method as used in VC++ CRT.
+FXString FXSystem::getCurrentDrive(){
+  return FXString::null;
+  }
+
+
 #endif
+
+
 
 
 // Get executable path

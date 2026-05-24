@@ -44,6 +44,8 @@
   - Remembering current pattern and search text would be nice, for repeated
     invocations.  Maybe some more tweaks.
 */
+#define TOPIC_FIND    112
+
 
 #define HORZ_PAD      12
 #define VERT_PAD      2
@@ -113,7 +115,7 @@ static const FXchar mkey[20][3]={
 
 // Traverse files under path and search for pattern in each
 FXuint SearchVisitor::traverse(const FXString& path,const FXString& pattern,const FXString& wild,FXint mode,FXuint opts,FXint depth){
-  FXTRACE((1,"SearchVisitor::traverse(path=%s,pattern=%s,wild=%s,mode=%b,opts=%b,depth=%d)\n",path.text(),pattern.text(),wild.text(),mode,opts,depth));
+  FXTRACE((TOPIC_FIND,"SearchVisitor::traverse(path=%s,pattern=%s,wild=%s,mode=%b,opts=%b,depth=%d)\n",path.text(),pattern.text(),wild.text(),mode,opts,depth));
 
   // Compile the pattern
   if(rex.parse(pattern,mode)==FXRex::ErrOK){
@@ -144,19 +146,20 @@ FXuint SearchVisitor::visit(const FXString& path){
   }
 
 
+
 // Search file contents for pattern
 FXint SearchVisitor::searchFile(const FXString& path) const {
-  FXString relpath=FXPath::relative(dlg->getDirectory(),path);
+  FXString dirpath=FXPath::directory(path);
   FXString text;
-  FXTRACE((1,"searchFile(path=%s)\n",path.text()));
-  dlg->setSearchingText(relpath);
+  FXTRACE((TOPIC_FIND,"searchFile(path=%s)\n",path.text()));
+  dlg->setSearchingText(dirpath);
   if(loadFile(path,text)){
     FXString hit;
     FXint beg[10],end[10],ls,le,p;
     FXint lineno=1;
     FXint column=0;
     FXint pos=0;
-    FXTRACE((1,"loadFile(path=%s) -> %d bytes\n",relpath.text(),text.length()));
+    FXTRACE((TOPIC_FIND,"loadFile(path=%s) -> %d bytes\n",path.text(),text.length()));
     while(pos<text.length()){
       if(rex.amatch(text,pos,FXRex::Normal,beg,end,10)){
         for(ls=beg[0]; 0<ls && text[ls-1]!='\n'; --ls){ }               // Back up to line start
@@ -166,7 +169,7 @@ FXint SearchVisitor::searchFile(const FXString& path) const {
           }
         hit.assign(&text[ls],le-ls);
         hit.trim();
-        dlg->appendSearchResult(relpath,hit,lineno,column);
+        dlg->appendSearchResult(path,hit,lineno,column);
         if(dlg->getFirstHit()) break;
         pos=le;
         }
@@ -175,7 +178,6 @@ FXint SearchVisitor::searchFile(const FXString& path) const {
     }
   return 0;
   }
-
 
 // Load file contents
 FXlong SearchVisitor::loadFile(const FXString& path,FXString& text) const {
@@ -269,8 +271,9 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
   // Matching files
   FXHorizontalFrame* resultbox=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
   locations=new FXIconList(resultbox,this,ID_FILELIST,LAYOUT_FILL_X|LAYOUT_FILL_Y|ICONLIST_DETAILED|ICONLIST_SINGLESELECT);
-  locations->appendHeader(tr("Location"),nullptr,200);
-  locations->appendHeader(tr("Context"),nullptr,800);
+  locations->appendHeader(tr("File"),nullptr,150);
+  locations->appendHeader(tr("Context"),nullptr,300);
+  locations->appendHeader(tr("Directory"),nullptr,300);
 
   // Clean array
   clearElms(optionsHistory,20);
@@ -301,12 +304,13 @@ FindInFiles::FindInFiles(Adie *a):FXDialogBox(a,"Find In Files",DECOR_TITLE|DECO
 
 // Load registy
 void FindInFiles::readRegistry(){
-  FXTRACE((1,"FindInFiles::readRegistry()\n"));
+  FXTRACE((TOPIC_FIND,"FindInFiles::readRegistry()\n"));
   setWidth(getApp()->reg().readIntEntry(sectionName,"width",600));
   setHeight(getApp()->reg().readIntEntry(sectionName,"height",400));
   firsthit=getApp()->reg().readBoolEntry(sectionName,"firsthit",false);
-  locations->setHeaderSize(0,getApp()->reg().readIntEntry(sectionName,"filespace",200));
-  locations->setHeaderSize(1,getApp()->reg().readIntEntry(sectionName,"matchspace",800));
+  locations->setHeaderSize(0,getApp()->reg().readIntEntry(sectionName,"filespace",150));
+  locations->setHeaderSize(1,getApp()->reg().readIntEntry(sectionName,"matchspace",300));
+  locations->setHeaderSize(2,getApp()->reg().readIntEntry(sectionName,"dirspace",300));
   setCurrentPattern(getApp()->reg().readIntEntry(sectionName,"searchpattern",0));
   for(FXint i=0; i<20; ++i){
     searchHistory[i]=getApp()->reg().readStringEntry(sectionName,skey[i],FXString::null);
@@ -320,12 +324,13 @@ void FindInFiles::readRegistry(){
 
 // Save registry
 void FindInFiles::writeRegistry(){
-  FXTRACE((1,"FindInFiles::writeRegistry()\n"));
+  FXTRACE((TOPIC_FIND,"FindInFiles::writeRegistry()\n"));
   getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
   getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
   getApp()->reg().writeBoolEntry(sectionName,"firsthit",firsthit);
   getApp()->reg().writeIntEntry(sectionName,"filespace",locations->getHeaderSize(0));
   getApp()->reg().writeIntEntry(sectionName,"matchspace",locations->getHeaderSize(1));
+  getApp()->reg().writeIntEntry(sectionName,"dirspace",locations->getHeaderSize(2));
   getApp()->reg().writeIntEntry(sectionName,"searchpattern",getCurrentPattern());
   for(FXint i=0; i<20; ++i){
     if(!searchHistory[i].empty()){
@@ -390,9 +395,12 @@ FXbool FindInFiles::continueProcessing(){
 
 // Called by visitor to deposit new search result
 // List will show filename relativized to base name, and location of where string was found
-void FindInFiles::appendSearchResult(const FXString& relpath,const FXString& text,FXint lineno,FXint column){
+void FindInFiles::appendSearchResult(const FXString& path,const FXString& hit,FXint lineno,FXint column){
+  FXString filename=FXPath::name(path);
+  FXString dirname=FXPath::directory(path);
+  FXString text=FXString::detab(hit,8);
   FXString string;
-  string.format("%s:%d:%d\t%s",relpath.text(),lineno,column,text.text());
+  string.format("%s:%d:%d\t%s\t%s",filename.text(),lineno,column,text.text(),dirname.text());
   locations->appendItem(string);
   }
 
@@ -737,11 +745,12 @@ long FindInFiles::onMouseWheel(FXObject*,FXSelector,void* ptr){
 long FindInFiles::onCmdFileDblClicked(FXObject*,FXSelector,void* ptr){
   FXint which=(FXint)(FXival)ptr;
   if(0<=which){
-    FXchar name[1024];
+    FXchar file[256];
+    FXchar directory[1024];
     FXint  lineno=0;
     FXint  column=0;
-    if(locations->getItem(which)->getText().scan("%1023[^:]:%d:%d",name,&lineno,&column)==3){
-      FXString filename=FXPath::absolute(getDirectory(),name);
+    if(locations->getItem(which)->getText().scan("%255[^:]:%d:%d\t%*[^\t]\t%1023[^\t]",file,&lineno,&column,directory)==4){
+      FXString filename=FXPath::absolute(directory,file);
       TextWindow* window=getApp()->openFileWindow(filename);
       window->visitLine(lineno,column);
       window->show(PLACEMENT_DEFAULT);

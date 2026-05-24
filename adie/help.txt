@@ -244,8 +244,8 @@ Undo and Redo.
 
 The editor supports unlimited (well, the limit is large...) undo and redo capability.  Each time you insert, remove, or replace some text, the editor remembers what you did.
 If you make a mistake, you can undo the last command, and the one before that, and so on. Having invoked undo many times, it is sometimes desirable to invoke the redo command, i.e. to perform the original editing operation again.  Thus, you can move backward or forward in time.
-The "Merge Undos" option consolidates contiguous single-character insertions or deletions into larger undo commands.  When the "Merge Undos" mode is on, an undo or redo will undo inserts or deletes on a word-by-word bases.  It tries to be smart about which character classes are "mergeable," so that for example editing source code, we're not backing over operators and other punctuation that may have special meanings in programming languages (we're still experimenting with this feature so the precise behaviour will be fine-tuned a bit in the future.
-A new addition to the undo system is the "Alternate History" mode.  If, after undoing several commands, you decide edit the buffer in a different way, all commands that you have undone will be deleted, and you will no longer be able to go forward with redo at that point.
+The "Merge Undos" option consolidates contiguous single-character insertions or deletions into larger undo commands.  When the "Merge Undos" mode is on, an undo or redo will undo inserts or deletes on a word-by-word basis.  It tries to be smart about which character classes are "mergeable," so that for example editing source code, we're not backing over operators and other punctuation that may have special meanings in programming languages (we're still experimenting with this feature so the precise behaviour will be fine-tuned a bit in the future.
+A new addition to the undo system is the "Alternate History" mode.  If, after undoing several commands, you decide edit the buffer in a different way, all commands that you have undone would normally be deleted, and you would no longer be able to go forward with redo from that point.
 However, when "Alternate History" mode on, Adie will remember "the path not taken" and allow you to undo back to the original text, prior to the change.
 Needless to say, this may vastly expand the amount of memory used by the undo system; however, to prevent things getting out of hand the undo list is periodically trimmed to keep it manageable.
 When you load a file, or save a file after editing it, the undo system will remember the state of the text buffer as "clean" or "marked".  Making further changes, you will be able to quickly go back to this clean state using the "Revert" command.  Unlike reload, no disk I/O is performed when this happens: we're simply exucuting undo or redo commands to go back to the marked state.
@@ -277,7 +277,7 @@ The expression calculator knows the usual operators:
   -, ~	unary minus, bitwise not
   ( )	parenthesized subexpressions
 
-The expression calculator knows common math functions: abs(), acos(), acosh(), asin(), asinh(), atan(), atanh(), cbrt(), ceil(), cos(), cosh(), cub(), erf(), erfc(), exp(), exp2(), exp10(), floor(), inverf(), inverfc(), isfin(), isinf(), isnan(), log(), log2(), log10(), near(), round(), sin(), sinh(), sqr(), sqrt(), tan(), tanh(), trunc(), wrap(), wrap4(), max(), min(), atan2().
+The expression calculator knows common math functions: abs(), acos(), acosh(), asin(), asinh(), atan(), atan2(), atanh(), cbrt(), ceil(), cos(), cosh(), cub(), erf(), erfc(), exp(), exp2(), exp10(), floor(), inverf(), inverfc(), isfin(), isinf(), isnan(), log(), log2(), log10(), max(), min(), near(), pow(), round(), sin(), sinh(), sqr(), sqrt(), tan(), tanh(), trunc(), wrap(), wrap4().
 
 And a few mathematical constants: PI, E, DTOR (degree to radians), RTOD (radians to degrees).
 
@@ -765,7 +765,7 @@ Note that subrules, if any, are matched first before attempting close pattern or
 
 Finding the Syntax File.
 
-When Adie starts up, it normally looks in the directories listed in the PATH environment variable.  There are installations where this is not convenient.  Therefore, it is possible to set the search directories using the special 'syntaxpaths' registry setting.
+When Adie starts up, it normally looks in the directories listed in the PATH environment variable.  There are installations where this is not convenient.  Therefore, it is possible to set the search directories using the special 'syntaxpath' registry setting.
 For testing purposes, you can also pass the filename of the syntax file directly on the command line using '-S' or '--syntax' flag.
 
 

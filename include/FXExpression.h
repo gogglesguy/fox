@@ -3,7 +3,7 @@
 *                      E x p r e s s i o n   E v a l u a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -65,11 +65,11 @@ namespace FX {
 *
 * The following functions are available:
 *
-*       abs, acos, acosh, asin, asinh, atan, atanh,
+*       abs, acos, acosh, asin, asinh, atan, atan2, atanh,
 *       cbrt, ceil, cos, cosh, cub, erf, erfc, exp, exp2,
 *       exp10, floor, inverf, inverfc, isfin, isinf, isnan,
-*       log, log2, log10, near, round, sin, sinh, sqr, sqrt,
-*       tan, tanh, trunc, wrap, wrap4, max, min, atan2
+*       log, log2, log10, near, sin, sinh, sqr, sqrt, round, 
+*       tan, tanh, trunc, wrap, wrap4, max, min, pow.
 *
 * The expression engine also contains the following constants:
 *
@@ -99,6 +99,7 @@ public:
     ErrComma,           /// Expected comma
     ErrIdent,           /// Unknown identifier
     ErrColon,           /// Expected colon
+    ErrConst,           /// Bad constant value
     ErrLong             /// Expression too long
     };
 
@@ -114,7 +115,10 @@ public:
   FXExpression(const FXchar* expression,const FXchar* variables=nullptr,Error* error=nullptr);
 
   /// Compile expression; if error is not NULL, error code is returned
-  FXExpression(const FXString& expression,const FXString& variables=FXString::null,Error* error=nullptr);
+  FXExpression(const FXString& expression,const FXchar* variables=nullptr,Error* error=nullptr);
+
+  /// Compile expression; if error is not NULL, error code is returned
+  FXExpression(const FXString& expression,const FXString& variables,Error* error=nullptr);
 
   /// Assign another expression to this one
   FXExpression& operator=(const FXExpression& orig);
@@ -137,7 +141,8 @@ public:
   * in the expression.
   */
   Error parse(const FXchar* expression,const FXchar* variables=nullptr);
-  Error parse(const FXString& expression,const FXString& variables=FXString::null);
+  Error parse(const FXString& expression,const FXchar* variables=nullptr);
+  Error parse(const FXString& expression,const FXString& variables);
 
   /// Returns error code for given error
   static const FXchar* getError(Error err){ return errors[err]; }

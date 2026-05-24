@@ -3,7 +3,7 @@
 *                           M a t h   F u n c t i o n s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2015,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2015,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -216,6 +216,30 @@ static inline FXuint fpBits(FXfloat x){
 static inline FXulong fpBits(FXdouble x){
   union{ FXdouble f; FXulong u; } z={x};
   return z.u;
+  }
+
+
+/// Assemble single precision floating point number
+static inline FXfloat fpFlt(FXuint bits){
+  union{ FXuint u; FXfloat f; } z={bits};
+  return z.f;
+  }
+
+/// Assemble single precision floating point number
+static inline FXdouble fpFlt(FXulong bits){
+  union{ FXulong u; FXdouble f; } z={bits};
+  return z.f;
+  }
+
+
+/// Assemble single precision floating point number from parts
+static inline FXfloat fpMake(FXuint mantissa,FXuint exponent=127,FXuint sign=0){
+  return fpFlt((mantissa&0x007fffff) | ((exponent&0xff)<<23) | (sign<<31));
+  }
+
+/// Assemble single precision floating point number from parts
+static inline FXdouble fpMake(FXulong mantissa,FXulong exponent=1023,FXulong sign=0){
+  return fpFlt((mantissa&FXLONG(0x000fffffffffffff)) | ((exponent&FXLONG(0x7ff))<<52) | (sign<<63));
   }
 
 
