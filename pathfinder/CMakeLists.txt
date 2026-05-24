@@ -63,6 +63,7 @@ smallicons.bmp
 sorting.bmp
 unmaphost.bmp
 warningicon_gif.gif
+work.gif
 work_gif.gif)
 
 

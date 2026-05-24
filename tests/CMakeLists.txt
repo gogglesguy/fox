@@ -138,4 +138,7 @@ target_link_libraries(wizard FX::FOX)
 add_executable(xml xml.cpp)
 target_link_libraries(xml FX::FOX)
 
+add_executable(units units.cpp)
+target_link_libraries(units FX::FOX)
+
 
