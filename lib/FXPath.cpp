@@ -1881,7 +1881,7 @@ FXString FXPath::dequote(const FXString& file){
     FXString result(file);
     FXint quote=0,param=0,p=0,q=0;
     FXchar c;
-    while(c=file[q++]!='\0'){
+    while((c=file[q++])!='\0'){
       switch(c){
       case '\'':                        // Single quoted, no escape codes in here
         if(quote==2) goto nrm;          // "...'..."

@@ -43,19 +43,21 @@
 
 
 // Basic includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <limits.h>
-#include <math.h>
-#include <float.h>
-#include <string.h>
-#include <errno.h>
-#include <signal.h>
-#include <time.h>
-#include <locale.h>
-#include <fcntl.h>
-#include <sys/stat.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+#include <climits>
+#include <cstdint>
+#include <cmath>
+#include <cfloat>
+#include <cerrno>
+#include <cctype>
+#include <ctime>
+#include <csignal>
+#include <cstring>
+#include <csignal>
+#include <clocale>
+
 
 // Platform includes
 #if defined(WIN32)  /////////////// Windows /////////////////////////////////////
@@ -129,6 +131,9 @@
 #include <grp.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
 #ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #endif
@@ -148,23 +153,10 @@
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
-#ifdef HAVE_DIRENT_H
+#ifdef HAVE_DIRENT_H            // Directory scanning
 #include <dirent.h>
-#define NAMLEN(dirent) strlen((dirent)->d_name)
-#else
-#define dirent direct
-#define NAMLEN(dirent) (dirent)->d_namlen
-#ifdef HAVE_SYS_NDIR_H
-#include <sys/ndir.h>
 #endif
-#ifdef HAVE_SYS_DIR_H
-#include <sys/dir.h>
-#endif
-#ifdef HAVE_NDIR_H
-#include <ndir.h>
-#endif
-#endif
-#ifdef HAVE_SYS_SELECT_H
+#ifdef HAVE_SYS_SELECT_H        // Event handling
 #include <sys/select.h>
 #endif
 #ifdef HAVE_SYS_EPOLL_H

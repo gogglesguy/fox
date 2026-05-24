@@ -21,32 +21,32 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{57A223D7-FD28-44A9-BB36-EAEC4399E3FE}</ProjectGuid>
     <RootNamespace>foxlib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -217,7 +217,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <CustomBuildStep>
       <Command>cd $(SolutionDir)..\lib
 $(OutputPath)reswrap.exe -nc -i  icons.h -n FX -o icons.cpp arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif
-$(OutputPath)reswrap.exe -nc -h -n FX -o icons.harrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
+$(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif bigapp.gif bigcdrom.gif bigcomputer.gif bigdesktop.gif bigdoc.gif bigfloppy.gif bigfloppy3.gif bigfloppy5.gif bigfolder.gif bigfolderopen.gif bigharddisk.gif bignetdrive.gif bignethood.gif bookadd.bmp bookclr.gif bookclr_gif.gif bookdel.bmp bookdel_gif.gif bookmrk_gif.gif booknxt_gif.gif bookprv_gif.gif bookset.gif bookset_gif.gif clearentry.gif cmymode.gif dialmode.gif dirup_gif.gif dockbottom.gif dockflip.gif dockfree.gif dockleft.gif dockright.gif docktop.gif entericon.gif erroricon.gif eyedrop.gif fileaccept.gif filecancel.gif filecopy.gif filedelete.gif filehidden.gif filelink.gif filemove.gif filerename.gif fileshown.gif foldernew.gif gotohome.gif gotowork.gif hammer_gif.gif hsvmode.gif infoicon.gif landscape.gif listmode.gif miniapp.gif minicdrom.gif minicomputer.gif minidesktop.gif minidoc.gif minifloppy.gif minifloppy3.gif minifloppy5.gif minifolder.gif minifolderopen.gif miniharddisk.gif mininetdrive.gif mininethood.gif minizipdrive.gif newfolder.bmp portrait.gif questionicon.gif redo_gif.gif rgbmode.gif searchicon.gif showbigicons.gif showdetails.gif showsmallicons.gif sorting.bmp undo_gif.gif warningicon.gif winclose.gif winmaximize.gif winminimize.gif winrestore.gif</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>icons.cpp;icons.h</Outputs>
