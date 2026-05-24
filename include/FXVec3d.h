@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -190,6 +190,21 @@ static inline FXdouble min(const FXVec3d& a){ return Math::fmin(Math::fmin(a.x,a
 /// Linearly interpolate
 static inline FXVec3d lerp(const FXVec3d& u,const FXVec3d& v,FXdouble f){return (v-u)*f+u;}
 
+/// Normalize non-zero vector
+static inline FXVec3d normalize(const FXVec3d& v){ return v*Math::rsqrt(v.length2()); }
+
+/// Normalize vector incrementally; assume |v| is approximately 1 already
+static inline FXVec3d fastnormalize(const FXVec3d& v){ return v*((3.0-v.length2())*0.5); }
+
+/// Clip vector to box -xlo...xhi, -ylo...yhi, and -zlo...zhi (xlo<0, ylo<0, zlo<0, 0<xhi, 0<yhi, 0<zhi).
+extern FXAPI FXVec3d clip(const FXVec3d& v,FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi,FXdouble zlo,FXdouble zhi);
+
+/// Clip vector to box -xmx...xmx, -ymx...ymx, and -zmx...zmx (0<xmx, 0<ymx, 0<zmx).
+extern FXAPI FXVec3d clip(const FXVec3d& v,FXdouble xmx,FXdouble ymx,FXdouble zmx);
+
+/// Clip vector to box -mx...mx (0<mx).
+extern FXAPI FXVec3d clip(const FXVec3d& v,FXdouble mx);
+
 /// Convert vector to color
 extern FXAPI FXColor colorFromVec3d(const FXVec3d& vec);
 
@@ -202,9 +217,6 @@ extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c);
 /// Compute approximate normal from four points a,b,c,d
 extern FXAPI FXVec3d normal(const FXVec3d& a,const FXVec3d& b,const FXVec3d& c,const FXVec3d& d);
 
-/// Normalize vector
-extern FXAPI FXVec3d normalize(const FXVec3d& v);
-
 /// Return vector orthogonal to v
 extern FXAPI FXVec3d orthogonal(const FXVec3d& v);
 
@@ -216,6 +228,10 @@ extern FXAPI FXVec3d rotate(const FXVec3d& vec,const FXVec3d& axis,FXdouble ang)
 
 /// Compute distance of point pnt from ray from org along direction dir
 extern FXAPI FXdouble distFromRay(const FXVec3d& org,const FXVec3d& dir,const FXVec3d& pnt);
+
+/// Return x of closest point P (pa+x*da) along ray A (pa,da) to other ray B (pb,db).
+/// Return DBL_MAX if no such point.
+extern FXAPI FXdouble closestAlongRay(const FXVec3d& pa,const FXVec3d& da,const FXVec3d& pb,const FXVec3d& db);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3d& v);

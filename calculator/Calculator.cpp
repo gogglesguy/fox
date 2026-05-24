@@ -3,7 +3,7 @@
 *                  F O X   D e s k t o p   C a l c u l a t o r                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2001,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2001,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This program is free software: you can redistribute it and/or modify          *
 * it under the terms of the GNU General Public License as published by          *
@@ -1113,7 +1113,7 @@ static FXdouble combinations(FXdouble n,FXdouble r){
 //           ( n )         n!
 // result =  (   )  =  ----------
 //           ( r )      r! (n-r)!
-// 
+//
 static ulong binomial(FXulong n,FXulong r){
   if(r<=n){
     if(n<(r<<1)) r=n-r;

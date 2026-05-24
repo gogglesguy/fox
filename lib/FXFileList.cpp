@@ -3,7 +3,7 @@
 *                        F i l e    L i s t   O b j e c t                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1430,10 +1430,12 @@ FXbool FXFileList::listItems(FXbool force,FXbool notify){
           // Suppress '.' if not showing navigational items or not at top directory
           if(name[0]=='.'){
             if(name[1]=='\0'){
-              if(!istop || (options&FILELIST_NO_PARENT)) continue;
+              if(options&FILELIST_NO_PARENT) continue;
+              if(!istop) continue;
               }
             else if(name[1]=='.' && name[2]=='\0'){
-              if(istop || (options&FILELIST_NO_PARENT)) continue;
+              if(options&FILELIST_NO_PARENT) continue;
+              if(istop) continue;
               }
             else{
               if(!(options&FILELIST_SHOWHIDDEN)) continue;

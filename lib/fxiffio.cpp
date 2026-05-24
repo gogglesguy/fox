@@ -3,7 +3,7 @@
 *                          I F F   I n p u t / O u t p u t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2004,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -190,7 +190,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
           colors=size/3;
           if(colors<1) goto x;
           if(colors>256) goto x;
-          memset(colormap,0,sizeof(colormap));
+          clearElms(colormap,ARRAYNUMBER(colormap));
           for(i=0; i<colors; i++){                  // Load colors
             store >> c1 >> c2 >> c3;
             colormap[i]=FXRGB(c1,c2,c3);
@@ -287,7 +287,7 @@ FXbool fxloadIFF(FXStream& store,FXColor*& data,FXint& width,FXint& height){
                     count+=2;
                     store >> color;
                     if(count>remainingbytes) count=remainingbytes;
-                    memset(ptr,color,count);
+                    fillElms(ptr,color,count);
                     }
                   else{
                     count+=1;

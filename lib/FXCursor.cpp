@@ -3,7 +3,7 @@
 *                         C u r s o r - O b j e c t                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -174,7 +174,7 @@ void FXCursor::create(){
           // Fill in data
           FXColor *imgptr=(FXColor*)imgdata;
           FXColor *srcimgptr=data;
-          memset(imgdata,0,32*32*sizeof(FXColor));
+          clearElms(imgptr,32*32);
           for(FXint j=0; j<height; j++){
             for(FXint i=0; i<width; i++){
               *imgptr++=*srcimgptr++;
@@ -207,8 +207,8 @@ void FXCursor::create(){
           FXint   srcoffset=0;
           FXint   dstoffset=0;
           FXTRACE((TOPIC_CREATION,"%s::create: custom b/w %dx%d cursor\n",getClassName(),width,height));
-          memset(tmpand,0xff,sizeof(tmpand));
-          memset(tmpxor,0x00,sizeof(tmpxor));
+          fillElms(tmpand,0xff,ARRAYNUMBER(tmpand));
+          fillElms(tmpxor,0x00,ARRAYNUMBER(tmpxor));
           for(FXint j=0; j<height; j++){
             for(FXint i=0; i<width; i++){
               if(((FXuchar*)(data+srcoffset+i))[3]>=128){
@@ -284,8 +284,8 @@ void FXCursor::create(){
           color[0].flags=DoRed|DoGreen|DoBlue;
           color[1].flags=DoRed|DoGreen|DoBlue;
           XQueryColors(DISPLAY(getApp()),DefaultColormap(DISPLAY(getApp()),DefaultScreen(DISPLAY(getApp()))),color,2);
-          memset(shapebits,0,sizeof(shapebits));
-          memset(maskbits,0,sizeof(maskbits));
+          fillElms(shapebits,0,ARRAYNUMBER(shapebits));
+          fillElms(maskbits,0,ARRAYNUMBER(maskbits));
           for(FXint j=0; j<height; j++){
             for(FXint i=0; i<width; i++){
               if(((FXuchar*)(data+srcoffset+i))[3]>=128){

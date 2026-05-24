@@ -3,7 +3,7 @@
 *                             X M L   S t r i n g   I / O                       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2016,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2016,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *

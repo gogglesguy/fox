@@ -3,7 +3,7 @@
 *                   M u l t i - L i n e   T e x t   W i d g e t                 *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -472,8 +472,8 @@ FXText::FXText(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
 void FXText::create(){
   FXScrollArea::create();
   font->create();
-  tabwidth=tabcolumns*font->getTextWidth(" ",1);
-  barwidth=barcolumns*font->getTextWidth("8",1);
+  tabwidth=tabcolumns*font->getCharWidth(' ');
+  barwidth=barcolumns*font->getCharWidth('8');
   recalc();
   }
 
@@ -1359,7 +1359,7 @@ FXint FXText::getVisibleHeight() const {
 
 // Get default width
 FXint FXText::getDefaultWidth(){
-  return 0<vcols ? marginleft+marginright+vcols*font->getTextWidth("8",1)+barwidth : FXScrollArea::getDefaultWidth()+barwidth;
+  return 0<vcols ? marginleft+marginright+vcols*font->getCharWidth('8')+barwidth : FXScrollArea::getDefaultWidth()+barwidth;
   }
 
 
@@ -1383,7 +1383,7 @@ void FXText::layout(){
   // so we don't get sudden surprises.
   // For mono-spaced fonts, wrapwidth is a integral multiple of font width.
   if(options&TEXT_FIXEDWRAP){
-    wrapwidth=wrapcolumns*font->getTextWidth("8",1);
+    wrapwidth=wrapcolumns*font->getCharWidth('8');
     }
   else{
     wrapwidth=width-barwidth-marginleft-marginright;
@@ -6194,8 +6194,8 @@ void FXText::setFont(FXFont* fnt){
   if(!fnt){ fxerror("%s::setFont: NULL font specified.\n",getClassName()); }
   if(font!=fnt){
     font=fnt;
-    tabwidth=tabcolumns*font->getTextWidth(" ",1);
-    barwidth=barcolumns*font->getTextWidth("8",1);
+    tabwidth=tabcolumns*font->getCharWidth(' ');
+    barwidth=barcolumns*font->getCharWidth('8');
     if(getComposeContext()) getComposeContext()->setFont(font);
     recalc();
     update();
@@ -6268,7 +6268,7 @@ void FXText::setBarColumns(FXint cols){
   if(cols<=0) cols=0;
   if(cols!=barcolumns){
     barcolumns=cols;
-    barwidth=barcolumns*font->getTextWidth("8",1);
+    barwidth=barcolumns*font->getCharWidth('8');
     recalc();
     update();
     }
@@ -6291,7 +6291,7 @@ void FXText::setTabColumns(FXint cols){
   cols=Math::iclamp(1,cols,MAXTABCOLUMNS);
   if(cols!=tabcolumns){
     tabcolumns=cols;
-    tabwidth=tabcolumns*font->getTextWidth(" ",1);
+    tabwidth=tabcolumns*font->getCharWidth(' ');
     recalc();
     update();
     }

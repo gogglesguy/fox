@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -42,7 +42,6 @@ namespace FX {
 
 // Convert from vector to color
 FXColor colorFromVec4d(const FXVec4d& vec){
-  FXColor res;
 
   // Scale and convert to integer:      00000000 000000BB 000000GG 000000RR
   __m128i uuuu=_mm256_cvtpd_epi32(_mm256_mul_pd(_mm256_loadu_pd(&vec[0]),_mm256_set1_pd(255.0)));
@@ -51,9 +50,7 @@ FXColor colorFromVec4d(const FXVec4d& vec){
   __m128i bbbb=_mm_shuffle_epi8(uuuu,_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,0,4,8));
 
   // Assign to output
-  res=_mm_cvtsi128_si32(bbbb);
-
-  return res;
+  return _mm_cvtsi128_si32(bbbb);
   }
 
 
@@ -65,7 +62,7 @@ FXVec4d colorToVec4d(FXColor clr){
   __m128i uuuu=_mm_shuffle_epi8(_mm_cvtsi32_si128(clr),_mm_set_epi8(-1,-1,-1,3,-1,-1,-1,0,-1,-1,-1,1,-1,-1,-1,2));
 
   // Convert to double and scale:       AAAAAAAA BBBBBBBB GGGGGGGG RRRRRRRR
-  __m256d dddd=_mm256_mul_pd(_mm256_cvtepi32_pd(uuuu),_mm256_set1_pd(0.003921568627));
+  __m256d dddd=_mm256_mul_pd(_mm256_cvtepi32_pd(uuuu),_mm256_set1_pd(0.0039215686274509803922));
 
   // Assign to output
   _mm256_storeu_pd(&res[0],dddd);
@@ -76,24 +73,16 @@ FXVec4d colorToVec4d(FXColor clr){
 
 // Convert from vector to color
 FXColor colorFromVec4d(const FXVec4d& vec){
-  return FXRGBA((vec.x*255.0+0.5),(vec.y*255.0+0.5),(vec.z*255.0+0.5),(vec.w*255.0+0.5));
+  return FXRGBA(Math::lrint(vec.x*255.0),Math::lrint(vec.y*255.0),Math::lrint(vec.z*255.0),Math::lrint(vec.w*255.0));
   }
 
 
 // Convert from color to vector
 FXVec4d colorToVec4d(FXColor clr){
-  return FXVec4d(0.003921568627*FXREDVAL(clr),0.003921568627*FXGREENVAL(clr),0.003921568627*FXBLUEVAL(clr),0.003921568627*FXALPHAVAL(clr));
+  return FXVec4d(0.0039215686274509803922*FXREDVAL(clr),0.0039215686274509803922*FXGREENVAL(clr),0.0039215686274509803922*FXBLUEVAL(clr),0.0039215686274509803922*FXALPHAVAL(clr));
   }
 
 #endif
-
-
-// Normalize vector
-FXVec4d normalize(const FXVec4d& v){
-  FXdouble m=v.length2();
-  if(__likely(m)){ return v*Math::rsqrt(m); }
-  return v;
-  }
 
 
 // Compute normalized plane equation ax+by+cz+d=0

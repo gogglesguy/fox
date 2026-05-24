@@ -3,7 +3,7 @@
 *                       A b s t r a c t   I / O   C l a s s                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -93,21 +93,22 @@ public:
     AllFull        = AllReadWrite|AllExec,              /// Full access for all
 
     /// Other flags
-    Hidden         = 0x00200,   /// Hidden file
-    Directory      = 0x00400,   /// Is directory
-    File           = 0x00800,   /// Is regular file
-    SymLink        = 0x01000,   /// Is symbolic link
+    Hidden         = 0x00200,           /// Hidden file
+    Directory      = 0x00400,           /// Is directory
+    File           = 0x00800,           /// Is regular file
+    SymLink        = 0x01000,           /// Is symbolic link
 
     /// Special mode bits
-    SetUser        = 0x02000,   /// Set user id
-    SetGroup       = 0x04000,   /// Set group id
-    Sticky         = 0x08000,   /// Sticky bit
+    SetUser        = 0x02000,           /// Set user id
+    SetGroup       = 0x04000,           /// Set group id
+    Sticky         = 0x08000,           /// Sticky bit
 
     /// Device special files
-    Character      = 0x10000,   /// Character device
-    Block          = 0x20000,   /// Block device
-    Socket         = 0x40000,   /// Socket device
-    Fifo           = 0x80000    /// Fifo device
+    Character      = 0x10000,           /// Character device
+    Block          = 0x20000,           /// Block device
+    Socket         = 0x40000,           /// Socket device
+    Fifo           = 0x80000,           /// Fifo device
+    Device         = Character|Block,   /// Device
     };
 
   /// Error return codes for readBlock() and writeBlock()

@@ -44,12 +44,13 @@ protected:
   TextWindowList      windowlist;               // Window list
   FXFileAssociations *associations;             // File association table
   SyntaxList          syntaxes;                 // List of syntax patterns
-  FXString            syntaxpaths;              // Where to look for syntax file
+  FXString            syntaxpath;               // Where to look for syntax file
   FXIcon             *bigicon;                  // Big application icon
   FXIcon             *smallicon;                // Small application icon
   FXIcon             *newicon;
   FXIcon             *newfileicon;
   FXIcon             *reloadicon;
+  FXIcon             *renameicon;
   FXIcon             *openicon;
   FXIcon             *closeicon;
   FXIcon             *saveicon;
@@ -116,7 +117,7 @@ private:
 public:
   enum{
     ID_CLOSEALL=FXApp::ID_LAST,
-    ID_SYNTAXPATHS,
+    ID_SYNTAXPATH,
     ID_HARVEST,
     ID_MAPS,
     ID_LAST
@@ -124,9 +125,9 @@ public:
 public:
   long onSigHarvest(FXObject*,FXSelector,void*);
   long onCmdCloseAll(FXObject*,FXSelector,void*);
-  long onCmdSyntaxPaths(FXObject*,FXSelector,void*);
+  long onCmdSyntaxPath(FXObject*,FXSelector,void*);
   long onCmdDumpMaps(FXObject*,FXSelector,void*);
-  long onUpdSyntaxPaths(FXObject*,FXSelector,void*);
+  long onUpdSyntaxPath(FXObject*,FXSelector,void*);
 public:
 
   // Construct application object
@@ -181,10 +182,10 @@ public:
   FXString unique(const FXString& path) const;
 
   // Set syntax paths
-  void setSyntaxPaths(const FXString& paths){ syntaxpaths=paths; }
+  void setSyntaxPath(const FXString& path){ syntaxpath=path; }
 
   // Get syntax paths
-  const FXString& getSyntaxPaths() const { return syntaxpaths; }
+  const FXString& getSyntaxPath() const { return syntaxpath; }
 
   // Delete application object
   virtual ~Adie();

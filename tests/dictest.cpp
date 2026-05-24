@@ -3,7 +3,7 @@
 *                                   Dictionary Test                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2008,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2008,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 

@@ -3,7 +3,7 @@
 *                      B y t e   S w a p p i n g   S u p p o r t                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2010,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2010,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -231,6 +231,14 @@ static inline FXulong clz64(FXulong x){
   unsigned long result;
   _BitScanReverse64(&result,x);
   return 63-result;
+#elif defined(_MSC_VER) && defined(_M_IX86)
+  unsigned long result;
+  if(x>>32){
+    _BitScanReverse(&result,(TUInt)(x>>32));
+    return 63-(32+result);
+    }
+  _BitScanReverse(&result,(TUInt)x);
+  return 63-result;
 #else
   FXulong g,f,e,d,c,b;
   g=(((FXlong)(x-FXULONG(0x0000000100000000)))>>63)&32; x<<=g;
@@ -270,6 +278,14 @@ static inline FXulong ctz64(FXulong x){
   unsigned long result;
   _BitScanForward64(&result,x);
   return result;
+#elif defined(_MSC_VER) && defined(_M_IX86)
+  unsigned long result;
+  if((TUInt)x){
+    _BitScanForward(&result,(TUInt)x);
+    return result;
+    }
+  _BitScanForward(&result,(TUInt)(x>>32));
+  return result+32;
 #else
   return FXULONG(63)-clz64(x&-x);
 #endif

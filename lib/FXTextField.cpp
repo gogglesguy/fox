@@ -3,7 +3,7 @@
 *                         T e x t   F i e l d   O b j e c t                     *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -218,16 +218,23 @@ FXTextField::FXTextField(FXComposite* p,FXint ncols,FXObject* tgt,FXSelector sel
   }
 
 
-// Create X window
+// Create window
 void FXTextField::create(){
   FXFrame::create();
   font->create();
   }
 
 
+// Detach window
+void FXTextField::detach(){
+  FXFrame::detach();
+  font->detach();
+  }
+
+
 // Get default width
 FXint FXTextField::getDefaultWidth(){
-  return padleft+padright+(border<<1)+columns*font->getTextWidth("8",1);
+  return padleft+padright+(border<<1)+columns*font->getCharWidth('8');
   }
 
 
@@ -413,28 +420,29 @@ FXint FXTextField::index(FXint x) const {
   FXint rr=width-border-padright;
   FXint ll=border+padleft;
   FXint mm=(ll+rr)/2;
-  FXint pos,xx,cw;
+  FXint pos,xx,cw,w,t;
   if(options&TEXTFIELD_PASSWD){
-    cw=font->getTextWidth("*",1);
-    if(options&JUSTIFY_RIGHT) xx=rr-cw*contents.count();
-    else if(options&JUSTIFY_LEFT) xx=ll;
-    else xx=mm-(cw*contents.count())/2;
-    xx+=shift;
+    cw=font->getCharWidth('*');
+    w=cw*contents.count();
+    if(options&JUSTIFY_LEFT){ xx=ll+shift; }
+    else if(options&JUSTIFY_RIGHT){ xx=rr+shift-w; }
+    else{ xx=mm+shift-w/2; }
     pos=contents.offset((x-xx+(cw>>1))/cw);
     }
   else{
-    if(options&JUSTIFY_RIGHT) xx=rr-font->getTextWidth(contents.text(),contents.length());
-    else if(options&JUSTIFY_LEFT) xx=ll;
-    else xx=mm-font->getTextWidth(contents.text(),contents.length())/2;
-    xx+=shift;
-    for(pos=0; pos<contents.length(); pos=contents.inc(pos)){
-      cw=font->getTextWidth(&contents[pos],wclen(&contents[pos]));
+    w=font->getTextWidth(contents.text(),contents.length());
+    if(options&JUSTIFY_LEFT){ xx=ll+shift; }
+    else if(options&JUSTIFY_RIGHT){ xx=rr+shift-w; }
+    else{ xx=mm+shift-w/2; }
+    pos=t=0;
+    while(t<contents.length()){
+      cw=font->getCharWidth(contents.wcnxt(t));
       if(x<(xx+(cw>>1))) break;
+      pos=t;
       xx+=cw;
       }
     }
-  if(pos<0) pos=0;
-  if(pos>contents.length()) pos=contents.length();
+  pos=FXCLAMP(0,pos,contents.length());
   return pos;
   }
 
@@ -444,33 +452,27 @@ FXint FXTextField::coord(FXint i) const {
   FXint rr=width-border-padright;
   FXint ll=border+padleft;
   FXint mm=(ll+rr)/2;
-  FXint pos;
+  FXint pos,cw,w1,w2;
   FXASSERT(0<=i && i<=contents.length());
-  if(options&JUSTIFY_RIGHT){
-    if(options&TEXTFIELD_PASSWD){
-      pos=rr-font->getTextWidth("*",1)*(contents.count()-contents.index(i));
-      }
-    else{
-      pos=rr-font->getTextWidth(&contents[i],contents.length()-i);
-      }
-    }
-  else if(options&JUSTIFY_LEFT){
-    if(options&TEXTFIELD_PASSWD){
-      pos=ll+font->getTextWidth("*",1)*contents.index(i);
-      }
-    else{
-      pos=ll+font->getTextWidth(contents.text(),i);
-      }
+  if(options&TEXTFIELD_PASSWD){
+    cw=font->getCharWidth('*');
+    w1=cw*contents.index(i);
+    w2=cw*(contents.count()-contents.index(i));
     }
   else{
-    if(options&TEXTFIELD_PASSWD){
-      pos=mm+font->getTextWidth("*",1)*contents.index(i)-(font->getTextWidth("*",1)*contents.count())/2;
-      }
-    else{
-      pos=mm+font->getTextWidth(contents.text(),i)-font->getTextWidth(contents.text(),contents.length())/2;
-      }
+    w1=font->getTextWidth(&contents[0],i);
+    w2=font->getTextWidth(&contents[i],contents.length()-i);
     }
-  return pos+shift;
+  if(options&JUSTIFY_LEFT){
+    pos=ll+shift+w1;
+    }
+  else if(options&JUSTIFY_RIGHT){
+    pos=rr+shift-w2;
+    }
+  else{
+    pos=mm+shift+w1-(w1+w2)/2;
+    }
+  return pos;
   }
 
 
@@ -493,25 +495,25 @@ void FXTextField::makePositionVisible(FXint pos){
   FXint xx;
   if(!xid) return;
   pos=contents.validate(FXCLAMP(0,pos,contents.length()));
-  if(options&JUSTIFY_RIGHT){
+  if(options&JUSTIFY_LEFT){
     if(options&TEXTFIELD_PASSWD)
-      xx=font->getTextWidth("*",1)*contents.count(pos,contents.length());
-    else
-      xx=font->getTextWidth(&contents[pos],contents.length()-pos);
-    if(shift-xx>0) shift=xx;
-    else if(shift-xx<-ww) shift=xx-ww;
-    }
-  else if(options&JUSTIFY_LEFT){
-    if(options&TEXTFIELD_PASSWD)
-      xx=font->getTextWidth("*",1)*contents.index(pos);
+      xx=font->getCharWidth('*')*contents.index(pos);
     else
       xx=font->getTextWidth(contents.text(),pos);
     if(shift+xx<0) shift=-xx;
     else if(shift+xx>=ww) shift=ww-xx;
     }
+  else if(options&JUSTIFY_RIGHT){
+    if(options&TEXTFIELD_PASSWD)
+      xx=font->getCharWidth('*')*contents.count(pos,contents.length());
+    else
+      xx=font->getTextWidth(&contents[pos],contents.length()-pos);
+    if(shift-xx>0) shift=xx;
+    else if(shift-xx<-ww) shift=xx-ww;
+    }
   else{
     if(options&TEXTFIELD_PASSWD)
-      xx=font->getTextWidth("*",1)*contents.index(pos)-(font->getTextWidth("*",1)*contents.count())/2;
+      xx=font->getCharWidth('*')*contents.index(pos)-(font->getCharWidth('*')*contents.count())/2;
     else
       xx=font->getTextWidth(contents.text(),pos)-font->getTextWidth(contents.text(),contents.length())/2;
     if(shift+ww/2+xx<0) shift=-ww/2-xx;
@@ -533,20 +535,20 @@ void FXTextField::layout(){
 
   // Figure text width
   if(options&TEXTFIELD_PASSWD)
-    tw=font->getTextWidth("*",1)*contents.count();
+    tw=font->getCharWidth('*')*contents.count();
   else
     tw=font->getTextWidth(contents.text(),contents.length());
 
   // Constrain shift
-  if(options&JUSTIFY_RIGHT){
-    if(ww>=tw) shift=0;
-    else if(shift<0) shift=0;
-    else if(shift>tw-ww) shift=tw-ww;
-    }
-  else if(options&JUSTIFY_LEFT){
+  if(options&JUSTIFY_LEFT){
     if(ww>=tw) shift=0;
     else if(shift>0) shift=0;
     else if(shift<ww-tw) shift=ww-tw;
+    }
+  else if(options&JUSTIFY_RIGHT){
+    if(ww>=tw) shift=0;
+    else if(shift<0) shift=0;
+    else if(shift>tw-ww) shift=tw-ww;
     }
   else{
     if(ww>=tw) shift=0;
@@ -908,8 +910,6 @@ void FXTextField::eraseCursor(FXDCWindow& dc) const {
 
 // Draw text fragment
 void FXTextField::drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint fm,FXint to) const {
-  x+=font->getTextWidth(contents.text(),fm);
-  y+=font->getFontAscent();
   dc.drawText(x,y,&contents[fm],to-fm);
   }
 
@@ -917,196 +917,203 @@ void FXTextField::drawTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint fm,FXint
 // Draw text fragment in password mode
 void FXTextField::drawPWDTextFragment(FXDCWindow& dc,FXint x,FXint y,FXint fm,FXint to) const {
   FXint cw=font->getTextWidth("*",1);
-  FXint i;
-  y+=font->getFontAscent();
-  x+=cw*contents.index(fm);
-  for(i=fm; i<to; i=contents.inc(i),x+=cw){ dc.drawText(x,y,"*",1); }
+  for(FXint i=fm; i<to; i=contents.inc(i),x+=cw){ dc.drawText(x,y,"*",1); }
   }
 
 
+
 // Draw range of text
+// In password mode, draw a '*' for every character [not byte].
+// Thus, the number of *'s is not the same as the number of bytes, as the
+// text widget may hold multi-byte characters!
 void FXTextField::drawTextRange(FXDCWindow& dc,FXint fm,FXint to) const {
-  FXint sx,ex,xx,yy,cw,hh,ww,si,ei,lx,rx,t;
-  FXint rr=width-border-padright;
-  FXint ll=border+padleft;
-  FXint mm=(ll+rr)/2;
+  if(fm<to){
+    FXint rr=width-border-padright;
+    FXint bb=height-border-padbottom;
+    FXint ll=padleft+border;
+    FXint tt=border+padtop;
+    FXint th=font->getFontHeight();
+    FXint sx,ex,xx,yy,cw,si,ei,lx,rx,t;
+    FXint mm=(ll+rr)/2;
+    FXwchar c;
 
-  if(to<=fm) return;
-
-  // Text color
-  dc.setForeground(textColor);
-
-  // Height
-  hh=font->getFontHeight();
-
-  // Text sticks to top of field
-  if(options&JUSTIFY_TOP){
-    yy=padtop+border;
-    }
-
-  // Text sticks to bottom of field
-  else if(options&JUSTIFY_BOTTOM){
-    yy=height-padbottom-border-hh;
-    }
-
-  // Text centered in y
-  else{
-    yy=border+padtop+(height-padbottom-padtop-(border<<1)-hh)/2;
-    }
-
-  if(anchor<cursor){si=anchor;ei=cursor;}else{si=cursor;ei=anchor;}
-
-  // Password mode
-  if(options&TEXTFIELD_PASSWD){
-    cw=font->getTextWidth("*",1);
-    ww=cw*contents.count();
-
-    // Text sticks to right of field
-    if(options&JUSTIFY_RIGHT){
-      xx=shift+rr-ww;
+    // Text sticks to top of field
+    if(options&JUSTIFY_TOP){
+      yy=tt;
       }
 
-    // Text sticks on left of field
-    else if(options&JUSTIFY_LEFT){
-      xx=shift+ll;
+    // Text sticks to bottom of field
+    else if(options&JUSTIFY_BOTTOM){
+      yy=bb-th;
       }
 
-    // Text centered in field
+    // Text centered in y
     else{
-      xx=shift+mm-ww/2;
+      yy=tt+(bb-tt-th)/2;
       }
 
-    // Reduce to avoid drawing excessive amounts of text
-    lx=xx+cw*contents.index(fm);
-    rx=xx+cw*contents.index(to);
-    while(fm<to){
-      if(lx+cw>=0) break;
-      lx+=cw;
-      fm=contents.inc(fm);
-      }
-    while(fm<to){
-      if(rx-cw<width) break;
-      rx-=cw;
-      to=contents.dec(to);
-      }
+    FXMINMAX(si,ei,cursor,anchor);
 
-    // Adjust selected range
-    if(si<fm) si=fm;
-    if(ei>to) ei=to;
+    // Password mode
+    if(options&TEXTFIELD_PASSWD){
+      cw=font->getCharWidth('*');
 
-    // Nothing selected
-    if(!hasSelection() || to<=si || ei<=fm){
-      drawPWDTextFragment(dc,xx,yy,fm,to);
-      }
-
-    // Stuff selected
-    else{
-      if(fm<si){
-        drawPWDTextFragment(dc,xx,yy,fm,si);
+      // Text sticks on left of field
+      if(options&JUSTIFY_LEFT){
+        xx=shift+ll;
         }
+
+      // Text sticks to right of field
+      else if(options&JUSTIFY_RIGHT){
+        xx=shift+rr-cw*contents.count();
+        }
+
+      // Text centered in field
       else{
-        si=fm;
+        xx=shift+mm-(cw*contents.count())/2;
         }
-      if(ei<to){
-        drawPWDTextFragment(dc,xx,yy,ei,to);
+
+      // First pixel of range
+      lx=xx+cw*contents.index(fm);
+
+      // Not visible
+      if(width<lx) return;
+
+      // First partially visible character
+      while(fm<to){
+        if(0<lx+cw) break;
+        fm=contents.inc(fm);
+        lx+=cw;
         }
-      else{
-        ei=to;
+
+      // Last partially visible character
+      rx=lx;
+      t=fm;
+      while(t<to){
+        if(width<rx) break;
+        t=contents.inc(t);
+        rx+=cw;
         }
-      if(si<ei){
-        sx=xx+cw*contents.index(si);
-        ex=xx+cw*contents.index(ei);
-        if(hasFocus()){
-          dc.setForeground(selbackColor);
-          dc.fillRectangle(sx,padtop+border,ex-sx,height-padtop-padbottom-(border<<1));
-          dc.setForeground(seltextColor);
-          drawPWDTextFragment(dc,xx,yy,si,ei);
-          }
-        else{
-          dc.setForeground(baseColor);
-          dc.fillRectangle(sx,padtop+border,ex-sx,height-padtop-padbottom-(border<<1));
-          dc.setForeground(textColor);
-          drawPWDTextFragment(dc,xx,yy,si,ei);
-          }
-        }
-      }
-    }
-
-  // Normal mode
-  else{
-    ww=font->getTextWidth(contents.text(),contents.length());
-
-    // Text sticks to right of field
-    if(options&JUSTIFY_RIGHT){
-      xx=shift+rr-ww;
-      }
-
-    // Text sticks on left of field
-    else if(options&JUSTIFY_LEFT){
-      xx=shift+ll;
-      }
-
-    // Text centered in field
-    else{
-      xx=shift+mm-ww/2;
-      }
-
-    // Reduce to avoid drawing excessive amounts of text
-    lx=xx+font->getTextWidth(&contents[0],fm);
-    rx=lx+font->getTextWidth(&contents[fm],to-fm);
-    while(fm<to){
-      t=contents.inc(fm);
-      cw=font->getTextWidth(&contents[fm],t-fm);
-      if(lx+cw>=0) break;
-      lx+=cw;
-      fm=t;
-      }
-    while(fm<to){
-      t=contents.dec(to);
-      cw=font->getTextWidth(&contents[t],to-t);
-      if(rx-cw<width) break;
-      rx-=cw;
       to=t;
-      }
 
-    // Adjust selected range
-    if(si<fm) si=fm;
-    if(ei>to) ei=to;
+      // Not visible
+      if(rx<0) return;
 
-    // Nothing selected
-    if(!hasSelection() || to<=si || ei<=fm){
-      drawTextFragment(dc,xx,yy,fm,to);
-      }
-
-    // Stuff selected
-    else{
-      if(fm<si){
-        drawTextFragment(dc,xx,yy,fm,si);
-        }
-      else{
-        si=fm;
-        }
-      if(ei<to){
-        drawTextFragment(dc,xx,yy,ei,to);
-        }
-      else{
-        ei=to;
-        }
-      if(si<ei){
-        sx=xx+font->getTextWidth(contents.text(),si);
-        ex=xx+font->getTextWidth(contents.text(),ei);
-        if(hasFocus()){
-          dc.setForeground(selbackColor);
-          dc.fillRectangle(sx,padtop+border,ex-sx,height-padtop-padbottom-(border<<1));
-          dc.setForeground(seltextColor);
-          drawTextFragment(dc,xx,yy,si,ei);
-          }
-        else{
-          dc.setForeground(baseColor);
-          dc.fillRectangle(sx,padtop+border,ex-sx,height-padtop-padbottom-(border<<1));
+      // Have a (visible) selection?
+      if(hasSelection() && si<to && fm<ei){
+        if(si<fm) si=fm;
+        if(ei>to) ei=to;
+        sx=lx+cw*(si-fm);
+        ex=sx+cw*(ei-si);
+        if(fm<si){
           dc.setForeground(textColor);
-          drawTextFragment(dc,xx,yy,si,ei);
+          drawPWDTextFragment(dc,lx,yy+font->getFontAscent(),fm,si);
           }
+        if(si<ei){
+          if(hasFocus()){
+            dc.setForeground(selbackColor);
+            dc.fillRectangle(sx,tt,ex-sx,bb-tt);
+            dc.setForeground(seltextColor);
+            drawPWDTextFragment(dc,sx,yy+font->getFontAscent(),si,ei);
+            }
+          else{
+            dc.setForeground(baseColor);
+            dc.fillRectangle(sx,tt,ex-sx,bb-tt);
+            dc.setForeground(textColor);
+            drawPWDTextFragment(dc,sx,yy+font->getFontAscent(),si,ei);
+            }
+          }
+        if(ei<to){
+          dc.setForeground(textColor);
+          drawPWDTextFragment(dc,ex,yy+font->getFontAscent(),ei,to);
+          }
+        }
+      else{
+        dc.setForeground(textColor);
+        drawPWDTextFragment(dc,lx,yy+font->getFontAscent(),fm,to);
+        }
+      }
+
+    // Normal mode
+    else{
+
+      // Text sticks on left of field
+      if(options&JUSTIFY_LEFT){
+        xx=shift+ll;
+        }
+
+      // Text sticks to right of field
+      else if(options&JUSTIFY_RIGHT){
+        xx=shift+rr-font->getTextWidth(contents.text(),contents.length());
+        }
+
+      // Text centered in field
+      else{
+        xx=shift+mm-font->getTextWidth(contents.text(),contents.length())/2;
+        }
+
+      // First pixel of range
+      lx=xx+font->getTextWidth(&contents[0],fm);
+
+      // Not visible
+      if(width<lx) return;
+
+      // First partially visible character
+      t=fm;
+      while(t<to){
+        c=contents.wcnxt(t);
+        cw=font->getCharWidth(c);
+        if(0<lx+cw) break;
+        lx+=cw;
+        fm=t;
+        }
+
+      // Last partially visible character
+      rx=lx;
+      t=fm;
+      while(t<to){
+        c=contents.wcnxt(t);
+        cw=font->getCharWidth(c);
+        rx+=cw;
+        if(width<rx) break;
+        }
+      to=t;
+
+      // Not visible
+      if(rx<0) return;
+
+      // Have a (visible) selection?
+      if(hasSelection() && si<to && fm<ei){
+        if(si<fm) si=fm;
+        if(ei>to) ei=to;
+        sx=lx+font->getTextWidth(&contents[fm],si-fm);
+        ex=sx+font->getTextWidth(&contents[si],ei-si);
+        if(fm<si){
+          dc.setForeground(textColor);
+          drawTextFragment(dc,lx,yy+font->getFontAscent(),fm,si);
+          }
+        if(si<ei){
+          if(hasFocus()){
+            dc.setForeground(selbackColor);
+            dc.fillRectangle(sx,tt,ex-sx,bb-tt);
+            dc.setForeground(seltextColor);
+            drawTextFragment(dc,sx,yy+font->getFontAscent(),si,ei);
+            }
+          else{
+            dc.setForeground(baseColor);
+            dc.fillRectangle(sx,tt,ex-sx,bb-tt);
+            dc.setForeground(textColor);
+            drawTextFragment(dc,sx,yy+font->getFontAscent(),si,ei);
+            }
+          }
+        if(ei<to){
+          dc.setForeground(textColor);
+          drawTextFragment(dc,ex,yy+font->getFontAscent(),ei,to);
+          }
+        }
+      else{
+        dc.setForeground(textColor);
+        drawTextFragment(dc,lx,yy+font->getFontAscent(),fm,to);
         }
       }
     }
@@ -1115,8 +1122,7 @@ void FXTextField::drawTextRange(FXDCWindow& dc,FXint fm,FXint to) const {
 
 // Handle repaint
 long FXTextField::onPaint(FXObject*,FXSelector,void* ptr){
-  FXEvent *ev=(FXEvent*)ptr;
-  FXDCWindow dc(this,ev);
+  FXDCWindow dc(this,(FXEvent*)ptr);
 
   // Set font
   dc.setFont(font);
@@ -1584,40 +1590,12 @@ long FXTextField::onAutoScroll(FXObject*,FXSelector,void* ptr){
     FXint tw;
 
     if(options&TEXTFIELD_PASSWD)
-      tw=font->getTextWidth("*",1)*contents.count();
+      tw=font->getCharWidth('*')*contents.count();
     else
       tw=font->getTextWidth(contents.text(),contents.length());
 
-    // Text right-aligned
-    if(options&JUSTIFY_RIGHT){
-
-      // Scroll left
-      if(event->win_x<ll){
-        if(tw>ww){
-          shift+=ll-event->win_x;
-          if(ww>tw-shift)
-            shift=tw-ww;
-          else
-            getApp()->addTimeout(this,ID_AUTOSCROLL,getApp()->getScrollSpeed(),event);
-          }
-        newcursor=index(ll);
-        }
-
-      // Scroll right
-      if(rr<event->win_x){
-        if(tw>ww){
-          shift+=rr-event->win_x;
-          if(shift<=0)
-            shift=0;
-          else
-            getApp()->addTimeout(this,ID_AUTOSCROLL,getApp()->getScrollSpeed(),event);
-          }
-        newcursor=index(rr);
-        }
-      }
-
     // Text left-aligned
-    else if(options&JUSTIFY_LEFT){
+    if(options&JUSTIFY_LEFT){
 
       // Scroll left
       if(event->win_x<ll){
@@ -1637,6 +1615,34 @@ long FXTextField::onAutoScroll(FXObject*,FXSelector,void* ptr){
           shift+=rr-event->win_x;
           if(shift+tw<ww)
             shift=ww-tw;
+          else
+            getApp()->addTimeout(this,ID_AUTOSCROLL,getApp()->getScrollSpeed(),event);
+          }
+        newcursor=index(rr);
+        }
+      }
+
+    // Text right-aligned
+    else if(options&JUSTIFY_RIGHT){
+
+      // Scroll left
+      if(event->win_x<ll){
+        if(tw>ww){
+          shift+=ll-event->win_x;
+          if(ww>tw-shift)
+            shift=tw-ww;
+          else
+            getApp()->addTimeout(this,ID_AUTOSCROLL,getApp()->getScrollSpeed(),event);
+          }
+        newcursor=index(ll);
+        }
+
+      // Scroll right
+      if(rr<event->win_x){
+        if(tw>ww){
+          shift+=rr-event->win_x;
+          if(shift<=0)
+            shift=0;
           else
             getApp()->addTimeout(this,ID_AUTOSCROLL,getApp()->getScrollSpeed(),event);
           }

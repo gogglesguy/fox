@@ -3,7 +3,7 @@
 *                    F o l d i n g   L i s t   W i d g e t                      *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -2736,12 +2736,6 @@ void FXFoldingList::setFont(FXFont* fnt){
   }
 
 
-// Change help text
-void FXFoldingList::setHelpText(const FXString& text){
-  help=text;
-  }
-
-
 // Set text color
 void FXFoldingList::setTextColor(FXColor clr){
   if(clr!=textColor){
@@ -2800,6 +2794,24 @@ void FXFoldingList::setListStyle(FXuint style){
 // Get list style
 FXuint FXFoldingList::getListStyle() const {
   return (options&FOLDINGLIST_MASK);
+  }
+
+
+// Change selection mode
+void FXFoldingList::setSelectMode(FXuint mode){
+  options=(options&~SELECT_MASK) | (mode&SELECT_MASK);
+  }
+
+
+// Return current selection mode
+FXuint FXFoldingList::getSelectMode() const {
+  return (options&SELECT_MASK);
+  }
+
+
+// Change help text
+void FXFoldingList::setHelpText(const FXString& text){
+  help=text;
   }
 
 

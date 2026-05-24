@@ -233,6 +233,7 @@ FXPacker.h \
 FXParallel.h \
 FXParseBuffer.h \
 FXPath.h \
+FXPathBox.h \
 FXPerformance.h \
 FXPicker.h \
 FXPipe.h \

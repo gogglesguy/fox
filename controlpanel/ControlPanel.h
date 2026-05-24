@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2024 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2025 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -122,6 +122,7 @@ private:
   FXTime             tooltipPause;
   FXTime             tooltipTime;
   FXuint             maxcolors;
+  FXuint             screenres;
   FXint              dragDelta;
   FXint              wheelLines;
   FXint              barSize;
@@ -156,6 +157,7 @@ private:
   FXDataTarget       target_wheellines;         // Mouse wheel lines
   FXDataTarget       target_barsize;            // Scroll bar size
   FXDataTarget       target_maxcolors;          // Maximum colors
+  FXDataTarget       target_screenres;          // Screen resolution
   FXDataTarget       target_gamma;              // Display gamma value
   FXDataTarget       target_subpixel;           // Xft font subpixel mode
   FXDataTarget       target_hintstyle;          // Xft font hint style

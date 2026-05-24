@@ -3,7 +3,7 @@
 *                    F i l e   S e l e c t i o n   D i a l o g                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -115,6 +115,7 @@ void FXFileDialog::readRegistry(){
   setWidth(getApp()->reg().readIntEntry(sectionName,"width",getWidth()));
   setHeight(getApp()->reg().readIntEntry(sectionName,"height",getHeight()));
   setFileBoxStyle(getApp()->reg().readUIntEntry(sectionName,"style",getFileBoxStyle()));
+  setSortOrder(getApp()->reg().readUIntEntry(sectionName,"sortorder",0));
   showHiddenFiles(getApp()->reg().readBoolEntry(sectionName,"showhidden",showHiddenFiles()));
   }
 
@@ -124,6 +125,7 @@ void FXFileDialog::writeRegistry(){
   getApp()->reg().writeIntEntry(sectionName,"width",getWidth());
   getApp()->reg().writeIntEntry(sectionName,"height",getHeight());
   getApp()->reg().writeUIntEntry(sectionName,"style",getFileBoxStyle());
+  getApp()->reg().writeUIntEntry(sectionName,"sortorder",getSortOrder());
   getApp()->reg().writeBoolEntry(sectionName,"showhidden",showHiddenFiles());
   }
 
@@ -245,6 +247,18 @@ void FXFileDialog::setFileBoxStyle(FXuint style){
 // Return File List style
 FXuint FXFileDialog::getFileBoxStyle() const {
   return filebox->getFileBoxStyle();
+  }
+
+
+// Change File List sorting order
+void FXFileDialog::setSortOrder(FXuint order){
+  filebox->setSortOrder(order);
+  }
+    
+
+// Return File List sorting order
+FXuint FXFileDialog::getSortOrder() const {
+  return filebox->getSortOrder();
   }
 
 

@@ -94,6 +94,10 @@
       what is matched or how the colorizer works.
 */
 
+#define TOPIC_SYNTAX    108
+#define TOPIC_DETAIL    109
+
+
 /*******************************************************************************/
 
 // Fill textstyle with style, returns position of last change+1
@@ -127,7 +131,7 @@ Rule::~Rule(){
 
 // Constructor
 DefaultRule::DefaultRule(const FXString& nam,const FXString& sty,FXival par,FXival idx):Rule(nam,sty,par,idx){
-  FXTRACE((10,"DefaultRule::DefaultRule(\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"DefaultRule::DefaultRule(\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),parent,index));
   }
 
 
@@ -160,14 +164,14 @@ nxt:continue;
 
 // Destructor
 DefaultRule::~DefaultRule(){
-  FXTRACE((10,"DefaultRule::~DefaultRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"DefaultRule::~DefaultRule()\n"));
   }
 
 /*******************************************************************************/
 
 // Constructor
 SimpleRule::SimpleRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx):Rule(nam,sty,par,idx),pattern(rex,FXRex::Newline|FXRex::NotEmpty){
-  FXTRACE((10,"SimpleRule::SimpleRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"SimpleRule::SimpleRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
   }
 
 
@@ -190,14 +194,14 @@ FXint SimpleRule::stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,FXi
 
 // Destructor
 SimpleRule::~SimpleRule(){
-  FXTRACE((10,"SimpleRule::~SimpleRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"SimpleRule::~SimpleRule()\n"));
   }
 
 /*******************************************************************************/
 
 // Constructor
 BracketRule::BracketRule(const FXString& nam,const FXString& sty,const FXString& brex,const FXString& erex,FXival par,FXival idx):Rule(nam,sty,par,idx),open(brex,FXRex::Newline),close(erex,FXRex::Newline){
-  FXTRACE((10,"BracketRule::BracketRule(\"%s\",\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),brex.text(),erex.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"BracketRule::BracketRule(\"%s\",\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),brex.text(),erex.text(),parent,index));
   }
 
 
@@ -239,14 +243,14 @@ nxt:continue;
 
 // Destructor
 BracketRule::~BracketRule(){
-  FXTRACE((10,"BracketRule::~BracketRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"BracketRule::~BracketRule()\n"));
   }
 
 /*******************************************************************************/
 
 // Constructor
 SafeBracketRule::SafeBracketRule(const FXString& nam,const FXString& sty,const FXString& brex,const FXString& erex,const FXString& srex,FXival par,FXival idx):BracketRule(nam,sty,brex,erex,par,idx),stop(srex,FXRex::Newline){
-  FXTRACE((10,"SafeBracketRule::SafeBracketRule(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),brex.text(),erex.text(),srex.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"SafeBracketRule::SafeBracketRule(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),brex.text(),erex.text(),srex.text(),parent,index));
   }
 
 
@@ -292,14 +296,14 @@ nxt:continue;
 
 // Destructor
 SafeBracketRule::~SafeBracketRule(){
-  FXTRACE((10,"BracketRule::~BracketRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"BracketRule::~BracketRule()\n"));
   }
 
 /*******************************************************************************/
 
 // Constructor
 SpanRule::SpanRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx):Rule(nam,sty,par,idx),pattern(rex,FXRex::Newline|FXRex::NotEmpty){
-  FXTRACE((10,"SpanRule::SpanRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"SpanRule::SpanRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
   }
 
 
@@ -337,7 +341,7 @@ nxt:continue;
 
 // Destructor
 SpanRule::~SpanRule(){
-  FXTRACE((10,"SpanRule::~SpanRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"SpanRule::~SpanRule()\n"));
   }
 
 /*******************************************************************************/
@@ -345,7 +349,7 @@ SpanRule::~SpanRule(){
 #if 0
 // Constructor
 CapturingRule::CapturingRule(const FXString& nam,const FXString& sty,const FXString& rex,FXival par,FXival idx):Rule(nam,sty,par,idx),pattern(rex,FXRex::Newline|FXRex::NotEmpty|FXRex::Capture){
-  FXTRACE((10,"CapturingRule::CapturingRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
+  FXTRACE((TOPIC_SYNTAX,"CapturingRule::CapturingRule(\"%s\",\"%s\",\"%s\",%ld,%ld)\n",nam.text(),sty.text(),rex.text(),parent,index));
   }
 
 
@@ -369,7 +373,7 @@ FXint CapturingRule::stylizeBody(const FXchar* text,FXchar* textstyle,FXint pos,
 
 // Destructor
 CapturingRule::~CapturingRule(){
-  FXTRACE((10,"CapturingRule::~CapturingRule()\n"));
+  FXTRACE((TOPIC_SYNTAX,"CapturingRule::~CapturingRule()\n"));
   }
 #endif
 
@@ -378,7 +382,7 @@ CapturingRule::~CapturingRule(){
 
 // Construct syntax object; needs at least one master rule
 Syntax::Syntax(const FXString& lang,const FXString& grp):language(lang),group(grp),delimiters(FXText::textDelimiters),contextLines(1),contextChars(1),autoindent(-1),wrapwidth(-1),tabwidth(-1),wrapmode(-1),tabmode(-1),strip(-1){
-  FXTRACE((10,"Syntax::Syntax(\"%s\",\"%s\")\n",lang.text(),grp.text()));
+  FXTRACE((TOPIC_SYNTAX,"Syntax::Syntax(\"%s\",\"%s\")\n",lang.text(),grp.text()));
   rules.append(new DefaultRule("Default",FXString::null,-1,0));
   }
 
@@ -493,6 +497,6 @@ FXival Syntax::commonAncestor(FXival a,FXival b) const {
 
 // Clean up
 Syntax::~Syntax(){
-  FXTRACE((10,"Syntax::~Syntax()\n"));
+  FXTRACE((TOPIC_SYNTAX,"Syntax::~Syntax()\n"));
   for(FXival node=0; node<rules.no(); node++){ delete rules[node]; }
   }

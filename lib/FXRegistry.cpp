@@ -3,7 +3,7 @@
 *                           R e g i s t r y   C l a s s                         *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -44,19 +44,19 @@
   - The FOX settings tree stores configuration data for FOX-based applications; it
     is organized as follows:
 
-    SettingsRoot/foxrc                  The "foxrc" file stores common configuration
+    SettingsRoot/fox.rc                 The "foxrc" file stores common configuration
                                         settings for all FOX-based applications,
                                         such as colors and file bindings.
 
-    SettingsRoot/Vendor/Vendorrc        The Vendorrc file is common to all applications
+    SettingsRoot/Vendor/Vendor.rc       The Vendorrc file is common to all applications
                                         from a particular organization, so that common
                                         configurable attributes may be given consistent
                                         values easily.
 
-    SettingsRoot/Vendor/Applicationrc   The Applicationrc file stores configuration data
+    SettingsRoot/Vendor/Application.rc  The Applicationrc file stores configuration data
                                         unique to a specific application only.
 
-    SettingsRoot/Applicationrc          If no Vendor name is specified, the Applicationrc
+    SettingsRoot/Application.rc         If no Vendor name is specified, the Applicationrc
                                         file is located at the toplevel of the SettingsRoot.
 
   - A System-Wide SettingsRoot may be located in a read-only, system adminstrator designated
@@ -168,7 +168,7 @@
 #if defined(WIN32)
 #define FOXRC           "fox.ini"
 #define SYSTEMDIRS      "C:\\Program Files;C:\\Windows"
-#define USERDIR         "%USERPROFILE%\\fox"
+#define USERDIR         "%USERPROFILE%\\.config"
 #define FILEEXT         ".ini"
 #else
 #define FOXRC           "fox.rc"
@@ -423,6 +423,8 @@ FXbool FXRegistry::read(){
     // Read system-wide settings from systemdirs
     if(!systemdirs.empty()){
 
+      FXTRACE((TOPIC_DETAIL,"FXRegistry::read: systemdirs=%s\n",systemdirs.text()));
+
       // Find common settings
       path=FXPath::search(systemdirs,FOXRC);
       if(!path.empty()){
@@ -461,6 +463,8 @@ FXbool FXRegistry::read(){
 
     // Read per-user settings from userdir
     if(!userdir.empty()){
+
+      FXTRACE((TOPIC_DETAIL,"FXRegistry::read: userdir=%s\n",userdir.text()));
 
       // Path to settings data
       path=FXPath::absolute(FXPath::expand(userdir));
@@ -503,6 +507,8 @@ FXbool FXRegistry::write(){
 
       // Write per-user settings to userdir
       if(!userdir.empty()){
+
+      FXTRACE((TOPIC_DETAIL,"FXRegistry::write: userdir=%s\n",userdir.text()));
 
         // Have application key
         if(!applicationkey.empty()){

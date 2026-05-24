@@ -3,7 +3,7 @@
 *                               F o n t   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1508,7 +1508,9 @@ FXint FXFont::leftBearing(FXwchar ch) const {
 #if defined(WIN32)              ///// WIN32 /////
     return 0;                                           // FIXME
 #elif defined(HAVE_XFT_H)       ///// XFT /////
-    return 0;                                           // FIXME
+    XGlyphInfo extents;
+    XftTextExtents32(DISPLAY(getApp()),(XftFont*)font,(const FcChar32*)&ch,1,&extents);
+    return extents.x;
 #else                           ///// XLFD /////
     const XFontStruct *fs=(XFontStruct*)font;
     if(fs->per_char){
@@ -1533,7 +1535,9 @@ FXint FXFont::rightBearing(FXwchar ch) const {
 #if defined(WIN32)              ///// WIN32 /////
     return 0;                                           // FIXME
 #elif defined(HAVE_XFT_H)       ///// XFT /////
-    return 0;                                           // FIXME
+    XGlyphInfo extents;
+    XftTextExtents32(DISPLAY(getApp()),(XftFont*)font,(const FcChar32*)&ch,1,&extents);
+    return extents.xOff-extents.width-extents.x;
 #else                           ///// XLFD /////
     const XFontStruct *fs=(XFontStruct*)font;
     if(fs->per_char){
@@ -1649,16 +1653,15 @@ FXint FXFont::getFontDescent() const {
 FXint FXFont::getCharWidth(const FXwchar ch) const {
   if(font){
 #if defined(WIN32)              ///// WIN32 /////
-    FXnchar sbuffer[2];
-    SIZE size;
-    sbuffer[0]=ch;
-    if(0xFFFF<ch){                      // Deal with surrogate pair
-      sbuffer[0]=(ch>>10)+LEAD_OFFSET;
-      sbuffer[1]=(ch&0x3FF)+TAIL_OFFSET;
-      GetTextExtentPoint32W((HDC)dc,sbuffer,2,&size);
+    FXnchar sbuffer[2]; SIZE size;
+    if(ch<0xFFFF){
+      sbuffer[0]=ch;
+      GetTextExtentPoint32W((HDC)dc,sbuffer,1,&size);
       return size.cx;
       }
-    GetTextExtentPoint32W((HDC)dc,sbuffer,1,&size);
+    sbuffer[0]=(ch>>10)+LEAD_OFFSET;    // Deal with surrogate pair
+    sbuffer[1]=(ch&0x3FF)+TAIL_OFFSET;
+    GetTextExtentPoint32W((HDC)dc,sbuffer,2,&size);
     return size.cx;
 #elif defined(HAVE_XFT_H)       ///// XFT /////
     XGlyphInfo extents;
@@ -1694,13 +1697,34 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
   if(!string && length){ fxerror("%s::getTextWidth: NULL string argument\n",getClassName()); }
   if(font){
 #if defined(WIN32)              ///// WIN32 /////
-    FXnchar sbuffer[4096];
-    FXint count=utf2ncs(sbuffer,string,ARRAYNUMBER(sbuffer),length);
     SIZE size;
-    GetTextExtentPoint32W((HDC)dc,sbuffer,count,&size);
+    FXint count;
+    if(length<=4096){
+      FXnchar sbuffer[4096];
+      count=utf2ncs(sbuffer,string,4096,length);
+      GetTextExtentPoint32W((HDC)dc,sbuffer,count,&size);
+      }
+    else{
+      FXnchar* dbuffer=nullptr;
+      if(!allocElms(dbuffer,length)){ throw FXResourceException("unable allocate memory in FXFont."); }
+      count=utf2ncs(dbuffer,string,length,length);
+      GetTextExtentPoint32W((HDC)dc,dbuffer,count,&size);
+      freeElms(dbuffer);
+      }
     return size.cx;
 #elif defined(HAVE_XFT_H)       ///// XFT /////
+    const FXchar *ptr=string;
+    const FXchar *end=string+length;
+    FXint width=0;
+    FXwchar ch;
     XGlyphInfo extents;
+    while(ptr<end){
+      ch=wcnxt(ptr);
+      XftTextExtents32(DISPLAY(getApp()),(XftFont*)font,(const FcChar32*)&ch,1,&extents);
+      width+=extents.xOff;
+      }
+    return width;
+/*
     // This returns rotated metrics; FOX likes to work with unrotated metrics, so if angle
     // is not 0, we calculate the unrotated baseline; note however that the calculation is
     // not 100% pixel exact when the angle is not a multiple of 90 degrees.
@@ -1718,11 +1742,13 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
     //FXTRACE((TOPIC_DETAIL,"  yOff:   %d\n",extents.yOff));
     //FXTRACE((TOPIC_DETAIL,"  result: %d\n",extents.xOff));
     return extents.xOff;
+*/
 #else                           ///// XLFD /////
     const XFontStruct *fs=(XFontStruct*)font;
+    const FXchar *ptr=string;
+    const FXchar *end=string+length;
     FXint defwidth=fs->min_bounds.width;
     FXint width=0,ww;
-    FXuint p=0;
     FXuint s;
     FXuchar r;
     FXuchar c;
@@ -1734,9 +1760,8 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
       if(fs->min_char_or_byte2<=c && c<=fs->max_char_or_byte2 && fs->min_byte1<=r && r<=fs->max_byte1){
         defwidth=fs->per_char[(r-fs->min_byte1)*s+(c-fs->min_char_or_byte2)].width;
         }
-      while(p<length){
-        w=wc(string+p);
-        p+=wclen(string+p);
+      while(ptr<end){
+        w=wcnxt(ptr);
         r=w>>8;
         c=w&255;
         if(fs->min_char_or_byte2<=c && c<=fs->max_char_or_byte2 && fs->min_byte1<=r && r<=fs->max_byte1){
@@ -1749,8 +1774,8 @@ FXint FXFont::getTextWidth(const FXchar *string,FXuint length) const {
         }
       }
     else{
-      while(p<length){
-        p+=wclen(string+p);
+      while(ptr<end){
+        wcnxt(ptr);
         width+=defwidth;
         }
       }

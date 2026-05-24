@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -191,6 +191,21 @@ static inline FXfloat min(const FXVec3f& a){ return Math::fmin(Math::fmin(a.x,a.
 /// Linearly interpolate
 static inline FXVec3f lerp(const FXVec3f& u,const FXVec3f& v,FXfloat f){return (v-u)*f+u;}
 
+/// Normalize non-zero vector
+static inline FXVec3f normalize(const FXVec3f& v){ return v*Math::rsqrt(v.length2()); }
+
+/// Normalize vector incrementally; assume |v| is approximately 1 already
+static inline FXVec3f fastnormalize(const FXVec3f& v){ return v*((3.0f-v.length2())*0.5f); }
+
+/// Clip vector to box -xlo...xhi, -ylo...yhi, and -zlo...zhi (xlo<0, ylo<0, zlo<0, 0<xhi, 0<yhi, 0<zhi).
+extern FXAPI FXVec3f clip(const FXVec3f& v,FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi);
+
+/// Clip vector to box -xmx...xmx, -ymx...ymx, and -zmx...zmx (0<xmx, 0<ymx, 0<zmx).
+extern FXAPI FXVec3f clip(const FXVec3f& v,FXfloat xmx,FXfloat ymx,FXfloat zmx);
+
+/// Clip vector to box -mx...mx (0<mx).
+extern FXAPI FXVec3f clip(const FXVec3f& v,FXfloat mx);
+
 /// Convert vector to color
 extern FXAPI FXColor colorFromVec3f(const FXVec3f& vec);
 
@@ -203,9 +218,6 @@ extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c);
 /// Compute approximate normal from four points a,b,c,d
 extern FXAPI FXVec3f normal(const FXVec3f& a,const FXVec3f& b,const FXVec3f& c,const FXVec3f& d);
 
-/// Normalize vector
-extern FXAPI FXVec3f normalize(const FXVec3f& v);
-
 /// Return vector orthogonal to v
 extern FXAPI FXVec3f orthogonal(const FXVec3f& v);
 
@@ -217,6 +229,10 @@ extern FXAPI FXVec3f rotate(const FXVec3f& vector,const FXVec3f& axis,FXfloat an
 
 /// Compute distance of point pnt from ray from org along direction dir
 extern FXAPI FXfloat distFromRay(const FXVec3f& org,const FXVec3f& dir,const FXVec3f& pnt);
+
+/// Return x of closest point P (pa+x*da) along ray A (pa,da) to other ray B (pb,db).
+/// Return DBL_MAX if no such point.
+extern FXAPI FXfloat closestAlongRay(const FXVec3f& pa,const FXVec3f& da,const FXVec3f& pb,const FXVec3f& db);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec3f& v);

@@ -3,7 +3,7 @@
 *                   FOX Desktop Setup - FOX Desktop Enviroment                  *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2004,2024 Sander Jansen.  All Rights Reserved.                  *
+* Copyright (C) 2004,2025 Sander Jansen.  All Rights Reserved.                  *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -464,6 +464,12 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,nullptr
   FXSpinner* spinner14=new FXSpinner(matrix3,3,&target_barsize,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
   spinner14->setRange(5,100);
 
+  // Maximum colors spinner
+  new FXLabel(matrix3,tr("Screen Resolution"),nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
+  FXSpinner* spinner15=new FXSpinner(matrix3,3,&target_screenres,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK);
+  spinner15->setRange(1,1000);
+
+
   // Xft hint style
   new FXLabel(matrix3,tr("Xft font hint style"),nullptr,LAYOUT_RIGHT|LAYOUT_CENTER_Y);
   FXListBox* list2=new FXListBox(matrix3,&target_hintstyle,FXDataTarget::ID_VALUE,FRAME_SUNKEN|FRAME_THICK|LAYOUT_TOP);
@@ -565,6 +571,7 @@ FXDesktopSetup::FXDesktopSetup(FXApp *ap):FXMainWindow(ap,FXString::null,nullptr
   target_wheellines.connect(wheelLines);
   target_barsize.connect(barSize);
   target_maxcolors.connect(maxcolors);
+  target_screenres.connect(screenres);
   target_gamma.connect(gamma);
   target_subpixel.connect(subpixel);
   target_hintstyle.connect(hintstyle);
@@ -1274,6 +1281,7 @@ FXbool FXDesktopSetup::readSettingsFile(const FXString& file){
     // Display tweaks
     maxcolors=desktopsettings.readUIntEntry("SETTINGS","maxcolors",125);
     gamma=desktopsettings.readRealEntry("SETTINGS","displaygamma",1.0);
+    screenres=desktopsettings.readUIntEntry("SETTINGS","screenres",100);
 
     // Xft font sub-pixel rendering
     const FXchar *rgba=desktopsettings.readStringEntry("Xft","rgba","unknown");
@@ -1346,6 +1354,7 @@ FXbool FXDesktopSetup::writeSettingsFile(const FXString& file){
   // Display tweaks
   desktopsettings.writeUIntEntry("SETTINGS","maxcolors",maxcolors);
   desktopsettings.writeRealEntry("SETTINGS","displaygamma",gamma);
+  desktopsettings.writeUIntEntry("SETTINGS","screenres",screenres);
 
   // Xft font sub-pixel rendering
   const FXchar *rgba="unknown";

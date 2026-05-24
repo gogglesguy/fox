@@ -3,7 +3,7 @@
 *                    D i r e c t o r y   E n u m e r a t o r                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -54,16 +54,32 @@ public:
   /// Construct directory enumerator open on path
   FXDir(const FXString& path);
 
-  /// Open directory to path, return true if ok.
+  /**
+  * Open directory to path, return true if ok.
+  */
   FXbool open(const FXString& path);
 
-  /// Returns true if the directory is open
+  /**
+  * Returns true if the directory is open.
+  */
   FXbool isOpen() const;
 
-  /// Go to next directory entry and return its name
+  /**
+  * Go to next directory entry and return its name.
+  */
   FXbool next(FXString& name);
 
-  /// Close directory
+  /**
+  * Go to next directory entry and return its name and file-mode flags.
+  * If mode flag is zero, FXStat::statFile() will be needed to obtain
+  * file type and permissions.  Otherwise, mode flag will indicate file
+  * type and permissions on Windows, but only file type on Linux.
+  */
+  FXbool next(FXString& name,FXuint& mode);
+
+  /**
+  * Close directory.
+  */
   void close();
 
 
@@ -91,10 +107,18 @@ public:
   */
   static FXint listDrives(FXString*& drivelist);
 
+  /**
+  * List connected file shares.
+  * On Linux, this just returns "/".
+  * On Windows, this returns a list of connected network drives.
+  */
+  static FXint listShares(FXString*& sharelist);
 
   /// Create a directories recursively
   static FXbool createDirectories(const FXString& path,FXuint perm=FXIO::AllFull);
 
+  /// Check for sub-directories
+  static FXbool hasSubDirectories(const FXString& path);
 
   /// Destructor
  ~FXDir();

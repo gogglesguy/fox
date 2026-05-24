@@ -161,7 +161,7 @@ public:
   FXbool continueProcessing();
 
   /// Called by visitor to deposit new search result
-  void appendSearchResult(const FXString& relpath,const FXString& text,FXint lineno,FXint column);
+  void appendSearchResult(const FXString& relpath,const FXString& hit,FXint lineno,FXint column);
 
   /// Clear search results
   void clearSearchResults();

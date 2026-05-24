@@ -3,7 +3,7 @@
 *                         M e s s a g e   B o x e s                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -38,7 +38,9 @@ enum {
   MBOX_QUIT_SAVE_CANCEL           = 0x60000000, /// Message box has QUIT, SAVE, and CANCEL buttons
   MBOX_SKIP_SKIPALL_CANCEL        = 0x70000000, /// Message box has SKIP, SKIP ALL, and CANCEL buttons
   MBOX_SAVE_CANCEL_DONTSAVE       = 0x80000000, /// Message box has DON'T SAVE,CANCEL and SAVE buttons
-  MBOX_YES_YESALL_NO_NOALL_CANCEL = 0xA0000000  /// Message box has YES, YES ALL, NO, NO ALL, and CANCEL buttons
+  MBOX_YES_YESALL_NO_NOALL_CANCEL = 0xA0000000, /// Message box has YES, YES ALL, NO, NO ALL, and CANCEL buttons
+  MBOX_YES_YESALL_NO              = 0xB0000000, /// Message box has YES, YES ALL, NO buttons
+  MBOX_YES_NO_NOALL               = 0xC0000000  /// Message box has YES, NO, NO ALL buttons
   };
 
 

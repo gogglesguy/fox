@@ -3,7 +3,7 @@
 *       D o u b l e - P r e c i s i o n   2 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -179,8 +179,20 @@ static inline FXdouble min(const FXVec2d& a){ return Math::fmin(a.x,a.y); }
 /// Linearly interpolate
 static inline FXVec2d lerp(const FXVec2d& u,const FXVec2d& v,FXdouble f){return (v-u)*f+u;}
 
-/// Normalize vector
-extern FXAPI FXVec2d normalize(const FXVec2d& v);
+/// Normalize non-zero vector
+static inline FXVec2d normalize(const FXVec2d& v){ return v*Math::rsqrt(v.length2()); }
+
+/// Normalize vector incrementally; assume |v| is approximately 1 already
+static inline FXVec2d fastnormalize(const FXVec2d& v){ return v*((3.0-v.length2())*0.5); }
+
+/// Clip vector to box -xlo...xhi and -ylo...yhi (xlo<0, ylo<0, 0<xhi, 0<yhi).
+extern FXAPI FXVec2d clip(const FXVec2d& v,FXdouble xlo,FXdouble xhi,FXdouble ylo,FXdouble yhi);
+
+/// Clip vector to box -xmx...xmx and -ymx...ymx (0<xmx, 0<ymx).
+extern FXAPI FXVec2d clip(const FXVec2d& v,FXdouble xmx,FXdouble ymx);
+
+/// Clip vector to box -mx...mx (0<mx).
+extern FXAPI FXVec2d clip(const FXVec2d& v,FXdouble mx);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec2d& v);

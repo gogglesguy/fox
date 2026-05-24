@@ -3,7 +3,7 @@
 *                       M e n u    B u t t o n    O b j e c t                   *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -443,10 +443,9 @@ long FXMenuButton::onCmdUnpost(FXObject*,FXSelector,void*){
 
 // Handle repaint
 long FXMenuButton::onPaint(FXObject*,FXSelector,void* ptr){
+  FXDCWindow dc(this,(FXEvent*)ptr);
   FXint tw=0,th=0,iw=0,ih=0,tx,ty,ix,iy;
-  FXEvent *ev=(FXEvent*)ptr;
   FXPoint points[3];
-  FXDCWindow dc(this,ev);
 
   // Got a border at all?
   if(options&(FRAME_RAISED|FRAME_SUNKEN)){

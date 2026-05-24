@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   4 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -192,6 +192,12 @@ static inline FXfloat min(const FXVec4f& a){ return Math::fmin(Math::fmin(a.x,a.
 /// Linearly interpolate
 static inline FXVec4f lerp(const FXVec4f& u,const FXVec4f& v,FXfloat f){return (v-u)*f+u;}
 
+/// Normalize non-zero vector
+static inline FXVec4f normalize(const FXVec4f& v){ return v*Math::rsqrt(v.length2()); }
+
+/// Normalize vector incrementally; assume |v| is approximately 1 already
+static inline FXVec4f fastnormalize(const FXVec4f& v){ return v*((3.0f-v.length2())*0.5f); }
+
 /// Compute normalized plane equation ax+by+cz+d=0
 extern FXAPI FXVec4f plane(const FXVec4f& vec);
 
@@ -209,9 +215,6 @@ extern FXAPI FXColor colorFromVec4f(const FXVec4f& vec);
 
 /// Convert color to vector
 extern FXAPI FXVec4f colorToVec4f(FXColor clr);
-
-/// Normalize vector
-extern FXAPI FXVec4f normalize(const FXVec4f& v);
 
 /// Save vector to a stream
 extern FXAPI FXStream& operator<<(FXStream& store,const FXVec4f& v);

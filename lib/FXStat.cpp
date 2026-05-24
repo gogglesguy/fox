@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -30,6 +30,9 @@
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
+#include "FXAutoThreadStorageKey.h"
+#include "FXThread.h"
+#include "FXPerformance.h"
 #include "FXIO.h"
 #include "FXPath.h"
 #include "FXStat.h"
@@ -205,9 +208,11 @@ static inline FILETIME fxwintime(FXTime ut){
 
 #endif
 
+PERFORMANCE_RECORDER(FXStat_statFile);
 
 // Get statistics of given file
 FXbool FXStat::statFile(const FXString& file,FXStat& info){
+  PERFORMANCE_COUNTER(FXStat_statFile);
   FXbool result=false;
   info.modeFlags=0;
   info.userNumber=0;
@@ -240,6 +245,9 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
           }
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
           info.modeFlags&=~FXIO::AllWrite;
+          }
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){ 
+          info.modeFlags|=FXIO::Device;
           }
         if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)){
           info.modeFlags&=~FXIO::AllExec;
@@ -274,6 +282,9 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
           }
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
           info.modeFlags&=~FXIO::AllWrite;
+          }
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
+          info.modeFlags|=FXIO::Device;
           }
         if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)){
           info.modeFlags&=~FXIO::AllExec;
@@ -329,9 +340,11 @@ FXbool FXStat::statFile(const FXString& file,FXStat& info){
   return result;
   }
 
+PERFORMANCE_RECORDER(FXStat_statLink);
 
 // Get statistice of the linked file
 FXbool FXStat::statLink(const FXString& file,FXStat& info){
+  PERFORMANCE_COUNTER(FXStat_statLink);
   FXbool result=false;
   info.modeFlags=0;
   info.userNumber=0;
@@ -364,6 +377,9 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
           }
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
           info.modeFlags&=~FXIO::AllWrite;
+          }
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
+          info.modeFlags|=FXIO::Device;
           }
         if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)){
           info.modeFlags&=~FXIO::AllExec;
@@ -398,6 +414,9 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
           }
         if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
           info.modeFlags&=~FXIO::AllWrite;
+          }
+        if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
+          info.modeFlags|=FXIO::Device;
           }
         if((info.modeFlags&FXIO::File) && !FXPath::hasExecExtension(file)){
           info.modeFlags&=~FXIO::AllExec;
@@ -454,8 +473,11 @@ FXbool FXStat::statLink(const FXString& file,FXStat& info){
   }
 
 
+PERFORMANCE_RECORDER(FXStat_stat);
+
 // Get statistice of the already open file
 FXbool FXStat::stat(const FXFile& file,FXStat& info){
+  PERFORMANCE_COUNTER(FXStat_stat);
   info.modeFlags=0;
   info.userNumber=0;
   info.groupNumber=0;
@@ -481,6 +503,9 @@ FXbool FXStat::stat(const FXFile& file,FXStat& info){
       }
     if(data.dwFileAttributes&FILE_ATTRIBUTE_READONLY){
       info.modeFlags&=~FXIO::AllWrite;
+      }
+    if(data.dwFileAttributes&FILE_ATTRIBUTE_DEVICE){
+      info.modeFlags|=FXIO::Device;
       }
     info.userNumber=0;
     info.groupNumber=0;
@@ -648,8 +673,11 @@ FXTime FXStat::modified(const FXString& file){
   }
 
 
+PERFORMANCE_RECORDER(FXStat_modified);
+
 // Change tiome when file was last modified
 FXbool FXStat::modified(const FXString& file,FXTime ns){
+  PERFORMANCE_COUNTER(FXStat_modified);
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -702,8 +730,11 @@ FXTime FXStat::accessed(const FXString& file){
   }
 
 
+PERFORMANCE_RECORDER(FXStat_accessed);
+
 // Change tiome when file was last accessed
 FXbool FXStat::accessed(const FXString& file,FXTime ns){
+  PERFORMANCE_COUNTER(FXStat_accessed);
   if(!file.empty()){
 #ifdef WIN32
 #ifdef UNICODE
@@ -984,8 +1015,11 @@ FXbool FXStat::isSame(const FXString& file1,const FXString& file2){
   }
 
 
+PERFORMANCE_RECORDER(FXStat_getTotalDiskSpace);
+
 // Obtain total amount of space on disk
 FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
+  PERFORMANCE_COUNTER(FXStat_getTotalDiskSpace);
 #ifdef WIN32
 #ifdef UNICODE
   FXnchar unifile[MAXPATHLEN];
@@ -1011,8 +1045,11 @@ FXbool FXStat::getTotalDiskSpace(const FXString& path,FXulong& space){
   }
 
 
+PERFORMANCE_RECORDER(FXStat_getAvailableDiskSpace);
+
 // Obtain available amount of space on disk
 FXbool FXStat::getAvailableDiskSpace(const FXString& path,FXulong& space){
+  PERFORMANCE_COUNTER(FXStat_getAvailableDiskSpace);
 #ifdef WIN32
 #ifdef UNICODE
   FXnchar unifile[MAXPATHLEN];

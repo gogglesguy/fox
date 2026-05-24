@@ -3,7 +3,7 @@
 *                           S t r i n g   O b j e c t                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -279,8 +279,7 @@ FXwchar FXString::wcprv(FXint& p) const {
 
 // Increment byte offset by one utf8 character
 FXint FXString::inc(FXint p) const {
-  FXASSERT(0<=p && p<length());
-  return (isUTF8(str[++p]) || isUTF8(str[++p]) || isUTF8(str[++p]) || ++p), p;
+  return (++p>=length() || isUTF8(str[p]) || ++p>=length() || isUTF8(str[p]) || ++p>=length() || isUTF8(str[p]) || ++p), p;
   }
 
 
@@ -293,8 +292,7 @@ FXint FXString::inc(FXint p,FXint n) const {
 
 // Decrement byte offset by one utf8 character
 FXint FXString::dec(FXint p) const {
-  FXASSERT(0<p && p<=length());
-  return (isUTF8(str[--p]) || isUTF8(str[--p]) || isUTF8(str[--p]) || --p), p;
+  return (--p<0 || isUTF8(str[p]) || --p<0 || isUTF8(str[p]) || --p<0 || isUTF8(str[p]) || --p), p;
   }
 
 
@@ -2228,8 +2226,8 @@ FXbool FXString::shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FX
 
 /*******************************************************************************/
 
-// Escape special characters, and optionally enclose with left and right quotes
-// and escape utf8 as \xHH if flag=1, or as \uHHHH if flag=2.
+// Escape special characters and optionally, enclose with left and right quotes.
+// Pass utf8 through if flag=0, escape it as \xHH if flag=1, and as \uHHHH if flag=2.
 // UTF8 characters may be encoded as hex (in the form of: \xHH), or as Unicode
 // escape sequences (of the form \uHHHH).  Code points exceeding 16-bits will be
 // encoded as hex-encoded surrogate-pairs (\uHHHH\uHHHH) in Unicode escape mode.
@@ -2727,18 +2725,10 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
       switch((c=str[p++])){
         case 'u':                       // Unicode escape
           c=0;
-          if(Ascii::isHexDigit(str[p])){
-            c=(c<<4)+Ascii::digitValue(str[p++]);
-            if(Ascii::isHexDigit(str[p])){
-              c=(c<<4)+Ascii::digitValue(str[p++]);
-              if(Ascii::isHexDigit(str[p])){
-                c=(c<<4)+Ascii::digitValue(str[p++]);
-                if(Ascii::isHexDigit(str[p])){
-                  c=(c<<4)+Ascii::digitValue(str[p++]);
-                  }
-                }
-              }
-            }
+          if(Ascii::isHexDigit(str[p])){ c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]); }}}}
           if(leadUTF16(c)) continue;
           if(followUTF16(c)){
             if(!leadUTF16(w)) continue;
@@ -2746,11 +2736,21 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
             }
           q+=wc2utf(c);
           continue;
+        case 'U':                       // Unicode escape
+          c=0;
+          if(Ascii::isHexDigit(str[p])){ c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]); }}}}}}}}
+          q+=wc2utf(c);
+          continue;
         case 'x':                       // Hex escape
-          if(Ascii::isHexDigit(str[p])){
-            p++;
-            if(Ascii::isHexDigit(str[p])) p++;
-            }
+          if(Ascii::isHexDigit(str[p])){ p++;
+          if(Ascii::isHexDigit(str[p])){ p++; }}
           q++;
           continue;
         case '\r':                      // End-of-line continuation
@@ -2800,18 +2800,11 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
     if(c=='\\' && p<num){               // Escape sequence
       switch((c=str[p++])){
         case 'u':                       // Unicode escape
-          if(Ascii::isHexDigit(str[p])){
-            c=Ascii::digitValue(str[p++]);
-            if(Ascii::isHexDigit(str[p])){
-              c=(c<<4)+Ascii::digitValue(str[p++]);
-              if(Ascii::isHexDigit(str[p])){
-                c=(c<<4)+Ascii::digitValue(str[p++]);
-                if(Ascii::isHexDigit(str[p])){
-                  c=(c<<4)+Ascii::digitValue(str[p++]);
-                  }
-                }
-              }
-            }
+          c=0;
+          if(Ascii::isHexDigit(str[p])){ c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]); }}}}
           if(leadUTF16(c)) continue;
           if(followUTF16(c)){
             if(!leadUTF16(w)) continue;
@@ -2819,13 +2812,22 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
             }
           q+=wc2utf(&result[q],c);
           continue;
+        case 'U':                       // Unicode escape
+          c=0;
+          if(Ascii::isHexDigit(str[p])){ c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]); }}}}}}}}
+          q+=wc2utf(&result[q],c);
+          continue;
         case 'x':                       // Hex escape
-          if(Ascii::isHexDigit(str[p])){
-            c=Ascii::digitValue(str[p++]);
-            if(Ascii::isHexDigit(str[p])){
-              c=(c<<4)+Ascii::digitValue(str[p++]);
-              }
-            }
+          c=0;
+          if(Ascii::isHexDigit(str[p])){ c=Ascii::digitValue(str[p++]);
+          if(Ascii::isHexDigit(str[p])){ c=(c<<4)+Ascii::digitValue(str[p++]); }}
           result[q++]=c;
           continue;
         case '\r':                      // End-of-line continuation

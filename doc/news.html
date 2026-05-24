@@ -16,6 +16,59 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+November 19 - FOX DEVELOPMENT 1.7.87
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Updated implementation of __sscanf(), __strtod(), __strtof() using Lemire's algorithm.</li>
+<li>New closestAlongRay() API in FXVec3f, FXVec3d calculates closest point bewteen two 3D line segments.</li>
+<li>Fast, square-rootless and division-less approximate vector fastnormalize(); plus, inlined normalize().</li>
+<li>FXText drawing fix that will remove drawing limitations.</li>
+<li>Inlined character classifications in fxascii.h.</li>
+<li>Experimental FXPathBox replacing FXDirBox in FXFileDialog.</li>
+<li>FXFileDialog not listing ".." anymore; always caused problems.</li>
+<li>FXString wide-character unicode escaping sequences interpreted "\Uxxxxxxxx".</li>
+<li>Out-of-bounds read in FXString fixed.</li>
+<li>Super-accurate, branch-free setAxes() API in Quaternion classes.</li>
+<li>Quaternion setAxisAngle() API replaced by setRotate().</li>
+<li>Simplified (faster) setXRotate(), setYRotate(), setZRotate() APIs on Quaternion for
+quicker setup rotations about principle axes.</li>
+<li>FXPath improvements for dealing with Windows pathname idiosyncracies.</li>
+<li>FXDir listing files in a directory can return some extra information w/o need for a call
+to FXStat API, on filesystems where this is supported.</li>
+<li>FXPath pathname conversion from "foreign" to "local" operating system conventions.</li>
+<li>WIN32_LEAN_AND_MEAN prior to including windows.h.</li>
+<li>Slightly more accurate conversions between FXVec4f, FXVec4d and FXColor.</li>
+<li>List filename before context, and folder at the end in Adie FindInFiles.</li>
+<li>FXExpression can now have constants as well as variables.</li>
+<li>FXRex quick check for empty string.</li>
+<li>Adie text editor syntax pattern for YAML added.</li>
+<li>Syntax highlighting for Rust programming language added.</li>
+<li>When file being editor by Adie is changed outside of editor, or removed, 
+a message is popped.  A new option can now be used to avoid future popups if
+some process repeatedly changes the file.  Also, when exiting Adie, if file
+was changed externally, you get one more chance to save text buffer contents.</li>
+<li>Added options to FXMessageBox.</li>
+<li>ControlPanel now has control to set display resolution (dpi).</li>
+<li>Fallback code for 64-bit leading zero count, trailing zero count on Windows.</li>
+<li>Ability to parse hexadecimal floats added.</li>
+</ul>
+When compiling on Windows, make sure a registry setting:
+<pre>
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem]
+</pre>
+is set to:
+<pre>
+"LongPathsEnabled"=dword:00000001
+</pre>
+it may be set to 0 by default, and this would cause VisualStudio's MSBuild to report path 
+length errors.
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 May 18 - FOX DEVELOPMENT 1.7.86
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>

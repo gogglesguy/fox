@@ -3,7 +3,7 @@
 *                                 Test Group Box                                *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 #include <stdio.h>
@@ -492,7 +492,7 @@ static const FXchar sourcefiles[]="All Files (*)\nC++ Source Files (*.cpp,*.cxx,
 
 // Open any file
 long GroupWindow::onCmdFileDlgAny(FXObject*,FXSelector,void*){
-  FXString file=FXFileDialog::getSaveFilename(this,"Save file",FXPath::absolute(FXSystem::getHomeDirectory(),"newfile.txt"),sourcefiles,1);
+  FXString file=FXFileDialog::getSaveFilename(this,"Save to file",FXPath::absolute(FXSystem::getHomeDirectory(),"newfile.txt"),sourcefiles,1);
   fxmessage("File=\"%s\"\n",file.text());
   return 1;
   }
@@ -500,7 +500,7 @@ long GroupWindow::onCmdFileDlgAny(FXObject*,FXSelector,void*){
 
 // Open existing file
 long GroupWindow::onCmdFileDlgExisting(FXObject*,FXSelector,void*){
-  FXString file=FXFileDialog::getOpenFilename(this,"Open file","groupbox.cpp",sourcefiles,1);
+  FXString file=FXFileDialog::getOpenFilename(this,"Open existing file","groupbox.cpp",sourcefiles,1);
   fxmessage("File=\"%s\"\n",file.text());
   return 1;
   }

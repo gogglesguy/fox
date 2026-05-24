@@ -3,7 +3,7 @@
 *                  F i l e   S e l e c t i o n   W i d g e t                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -72,6 +72,7 @@
 #include "FXComboBox.h"
 #include "FXTreeListBox.h"
 #include "FXDirBox.h"
+#include "FXPathBox.h"
 #include "FXHeader.h"
 #include "FXIconList.h"
 #include "FXFileList.h"
@@ -149,7 +150,6 @@
 */
 
 
-#define FILELISTMASK  (ICONLIST_EXTENDEDSELECT|ICONLIST_SINGLESELECT|ICONLIST_BROWSESELECT|ICONLIST_MULTIPLESELECT)
 #define FILESTYLEMASK (ICONLIST_DETAILED|ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS|ICONLIST_ROWS|ICONLIST_COLUMNS|ICONLIST_AUTOSIZE)
 
 using namespace FX;
@@ -169,7 +169,6 @@ FXDEFMAP(FXFileSelector) FXFileSelectorMap[]={
   FXMAPFUNC(SEL_RIGHTBUTTONRELEASE,FXFileSelector::ID_FILELIST,FXFileSelector::onPopupMenu),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_DIRECTORY_UP,FXFileSelector::onCmdDirectoryUp),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_DIRECTORY_UP,FXFileSelector::onUpdDirectoryUp),
-  FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_DIRTREE,FXFileSelector::onUpdDirTree),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_DIRTREE,FXFileSelector::onCmdDirTree),
   FXMAPFUNC(SEL_COMMAND,FXFileSelector::ID_HOME,FXFileSelector::onCmdHome),
   FXMAPFUNC(SEL_UPDATE,FXFileSelector::ID_HOME,FXFileSelector::onUpdNavigable),
@@ -202,6 +201,60 @@ FXIMPLEMENT(FXFileSelector,FXPacker,FXFileSelectorMap,ARRAYNUMBER(FXFileSelector
 
 /*******************************************************************************/
 
+#if 0
+const FXchar *const codecNames[]={
+  "ISO-8859-1",         // "iso8859-1","ISO-8859-1","ISO_8859-1","latin1","CP819","iso-ir-100","IBM819","l1","csISOLatin1"
+  "ISO-8859-2",         // "iso8859-2","ISO-8859-2","ISO_8859-2","latin2","iso-ir-101","l2","csISOLatin2"
+  "ISO-8859-3",         // "iso8859-3","ISO-8859-3","ISO_8859-3","latin3","iso-ir-109","l3","csISOLatin3"
+  "ISO-8859-4",         // "iso8859-4","ISO-8859-4","ISO_8859-4","latin4","iso-ir-110","l4","csISOLatin4"
+  "ISO-8859-5",         // "iso8859-5","ISO-8859-5","ISO_8859-5","cyrillic","iso-ir-144","csISOLatinCyrillic"
+  "ISO-8859-6",         // "iso8859-6","ISO-8859-6","ISO_8859-6","arabic","iso-ir-127","ECMA-114","ASMO-708","csISOLatinArabic"
+  "ISO-8859-7",         // "iso8859-7","ISO-8859-7","ISO_8859-7","greek","iso-ir-126","greek8","ELOT_928","ECMA-118"
+  "ISO-8859-8",         // "iso8859-8","ISO-8859-8","ISO_8859-8","hebrew","iso-ir-138","csISOLatinHebrew"
+  "ISO-8859-9",         // "iso8859-9","ISO-8859-9","ISO_8859-9","latin5","iso-ir-148","l5","csISOLatin5"
+  "ISO-8859-10",        // "iso8859-10","ISO-8859-10","ISO_8859-10","latin6","iso-ir-157","csISOLatin6","l6"
+  "ISO-8859-11",        // "iso8859-11","ISO-8859-11","ISO_8859-11"
+  "ISO-8859-13",        // "iso8859-13","ISO-8859-13","ISO_8859-13"
+  "ISO-8859-14",        // "iso8859-14","ISO-8859-14","ISO_8859-14"
+  "ISO-8859-15",        // "iso8859-15","ISO-8859-15","ISO_8859-15","Latin-9","latin9"
+  "ISO-8859-16",        // "iso8859-16","ISO-8859-16","ISO_8859-16","latin10","iso-ir-226","l10"
+  "IBM437",             // "microsoft-cp437","IBM437","cp437","csPC8CodePage437"
+  "IBM850",             // "microsoft-cp850","IBM850","cp850","850","csPC850Multilingual"
+  "IBM852",             // "microsoft-cp852","IBM852","cp852","852","csPCp852","microsoft-cp852"
+  "IBM855",             // "microsoft-cp855","IBM855","cp855","855","csIBM855"
+  "IBM856",             // "microsoft-cp856","IBM856","cp856","856","csIBM856","microsoft-cp856"
+  "IBM857",             // "microsoft-cp857","IBM857","cp857","857","csIBM857"
+  "IBM860",             // "microsoft-cp860","IBM860","cp860","860","csIBM860"
+  "IBM861",             // "microsoft-cp861","IBM861","cp861","861","cp-is","csIBM861"
+  "IBM862",             // "microsoft-cp862","IBM862","cp862","862","csPC862LatinHebrew"
+  "IBM863",             // "microsoft-cp863","IBM863","cp863","863","csIBM863"
+  "IBM864",             // "microsoft-cp864","IBM864","cp864","csIBM864"
+  "IBM865",             // "microsoft-cp865","IBM865","cp865","865","csIBM865"
+  "IBM866",             // "microsoft-cp866","IBM866","cp866","866","csIBM866"
+  "IBM874",             // "microsoft-cp874","IBM874","cp874","874"
+  "windows-1250",       // "microsoft-cp1250","windows-1250","cp1250","latin2"
+  "windows-1251",       // "microsoft-cp1251","windows-1251","cp1251"
+  "windows-1252",       // "microsoft-cp1252","windows-1252","cp1252"
+  "windows-1253",       // "microsoft-cp1253","windows-1253","cp1253"
+  "windows-1254",       // "microsoft-cp1254","windows-1254","cp1254"
+  "windows-1255",       // "microsoft-cp1255","windows-1255","cp1255"
+  "windows-1256",       // "microsoft-cp1256","windows-1256","cp1256".
+  "windows-1257",       // "microsoft-cp1257","windows-1257","cp1257","microsoft-cp1257"
+  "windows-1258",       // "microsoft-cp1258","windows-1258","cp1258"
+  "KOI8-R",             // "koi8-r","KOI8-R"
+  "MBCS",               // "MBCS"
+  "UTF-8",              // "UTF-8"
+  "UTF-16BE",           // "iso10646-1","UTF-16BE"
+  "UTF-16LE",           // "UTF-16LE"
+  "UTF-16",             // "UTF-16"
+  "UTF-32BE",           // "UTF-32BE
+  "UTF-32LE",           // "UTF-32LE"
+  "UTF-32",             // "UTF-32"
+  nullptr
+  };
+#endif
+
+
 // Separator item
 FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,FXint y,FXint w,FXint h):FXPacker(p,opts,x,y,w,h,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,DEFAULT_SPACING,8,8),bookmarks(p->getApp(),"Visited Directories"),selectmode(SELECTFILE_ANY){
   FXAccelTable *table=getShell()->getAccelTable();
@@ -209,19 +262,29 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   message=sel;
   navbuttons=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0, 0,0);
   entryblock=new FXMatrix(this,3,MATRIX_BY_COLUMNS|LAYOUT_SIDE_BOTTOM|LAYOUT_FILL_X,0,0,0,0, 0,0,0,0);
+
+/*
+  new FXLabel(entryblock,tr("&Encoding:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  encodinglist=new FXComboBox(entryblock,10,nullptr,0,COMBOBOX_STATIC|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
+  encodinglist->setNumVisible(8);
+  encodinglist->fillItems(codecNames);
+  new FXFrame(entryblock,FRAME_NONE,0,0,0,0,20,20);
+*/
   new FXLabel(entryblock,tr("&File Name:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   filename=new FXTextField(entryblock,25,this,ID_ACCEPT,TEXTFIELD_ENTER_ONLY|LAYOUT_FILL_COLUMN|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
   new FXButton(entryblock,tr("&OK"),nullptr,this,ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X,0,0,0,0,20,20);
   accept=new FXButton(navbuttons,FXString::null,nullptr,nullptr,0,LAYOUT_FIX_X|LAYOUT_FIX_Y|LAYOUT_FIX_WIDTH|LAYOUT_FIX_HEIGHT,0,0,0,0, 0,0,0,0);
   accept->hide();
+
   new FXLabel(entryblock,tr("File F&ilter:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   FXHorizontalFrame *filterframe=new FXHorizontalFrame(entryblock,LAYOUT_FILL_COLUMN|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 0,0,0,0);
   filefilter=new FXComboBox(filterframe,10,this,ID_FILEFILTER,COMBOBOX_STATIC|LAYOUT_FILL_X|FRAME_SUNKEN|FRAME_THICK);
   filefilter->setNumVisible(4);
   readonly=new FXCheckButton(filterframe,tr("Read Only"),nullptr,0,ICON_BEFORE_TEXT|JUSTIFY_LEFT|LAYOUT_CENTER_Y);
   cancel=new FXButton(entryblock,tr("&Cancel"),nullptr,nullptr,0,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_FILL_X,0,0,0,0,20,20);
+
   fileboxframe=new FXHorizontalFrame(this,LAYOUT_SIDE_TOP|LAYOUT_FILL_X|LAYOUT_FILL_Y|FRAME_SUNKEN|FRAME_THICK,0,0,0,0,0,0,0,0);
-  filebox=new FXFileList(fileboxframe,this,ID_FILELIST,ICONLIST_MINI_ICONS|ICONLIST_BROWSESELECT|ICONLIST_AUTOSIZE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  filebox=new FXFileList(fileboxframe,this,ID_FILELIST,FILELIST_NO_PARENT|ICONLIST_MINI_ICONS|ICONLIST_BROWSESELECT|ICONLIST_AUTOSIZE|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   filebox->horizontalScrollBar()->setWheelLines(1);
   filebox->setDraggableFiles(false);
   filebox->setFocus();
@@ -245,9 +308,14 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
   moveicon=new FXGIFIcon(getApp(),filemove);
   linkicon=new FXGIFIcon(getApp(),filelink);
   deleteicon=new FXGIFIcon(getApp(),filedelete);
+#if defined(PATHBOX)
+  dirbox=new FXPathBox(navbuttons,this,ID_DIRTREE,PATHBOX_NO_OWN_ASSOC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y); //,0,0,0,0,1,1,1,1);
+  dirbox->setAssociations(filebox->getAssociations(),false);    // Shared file associations
+#else
   dirbox=new FXDirBox(navbuttons,this,ID_DIRTREE,DIRBOX_NO_OWN_ASSOC|FRAME_SUNKEN|FRAME_THICK|LAYOUT_FILL_X|LAYOUT_CENTER_Y,0,0,0,0,1,1,1,1);
   dirbox->setNumVisible(5);
   dirbox->setAssociations(filebox->getAssociations(),false);    // Shared file associations
+#endif
   bookmarkmenu=new FXMenuPane(this,POPUP_SHRINKWRAP);
   new FXMenuCommand(bookmarkmenu,tr("&Set bookmark\t\tBookmark current directory."),bookaddicon,this,ID_BOOKMARK);
   new FXMenuCommand(bookmarkmenu,tr("&Unset bookmark\t\tRemove current directory bookmark."),bookdelicon,this,ID_UNBOOKMARK);
@@ -305,7 +373,7 @@ FXFileSelector::FXFileSelector(FXComposite *p,FXObject* tgt,FXSelector sel,FXuin
     table->addAccel(MKUINT(KEY_i,ALTMASK),filebox,FXSEL(SEL_COMMAND,FXFileList::ID_TOGGLE_IMAGES));
     }
 
-  // Now use up to 15 bookmarked directories
+  // Now use up to 20 bookmarked directories
   bookmarks.setMaxFiles(20);
   bookmarks.setTarget(this);
   bookmarks.setSelector(ID_VISIT);
@@ -448,7 +516,7 @@ long FXFileSelector::onCmdItemSelected(FXObject*,FXSelector,void* ptr){
 
 
 // Change in items which are selected
-long FXFileSelector::onCmdItemDeselected(FXObject*,FXSelector,void*){
+long FXFileSelector::onCmdItemDeselected(FXObject*,FXSelector,void* ptr){
   FXString text;
   if(selectmode==SELECTFILE_MULTIPLE){
     for(FXint i=0; i<filebox->getNumItems(); i++){
@@ -586,9 +654,9 @@ long FXFileSelector::onCmdAccept(FXObject*,FXSelector,void*){
 // a quick jump back into the original directory in case we went up too far.
 long FXFileSelector::onCmdDirectoryUp(FXObject*,FXSelector,void*){
   if(allowNavigation() && !FXPath::isTopDirectory(getDirectory())){
-    FXString dir(getDirectory());
-    setDirectory(FXPath::upLevel(dir));
-    filebox->setCurrentFile(dir);
+    FXString path=getDirectory();
+    filebox->setCurrentFile(path,true);
+    dirbox->setDirectory(filebox->getDirectory());
     return 1;
     }
   getApp()->beep();
@@ -662,21 +730,19 @@ long FXFileSelector::onCmdUnBookmark(FXObject*,FXSelector,void*){
 
 
 // Switched directories using directory tree
-long FXFileSelector::onUpdDirTree(FXObject*,FXSelector,void*){
-  dirbox->setDirectory(filebox->getDirectory());
-  return 1;
-  }
-
-
-// Switched directories using directory tree
 long FXFileSelector::onCmdDirTree(FXObject*,FXSelector,void* ptr){
   if(allowNavigation()){
+#if defined(PATHBOX)
+//    filebox->setDirectory(dirbox->getItemText((FXint)(FXival)ptr),true);
     filebox->setDirectory((FXchar*)ptr,true);
+#else
+    filebox->setDirectory((FXchar*)ptr,true);
+#endif
     if(selectmode==SELECTFILE_DIRECTORY) filename->setText(FXString::null);
     }
-  else{
-    dirbox->setDirectory(filebox->getDirectory());
-    }
+//  else{
+//    dirbox->setDirectory(filebox->getDirectory());
+//    }
   return 1;
   }
 
@@ -695,7 +761,9 @@ long FXFileSelector::onCmdNew(FXObject*,FXSelector,void*){
       FXMessageBox::error(this,MBOX_OK,tr("Cannot Create"),tr("Cannot create directory %s.\n"),dirname.text());
       return 1;
       }
-    setDirectory(dirname);
+    if(allowNavigation()){
+      setDirectory(dirname);
+      }
     }
   return 1;
   }
@@ -1012,6 +1080,14 @@ long FXFileSelector::onCmdFilter(FXObject*,FXSelector,void* ptr){
 
 // Set directory
 void FXFileSelector::setDirectory(const FXString& path){
+  if(filebox->setDirectory(path,true)){
+    dirbox->setDirectory(filebox->getDirectory());
+    }
+  }
+
+/*
+// Set directory
+void FXFileSelector::setDirectory(const FXString& path){
   FXString abspath(FXPath::absolute(path));
   filebox->setDirectory(abspath,true);
   dirbox->setDirectory(filebox->getDirectory());
@@ -1019,7 +1095,7 @@ void FXFileSelector::setDirectory(const FXString& path){
     filename->setText(FXString::null);
     }
   }
-
+*/
 
 // Get directory
 FXString FXFileSelector::getDirectory() const {
@@ -1027,6 +1103,18 @@ FXString FXFileSelector::getDirectory() const {
   }
 
 
+// Set file name
+void FXFileSelector::setFilename(const FXString& path){
+  if(filebox->setDirectory(FXPath::directory(path),true)){
+    dirbox->setDirectory(filebox->getDirectory());
+    if(!filebox->setCurrentFile(path,true)){
+      if(selectmode==SELECTFILE_ANY){ filename->setText(FXPath::name(path)); }
+      }
+    }
+  }
+
+
+/*
 // Set file name
 void FXFileSelector::setFilename(const FXString& path){
   FXString fullname(FXPath::absolute(path));
@@ -1040,7 +1128,7 @@ void FXFileSelector::setFilename(const FXString& path){
     filename->setText(name);
     }
   }
-
+*/
 
 // Get complete path + filename
 FXString FXFileSelector::getFilename() const {
@@ -1189,25 +1277,55 @@ FXuint FXFileSelector::getFileBoxStyle() const {
   }
 
 
+// List of sort functions
+static const FXIconListSortFunc sortFuncTable[]={
+  FXFileList::ascending,FXFileList::descending, 
+  FXFileList::ascendingCase,FXFileList::descendingCase,
+  FXFileList::ascendingType,FXFileList::descendingType,
+  FXFileList::ascendingSize,FXFileList::descendingSize,
+  FXFileList::ascendingTime,FXFileList::descendingTime,
+  FXFileList::ascendingUser,FXFileList::descendingUser,
+  FXFileList::ascendingGroup,FXFileList::descendingGroup
+  };
+
+
+// Change File List sorting order
+void FXFileSelector::setSortOrder(FXuint order){
+  if(order<ARRAYNUMBER(sortFuncTable)){
+    filebox->setSortFunc(sortFuncTable[order]);
+    }
+  }
+    
+
+// Return File List sorting order
+FXuint FXFileSelector::getSortOrder() const {
+  FXIconListSortFunc sf=filebox->getSortFunc();
+  for(FXuint order=0; order<ARRAYNUMBER(sortFuncTable); ++order){
+    if(sortFuncTable[order]==sf) return order;
+    }
+  return 0;
+  }
+
+
 // Change file selection mode
 void FXFileSelector::setSelectMode(FXuint mode){
   switch(mode){
     case SELECTFILE_EXISTING:
       filebox->showOnlyDirectories(false);
-      filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_BROWSESELECT);
+      filebox->setSelectMode(ICONLIST_BROWSESELECT);
       break;
     case SELECTFILE_MULTIPLE:
     case SELECTFILE_MULTIPLE_ALL:
       filebox->showOnlyDirectories(false);
-      filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_EXTENDEDSELECT);
+      filebox->setSelectMode(ICONLIST_EXTENDEDSELECT);
       break;
     case SELECTFILE_DIRECTORY:
       filebox->showOnlyDirectories(true);
-      filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_BROWSESELECT);
+      filebox->setSelectMode(ICONLIST_BROWSESELECT);
       break;
     default:
       filebox->showOnlyDirectories(false);
-      filebox->setListStyle((filebox->getListStyle()&~FILELISTMASK)|ICONLIST_SINGLESELECT);
+      filebox->setSelectMode(ICONLIST_SINGLESELECT);
       break;
     }
   selectmode=mode;
@@ -1323,7 +1441,11 @@ FXString FXFileSelector::getTimeFormat() const {
 // Optionally, share associations between other parts of the application as well.
 void FXFileSelector::setAssociations(FXFileAssociations* assoc,FXbool owned){
   filebox->setAssociations(assoc,owned);
+#if defined(PATHBOX)
   dirbox->setAssociations(assoc,false);
+#else
+  dirbox->setAssociations(assoc,false);
+#endif
   }
 
 
@@ -1468,7 +1590,11 @@ FXFileSelector::~FXFileSelector(){
   fileboxframe=(FXHorizontalFrame*)-1L;
   entryblock=(FXMatrix*)-1L;
   readonly=(FXCheckButton*)-1L;
+#if defined(PATHBOX)
+  dirbox=(FXPathBox*)-1L;
+#else
   dirbox=(FXDirBox*)-1L;
+#endif
   accept=(FXButton*)-1L;
   cancel=(FXButton*)-1L;
   updiricon=(FXIcon*)-1L;

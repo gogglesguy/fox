@@ -366,6 +366,7 @@ FXOptionMenu.cpp \
 FXPacker.cpp \
 FXParseBuffer.cpp \
 FXPath.cpp \
+FXPathBox.cpp \
 FXPCXIcon.cpp \
 FXPCXImage.cpp \
 FXPerformance.cpp \

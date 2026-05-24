@@ -381,5 +381,8 @@
     <Image Include="..\..\adie\wordwrap_gif.gif">
       <Filter>Icons</Filter>
     </Image>
+    <Image Include="..\..\adie\rename_gif.gif">
+      <Filter>Icons</Filter>
+    </Image>
   </ItemGroup>
 </Project>

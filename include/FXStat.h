@@ -3,7 +3,7 @@
 *                        F i l e   S t a t i s t i c s                          *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -303,7 +303,7 @@ public:
   /// Return true if file1 is the same as file2, even though they
   /// may have different paths.
   static FXbool isSame(const FXString& file1,const FXString& file2);
-  
+
   /// Obtain total amount of space on disk mounted at given path
   static FXbool getTotalDiskSpace(const FXString& path,FXulong& space);
 

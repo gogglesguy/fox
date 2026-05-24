@@ -3,7 +3,7 @@
 *                         M e s s a g e   B o x e s                             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -56,13 +56,16 @@
     different ways.
 
   - Added MBOX_SAVE_CANCEL_DONTSAVE dialog from Sander.
+  
+  - More additions: YES/YES ALL/NO, and YES/ NO/ NO ALL added, very
+    useful to avoid repeatedly asking same question over and over.
 */
 
 // Padding for message box buttons
 #define HORZ_PAD 30
 #define VERT_PAD 2
 
-#define MBOX_BUTTON_MASK   (MBOX_OK|MBOX_OK_CANCEL|MBOX_YES_NO|MBOX_YES_NO_CANCEL|MBOX_QUIT_CANCEL|MBOX_QUIT_SAVE_CANCEL|MBOX_SAVE_CANCEL_DONTSAVE)
+#define MBOX_BUTTON_MASK   (MBOX_OK|MBOX_OK_CANCEL|MBOX_YES_NO|MBOX_YES_NO_CANCEL|MBOX_QUIT_CANCEL|MBOX_QUIT_SAVE_CANCEL|MBOX_SAVE_CANCEL_DONTSAVE|MBOX_YES_YESALL_NO|MBOX_YES_NO_NOALL)
 
 using namespace FX;
 
@@ -152,6 +155,18 @@ void FXMessageBox::initialize(const FXString& text,FXIcon* icn,FXuint whichbutto
     new FXButton(buttons,tr("&No"),nullptr,this,ID_CLICKED_NO,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
     new FXButton(buttons,tr("N&o to All"),nullptr,this,ID_CLICKED_NOALL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
     new FXButton(buttons,tr("&Cancel"),nullptr,this,ID_CLICKED_CANCEL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    initial->setFocus();
+    }
+  else if(whichbuttons==MBOX_YES_YESALL_NO){
+    initial=new FXButton(buttons,tr("&Yes"),nullptr,this,ID_CLICKED_YES,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    new FXButton(buttons,tr("Y&es to All"),nullptr,this,ID_CLICKED_YESALL,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    new FXButton(buttons,tr("&No"),nullptr,this,ID_CLICKED_NO,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    initial->setFocus();
+    }
+  else if(whichbuttons==MBOX_YES_NO_NOALL){
+    initial=new FXButton(buttons,tr("&Yes"),nullptr,this,ID_CLICKED_YES,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    new FXButton(buttons,tr("&No"),nullptr,this,ID_CLICKED_NO,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
+    new FXButton(buttons,tr("N&o to All"),nullptr,this,ID_CLICKED_NOALL,BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_TOP|LAYOUT_LEFT|LAYOUT_CENTER_X,0,0,0,0,15,15,VERT_PAD,VERT_PAD);
     initial->setFocus();
     }
   }

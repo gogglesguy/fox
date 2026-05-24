@@ -142,7 +142,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
       <Message>Reswrapping icons...</Message>
     </CustomBuildStep>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;mpr.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -187,7 +187,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h arrownext.gif arrowprev.gif big
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;Mpr.lib;comdlg32.lib;advapi32.lib;shell32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Imm32.lib;Msimg32.lib;Ws2_32.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>cd $(SolutionDir)..\lib
@@ -431,6 +431,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <ClInclude Include="..\..\include\FXParallel.h" />
     <ClInclude Include="..\..\include\FXParseBuffer.h" />
     <ClInclude Include="..\..\include\FXPath.h" />
+    <ClInclude Include="..\..\include\FXPathBox.h" />
     <ClInclude Include="..\..\include\FXPCXIcon.h" />
     <ClInclude Include="..\..\include\FXPCXImage.h" />
     <ClInclude Include="..\..\include\FXPerformance.h" />
@@ -803,6 +804,7 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <ClCompile Include="..\..\lib\FXParseBuffer.cpp" />
     <ClCompile Include="..\..\lib\fxparsegeometry.cpp" />
     <ClCompile Include="..\..\lib\FXPath.cpp" />
+    <ClCompile Include="..\..\lib\FXPathBox.cpp" />
     <ClCompile Include="..\..\lib\FXPCXIcon.cpp" />
     <ClCompile Include="..\..\lib\FXPCXImage.cpp" />
     <ClCompile Include="..\..\lib\fxpcxio.cpp" />
@@ -974,15 +976,9 @@ $(OutputPath)reswrap.exe -nc -h -n FX -o icons.h  arrownext.gif arrowprev.gif bi
     <Image Include="..\..\lib\bigharddisk.gif" />
     <Image Include="..\..\lib\bignetdrive.gif" />
     <Image Include="..\..\lib\bignethood.gif" />
-    <Image Include="..\..\lib\bookadd.bmp" />
-    <Image Include="..\..\lib\bookclr.gif" />
     <Image Include="..\..\lib\bookclr_gif.gif" />
-    <Image Include="..\..\lib\bookdel.bmp" />
     <Image Include="..\..\lib\bookdel_gif.gif" />
     <Image Include="..\..\lib\bookmrk_gif.gif" />
-    <Image Include="..\..\lib\booknxt_gif.gif" />
-    <Image Include="..\..\lib\bookprv_gif.gif" />
-    <Image Include="..\..\lib\bookset.gif" />
     <Image Include="..\..\lib\bookset_gif.gif" />
     <Image Include="..\..\lib\clearentry.gif" />
     <Image Include="..\..\lib\cmymode.gif" />

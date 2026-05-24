@@ -3,7 +3,7 @@
 *                            L i s t   O b j e c t                              *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -382,18 +382,16 @@ FXList::FXList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,FXint x,F
 
 // Create window
 void FXList::create(){
-  FXint i;
   FXScrollArea::create();
-  for(i=0; i<items.no(); i++){items[i]->create();}
+  for(FXint i=0; i<items.no(); i++){items[i]->create();}
   font->create();
   }
 
 
 // Detach window
 void FXList::detach(){
-  FXint i;
   FXScrollArea::detach();
-  for(i=0; i<items.no(); i++){items[i]->detach();}
+  for(FXint i=0; i<items.no(); i++){items[i]->detach();}
   font->detach();
   }
 
@@ -437,12 +435,12 @@ FXint FXList::getDefaultHeight(){
 
 // Recompute interior
 void FXList::recompute(){
-  FXint x,y,w,h,i;
+  FXint x,y,w,h;
   x=0;
   y=0;
   listWidth=0;
   listHeight=0;
-  for(i=0; i<items.no(); i++){
+  for(FXint i=0; i<items.no(); i++){
     items[i]->x=x;
     items[i]->y=y;
     w=items[i]->getWidth(this);
@@ -952,14 +950,14 @@ long FXList::onFocusOut(FXObject* sender,FXSelector sel,void* ptr){
 long FXList::onPaint(FXObject*,FXSelector,void* ptr){
   FXEvent* event=(FXEvent*)ptr;
   FXDCWindow dc(this,event);
-  FXint i,y,h;
+  FXint y,h;
 
   // Set font
   dc.setFont(font);
 
   // Paint items
   y=pos_y;
-  for(i=0; i<items.no(); i++){
+  for(FXint i=0; i<items.no(); i++){
     h=items[i]->getHeight(this);
     if(event->rect.y<=y+h && y<event->rect.y+event->rect.h){
       items[i]->draw(this,dc,pos_x,y,FXMAX(listWidth,getVisibleWidth()),h);
@@ -2016,6 +2014,18 @@ void FXList::setListStyle(FXuint style){
 // Get list style
 FXuint FXList::getListStyle() const {
   return (options&LIST_MASK);
+  }
+
+
+// Change selection mode
+void FXList::setSelectMode(FXuint mode){
+  options=(options&~SELECT_MASK) | (mode&SELECT_MASK);
+  }
+
+
+// Return current selection mode
+FXuint FXList::getSelectMode() const {
+  return (options&SELECT_MASK);
   }
 
 

@@ -3,7 +3,7 @@
 *           W a t c h   D i r e c t o r i e s   f o r   C h a n g e s           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2006,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2006,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -220,7 +220,7 @@ struct FILE_NOTIFY_INFORMATION {
   };
 
   USES_CONVERSION;
-  HANDLE hDir = CreateFile("c:\\Folder", // pointer to the file name
+  HANDLE hDir = CreateFile("C:\\Folder", // pointer to the file name
     FILE_LIST_DIRECTORY,                // access (read-write) mode
     FILE_SHARE_READ|FILE_SHARE_DELETE,  // share mode
     nullptr, // security descriptor

@@ -3,7 +3,7 @@
 *              D o u b l e - P r e c i s i o n  Q u a t e r n i o n             *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -149,17 +149,28 @@ public:
   FXQuatd& adjust();
 
   /**
+  * Set quaternion from axis and cos, sin of angle.
+  * Quaternion represents a rotation of phi radians about unit vector axis.
+  */
+  void setRotate(const FXVec3d& axis,FXdouble cosang,FXdouble sinang);
+
+  /**
+  * Obtain axis and sin and cos of angle.
+  */
+  void getRotate(FXVec3d& axis,FXdouble& cosang,FXdouble& sinang) const;
+
+  /**
   * Set quaternion from axis and angle.
   * Quaternion represents a rotation of phi radians about unit vector axis.
   */
-  void setAxisAngle(const FXVec3d& axis,FXdouble phi);
+  void setRotate(const FXVec3d& axis,FXdouble phi);
 
   /**
   * Obtain axis and angle from quaternion.
   * Return unit vector and angle of rotation phi, in radians.
   * If identity quaternion (0,0,0,1), return axis as (1,0.0).
   */
-  void getAxisAngle(FXVec3d& axis,FXdouble& phi) const;
+  void getRotate(FXVec3d& axis,FXdouble& phi) const;
 
   /**
   * Set quaternion from rotation vector rot, representing a rotation by |rot| radians
@@ -185,6 +196,36 @@ public:
   * Return modified rodrigues parameters from unit quaternion.
   */
   FXVec3d getMRP() const;
+
+  /**
+  * Set quaternion to rotation about x-axis by angle ang.
+  */
+  void setXRotate(FXdouble ang);
+
+  /**
+  * Set quaternion to rotation about x-axis by cos, sin of angle.
+  */
+  void setXRotate(FXdouble cosang,FXdouble sinang);
+
+  /**
+  * Set quaternion to rotation about y-axis by angle ang.
+  */
+  void setYRotate(FXdouble ang);
+
+  /**
+  * Set quaternion to rotation about y-axis by cos, sin of angle.
+  */
+  void setYRotate(FXdouble cosang,FXdouble sinang);
+
+  /**
+  * Set quaternion to rotation about z-axis by angle ang.
+  */
+  void setZRotate(FXdouble ang);
+
+  /**
+  * Set quaternion to rotation about z-axis by cos, sin of angle.
+  */
+  void setZRotate(FXdouble cosang,FXdouble sinang);
 
   /// Set quaternion from roll (x), pitch (y), yaw (z), in that order
   void setRollPitchYaw(FXdouble roll,FXdouble pitch,FXdouble yaw);

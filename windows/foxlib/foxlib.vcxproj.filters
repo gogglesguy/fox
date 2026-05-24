@@ -1116,6 +1116,9 @@
     <ClInclude Include="..\..\include\FXPerformance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\FXPathBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\lib\FX4Splitter.cpp">
@@ -2273,6 +2276,9 @@
     <ClCompile Include="..\..\lib\FXPerformance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\lib\FXPathBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\lib\arrownext.gif">
@@ -2318,15 +2324,6 @@
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\lib\bignethood.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\lib\bookadd.bmp">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\lib\bookclr.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\lib\bookdel.bmp">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\lib\bookset.gif">
@@ -2510,12 +2507,6 @@
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\lib\bookmrk_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\lib\booknxt_gif.gif">
-      <Filter>Icons</Filter>
-    </Image>
-    <Image Include="..\..\lib\bookprv_gif.gif">
       <Filter>Icons</Filter>
     </Image>
     <Image Include="..\..\lib\bookset_gif.gif">

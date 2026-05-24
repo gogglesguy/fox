@@ -3,7 +3,7 @@
 *                             B i t m a p    O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1998,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1998,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -491,7 +491,7 @@ void FXBitmap::resize(FXint w,FXint h){
 // Fill bitmap with uniform value
 void FXBitmap::fill(FXbool color){
   if(data){
-    memset(data,0-color,height*bytewidth);
+    fillElms(data,0-color,height*bytewidth);
     }
   }
 

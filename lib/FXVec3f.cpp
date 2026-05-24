@@ -3,7 +3,7 @@
 *       S i n g l e - P r e c i s i o n   3 - E l e m e n t   V e c t o r       *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1994,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1994,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -45,7 +45,6 @@ namespace FX {
 
 // Convert from vector to color
 FXColor colorFromVec3f(const FXVec3f& vec){
-  FXColor res;
 
   // Scale and convert to integer:      00000000 000000BB 000000GG 000000RR
   __m128i uuuu=_mm_cvtps_epi32(_mm_mul_ps(_mm_maskload_ps(&vec[0],MMM),_mm_set1_ps(255.0f)));
@@ -54,11 +53,7 @@ FXColor colorFromVec3f(const FXVec3f& vec){
   __m128i bbbb=_mm_shuffle_epi8(uuuu,_mm_set_epi8(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,12,0,4,8));
 
   // Assign to output
-  res=_mm_cvtsi128_si32(bbbb);
-
-  // Set alpha to opaque
-  res|=FXRGBA(0,0,0,255);
-  return res;
+  return _mm_cvtsi128_si32(bbbb) | FXRGBA(0,0,0,255);
   }
 
 
@@ -81,7 +76,7 @@ FXVec3f colorToVec3f(FXColor clr){
 
 // Convert from vector to color
 FXColor colorFromVec3f(const FXVec3f& vec){
-  return FXRGB((vec.x*255.0f+0.5f),(vec.y*255.0f+0.5f),(vec.z*255.0f+0.5f));
+  return FXRGB(Math::lrint(vec.x*255.0f),Math::lrint(vec.y*255.0f),Math::lrint(vec.z*255.0f));
   }
 
 
@@ -127,11 +122,59 @@ FXfloat dot(const FXVec3f& u,const FXVec3f& v){
   }
 
 
-// Normalize vector
-FXVec3f normalize(const FXVec3f& v){
-  FXfloat m=v.length2();
-  if(__likely(m)){ return v*Math::rsqrt(m); }
-  return v;
+// Clip vector to box -xlo...xhi, -ylo...yhi, and -zlo...zhi (xlo<0, ylo<0, zlo<0, 0<xhi, 0<yhi, 0<zhi).
+FXVec3f clip(const FXVec3f& v,FXfloat xlo,FXfloat xhi,FXfloat ylo,FXfloat yhi,FXfloat zlo,FXfloat zhi){
+  FXVec3f result(v);
+  FXfloat s;
+  if(__unlikely(xhi<result.x)){
+    s=xhi/result.x;
+    result.x=xhi;
+    result.y*=s;
+    result.z*=s;
+    }
+  else if(__unlikely(result.x<xlo)){
+    s=xlo/result.x;
+    result.x=xlo;
+    result.y*=s;
+    result.z*=s;
+    }
+  if(__unlikely(yhi<result.y)){
+    s=yhi/result.y;
+    result.y=yhi;
+    result.x*=s;
+    result.z*=s;
+    }
+  else if(__unlikely(result.y<ylo)){
+    s=ylo/result.y;
+    result.y=ylo;
+    result.x*=s;
+    result.z*=s;
+    }
+  if(__unlikely(zhi<result.z)){
+    s=zhi/result.z;
+    result.z=zhi;
+    result.x*=s;
+    result.y*=s;
+    }
+  else if(__unlikely(result.z<zlo)){
+    s=zlo/result.z;
+    result.z=zlo;
+    result.x*=s;
+    result.y*=s;
+    }
+  return result;
+  }
+
+
+// Clip vector to box -xmx...xmx, -ymx...ymx, and -zmx...zmx (0<xmx, 0<ymx, 0<zmx).
+FXVec3f clip(const FXVec3f& v,FXfloat xmx,FXfloat ymx,FXfloat zmx){
+  return clip(v,-xmx,xmx,-ymx,ymx,-zmx,zmx);
+  }
+
+
+// Clip vector to box -mx...mx (0<mx).
+FXVec3f clip(const FXVec3f& v,FXfloat mx){
+  return clip(v,-mx,mx,-mx,mx,-mx,mx);
   }
 
 
@@ -197,6 +240,26 @@ FXfloat distFromRay(const FXVec3f& org,const FXVec3f& dir,const FXVec3f& pnt){
   FXVec3f u(pnt-org);
   FXVec3f v(u-(u*dir)*dir);
   return v.length();
+  }
+
+
+// Return x of closest point P (pa+x*da) along ray A (pa,da) to other ray B (pb,db).
+// Return DBL_MAX if no such point.
+FXfloat closestAlongRay(const FXVec3f& pa,const FXVec3f& da,const FXVec3f& pb,const FXVec3f& db){
+  FXfloat s(da*da);
+  FXfloat t(db*db);
+  FXfloat st=s*t;
+  if(st){
+    FXfloat p(da*db);
+    FXfloat w=st-p*p;
+    if(w){
+      FXVec3f dc(pb-pa);
+      FXfloat q(da*dc);
+      FXfloat r(db*dc);
+      return (q*t-p*r)/w;       // The closest on ray B is (p*q-r*s)/w
+      }
+    }
+  return DBL_MAX;
   }
 
 

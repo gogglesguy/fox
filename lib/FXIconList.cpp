@@ -3,7 +3,7 @@
 *                          I c o n L i s t   O b j e c t                        *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -623,18 +623,16 @@ FXIconList::FXIconList(FXComposite *p,FXObject* tgt,FXSelector sel,FXuint opts,F
 
 // Create window
 void FXIconList::create(){
-  FXint i;
   FXScrollArea::create();
-  for(i=0; i<items.no(); i++){items[i]->create();}
+  for(FXint i=0; i<items.no(); i++){items[i]->create();}
   font->create();
   }
 
 
 // Detach window
 void FXIconList::detach(){
-  FXint i;
   FXScrollArea::detach();
-  for(i=0; i<items.no(); i++){items[i]->detach();}
+  for(FXint i=0; i<items.no(); i++){items[i]->detach();}
   font->detach();
   }
 
@@ -720,13 +718,13 @@ void FXIconList::getrowscols(FXint& nr,FXint& nc,FXint w,FXint h) const {
 
 // Recompute interior
 void FXIconList::recompute(){
-  FXint w,h,i;
+  FXint w,h;
 
   itemWidth=1;
   itemHeight=1;
 
   // Measure the items
-  for(i=0; i<items.no(); i++){
+  for(FXint i=0; i<items.no(); i++){
     w=items[i]->getWidth(this);
     h=items[i]->getHeight(this);
     if(w>itemWidth) itemWidth=w;
@@ -831,12 +829,12 @@ long FXIconList::onChgHeader(FXObject*,FXSelector,void*){
 // to that of the widest item.
 long FXIconList::onClkHeader(FXObject*,FXSelector,void* ptr){
   FXint hi=(FXint)(FXival)ptr;
-  FXint i,iw,tw,w,nw=0;
+  FXint iw,tw,w,nw=0;
   FXString text;
 
   // For detailed icon list
   if(!(options&(ICONLIST_MINI_ICONS|ICONLIST_BIG_ICONS))){
-    for(i=0; i<items.no(); i++){
+    for(FXint i=0; i<items.no(); i++){
       w=0;
 
       // The first header item may have an icon
@@ -1900,21 +1898,21 @@ long FXIconList::onUpdShowMiniIcons(FXObject* sender,FXSelector,void*){
 
 // Select all items
 long FXIconList::onCmdSelectAll(FXObject*,FXSelector,void*){
-  for(int i=0; i<items.no(); i++) selectItem(i,true);
+  for(FXint i=0; i<items.no(); i++) selectItem(i,true);
   return 1;
   }
 
 
 // Deselect all items
 long FXIconList::onCmdDeselectAll(FXObject*,FXSelector,void*){
-  for(int i=0; i<items.no(); i++) deselectItem(i,true);
+  for(FXint i=0; i<items.no(); i++) deselectItem(i,true);
   return 1;
   }
 
 
 // Select inverse of current selection
 long FXIconList::onCmdSelectInverse(FXObject*,FXSelector,void*){
-  for(int i=0; i<items.no(); i++) toggleItem(i,true);
+  for(FXint i=0; i<items.no(); i++) toggleItem(i,true);
   return 1;
   }
 
@@ -2959,6 +2957,18 @@ void FXIconList::setListStyle(FXuint style){
 // Get list style
 FXuint FXIconList::getListStyle() const {
   return (options&ICONLIST_MASK);
+  }
+
+
+// Change selection mode
+void FXIconList::setSelectMode(FXuint mode){
+  options=(options&~SELECT_MASK) | (mode&SELECT_MASK);
+  }
+
+
+// Return current selection mode
+FXuint FXIconList::getSelectMode() const {
+  return (options&SELECT_MASK);
   }
 
 

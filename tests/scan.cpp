@@ -3,7 +3,7 @@
 *                             String Format I/O Test                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2007,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2007,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 ********************************************************************************/
 #include "fx.h"
 
@@ -19,6 +19,8 @@ namespace FX {
 
 extern FXint __sscanf(const FXchar* string,const FXchar* format,...);
 extern FXint __snprintf(FXchar* string,FXint length,const FXchar* format,...);
+extern FXdouble __strtod(const FXchar *beg,const FXchar** end=nullptr,FXbool* ok=nullptr);
+extern FXfloat __strtof(const FXchar *beg,const FXchar** end=nullptr,FXbool* ok=nullptr);
 
 }
 
@@ -64,42 +66,94 @@ const FXchar* floatformat[]={
 
 
 const FXchar *floatnumbers[]={
+  "0",
+  ".0",
+  "0."
+  "0.0E-10",
+  "0.0E+10",
+  "0.0E10",
+  "0E10\n",
+
+  // SP corner cases
+  "0x0.000002p-126",                    // FLT_TRUE_MIN
+  "1.401298464e-45",                    // FLT_TRUE_MIN
+  
+  "0x1.000000p-126",                    // FLT_MIN
+  "1.175494351e-38",                    // FLT_MIN
+  
+  "0x1.FFFFFEp+127",                    // FLT_MAX
+  "3.402823466e+38",                    // FLT_MAX
+  
+  "0x1.000000p+128",                    // FLT INF
+  "0x1.FFFFFEp+128",                    // FLT INF
+  
+  "Inf",                                // FLT INF
+  "Infinity",                           // FLT INF
+  
+  "NaN",                                // FLT NAN
+  
+  "0x1.000000p-23",                     // FLT_EPSILON
+  "1.192092896e-07\n",                  // FLT_EPSILON
+  
+  // DP corner cases
+  "0x0.0000000000001p-1022",            // DBL_TRUE_MIN
+  "4.9406564584124654e-324",            // DBL_TRUE_MIN
+  
+  "0x1.0000000000000p-1022",            // DBL_MIN
+  "2.2250738585072014e-308",            // DBL_MIN
+  
+  "0x1.FFFFFFFFFFFFFp+1023",            // DBL_MAX
+  "1.79769313486231578e+308",           // DBL_MAX
+  
+  "0x1.0000000000000p+1024",            // DBL INF
+  "0x1.FFFFFFFFFFFFFp+1024",            // DBL INF
+  "Inf",                                // DBL INF
+  "Infinity",                           // DBL INF
+  
+  "NaN",                                // DBL NAN
+  
+  "0x1.0000000000000p-52",              // DBL_EPSILON
+  "2.2204460492503131e-016\n",          // DBL_EPSILON
+
   "3.1415926535897932384626433833",
-  "-1.23456789E-99",
-  "1.7976931348623157e+308",
-  "2.2250738585072014e-308",
-  "1.8e+308",
-  "4.94065645841246544177e-324",
-  "0.0E400",
-  "1,000.0",
   "0.0000000000000001234567891234567",
   "0.0000000001234567891234567",
   "123456789.1234567",
   "1234567891234567.",
-  "1234567891234567000000",
+  "1234567891234567000000\n",
+
   "1,234,567,891,234,567,000,000",
+  "1,234,567,890",
+  "12,345,678",
+  "123,456,789",
+  "1,234,567,89",
+  "1,234,567,890,123.567",
+  "0,123\n",
+
+  "-1.23456789E-99",
+  "1.8e+308",
+  "0.0E400",
+  "1,000.0",
+  ".5E3",
+  ".E5",
+  "0.01",
+  "0.001",
   "-1.",
   "-.1",
   "1.",
   ".1",
-  "NaN",
-  "Inf",
-  "Infinity",
   "+0.5",
   "-.5",
-  "0.005",
+  "0.005\n",
+  
   "0x1.ac53a7df93d691111p+66",
+  "0x1.3e9e4e4c2f344p+199",
   "0x003.fffffffffffffp+00",
   "0x0.00ffffffp+00",
   "0x1.p+1024",
   "0x1.ffffffffffffp+1024",
   "0x1.222p-1066",
   "0x0p+66",
-  "1,234,567,890",
-  "12,345,678",
-  "123,456,789",
-  "1,234,567,89",
-  "0,123",
   };
 
 /*******************************************************************************/
@@ -173,6 +227,7 @@ int main(int,char*[]){
   FXint    res;
   FXint    ia,ib,ic;
   FXdouble da,db,dc;
+  FXfloat  fa,fb,fc;
   FXchar   str[1000];
   FXchar   buf[2000];
 /*
@@ -201,6 +256,27 @@ __snprintf(buf,sizeof(buf),"format=\"%s\" input=%s  res=%d  num=%.18lg = 0x%016l
 
 */
 
+  // Strtod()
+  for(y=0; y<ARRAYNUMBER(floatnumbers); y++){
+    da=strtod(floatnumbers[y],nullptr);
+    db=__strtod(floatnumbers[y],nullptr);
+    __sscanf(floatnumbers[y],"%'lf",&dc);
+    snprintf(buf,sizeof(buf),"strtod=%- 30.18lg (0x%016llx %- 5lld) __strtod=%- 30.18lg (0x%016llx %- 5lld) __sscanf=%-30.18lg  (0x%016llx %- 5lld) input=%s",da,Math::fpMantissa(da),((Math::fpBits(da)>>52)&0x7ff),db,Math::fpMantissa(db),((Math::fpBits(db)>>52)&0x7ff),dc,Math::fpMantissa(dc),((Math::fpBits(dc)>>52)&0x7ff),floatnumbers[y]);
+    fprintf(stdout,"%s\n",buf);
+    }
+  fprintf(stdout,"\n");
+
+  // Strtof()
+  for(y=0; y<ARRAYNUMBER(floatnumbers); y++){
+    fa=strtof(floatnumbers[y],nullptr);
+    fb=__strtof(floatnumbers[y],nullptr);
+    __sscanf(floatnumbers[y],"%'f",&fc);
+    snprintf(buf,sizeof(buf),"strtof=%- 30.18lg (0x%08x %- 5d) __strtof=%- 30.18lg (0x%08x %- 5d) __sscanf=%-30.18lg  (0x%08lx %- 5d) input=%s",(FXdouble)fa,Math::fpMantissa(fa),((Math::fpBits(fa)>>23)&0xff),(FXdouble)fb,Math::fpMantissa(fb),((Math::fpBits(fb)>>23)&0xff),(FXdouble)fc,Math::fpMantissa(fc),((Math::fpBits(fc)>>23)&0xff),floatnumbers[y]);
+    fprintf(stdout,"%s\n",buf);
+    }
+  fprintf(stdout,"\n");
+  fprintf(stdout,"\n");
+
   // Reading integers
   for(x=0; x<ARRAYNUMBER(intformat); x++){
     for(y=0; y<ARRAYNUMBER(intnumbers); y++){
@@ -211,7 +287,7 @@ __snprintf(buf,sizeof(buf),"format=\"%s\" input=%s  res=%d  num=%.18lg = 0x%016l
     }
   fprintf(stdout,"\n");
 
- // Reading floats
+  // Reading floats
   for(x=0; x<ARRAYNUMBER(floatformat); x++){
     for(y=0; y<ARRAYNUMBER(floatnumbers); y++){
       da=0;

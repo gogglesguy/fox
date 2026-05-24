@@ -3,7 +3,7 @@
 *                            V i s u a l   C l a s s                            *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -224,7 +224,7 @@ void FXVisual::create(){
 
       // True color mode; find out how deep
       else{
-        memset(&bmi,0,sizeof(BITMAPINFO256));
+        clearElms(&bmi,1);
         bmi.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
         // Get a device-dependent bitmap that's compatible with the
         // screen, then convert the DDB to a DIB.  We need to call GetDIBits

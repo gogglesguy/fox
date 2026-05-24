@@ -3,7 +3,7 @@
 *  D e v i c e   C o n t e x t   F o r   W i n d o w s   a n d   I m a g e s    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1999,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1999,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -33,6 +33,7 @@
 #include "FXHash.h"
 #include "FXStream.h"
 #include "FXString.h"
+#include "FXException.h"
 #include "FXStringDictionary.h"
 #include "FXSettings.h"
 #include "FXRegistry.h"
@@ -746,11 +747,23 @@ void FXDCWindow::setFont(FXFont *fnt){
 void FXDCWindow::drawText(FXint x,FXint y,const FXchar* string,FXuint length){
   if(!surface){ fxerror("FXDCWindow::drawText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawText: no font selected.\n"); }
-  FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,ARRAYNUMBER(sbuffer),length);
-  FXint bkmode=::SetBkMode((HDC)ctx,TRANSPARENT);
-  ::TextOutW((HDC)ctx,x,y,sbuffer,count);
-  ::SetBkMode((HDC)ctx,bkmode);
+  if(0<length){
+    FXint bkmode=::SetBkMode((HDC)ctx,TRANSPARENT);
+    FXint count;
+    if(length<4096){
+      FXnchar sbuffer[4096];
+      count=utf2ncs(sbuffer,string,4096,length);
+      ::TextOutW((HDC)ctx,x,y,sbuffer,count);
+      }
+    else{
+      FXnchar* dbuffer=nullptr;
+      if(!allocElms(dbuffer,length)){ throw FXResourceException("unable allocate memory in FXDCWindow."); }
+      count=utf2ncs(dbuffer,string,length,length);
+      ::TextOutW((HDC)ctx,x,y,dbuffer,count);
+      freeElms(dbuffer);
+      }
+    ::SetBkMode((HDC)ctx,bkmode);
+    }
   }
 
 
@@ -758,14 +771,23 @@ void FXDCWindow::drawText(FXint x,FXint y,const FXchar* string,FXuint length){
 void FXDCWindow::drawImageText(FXint x,FXint y,const FXchar* string,FXuint length){
   if(!surface){ fxerror("FXDCWindow::drawImageText: DC not connected to drawable.\n"); }
   if(!font){ fxerror("FXDCWindow::drawImageText: no font selected.\n"); }
-  FXnchar sbuffer[4096];
-  FXint count=utf2ncs(sbuffer,string,ARRAYNUMBER(sbuffer),length);
-  FXint bkmode=::SetBkMode((HDC)ctx,OPAQUE);
-  ::TextOutW((HDC)ctx,x,y,sbuffer,count);
-//    RECT r;
-//    r.left=clip.x; r.top=clip.y; r.right=clip.x+clip.w; r.bottom=clip.y+clip.h;
-//    ExtTextOutW((HDC)ctx,x,y,ETO_OPAQUE|ETO_CLIPPED,&r,sbuffer,count,nullptr);
-  ::SetBkMode((HDC)ctx,bkmode);
+  if(0<length){
+    FXint bkmode=::SetBkMode((HDC)ctx,OPAQUE);
+    FXint count;
+    if(length<4096){
+      FXnchar sbuffer[4096];
+      count=utf2ncs(sbuffer,string,4096,length);
+      ::TextOutW((HDC)ctx,x,y,sbuffer,count);
+      }
+    else{
+      FXnchar* dbuffer=nullptr;
+      if(!allocElms(dbuffer,length)){ throw FXResourceException("unable allocate memory in FXDCWindow."); }
+      count=utf2ncs(dbuffer,string,length,length);
+      ::TextOutW((HDC)ctx,x,y,dbuffer,count);
+      freeElms(dbuffer);
+      }
+    ::SetBkMode((HDC)ctx,bkmode);
+    }
   }
 
 

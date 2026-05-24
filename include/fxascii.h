@@ -3,7 +3,7 @@
 *                    A S C I I   C h a r a c t e r   I n f o                    *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 2005,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 2005,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -67,7 +67,7 @@ static inline FXint digitValue(FXchar asc){
 
 
 // Ascii digit of numeric value
-static inline FXint valueDigit(FXuchar asc){
+static inline FXint valueDigit(FXchar asc){
   return value_to_digit[(FXuchar)asc];
   }
 

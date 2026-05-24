@@ -83,8 +83,13 @@
     replace selection with result.
 */
 
+#define TOPIC_SYSTEM    102
+#define TOPIC_FILEIO    103
+#define TOPIC_COMMAND   104
+#define TOPIC_DETAIL    105
+
 #define CLOCKTIMER      1000000000      // Blink rate for corner clock
-#define CHECKTIMER      1000000000      // Blink rate for corner clock
+#define CHECKTIMER      1000000000      // Check for file change
 #define RESTYLEJUMP     80              // Restyling back-off
 #define MAXFILESIZE     1000000000      // Limit files to this when loading
 
@@ -117,6 +122,8 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SWITCH,TextWindow::onCmdSwitch),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_RELOAD,TextWindow::onCmdReload),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_RELOAD,TextWindow::onUpdReload),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_RENAME,TextWindow::onCmdRename),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_RENAME,TextWindow::onUpdRename),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE,TextWindow::onCmdSave),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SAVE,TextWindow::onUpdSave),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVEAS,TextWindow::onCmdSaveAs),
@@ -231,8 +238,8 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_BROWSER,TextWindow::onUpdToggleBrowser),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_TOGGLE_DOTFILES,TextWindow::onCmdToggleHidden),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_TOGGLE_DOTFILES,TextWindow::onUpdToggleHidden),
-  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATHS,TextWindow::onCmdSearchPaths),
-  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATHS,TextWindow::onUpdSearchPaths),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SEARCHPATH,TextWindow::onCmdSearchPath),
+  FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATH,TextWindow::onUpdSearchPath),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FINDFILES,TextWindow::onCmdFindInFiles),
 
@@ -461,7 +468,7 @@ TextWindow::TextWindow(Adie* a):FXMainWindow(a,"Adie",nullptr,nullptr,DECOR_ALL,
   insertpoint=0;
 
   // Initialize other stuff
-  searchpaths="/usr/include";
+  searchpath="/usr/include";
   setPatternList("All Files (*)");
   setCurrentPattern(0);
   shellCommand=nullptr;
@@ -515,10 +522,11 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(filemenu,tr("&Save\tCtl-S\tSave file to disk."),getApp()->saveicon,this,ID_SAVE);
   new FXMenuCommand(filemenu,tr("Save &As...\tShift-Ctl-S\tSave under a different file name."),getApp()->saveasicon,this,ID_SAVEAS);
   new FXMenuCommand(filemenu,tr("Save &To...\tShift-Ctl-T\tSave copy to a different file name."),getApp()->savetoicon,this,ID_SAVETO);
+  new FXMenuCommand(filemenu,tr("Rename To...\t\tGive file a different name."),getApp()->renameicon,this,ID_RENAME);
   new FXMenuCommand(filemenu,tr("&Close\tCtl-W\tClose document."),getApp()->closeicon,this,ID_CLOSE);
   new FXMenuSeparator(filemenu);
-  new FXMenuCommand(filemenu,tr("Insert from file...\t\tInsert text from file."),getApp()->importicon,this,ID_INSERT_FILE);
-  new FXMenuCommand(filemenu,tr("Extract to file...\t\tExtract text to file."),getApp()->exporticon,this,ID_EXTRACT_FILE);
+  new FXMenuCommand(filemenu,tr("&Insert text from file...\t\tInsert text from file."),getApp()->importicon,this,ID_INSERT_FILE);
+  new FXMenuCommand(filemenu,tr("E&xtract text to file...\t\tExtract selected text to file."),getApp()->exporticon,this,ID_EXTRACT_FILE);
   new FXMenuCommand(filemenu,tr("&Print...\tCtl-P\tPrint document."),getApp()->printicon,this,ID_PRINT);
   new FXMenuCheck(filemenu,tr("&Editable\t\tFile is editable."),editor,FXText::ID_TOGGLE_EDITABLE);
 
@@ -749,6 +757,7 @@ void TextWindow::createToolbar(){
   new FXButton(toolbar,tr("\tSave\tSave file to disk."),getApp()->saveicon,this,ID_SAVE,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tSave As\tSave under a different file name."),getApp()->saveasicon,this,ID_SAVEAS,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
   new FXButton(toolbar,tr("\tSave To\tSave copy to a different file name."),getApp()->savetoicon,this,ID_SAVETO,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
+  new FXButton(toolbar,tr("\tRename To\tGive file a different name."),getApp()->renameicon,this,ID_RENAME,ICON_ABOVE_TEXT|BUTTON_TOOLBAR|FRAME_RAISED|LAYOUT_TOP|LAYOUT_LEFT);
 
   // Spacer
   new FXSeparator(toolbar,SEPARATOR_GROOVE);
@@ -999,32 +1008,32 @@ FXString TextWindow::getPatternList() const {
 
 
 // Change search paths
-void TextWindow::setSearchPaths(const FXString& paths){
-  searchpaths=paths;
+void TextWindow::setSearchPath(const FXString& path){
+  searchpath=path;
   }
 
 
 // Get seatch paths
-FXString TextWindow::getSearchPaths() const {
-  return searchpaths;
+FXString TextWindow::getSearchPath() const {
+  return searchpath;
   }
 
 
 // Search for file using search paths
-// The search paths may contain relative directories, which
-// are interpreted relative to the directory containing the
-// current file.
+// The searchpath may contain both absolute and relative directories.
+// Relative directories are interpreted relative to the one containing
+// the current file; for example "../include:../lib:/usr/include".
 FXString TextWindow::searchForFile(const FXString& file){
   if(!file.empty()){
     FXString base(FXPath::directory(getFilename()));
     FXString path(FXPath::absolute(base,file));
     if(FXStat::exists(path)) return path;
-    for(FXint beg=0,end=0; searchpaths[beg]; beg=end){
-      while(searchpaths[beg]==PATHLISTSEP) beg++;
+    for(FXint beg=0,end=0; searchpath[beg]; beg=end){
+      while(searchpath[beg]==PATHLISTSEP) beg++;
       end=beg;
-      while(searchpaths[end] && searchpaths[end]!=PATHLISTSEP) end++;
+      while(searchpath[end] && searchpath[end]!=PATHLISTSEP) end++;
       if(beg==end) break;
-      path=FXPath::absolute(FXPath::absolute(base,FXPath::expand(searchpaths.mid(beg,end-beg))),file);
+      path=FXPath::absolute(FXPath::absolute(base,FXPath::expand(searchpath.mid(beg,end-beg))),file);
       if(FXStat::exists(path)) return path;
       }
     }
@@ -1168,8 +1177,8 @@ fxmessage("adler32=%08x\n",sum);
     // Can we read/write it?
     setEditable(FXStat::isAccessible(file));
 
-    // Recent files
-    mrufiles.appendFile(file);
+    // Add to recent file list
+    appendRecentlyUsed(file);
 
     // Clear undo records
     undolist.clear();
@@ -1218,8 +1227,8 @@ FXbool TextWindow::saveFile(const FXString& file){
     // We just wrote it...
     setEditable(true);
 
-    // Recent files
-    mrufiles.appendFile(file);
+    // Add to recent file list
+    appendRecentlyUsed(file);
 
     // Mark undo state as clean (saved)
     undolist.mark();
@@ -1487,7 +1496,7 @@ void TextWindow::readRegistry(){
   setCurrentPattern(getApp()->reg().readIntEntry("SETTINGS","filepatternno",0));
 
   // Search path
-  searchpaths=getApp()->reg().readStringEntry("SETTINGS","searchpaths","/usr/include");
+  searchpath=getApp()->reg().readStringEntry("SETTINGS","searchpath","/usr/include");
 
   // Change the colors
   editor->setTextColor(textfore);
@@ -1694,7 +1703,7 @@ void TextWindow::writeRegistry(){
   getApp()->reg().writeIntEntry("SETTINGS","filepatternno",getCurrentPattern());
 
   // Search path
-  getApp()->reg().writeStringEntry("SETTINGS","searchpaths",searchpaths.text());
+  getApp()->reg().writeStringEntry("SETTINGS","searchpath",searchpath.text());
 
   // Remove bookmarks and views
   if(!savemarks){ getApp()->reg().deleteSection("BOOKMARKS"); }
@@ -1768,7 +1777,7 @@ long TextWindow::onCmdAbout(FXObject*,FXSelector,void*){
   FXVerticalFrame* side=new FXVerticalFrame(&about,LAYOUT_SIDE_RIGHT|LAYOUT_FILL_X|LAYOUT_FILL_Y,0,0,0,0, 10,10,10,10, 0,0);
   new FXLabel(side,"A . d . i . e",nullptr,JUSTIFY_LEFT|ICON_BEFORE_TEXT|LAYOUT_FILL_X);
   new FXHorizontalSeparator(side,SEPARATOR_LINE|LAYOUT_FILL_X);
-  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s %s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2024 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,__TIME__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
+  new FXLabel(side,FXString::value(tr("\nThe Adie ADvanced Interactive Editor, version %d.%d.%d (%s %s).\n\nAdie is a fast and convenient programming text editor and file\nviewer with an integrated directory browser.\nUsing The FOX Toolkit (www.fox-toolkit.org), version %d.%d.%d.\nCopyright (C) 2000,2025 Jeroen van der Zijp (jeroen@fox-toolkit.net).\n "),VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,__DATE__,__TIME__,FOX_MAJOR,FOX_MINOR,FOX_LEVEL),nullptr,JUSTIFY_LEFT|LAYOUT_FILL_X|LAYOUT_FILL_Y);
   FXButton *button=new FXButton(side,tr("&OK"),nullptr,&about,FXDialogBox::ID_ACCEPT,BUTTON_INITIAL|BUTTON_DEFAULT|FRAME_RAISED|FRAME_THICK|LAYOUT_RIGHT,0,0,0,0,32,32,2,2);
   button->setFocus();
   about.execute(PLACEMENT_OWNER);
@@ -1833,9 +1842,11 @@ long TextWindow::onUpdHasSelection(FXObject* sender,FXSelector,void*){
 // Before switching to another file or closing the window, check to
 // see if the text buffer may need to be saved:
 //
-//  - The file on the disk was removed, making the text buffer the
-//    last remaining copy of the file.  If we haven't asked before,
-//    ask the user to save it back to disk.
+//  - The file on the disk was removed, see if user wants this file
+//    to be saved back to disk.
+//
+//  - The file on the disk was changed by another application; see
+//    if user wants this file to be saved back to disk.
 //
 //  - The text buffer was modified. Ask the user if he wants to save
 //    the text buffer to disk.
@@ -1845,22 +1856,41 @@ long TextWindow::onUpdHasSelection(FXObject* sender,FXSelector,void*){
 FXbool TextWindow::saveChanges(){
   FXuint answer;
   if(isFilenameSet()){
-    if(1<getFiletime() && !FXStat::exists(getFilename())){
-      answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Was Removed From Disk"),tr("Save file: %s back to disk?"),getFilename().text());
-      if(answer==MBOX_CLICKED_CANCEL) return false;
-      if(answer==MBOX_CLICKED_NO) return true;
-      return saveDoc();
+    if(0<getFiletime()){
+      FXStat info;
+
+      // File on disk was removed or renamed 
+      if(!FXStat::statFile(getFilename(),info)){
+        answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Was Removed From Disk"),tr("Save file: %s to disk?"),getFilename().text());
+        if(answer==MBOX_CLICKED_CANCEL) return false;
+        if(answer==MBOX_CLICKED_NO) return true;
+        return saveDocAs();
+        }
+        
+      // File was changed on disk since last time
+      if(getFiletime()!=info.modified()){
+        answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Was Changed On Disk"),tr("Save file: %s to disk?"),getFilename().text());
+        if(answer==MBOX_CLICKED_CANCEL) return false;
+        if(answer==MBOX_CLICKED_NO) return true;
+        return saveDocAs();
+        }
       }
+      
+    // File was modified, save it back to disk
     if(isModified()){
       answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Has Unsaved Changes"),tr("Save file: %s to disk?"),getFilename().text());
       if(answer==MBOX_CLICKED_CANCEL) return false;
       if(answer==MBOX_CLICKED_NO) return true;
       return saveDoc();
       }
+      
+    // Just save bookmarks and view
     writeBookmarks(getFilename());
     writeView(getFilename());
     return true;
     }
+    
+  // File was modified, save to new name
   if(isModified()){
     answer=FXMessageBox::warning(this,MBOX_YES_NO_CANCEL,tr("File Has Unsaved Changes"),tr("Save file: %s to disk?"),getFilename().text());
     if(answer==MBOX_CLICKED_CANCEL) return false;
@@ -1982,6 +2012,45 @@ FXbool TextWindow::saveDocAs(){
   }
 
 
+// Change document's filename
+// 1) Check if name actually changed;
+// 2) If new name exists, warning about overwrite;
+// 3) If old filename exists, move it to new filename;
+// 4) Update name for this buffer, file browser.
+FXbool TextWindow::renameTo(){
+  FXFileDialog renamedialog(this,tr("Rename file to"));
+  FXString oldfile=getFilename();
+  FXint patno=getApp()->reg().readIntEntry("File Dialog","pattern",0);
+  renamedialog.setSelectMode(SELECTFILE_ANY);
+  renamedialog.setAssociations(getApp()->getFileAssociations(),false);
+  renamedialog.setPatternList(getPatternList());
+  renamedialog.setCurrentPattern(FXCLAMP(0,patno,renamedialog.getNumPatterns()-1));
+  renamedialog.setFilename(oldfile);
+  if(renamedialog.execute()){
+    FXString newfile=renamedialog.getFilename();
+    getApp()->reg().writeIntEntry("File Dialog","pattern",renamedialog.getCurrentPattern());
+    if(oldfile!=newfile){
+      if(FXStat::exists(newfile)){
+        if(FXMessageBox::warning(this,MBOX_YES_NO,tr("File Already Exists"),tr("Overwrite file: %s?"),newfile.text())==MBOX_CLICKED_NO) return false;
+        }
+      if(FXStat::exists(oldfile)){
+        if(!FXFile::move(oldfile,newfile,true)){
+          FXMessageBox::error(this,MBOX_OK,tr("Error Renaming File"),tr("Unable to rename file: %s to: %s"),oldfile.text(),newfile.text());
+          return false;
+          }
+        }
+      appendRecentlyUsed(newfile);
+      removeRecentlyUsed(oldfile);
+      setBrowserCurrentFile(newfile);
+      setFilename(newfile);
+      setFilenameSet(true);
+      return true;
+      }
+    }
+  return false;
+  }
+
+
 // Save document to another name
 // If file exist, prompt before overwriting
 FXbool TextWindow::saveDocTo(){
@@ -2037,8 +2106,10 @@ FXbool TextWindow::openDoc(){
   opendialog.setPatternList(getPatternList());
   opendialog.setCurrentPattern(FXCLAMP(0,patno,opendialog.getNumPatterns()-1));
   opendialog.setFilename(file);
+  //opendialog.showReadOnly(true);
   if(opendialog.execute()){
     file=opendialog.getFilename();
+    //FXbool readonly=opendialog.getReadOnly();
     getApp()->reg().writeIntEntry("File Dialog","pattern",opendialog.getCurrentPattern());
     return openDoc(file);
     }
@@ -2057,6 +2128,7 @@ FXbool TextWindow::openDoc(const FXString& file){
       }
     if(!window->loadFile(file)){
       FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+      delete window;
       return false;
       }
     window->setBrowserCurrentFile(file);
@@ -2187,6 +2259,7 @@ FXbool TextWindow::openSelDoc(){
             }
           if(!window->loadFile(file)){
             FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+            delete window;
             return false;
             }
 
@@ -2296,7 +2369,7 @@ long TextWindow::onCmdOpen(FXObject*,FXSelector,void*){
 long TextWindow::onCmdOpenRecent(FXObject*,FXSelector,void* ptr){
   FXString file((const FXchar*)ptr);
   if(!openDoc(file)){
-    mrufiles.removeFile(file);
+    removeRecentlyUsed(file);
     }
   return 1;
   }
@@ -2368,6 +2441,20 @@ long TextWindow::onCmdReload(FXObject*,FXSelector,void*){
 
 // Update reload document from file
 long TextWindow::onUpdReload(FXObject* sender,FXSelector,void* ptr){
+  sender->handle(this,isFilenameSet()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
+  return 1;
+  }
+
+
+// Rename file
+long TextWindow::onCmdRename(FXObject*,FXSelector,void*){
+  renameTo();
+  return 1;
+  }
+
+
+// Update rename file
+long TextWindow::onUpdRename(FXObject* sender,FXSelector,void* ptr){
   sender->handle(this,isFilenameSet()?FXSEL(SEL_COMMAND,ID_ENABLE):FXSEL(SEL_COMMAND,ID_DISABLE),ptr);
   return 1;
   }
@@ -2468,7 +2555,7 @@ long TextWindow::onCmdPrint(FXObject*,FXSelector,void*){
   FXPrinter printer;
   if(dlg.execute()){
     dlg.getPrinter(printer);
-    FXTRACE((100,"Printer = %s\n",printer.name.text()));
+    FXTRACE((TOPIC_COMMAND,"Printer = %s\n",printer.name.text()));
     }
   return 1;
   }
@@ -3148,15 +3235,15 @@ long TextWindow::onCmdFilter(FXObject*,FXSelector,void* ptr){
 
 
 // Change search paths
-long TextWindow::onCmdSearchPaths(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETSTRINGVALUE),(void*)&searchpaths);
+long TextWindow::onCmdSearchPath(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_GETSTRINGVALUE),(void*)&searchpath);
   return 1;
   }
 
 
 // Update search paths
-long TextWindow::onUpdSearchPaths(FXObject* sender,FXSelector,void*){
-  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&searchpaths);
+long TextWindow::onUpdSearchPath(FXObject* sender,FXSelector,void*){
+  sender->handle(this,FXSEL(SEL_COMMAND,ID_SETSTRINGVALUE),(void*)&searchpath);
   return 1;
   }
 
@@ -3728,7 +3815,7 @@ FXbool TextWindow::matchesSelection(const FXString& string,FXint* beg,FXint* end
 
 // Search text
 long TextWindow::onCmdSearch(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TextWindow::onCmdSearch()\n"));
+  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearch()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXSearchDialog searchdialog(this,tr("Search"),&dialogicon);
   FXint    beg[10],end[10],pos,code;
@@ -3815,7 +3902,7 @@ static FXString substitute(const FXString& original,const FXString& replace,FXin
 
 // Replace text
 long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
-  FXTRACE((100,"TextWindow::onCmdReplace()\n"));
+  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdReplace()\n"));
   FXGIFIcon dialogicon(getApp(),searchicon_gif);
   FXReplaceDialog replacedialog(this,tr("Replace"),&dialogicon);
   FXint    beg[10],end[10],pos,finish,fm,to,code;
@@ -3987,7 +4074,7 @@ long TextWindow::onCmdReplace(FXObject*,FXSelector,void*){
 
 // Search selected
 long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
-  FXTRACE((100,"TextWindow::onCmdSearchSel()\n"));
+  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearchSel()\n"));
   FXString string;
   if(getDNDData(FROM_SELECTION,utf8Type,string)){               // UTF8 string
     searchstring=string;
@@ -4016,7 +4103,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
       if(editor->isPosSelected(pos)) pos=selstart-1;            // Start from selection start-1 if position is selected
       searchflags=(searchflags&~SEARCH_FORWARD)|SEARCH_BACKWARD;
       }
-    FXTRACE((100,"searchstring=\n\"\"\"\n%s\n\"\"\"\n",searchstring.text()));
+    FXTRACE((TOPIC_DETAIL,"searchstring=\n\"\"\"\n%s\n\"\"\"\n",searchstring.text()));
     if(editor->findText(searchstring,beg,end,pos,searchflags|SEARCH_WRAP,10)){
       if(beg[0]!=selstart || end[0]!=selend){
         editor->setAnchorPos(beg[0]);
@@ -4032,7 +4119,7 @@ long TextWindow::onCmdSearchSel(FXObject*,FXSelector sel,void*){
 
 // Search for next occurence
 long TextWindow::onCmdSearchNext(FXObject*,FXSelector sel,void*){
-  FXTRACE((100,"TextWindow::onCmdSearchNext()\n"));
+  FXTRACE((TOPIC_COMMAND,"TextWindow::onCmdSearchNext()\n"));
   if(!searchstring.empty()){
     FXint selstart=editor->getSelStartPos();
     FXint selend=editor->getSelEndPos();
@@ -4431,7 +4518,7 @@ long TextWindow::onTextFocus(FXObject*,FXSelector,void*){
 long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((140,"Inserted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE((TOPIC_DETAIL,"Inserted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4461,7 +4548,7 @@ long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
 long TextWindow::onTextReplaced(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((140,"Replaced: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE((TOPIC_DETAIL,"Replaced: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4491,7 +4578,7 @@ long TextWindow::onTextReplaced(FXObject*,FXSelector,void* ptr){
 long TextWindow::onTextDeleted(FXObject*,FXSelector,void* ptr){
   const FXTextChange *change=(const FXTextChange*)ptr;
 
-  FXTRACE((140,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
+  FXTRACE((TOPIC_DETAIL,"Deleted: pos=%d ndel=%d nins=%d\n",change->pos,change->ndel,change->nins));
 
   // Log undo record, optionally merging with previously recorded
   // undo record.  Do not merge undos if merging is off, or if cursor
@@ -4635,27 +4722,25 @@ long TextWindow::onCheckChange(FXObject*,FXSelector,void*){
 
         // Check file on disk still exists, or has changed
         if(FXStat::statFile(getFilename(),info)){
+        
+          // Filetime on disk was changed, i.e. another application changed
+          // this file while we were editing it. Offer the user a choice to
+          // reload, ignore this one change, or all future changes.
           if(getFiletime()!=info.modified()){
-
-            // Don't warn again unless there's another change
-            setFiletime(info.modified());
-
-            // Warn user file was changed on the disk
-            FXuint answer=FXMessageBox::warning(this,MBOX_YES_NO,tr("File Was Changed On Disk"),tr("Reload file: %s back from disk?"),getFilename().text());
+            FXuint answer=FXMessageBox::warning(this,MBOX_YES_NO_NOALL,tr("File Was Changed On Disk"),tr("Reload file: %s back from disk?"),getFilename().text());
+            if(answer==MBOX_CLICKED_NO){ setFiletime(info.modified()); }
+            if(answer==MBOX_CLICKED_NOALL){ setFiletime(1); }
             if(answer==MBOX_CLICKED_YES){
               reloadDoc();
               }
             }
           }
 
-        // File was removed
+        // File was removed. Maybe this was in error, so offer the
+        // user an oportunity to resave data still in the buffer
         else{
-
-          // Don't warn again; no need to check again
-          setFiletime(1);
-
-          // Warn user file was removed from disk
           FXuint answer=FXMessageBox::warning(this,MBOX_YES_NO,tr("File Was Removed From Disk"),tr("Save file: %s back to disk?"),getFilename().text());
+          if(answer==MBOX_CLICKED_NO){ setFiletime(1); }
           if(answer==MBOX_CLICKED_YES){
             saveDocAs();
             }
@@ -4952,6 +5037,17 @@ void TextWindow::writeView(const FXString& file){
     }
   }
 
+
+// Append filename to recently used files list
+void TextWindow::appendRecentlyUsed(const FXString& file){
+  mrufiles.appendFile(file);
+  }
+
+
+// Remove filename from recently used file list
+void TextWindow::removeRecentlyUsed(const FXString& file){
+  mrufiles.removeFile(file);
+  }
 
 /*******************************************************************************/
 
@@ -5352,8 +5448,8 @@ FXint TextWindow::forwardByContext(FXint pos) const {
 FXint TextWindow::backwardByContext(FXint pos) const {
   FXint nlines=syntax->getContextLines();
   FXint nchars=syntax->getContextChars();
-  FXint r1=pos;
-  FXint r2=pos;
+  FXint r1=pos-1;
+  FXint r2=pos-1;
   if(0<nchars){
     r1=editor->validPos(pos-nchars);
     }
@@ -5376,6 +5472,8 @@ FXint TextWindow::findRestylePoint(FXint pos,FXint& style) const {
 
   // At begin of buffer, so restyle from begin
   if(probepos==0) return 0;
+
+  FXASSERT(0<=pos && pos<editor->getLength());
 
   // Get style here
   runstyle=editor->getStyle(probepos);
@@ -5452,7 +5550,7 @@ FXint TextWindow::restyleRange(FXint beg,FXint end,FXint& changed,FXint rule){
 
 // Restyle text after change in buffer
 void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
-  FXTRACE((100,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
+  FXTRACE((TOPIC_DETAIL,"restyleText(pos=%d,del=%d,ins=%d)\n",pos,del,ins));
   if(colorize && syntax){
     FXint tail,changed,affected,beg,end,len,rule,restylejump;
 
@@ -5469,7 +5567,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
     // Scan forward by one context
     end=forwardByContext(changed);
 
-    FXTRACE((110,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
+    FXTRACE((TOPIC_DETAIL,"pos=%d del=%d ins=%d beg=%d end=%d len=%d rule=%d (%s)\n",pos,del,ins,beg,end,len,rule,syntax->getRule(rule)->getName().text()));
 
     FXASSERT(0<=rule && rule<syntax->getNumRules());
 
@@ -5481,7 +5579,7 @@ void TextWindow::restyleText(FXint pos,FXint del,FXint ins){
       // and the range of affected characters where style was changed
       tail=restyleRange(beg,end,affected,rule);
 
-      FXTRACE((110,"affected=%d beg=%d end=%d tail=%d, rule=%d (%s)\n",affected,beg,end,tail,rule,syntax->getRule(rule)->getName().text()));
+      FXTRACE((TOPIC_DETAIL,"affected=%d beg=%d end=%d tail=%d, rule=%d (%s)\n",affected,beg,end,tail,rule,syntax->getRule(rule)->getName().text()));
 
       // Not all colored yet, continue coloring with parent rule from tail
       if(tail<end){
@@ -5602,6 +5700,7 @@ long TextWindow::onQueryTextTip(FXObject* sender,FXSelector,void*){
     if(editor->getCursorPosition(x,y,btns)){
       if(vx<=x && vy<=y && x<vx+vw && y<vy+vh){
         pos=editor->getPosAt(x,y);
+        FXASSERT(0<=pos && pos<editor->getLength());
         s=editor->getStyle(pos);
         if(0<s && s<getSyntax()->getNumRules()){
           FXString tipstring=getSyntax()->getRule(s)->getName();

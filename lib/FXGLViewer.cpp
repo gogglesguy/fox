@@ -3,7 +3,7 @@
 *                           O p e n G L   V i e w e r                           *
 *                                                                               *
 *********************************************************************************
-* Copyright (C) 1997,2024 by Jeroen van der Zijp.   All Rights Reserved.        *
+* Copyright (C) 1997,2025 by Jeroen van der Zijp.   All Rights Reserved.        *
 *********************************************************************************
 * This library is free software; you can redistribute it and/or modify          *
 * it under the terms of the GNU Lesser General Public License as published by   *
@@ -1934,9 +1934,6 @@ FXfloat curve(FXfloat x,FXfloat theta){
 
 // Space ball motion
 long FXGLViewer::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
-  const FXVec3f xaxis(1.0f,0.0f,0.0f);
-  const FXVec3f yaxis(0.0f,1.0f,0.0f);
-  const FXVec3f zaxis(0.0f,0.0f,1.0f);
   if(isEnabled()){
     FXEvent* event=(FXEvent*)ptr;
     FXTRACE((TOPIC_DETAIL,"%s::onSpaceBallMotion Mask=%08x\n",getClassName(),event->state));
@@ -1945,18 +1942,18 @@ long FXGLViewer::onSpaceBallMotion(FXObject*,FXSelector,void* ptr){
     FXQuatf q;
     if(FXABS(event->values[3])>FXABS(event->values[4])){
       if(FXABS(event->values[3])>FXABS(event->values[5])){
-        q.setAxisAngle(xaxis,0.0004f*curve(event->values[3],50.0f));
+        q.setXRotate(0.0004f*curve(event->values[3],50.0f));
         }
       else{
-        q.setAxisAngle(zaxis,-0.0004f*curve(event->values[5],50.0f));
+        q.setZRotate(-0.0004f*curve(event->values[5],50.0f));
         }
       }
     else{
       if(FXABS(event->values[4])>FXABS(event->values[5])){
-        q.setAxisAngle(yaxis,-0.0004f*curve(event->values[4],50.0f));
+        q.setYRotate(-0.0004f*curve(event->values[4],50.0f));
         }
       else{
-        q.setAxisAngle(zaxis,-0.0004f*curve(event->values[5],50.0f));
+        q.setZRotate(-0.0004f*curve(event->values[5],50.0f));
         }
       }
     translate(-worldVector(0,0,0.01f*curve(event->values[0],40.0f),0.01f*curve(event->values[1],40.0f)));
@@ -2308,9 +2305,6 @@ long FXGLViewer::onUpdXYZScale(FXObject* sender,FXSelector sel,void*){
 
 // Rotate camera about model by means of dials
 long FXGLViewer::onCmdXYZDial(FXObject*,FXSelector sel,void* ptr){
-  const FXVec3f xaxis(1.0f,0.0f,0.0f);
-  const FXVec3f yaxis(0.0f,1.0f,0.0f);
-  const FXVec3f zaxis(0.0f,0.0f,1.0f);
   FXint dialnew=(FXint)(FXival)ptr;
   FXfloat ang;
   FXQuatf q;
@@ -2320,17 +2314,17 @@ long FXGLViewer::onCmdXYZDial(FXObject*,FXSelector sel,void* ptr){
     switch(FXSELID(sel)){
       case ID_DIAL_X:
         ang=(FXfloat)(DTOR*(dialnew-dial[0]));
-        q.setAxisAngle(xaxis,-ang);
+        q.setXRotate(-ang);
         dial[0]=dialnew;
         break;
       case ID_DIAL_Y:
         ang=(FXfloat)(DTOR*(dialnew-dial[1]));
-        q.setAxisAngle(yaxis, ang);
+        q.setYRotate(ang);
         dial[1]=dialnew;
         break;
       case ID_DIAL_Z:
         ang=(FXfloat)(DTOR*(dialnew-dial[2]));
-        q.setAxisAngle(zaxis, ang);
+        q.setZRotate(ang);
         dial[2]=dialnew;
         break;
       }
