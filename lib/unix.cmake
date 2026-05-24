@@ -199,26 +199,9 @@ endif()
 # This macro is obsolescent, as all current systems with directory libraries have <dirent.h>.
 # New programs need not use this macro.
 #
-# Not checking for the SCO Xenix dir and x libraries.
-#
 check_cxx_source_compiles("#include <dirent.h>\nint main(int argc,char *argv[]) { DIR * d; return 0; }" HAVE_DIRENT_H)
 if(HAVE_DIRENT_H)
   target_compile_definitions(FOX_XINCS INTERFACE HAVE_DIRENT_H)
-else()
-  check_cxx_source_compiles("#include <sys/ndir.h>\nint main(int argc,char *argv[]) { DIR * d; return 0; }" HAVE_SYS_NDIR_H)
-  if(HAVE_SYS_NDIR_H)
-    target_compile_definitions(FOX_XINCS INTERFACE HAVE_SYS_NDIR_H)
-  else()
-    check_cxx_source_compiles("#include <sys/dir.h>\nint main(int argc,char *argv[]) { DIR * d; return 0; }" HAVE_SYS_DIR_H)
-    if(NOT HAVE_SYS_DIR_H)
-      target_compile_definitions(FOX_XINCS INTERFACE HAVE_SYS_DIR_H)
-    else()
-      check_cxx_source_compiles("#include <ndir.h>\nint main(int argc,char *argv[]) { DIR * d; return 0; }" HAVE_NDIR_H)
-      if(HAVE_NDIR_H)
-        target_compile_definitions(FOX_XINCS INTERFACE HAVE_NDIR_H)
-      endif()
-    endif()
-  endif()
 endif()
 
 #
