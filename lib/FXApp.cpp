@@ -4332,31 +4332,25 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
     // Alternative display
     if(FXString::compare(argv[j],"-display")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -display.\n",getClassName());
-        ::exit(1);
-        }
-      dpy=argv[j++];
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -display.\n",getClassName()); ::exit(1); }
+      dpy=argv[j];
+      j++;
       continue;
       }
 
     // Set input method
     if(FXString::compare(argv[j],"-im")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -im.\n",getClassName());
-        ::exit(1);
-        }
-      inputmethod=argv[j++];
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -im.\n",getClassName()); ::exit(1); }
+      inputmethod=argv[j];
+      j++;
       continue;
       }
 
     // Input style
     if(FXString::compare(argv[j],"-is")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -is.\n",getClassName());
-        ::exit(1);
-        }
-      style=argv[j++];
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -is.\n",getClassName()); ::exit(1); }
+      style=argv[j];
+      j++;
       continue;
       }
 
@@ -4364,31 +4358,24 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
     // Set trace level
     if(FXString::compare(argv[j],"-tracelevel")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -tracelevel.\n",getClassName());
-        ::exit(1);
-        }
-      setTraceLevel(__strtoul(argv[j++]));
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -tracelevel.\n",getClassName()); ::exit(1); }
+      setTraceLevel(__strtoul(argv[j]));
+      j++;
       continue;
       }
 
     // Set trace level
     if(FXString::compare(argv[j],"-tracetopics")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -tracetopics.\n",getClassName());
-        ::exit(1);
-        }
-      setTraceTopics(argv[j++]);
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -tracetopics.\n",getClassName()); ::exit(1); }
+      if(!setTraceTopics(argv[j++])){ fxwarning("%s:init: bad syntax: %s for -tracetopics.\n",getClassName(),argv[j-1]); ::exit(1); }
       continue;
       }
 
     // Set per-user configuration directory
     if(FXString::compare(argv[j],"-config")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -config.\n",getClassName());
-        ::exit(1);
-        }
-      registry.setUserDirectory(argv[j++]);
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -config.\n",getClassName()); ::exit(1); }
+      registry.setUserDirectory(argv[j]);
+      j++;
       continue;
       }
 
@@ -4401,15 +4388,10 @@ void FXApp::init(int& argc,char** argv,FXbool connect){
 
     // Set maximum number of colors
     if(FXString::compare(argv[j],"-maxcolors")==0){
-      if(++j>=argc){
-        fxwarning("%s:init: missing argument for -maxcolors.\n",getClassName());
-        ::exit(1);
-        }
-      maxcols=__strtoul(argv[j++]);
-      if(maxcols<2 || maxcols>256){
-        fxwarning("%s::init: expected value between 2 and 256.\n",getClassName());
-        ::exit(1);
-        }
+      if(++j>=argc){ fxwarning("%s:init: missing argument for -maxcolors.\n",getClassName()); ::exit(1); }
+      maxcols=__strtoul(argv[j]);
+      if(maxcols<2 || maxcols>256){ fxwarning("%s::init: expected value between 2 and 256.\n",getClassName()); ::exit(1); }
+      j++;
       continue;
       }
 

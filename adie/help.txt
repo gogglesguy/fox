@@ -243,13 +243,18 @@ Between one text window and another, the drag defaults to a copy operation you c
 Undo and Redo.
 
 The editor supports unlimited (well, the limit is large...) undo and redo capability.  Each time you insert, remove, or replace some text, the editor remembers what you did.
-If you make a mistake, you can undo the last command, and the one before that, and so on. Having invoked undo many times, it is sometimes desirable to invoke the redo command, i.e. to perform the original editing operation again.  Thus, you can move backward or forward in time.
+If you make a mistake, you can undo the last edit, and the one before that, and so on. Having invoked undo many times, it is sometimes desirable to invoke the redo command, i.e. to perform the original editing operation again.  Thus, you can move backward or forward in time.
+
 The "Merge Undos" option consolidates contiguous single-character insertions or deletions into larger undo commands.  When the "Merge Undos" mode is on, an undo or redo will undo inserts or deletes on a word-by-word basis.  It tries to be smart about which character classes are "mergeable," so that for example editing source code, we're not backing over operators and other punctuation that may have special meanings in programming languages (we're still experimenting with this feature so the precise behaviour will be fine-tuned a bit in the future.
+
 A new addition to the undo system is the "Alternate History" mode.  If, after undoing several commands, you decide edit the buffer in a different way, all commands that you have undone would normally be deleted, and you would no longer be able to go forward with redo from that point.
 However, when "Alternate History" mode on, Adie will remember "the path not taken" and allow you to undo back to the original text, prior to the change.
+
 Needless to say, this may vastly expand the amount of memory used by the undo system; however, to prevent things getting out of hand the undo list is periodically trimmed to keep it manageable.
+
 When you load a file, or save a file after editing it, the undo system will remember the state of the text buffer as "clean" or "marked".  Making further changes, you will be able to quickly go back to this clean state using the "Revert" command.  Unlike reload, no disk I/O is performed when this happens: we're simply exucuting undo or redo commands to go back to the marked state.
-Of course, if a huge amount of text was modified, and the undo list had to be trimmed, you will potentially not be able to reach the marked state anymore if it wanders into the trimmed range.  However, the limits are set pretty large for editing regular source files.
+
+Of course, if a huge amount of text was modified, and the undo list had to be trimmed, you will potentially not be able to reach the marked state anymore if it wanders into the trimmed range.  However, the default limits are set pretty large for editing regular source files; if you ever run into these limits, they can be changed in the preferences panel.
 
 
 Evaluating Numerical Expressions.

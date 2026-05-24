@@ -22,6 +22,7 @@
 #include "fxver.h"
 #include "fxdefs.h"
 #include "fxchar.h"
+#include "fxascii.h"
 #include "FXElement.h"
 #include "FXArray.h"
 #include "FXMetaClass.h"
@@ -89,8 +90,9 @@
 
      o 2n backslashes followed by a " produce n backslashes + start/end double quoted part.
 
-     o 2n+1 backslashes followed by a " produce n backslashes + a literal quotation mark
-       n backslashes not followed by a quotation mark produce n backslashes.
+     o 2n+1 backslashes followed by a " produce n backslashes + a literal quotation mark.
+
+     o n backslashes not followed by a quotation mark produce n backslashes.
 
      o undocumented rules regarding double quotes:
 
@@ -114,6 +116,17 @@
         Use \\"  to insert a \ then start or end a double quoted part
         Use \\\" to insert a literal \"
         Use \    to insert a literal \
+
+     o Examples given:
+
+       Command-line input      argv[1]         argv[2]         argv[3]
+       ----------------------------------------------------------------
+       "a b c" d e             a b c           d               e
+       "ab\"c" "\\" d          ab"c            \               d
+       a\\\b d"e f"g h         a\\\b           de fg           h
+       a\\\"b c d              a\"b            c               d
+       a\\\\"b c" d e          a\\b c          d               e
+       a"b"" c d               ab"             c               d
 
   - On Linux, consider using posix_spawn() instead of the old fork()/exec() pair.
     This means setting up some posix_spawn_file_actions and posix_spawnattr to
@@ -180,12 +193,12 @@ static int CDECL comparison(const void *a1, const void *a2){
 
 
 // See if quotes are needed
-static FXbool needquotes(const FXchar* ptr){
+static inline FXint needquotes(const FXchar* ptr){
   FXchar c;
   while((c=*ptr++)!='\0'){
-    if(c==' ' || c=='"' || c=='\t' || c=='\v' || c=='\n') return true;
+    if(c==' ' || c=='\t') return 1;
     }
-  return false;
+  return 0;
   }
 
 #ifdef UNICODE
@@ -194,67 +207,97 @@ static FXbool needquotes(const FXchar* ptr){
 static FXnchar* commandline(const FXchar *const *args){
   FXnchar *result=nullptr;
   if(args){
-    FXint size,s,n,w;
-    const FXchar  *ptr;
-    FXnchar       *dst;
-    FXbool         q;
-    for(size=s=0; (ptr=args[s])!=nullptr; ++s){
-      q=needquotes(ptr);
-      if(q) size+=2;
-      n=0;
-      while(1){
-        w=wc(ptr);
-        if(w=='\0'){
-          if(q){ size+=n; }
+    const FXchar *const *arg;
+    const FXchar *ptr;
+    FXint size=0,quote=0,slash=0,w;
+    arg=args;
+    while((ptr=*arg++)!=nullptr){
+      quote=needquotes(ptr);
+      if(quote) size++;         // Open quote
+      do{
+        w=wcnxt(ptr);
+        switch(w){
+        case '\\':              // Backslash
+          size++;
+          slash++;
+          break;
+        case '"':               // Embedded '"'
+          size+=slash;          // Double '\'
+          size+=2;              // Escaped '\"'
+          slash=0;
+          break;
+        case '\0':              // End of string
+          if(quote) size+=slash;// Double '\'
+          slash=0;
+          break;
+        case ' ':               // White space
+        case '\t':
+          size++;
+          slash=0;
+          break;
+        default:                // Normal characters
+          size+=wc2nc(w);
+          slash=0;
           break;
           }
-        else if(w=='\\'){
-          size++;
-          n++;
-          }
-        else if(w=='"'){
-          size+=n+2;
-          n=0;
-          }
-        else{
-          size+=wc2nc(w);
-          n=0;
-          }
-        ptr=wcinc(ptr);
         }
-      size++;
+      while(w);
+      if(quote) size++;         // Close quote
+      size++;                   // Separate with ' '
       }
-    if(allocElms(result,size+1)){
-      for(dst=result,s=0; (ptr=args[s])!=nullptr; ++s){
-        q=needquotes(ptr);
-        if(q) *dst++='"';
-        n=0;
-        while(1){
-          w=wc(ptr);
-          if(w=='\0'){
-            if(q){ while(--n>=0){ *dst++='\\'; } }
-            break;
-            }
-          else if(w=='\\'){
+
+    // Ultimate termination
+    size++;
+
+    // Allocate buffer for the command
+    if(allocElms(result,size)){
+      FXnchar *dst=result;
+      arg=args;
+      while((ptr=*arg++)!=nullptr){
+        quote=needquotes(ptr);
+        if(quote) *dst++='"';   // Open quote
+        do{
+          w=wcnxt(ptr);
+          switch(w){
+          case '\\':            // Backslash
             *dst++='\\';
-            n++;
-            }
-          else if(w=='"'){
-            while(--n>=0){ *dst++='\\'; }
+            slash++;
+            break;
+          case '"':             // Embedded '"'
+            while(slash){
+              *dst++='\\';
+              slash--;
+              }
             *dst++='\\';
             *dst++='"';
-            n=0;
-            }
-          else{
+            slash=0;
+            break;
+          case '\0':            // End of string
+            if(quote){
+              while(slash){
+                *dst++='\\';
+                slash++;
+                }
+              }
+            slash=0;
+            break;
+          case ' ':             // White space
+          case '\t':
+            *dst++=w;
+            slash=0;
+            break;
+          default:              // Normal characters
             dst+=wc2nc(dst,w);
-            n=0;
+            slash=0;
+            break;
             }
-          ptr=wcinc(ptr);
           }
-        if(q) *dst++='"';
-        *dst++=' ';
+        while(w);
+        if(quote) *dst++='"';   // Close quote
+        *dst++=' ';             // Separate with ' '
         }
-      *dst='\0';
+      *dst++='\0';              // Terminate
+      FXASSERT(dst==result+size);
       }
     }
   return result;
@@ -294,65 +337,97 @@ static FXnchar* enviroblock(const FXchar *const *env){
 static FXchar* commandline(const FXchar *const *args){
   FXchar *result=nullptr;
   if(args){
-    FXint size,s,n,w;
-    const FXchar  *ptr;
-    FXchar        *dst;
-    FXbool         q;
-    for(size=s=0; (ptr=args[s])!=nullptr; ++s){
-      q=needquotes(ptr);
-      if(q) size+=2;
-      n=0;
-      while(1){
+    const FXchar *const *arg;
+    const FXchar *ptr;
+    FXint size=0,quote=0,slash=0,w;
+    arg=args;
+    while((ptr=*arg++)!=nullptr){
+      quote=needquotes(ptr);
+      if(quote) size++;         // Open quote
+      do{
         w=*ptr++;
-        if(w=='\0'){
-          if(q){ size+=n; }
+        switch(w){
+        case '\\':              // Backslash
+          size++;
+          slash++;
+          break;
+        case '"':               // Embedded '"'
+          size+=slash;          // Double '\'
+          size+=2;              // Escaped '\"'
+          slash=0;
+          break;
+        case '\0':              // End of string
+          if(quote) size+=slash;// Double '\'
+          slash=0;
+          break;
+        case ' ':               // White space
+        case '\t':
+          size++;
+          slash=0;
+          break;
+        default:                // Normal characters
+          size++;
+          slash=0;
           break;
           }
-        else if(w=='\\'){
-          size++;
-          n++;
-          }
-        else if(w=='"'){
-          size+=n+2;
-          n=0;
-          }
-        else{
-          size++;
-          n=0;
-          }
         }
-      size++;
+      while(w);
+      if(quote) size++;         // Close quote
+      size++;                   // Separate with ' '
       }
-    if(allocElms(result,size+1)){
-      for(dst=result,s=0; (ptr=args[s])!=nullptr; ++s){
-        q=needquotes(ptr);
-        if(q) *dst++='"';
-        n=0;
-        while(1){
+
+    // Ultimate termination
+    size++;
+
+    // Allocate buffer for the command
+    if(allocElms(result,size)){
+      FXchar *dst=result;
+      arg=args;
+      while((ptr=*arg++)!=nullptr){
+        quote=needquotes(ptr);
+        if(quote) *dst++='"';   // Open quote
+        do{
           w=*ptr++;
-          if(w=='\0'){
-            if(q){ while(--n>=0){ *dst++='\\'; } }
-            break;
-            }
-          else if(w=='\\'){
+          switch(w){
+          case '\\':            // Backslash
             *dst++='\\';
-            n++;
-            }
-          else if(w=='"'){
-            while(--n>=0){ *dst++='\\'; }
+            slash++;
+            break;
+          case '"':             // Embedded '"'
+            while(slash){
+              *dst++='\\';
+              slash--;
+              }
             *dst++='\\';
             *dst++='"';
-            n=0;
-            }
-          else{
+            slash=0;
+            break;
+          case '\0':            // End of string
+            if(quote){
+              while(slash){
+                *dst++='\\';
+                slash++;
+                }
+              }
+            slash=0;
+            break;
+          case ' ':             // White space
+          case '\t':
             *dst++=w;
-            n=0;
+            slash=0;
+            break;
+          default:              // Normal characters
+            *dst++=w;
+            slash=0;
+            break;
             }
           }
-        if(q) *dst++='"';
-        *dst++=' ';
+        while(w);
+        if(quote) *dst++='"';   // Close quote
+        *dst++='\0';            // Separate with ' '
         }
-      *dst='\0';
+      *dst++='\0';
+      FXASSERT(dst==result+size);
       }
     }
   return result;

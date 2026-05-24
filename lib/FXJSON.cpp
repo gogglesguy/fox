@@ -235,7 +235,6 @@
 
 #define TOPIC_CONSTRUCT 1000
 #define TOPIC_DETAIL    1001
-#define TOPIC_DEBUG     1002
 
 // Line termination length
 #define ENDLINELENGTH (sizeof(ENDLINE)-1)
@@ -349,6 +348,7 @@ FXJSON::Token FXJSON::next(){
         continue;
       case ' ':                                         // Space
         column++;
+        //FALL//
       case '\v':                                        // Vertical tab
       case '\f':                                        // Form feed
         offset++;
@@ -1148,8 +1148,8 @@ FXJSON::Token FXJSON::string(){
 
 // Load map elements int o var
 FXJSON::Error FXJSON::loadMap(FXVariant& var){
+  Error err=ErrEnd;
   FXString key;
-  Error err;
 
   // Make it into an array now
   var.setType(FXVariant::MapType);
@@ -1169,7 +1169,7 @@ FXJSON::Error FXJSON::loadMap(FXVariant& var){
       }
 
     // Check for duplicates
-    if(var.has(key)) return ErrDuplicate;
+    if(var.asMap().has(key)) return ErrDuplicate;
 
     // Token following the string
     token=next();
@@ -1183,7 +1183,7 @@ FXJSON::Error FXJSON::loadMap(FXVariant& var){
     if(token==TK_EOF) return ErrEnd;
 
     // Load item directly into associated slot
-    if((err=loadVariant(var[key]))!=ErrOK) return err;
+    if((err=loadVariant(var.asMap().at(key)))!=ErrOK) return err;
 
     // Expect another key-value pair
     if(token!=TK_COMMA) break;
@@ -1198,19 +1198,28 @@ FXJSON::Error FXJSON::loadMap(FXVariant& var){
 
 // Load array elements into var
 FXJSON::Error FXJSON::loadArray(FXVariant& var){
-  FXival index=0;
-  Error err;
+  Error err=ErrEnd;
+  FXival num=0;
 
   // Make it into an array now
-  var.setType(FXVariant::ArrayType);
+  var.no(0);
 
   // Parse values
   // Here reserved words have special meanings;
   // note that identifiers are excluded.
   while(TK_NAN<=token && token<=TK_LBRACE){
 
+    // Grow array by leaps and bounds
+    if(var.asArray().no()<=num){
+      FXival sz=var.asArray().no()?var.asArray().no()<<1:1;
+      var.asArray().no(sz);
+      }
+
     // Load item directly into array slot
-    if((err=loadVariant(var[index]))!=ErrOK) return err;
+    if((err=loadVariant(var.asArray().at(num)))!=ErrOK) return err;
+
+    // Next array index
+    num++;
 
     // Expect another value
     if(token!=TK_COMMA) break;
@@ -1218,10 +1227,11 @@ FXJSON::Error FXJSON::loadArray(FXVariant& var){
     // Next token
     token=next();
     if(token==TK_EOF) return ErrEnd;
-
-    // Next array index
-    index++;
     }
+  
+  // Trim the excess
+  var.asArray().no(num);
+
   return ErrOK;
   }
 

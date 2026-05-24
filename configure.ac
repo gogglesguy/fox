@@ -1,11 +1,11 @@
 # Version of the code
 m4_define([fox_major], [1])
 m4_define([fox_minor], [7])
-m4_define([fox_level], [87])
+m4_define([fox_level], [88])
 m4_define([fox_version],[fox_major.fox_minor.fox_level])
 
 # Init
-AC_INIT(fox,[fox_version],jeroen@fox-toolkit.net)
+AC_INIT([fox],[fox_version],[jeroen@fox-toolkit.net])
 AC_CONFIG_SRCDIR([include/fx.h])
 AM_INIT_AUTOMAKE([foreign])
 
@@ -69,7 +69,7 @@ AC_SUBST(LT_AGE)
 CXXFLAGS=""
 
 # More secret source
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 # Check using C++
 AC_LANG(C++)
@@ -81,7 +81,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+LT_INIT
 
 # Disable annoying warning
 AC_DISABLE_OPTION_CHECKING
@@ -93,7 +93,6 @@ LIBGL="-lGL"
 # Checks for header files.
 AC_PATH_X
 AC_PATH_XTRA
-AC_HEADER_TIME
 AC_HEADER_SYS_WAIT
 AC_HEADER_DIRENT
 
@@ -362,7 +361,7 @@ AC_SUBST(GLU_LIBS)
 # echo | gcc -E -dM -
 
 # Done.
-AC_OUTPUT(Makefile
+AC_CONFIG_FILES([Makefile
 utils/Makefile
 include/Makefile
 include/fxver.h
@@ -382,4 +381,5 @@ controlpanel/Makefile
 windows/Makefile
 fox-config
 fox.spec
-fox17.pc)
+fox17.pc])
+AC_OUTPUT

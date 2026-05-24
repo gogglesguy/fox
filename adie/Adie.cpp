@@ -237,7 +237,7 @@ Syntax* Adie::getSyntaxByName(const FXString& lang){
   FXTRACE((TOPIC_DETAIL,"Adie::getSyntaxByName(%s)\n",lang.text()));
   if(!lang.empty()){
     for(FXint syn=0; syn<numSyntaxes(); syn++){
-      if(getSyntax(syn)->getName()==lang){
+      if(FXString::comparecase(getSyntax(syn)->getName(),lang)==0){
         FXTRACE((TOPIC_DETAIL,"syntaxes[%d]: language: %s matched name: %s!\n",syn,getSyntax(syn)->getName().text(),lang.text()));
         return getSyntax(syn);
         }

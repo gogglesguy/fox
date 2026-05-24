@@ -160,6 +160,7 @@ public:
 * For example, parseHotKey(""Salt && &Pepper!"") yields the same value as
 * MKUINT(KEY_p,ALTMASK).
 */
+extern FXAPI FXHotKey parseHotKey(const FXchar* string);
 extern FXAPI FXHotKey parseHotKey(const FXString& string);
 
 /**
@@ -168,6 +169,7 @@ extern FXAPI FXHotKey parseHotKey(const FXString& string);
 * Note that this is the byte-offset, not the character
 * index!
 */
+extern FXAPI FXint findHotKey(const FXchar* string);
 extern FXAPI FXint findHotKey(const FXString& string);
 
 /**
@@ -175,6 +177,7 @@ extern FXAPI FXint findHotKey(const FXString& string);
 * For example, stripHotKey("Salt && &Pepper") should
 * yield "Salt & Pepper".
 */
+extern FXAPI FXString stripHotKey(const FXchar* string);
 extern FXAPI FXString stripHotKey(const FXString& string);
 
 }

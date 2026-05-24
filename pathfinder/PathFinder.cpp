@@ -1194,7 +1194,7 @@ long PathFinderMain::onFileDblClicked(FXObject*,FXSelector,void* ptr){
 
     // If executable, execute it!
     else if(filelist->isItemExecutable(index)){
-      executeCommandline(pathname);
+      executeCommandline(FXPath::enquote(pathname));
       }
 
     // If regular file return as the selected file

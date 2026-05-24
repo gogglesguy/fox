@@ -113,6 +113,25 @@
     track of alternate history may not be as important as linear history;
     when space is exceeded one might want to start deleting alternate
     history before deleting linear history.
+    How to identify alternate history sequences? First, we can identify
+    the end of an alternate history sequence, by the fact that the direction
+    flips at that point:
+    
+               __ __ __
+      C1 C2 C3 C3 C2 C1
+      
+    There may also be "wrinkles" in history, i.e. paths not taken *within* the
+    paths not taken; these types of undo records will have reference counts
+    that are >2.  However, it should be true that a *complete* alternate history
+    will have an even-numbered reference count. This may not remain true once
+    history is trimmed, however.
+    
+    One may be able to trim undo by record-size starting from the oldest linear
+    record; this should have a reference count==1.  When finding a reference
+    count>1, identify the first direction-change (in the above, the position
+    between C3 and C3's inverse).  Delete pairs of Ci, Ci-inverse) until the 
+    remaining oldest record has a refcount of 1, then proceed with oldest-
+    first as before.
 */
 
 #define TOPIC_CONSTRUCT 1000
@@ -397,7 +416,7 @@ void FXUndoList::revert(){
 // order, as shown below:
 //
 //  redolist: <empty>
-//                              _  _  _  _
+//                              __ __ __ __
 //  undolist: ...  C1 C2 C3 C4  C4 C3 C2 C1
 //
 // We are still in state S, the document doesn't get changed by this!

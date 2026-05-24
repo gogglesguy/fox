@@ -297,33 +297,42 @@ void setTraceLevel(FXuint level,FXbool flag){
 // <topic>       : <digit> [ <digits> ]*
 //
 FXbool setTraceTopics(const FXchar* topics,FXbool flag){
-  if(__likely(topics)){
-    FXuint f,t;
-    while((*topics==':') || ('0'<=*topics && *topics<='9')){
-      f=0;
-      while('0'<=*topics && *topics<='9'){
-        f=f*10+*topics++-'0';
-        }
-      f=FXMIN(f,ARRAYNUMBER(fxTopicArray)-1);
-      t=f;
-      if(*topics==':'){
-        topics++;
-        t=ARRAYNUMBER(fxTopicArray)-1;
-        if('0'<=*topics && *topics<='9'){
-          t=0;
-          while('0'<=*topics && *topics<='9'){
-            t=t*10+*topics++-'0';
-            }
-          t=FXMIN(t,ARRAYNUMBER(fxTopicArray)-1);
-          if(f>t) swap(f,t);
+  if(topics){
+    if((*topics==':') || ('0'<=*topics && *topics<='9')){
+      FXuint f,t;
+      do{
+        f=0;
+        while('0'<=*topics && *topics<='9'){
+          f=f*10+*topics++-'0';
           }
-        fillElms(&fxTopicArray[f],flag,t-f);
+        if(ARRAYNUMBER(fxTopicArray)<=f){
+          f=ARRAYNUMBER(fxTopicArray)-1;
+          }
+        t=f;
+        if(*topics==':'){
+          topics++;
+          t=ARRAYNUMBER(fxTopicArray)-1;
+          if('0'<=*topics && *topics<='9'){
+            t=0;
+            while('0'<=*topics && *topics<='9'){
+              t=t*10+*topics++-'0';
+              }
+            if(ARRAYNUMBER(fxTopicArray)<=t){
+              t=ARRAYNUMBER(fxTopicArray)-1;
+              }
+            }
+          if(f<t){
+            fillElms(&fxTopicArray[f],flag,t-f);
+            }
+          }
+        fxTopicArray[t]=flag;
+        if(*topics==','){
+          topics++;
+          }
         }
-      fxTopicArray[t]=flag;
-      if(*topics!=',') break;
-      topics++;
+      while((*topics==':') || ('0'<=*topics && *topics<='9'));
+      return (*topics=='\0');
       }
-    return true;
     }
   return false;
   }

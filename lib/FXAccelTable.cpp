@@ -540,8 +540,8 @@ FXString FXAccelTable::unparseAccel(FXHotKey key){
 /*******************************************************************************/
 
 // Parse hot key from string
-FXHotKey parseHotKey(const FXString& string){
-  const FXchar* ptr=string.text();
+FXHotKey parseHotKey(const FXchar* string){
+  const FXchar* ptr=string;
   FXuint code=0;
   FXuint mods=0;
   while(*ptr){
@@ -558,16 +558,22 @@ FXHotKey parseHotKey(const FXString& string){
       }
     ptr++;
     }
-  FXTRACE((TOPIC_ACCEL,"parseHotKey(%s) = code=%04x mods=%04x\n",string.text(),code,mods));
+  FXTRACE((TOPIC_ACCEL,"parseHotKey(%s) = code=%04x mods=%04x\n",string,code,mods));
   return MKUINT(code,mods);
   }
 
 
+// Parse hot key from string
+FXHotKey parseHotKey(const FXString& string){
+  return parseHotKey(string.text());
+  }
+
+
 // Obtain hot key offset in string
-FXint findHotKey(const FXString& string){
+FXint findHotKey(const FXchar* string){
   FXint pos=0;
   FXint n=0;
-  while(pos<string.length()){
+  while(string[pos]!='\0'){
     if(string[pos]=='&'){
       if(string[pos+1]!='&'){
         return n;
@@ -581,9 +587,15 @@ FXint findHotKey(const FXString& string){
   }
 
 
+// Obtain hot key offset in string
+FXint findHotKey(const FXString& string){
+  return findHotKey(string.text());
+  }
+
+
 // Strip hot key from string
-FXString stripHotKey(const FXString& string){
-  FXString result=string;
+FXString stripHotKey(const FXchar* string){
+  FXString result(string);
   FXint len=result.length();
   FXint i,j;
   for(i=j=0; j<len; j++){
@@ -595,6 +607,12 @@ FXString stripHotKey(const FXString& string){
     }
   result.trunc(i);
   return result;
+  }
+
+
+// Strip hot key from string
+FXString stripHotKey(const FXString& string){
+  return stripHotKey(string.text());
   }
 
 /*******************************************************************************/

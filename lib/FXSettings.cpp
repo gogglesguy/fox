@@ -72,7 +72,6 @@ using namespace FX;
 
 namespace FX {
 
-
 // Empty string dictionary table value
 extern const FXint __string__empty__[];
 extern const FXival __stringdictionary__empty__[];
@@ -278,112 +277,117 @@ FXbool FXSettings::unparseFile(const FXString& filename){
   }
 
 
+// Escape characters in [set] by '\'
+static FXString escape(const FXString& str,const FXchar* set){
+  FXString result;
+  FXint p=0;
+  FXchar c;
+  while((c=str[p++])!='\0'){
+    if(strchr(set,c)){
+      result.append('\\');
+      }
+    result.append(c);
+    }
+  return result;
+  }
+
+
+// Unescape characters escaped by '\'
+static FXString unescape(const FXString& str){
+  FXString result;
+  FXint p=0;
+  FXchar c;
+  while((c=str[p++])!='\0'){
+    if(c=='\\'){
+      if((c=str[p++])=='\0') break;
+      }
+    result.append(c);
+    }
+  return result;
+  }
+
+
 // Parse single string to populate settings
 FXbool FXSettings::parse(const FXString& str,FXbool mrk){
-  FXint lineno=1,p=0,b,e;
   FXString section,name,value;
+  FXint lineno=1,p=0,sb,se,kb,ke,vb,ve;
 
   // Skip over byte-order mark
-  if(str[p]=='\xef' && str[p+1]=='\xbb' && str[p+2]=='\xbf') p+=3;
+  if(str[p]=='\xEF' && str[p+1]=='\xBB' && str[p+2]=='\xBF'){
+    p+=3;
+    }
 
   // Parse one line at a time
-  while(str[p]){
+  while(p<str.length()){
 
-    // Skip leading blanks
-    while(Ascii::isBlank(str[p])) ++p;
+    // Skip leading whitespace
+    while(Ascii::isBlank(str[p])){
+      p++;
+      }
 
-    // Parse section name
+    // Parse section
     if(str[p]=='['){
-#if 0
-      b=p++;
-
-      // Scan over section name
-      while(str[p] && str[p]!=']' && str[p]!='\r' && str[p]!='\n'){
-        if(Ascii::isControl(str[p])){ fxwarning("%d: control character in section name.\n",lineno); goto nxt; }
-        if(str[p]=='\\' && str[p+1]==']') p++;          // For backward compatibility, only ']' needs escape
-        ++p;
+      section=FXString::null;
+      sb=++p;
+      while(str[p]!=']' && !Ascii::isControl(str[p])){
+        if(str[p]=='\\' && !Ascii::isControl(str[p+1])) p++;
+        p++;
         }
-
-      // Check errors
-      if(str[p]!=']'){ fxwarning("%d: expected ']' to close section name.\n",lineno); goto nxt; }
-
-      e=++p;
-
-      // Grab name
-      section=FXString::unescape(str.mid(b,e-b),'[',']');
-#endif
-#if 1
-      b=++p;
-
-      // Scan over section name
-      while(str[p] && str[p]!=']' && str[p]!='\r' && str[p]!='\n'){
-        if(Ascii::isControl(str[p])){ fxwarning("%d: control character in section name.\n",lineno); goto nxt; }
-        ++p;
+      se=p++;
+      if(str[se]==']'){
+        section=unescape(str.mid(sb,se-sb));
         }
-
-      // Check errors
-      if(str[p]!=']'){ fxwarning("%d: expected ']' to close section name.\n",lineno); goto nxt; }
-
-      e=p++;
-
-      // Grab name
-      section=str.mid(b,e-b);
-#endif
+      else{
+        fxwarning("%d: expected ']' following section name.\n",lineno);
+        }
       }
 
-    // Parse name-value pair
-    else if(str[p]!='#' && str[p]!=';' && str[p]!='\r' && str[p]!='\n'){
+    // Parse key-value in section
+    else if(str[p]=='#' || str[p]==';'){
+      p++;
+      }
 
-      // Should have seen section prior to this
-      if(section.empty()){ fxwarning("%d: entry should follow a section.\n",lineno); goto nxt; }
-
-      b=p;
-
-      // Scan key name
-      while(str[p] && str[p]!='=' && str[p]!='\r' && str[p]!='\n'){
-        if(Ascii::isControl(str[p])){ fxwarning("%d: control character in entry name.\n",lineno); goto nxt; }
-        ++p;
+    // Parse key-value in section
+    else if(' '<str[p]){
+      kb=p;
+      while(str[p]!='=' && !Ascii::isControl(str[p])){
+        if(str[p]=='\\' && !Ascii::isControl(str[p+1])) p++;
+        p++;
         }
-
-      // Check errors
-      if(str[p]!='='){ fxwarning("%d: expected '=' to follow entry name.\n",lineno); goto nxt; }
-
-      e=p++;
-
-      // Remove trailing spaces after name
-      while(b<e && Ascii::isBlank(str[e-1])) e--;
-
-      // Grab name
-      name=str.mid(b,e-b);
-
-      // Skip leading spaces
+      ke=p++;
       while(Ascii::isBlank(str[p])) p++;
-
-      // Mark value
-      b=p;
-
-      // Scan value
-      while(str[p] && str[p]!='\n' && str[p]!='\r'){
-        if(Ascii::isControl(str[p])){ fxwarning("%d: control character in entry value.\n",lineno); goto nxt; }
-        ++p;
+      if(str[ke]=='='){
+        while(kb<ke && Ascii::isBlank(str[ke-1])) ke--;
+        vb=p;
+        while(p<str.length() && !Ascii::isControl(str[p])) p++;
+        ve=p;
+        while(vb<ve && Ascii::isBlank(str[ve-1])) ve--;
+        if(!section.empty()){
+          name=unescape(str.mid(kb,ke-kb));
+          value=FXString::unescape(str.mid(vb,ve-vb),'"','"');
+          if(!name.empty()){
+            at(section).at(name,mrk)=value;
+            }
+          else{
+            fxwarning("%d: section '%s': empty key name.\n",lineno,section.text());
+            }
+          }
+        else{
+          fxwarning("%d: entry: '%.*s=%.*s': empty section name.\n",lineno,ke-kb,&str[kb],ve-vb,&str[vb]);
+          }
         }
-
-      e=p;
-
-      // Remove trailing spaces after value
-      while(b<e && Ascii::isBlank(str[e-1])) e--;
-
-      // Grab the unescaped value
-      value=FXString::unescape(str.mid(b,e-b),'"','"');
-
-      // Add entry to current section
-      at(section).at(name,mrk)=value;
+      else{
+        fxwarning("%d: entry: '%.*s': expected '=' to follow name.\n",lineno,ke-kb,&str[kb]);
+        }
       }
 
-    // Skip to end of line
-nxt:while(str[p]){
-      if(str[p++]=='\n'){ lineno++; break; }
+    // To end of line
+    while(p<str.length()){
+      if(str[p++]=='\n') break;
       }
+
+    // Increment line
+    lineno++;
     }
   return true;
   }
@@ -412,23 +416,19 @@ FXbool FXSettings::unparse(FXString& str) const {
           if(!data(sec).empty(ent) && data(sec).mark(ent)){
 
             // Write section name if not written yet
-            // Technically, we should escape section-key if it contains
-            // special characters like '[' or ']', or some control characters.
-            // But we weren't escaping things in the past.  So problem is to
-            // escape such that older program still read it correctly. Before,
-            // the '\' and '[' were OK to embed into section-key...
+            // Escape dangerous characters
             if(!flg){
-//              str.append(FXString::escape(key(sec),'[',']',0));
-//              str.append(ENDLINE);
               str.append("[");
-              str.append(key(sec));      // FIXME should escape group
+              str.append(escape(key(sec),"]#;\\"));
               str.append("]" ENDLINE);
               flg=1;
               }
 
-            // Write marked key-value pairs only
-            str.append(data(sec).key(ent));
+            // Escape dangerous characters
+            str.append(escape(data(sec).key(ent),"=[]#;\\"));
             str.append("=");
+
+            // Enquote if needed, escape special characters
             if(FXString::shouldEscape(data(sec).data(ent),'"','"')){
               str.append(FXString::escape(data(sec).data(ent),'"','"'));
               }
@@ -641,6 +641,7 @@ FXbool FXSettings::writeUIntEntry(const FXchar* section,const FXchar* name,FXuin
   at(section).at(name,true).fromUInt(val);
   return true;
   }
+
 
 // Write a unsigned int-valued registry entry
 FXbool FXSettings::writeUIntEntry(const FXString& section,const FXchar* name,FXuint val){

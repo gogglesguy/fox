@@ -66,7 +66,7 @@ namespace FXPath {
 
   /**
   * Return the directory part of the path name.
-  * Note that directory() of "/bla/bla/") is "/bla/bla" and 
+  * Note that directory() of "/bla/bla/") is "/bla/bla" and
   * NOT "/bla".
   * However, directory("/bla/bla") is "/bla" as we expect!
   * The "\\Server\Share\", "C:\" or "\" ("/" for Linux) are the
@@ -107,30 +107,60 @@ namespace FXPath {
 
   /**
   * Perform tilde or environment variable expansion.
-  * A prefix of the form "~" or "~user" is expanded to the (current) user's 
+  * A prefix of the form "~" or "~user" is expanded to the (current) user's
   * home directory.
-  * Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows) 
-  * are expanded by substituting the value of the variable, recusively up to 
+  * Environment variables of the form $VAR or ${VAR} (or %VAR% on Windows)
+  * are expanded by substituting the value of the variable, recusively up to
   * given maximum level.
   * On Windows, only environment variables are expanded.
   */
   extern FXAPI FXString expand(const FXString& file,FXint level=4);
 
   /**
-  * Convert a foreign path or path-list to local conventions, changing path
-  * separators "/" and "\", %VAR% and $VAR or ${VAR}, and path-list 
-  * separators such as ":" and ";" and so on.
-  * Parts of the path identifying drive letters or network shares are
-  * not available on all systems, and may be modified in the conversion.
+  * Convert a UNIX path to Windows conventions.
+  *
+  *  - Replace "/" with "\" for path separator.
+  *  - Replace "${ENVVAR}" or "$ENVVAR" with "%ENVVAR%".
+  *
+  * Also, if path starting with a single "/", prefix it by:
+  *
+  *  - Drive letter "C:" from the current working directory.
+  *  - Share name "\\Server\Share" from the current working directory.
+  */
+  extern FXAPI FXString convertToWindows(const FXString& path);
+
+  /**
+  * Convert Windows path to UNIX conventions:
+  *
+  *  - Replace "\" with "/" for path separator.
+  *  - Replace "%ENVVAR%" with "${ENVVAR}".
+  *
+  * If prefixed by drive letter "C:" or share name "\\Server\Share":
+  *
+  *  - Drop drive letter "C:" from the front.
+  *  - Drop share name "\\Server\Share" from the front.
+  */
+  extern FXAPI FXString convertFromWindows(const FXString& path);
+
+  /**
+  * Convert a foreign path to local conventions, changing path
+  * separators "/" and "\", %VAR% and $VAR or ${VAR}.
   */
   extern FXAPI FXString convert(const FXString& path);
+  
+  /**
+  * Convert a foreign path-list to local conventions, changing path
+  * separators "/" and "\", %VAR% and $VAR or ${VAR}, and path-list
+  * separators such as ":" and ";".
+  */
+  extern FXAPI FXString convertPathList(const FXString& path);
 
   /**
   * Contract path based on user name and environment variable.
-  * The contract() function is in some sense the reverse of expand(): 
-  * directory-part may be changed to "~" or "~user" when a username is 
+  * The contract() function is in some sense the reverse of expand():
+  * directory-part may be changed to "~" or "~user" when a username is
   * given [on Unix systems only], while other parts between path-separators
-  * may be replaced by $var when a environment variable name is given. 
+  * may be replaced by $var when a environment variable name is given.
   */
   extern FXAPI FXString contract(const FXString& file,const FXString& user=FXString::null,const FXString& var=FXString::null);
 
@@ -195,7 +225,7 @@ namespace FXPath {
   extern FXAPI FXString validPath(const FXString& file);
 
   /**
-  * Return true if path is valid, i.e. all components
+  * Return true if absolute path is valid, i.e. all components
   * of the path exist.
   */
   extern FXAPI FXbool isValidPath(const FXString& file);

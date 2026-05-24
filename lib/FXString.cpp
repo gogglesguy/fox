@@ -2244,12 +2244,12 @@ FXString FXString::escape(const FXchar* str,FXint num,FXchar lquote,FXchar rquot
     switch(c){
       case '\a':                                // Special control characters
       case '\b':
-      case '\t':
       case '\n':
       case '\v':
       case '\f':
       case '\r':
       case '\\':
+      case '\t':
         q+=2;
         continue;
       case 0x00:                                // Non-special control characters
@@ -2459,10 +2459,6 @@ nml1:   q+=1;                                   // Normal characters
         result[q++]='\\';
         result[q++]='b';
         continue;
-      case '\t':
-        result[q++]='\\';
-        result[q++]='t';
-        continue;
       case '\n':
         result[q++]='\\';
         result[q++]='n';
@@ -2482,6 +2478,10 @@ nml1:   q+=1;                                   // Normal characters
       case '\\':
         result[q++]='\\';
         result[q++]='\\';
+        continue;
+      case '\t':
+        result[q++]='\\';
+        result[q++]='t';
         continue;
       case 0x00:                                // Non-special control characters
       case 0x01:
@@ -2791,7 +2791,7 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
     q++;                                // Normal characters
     }
   result.length(q);                     // Resize result string
-  p=q=c=0;
+  p=q=0;
   if(str[p]==lquote && lquote) p++;     // Opening quote
   while(p<num){                         // Then convert the string
     w=c;                                // Keep previous decoded character
@@ -2879,7 +2879,7 @@ FXString FXString::unescape(const FXchar* str,FXint num,FXchar lquote,FXchar rqu
         case '\\':
           result[q++]='\\';
           continue;
-        default:                        // Unneccessarily escaped character
+        default:                        // Generic escaped character
           result[q++]=c;
           continue;
         }

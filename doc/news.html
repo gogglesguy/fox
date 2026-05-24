@@ -16,6 +16,27 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+Dec 29 - FOX DEVELOPMENT 1.7.88
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>The setTraceTopics() API is a little bit stricter on syntax.</li>
+<li>FXPath::convert() more battle-tested; new APIs convertToWindows(), convertFromWindows() added.</li>
+<li>FXPath::enquote(), FXPath::dequote() more solidly implemented, particularly Windows versions.</li>
+<li>FXURL::fileToURL(), FXURL::fileFromURL() use above convertToWindows(), convertFromWindows() to encode files to urls on Windows.</li>
+<li>FXPath dealings with non-fully qualified paths now improved.</li>
+<li>Updated FXPath::parseArgs().</li>
+<li>Updated internals of FXProcess building command lines for CreateProcess() on Windows.</li>
+<li>Modeline paring in Adie takes place after other methods.</li>
+<li>FXSettings key-value parser was improved: relaxed key- and section-names by allowing escapes for dangerous characters.</li>
+<li>FXPath implementation improvements, particularly for Windows.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 November 19 - FOX DEVELOPMENT 1.7.87
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -45,7 +66,7 @@ to FXStat API, on filesystems where this is supported.</li>
 <li>FXRex quick check for empty string.</li>
 <li>Adie text editor syntax pattern for YAML added.</li>
 <li>Syntax highlighting for Rust programming language added.</li>
-<li>When file being editor by Adie is changed outside of editor, or removed, 
+<li>When file being editor by Adie is changed outside of editor, or removed,
 a message is popped.  A new option can now be used to avoid future popups if
 some process repeatedly changes the file.  Also, when exiting Adie, if file
 was changed externally, you get one more chance to save text buffer contents.</li>
@@ -62,7 +83,7 @@ is set to:
 <pre>
 "LongPathsEnabled"=dword:00000001
 </pre>
-it may be set to 0 by default, and this would cause VisualStudio's MSBuild to report path 
+it may be set to 0 by default, and this would cause VisualStudio's MSBuild to report path
 length errors.
 
 

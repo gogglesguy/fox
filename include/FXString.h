@@ -635,24 +635,22 @@ public:
   static FXbool shouldEscape(const FXString& str,FXchar lquote='\0',FXchar rquote='\0',FXint flag=0);
 
   /**
-  * Escape special characters.
-  * Optionally enclose return value with left and right quotes.
+  * Escape special characters, and enclose return value with left and right quotes.
   * Flag: 0 don't escape UTF8 multi-byte characters.
   * Flag: 1 escapes UTF8 multi-byte characters to a sequence of hexadecimals of the form \xXX.
   * Flag: 2 escapes UTF8 multi-byte characters to the form \uXXXX or \uXXXX\uYYYY.
   * Ill-formed UTF8 will be escaped as hexadecimals \xXX regardless even if \uXXXX is requested.
-  * Quotes will be escaped if quoting is performed.
+  * If the string is not quoted, spaces will be escaped; and quotes will be escaped if present.
   */
   static FXString escape(const FXchar* str,FXchar lquote='\0',FXchar rquote='\0',FXint flag=0);
   static FXString escape(const FXchar* str,FXint num,FXchar lquote='\0',FXchar rquote='\0',FXint flag=0);
   static FXString escape(const FXString& str,FXchar lquote='\0',FXchar rquote='\0',FXint flag=0);
 
   /**
-  * Unescape special characters,
-  * Optionally remove surrounding left and right quotes.
+  * Unescape special characters, and remove surrounding left and right quotes.
   * In particular, unescape \xXX to the hexadecimal character XX, \uXXXX to the multi-byte
   * UTF8 sequence representing unicode character XXXX, and unescape \t, \n, etc.
-  * Handle surrogate pairs of the form \uXXXX\uYYYY properly.
+  * Handle surrogate pairs of the form \uXXXX\uYYYY or \UXXXXYYYY properly.
   */
   static FXString unescape(const FXchar* str,FXchar lquote='\0',FXchar rquote='\0');
   static FXString unescape(const FXchar* str,FXint num,FXchar lquote='\0',FXchar rquote='\0');

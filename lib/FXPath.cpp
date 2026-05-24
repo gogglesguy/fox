@@ -65,23 +65,15 @@
 
   - Some examples of Windows paths:
 
-      "C:\temp\test-file.txt"           File "test-file.txt" in folder "temp" on drive "C:".
-
-      "\\Server\Share\Test\Foo.txt"     File "Foo.txt" in "Test" on share "Share" of server "Server".
-
-      "\\Server\C$\"                    Root directory "\" on drive "C:" on Server "Server".
-
-      "\\127.0.0.1\C$\temp\file.txt"    You can see there may be dots in server name!!
-
-      "\\LOCALHOST\C$\temp\file.txt"    Special "\\LOCALHOST\C$" maps to "C:".
-
-      "\\.\UNC\LOCALHOST\C$\temp\file.txt"      This is just nuts.
-
-      "\\.\C:\temp\file.txt"            DOS device path.
-
-      "\\?\C:\temp\file.txt"            DOS device path.
-
-      "\\.\CON"                         Devices like LPT1, COM1, etc.
+    "C:\temp\file.txt"                   File "file.txt" in folder "temp" on drive "C:".
+    "\\Server\Share\Test\Foo.txt"        File "Foo.txt" in "Test" on "Share" of "Server".
+    "\\Server\C$\"                       Root directory "\" on drive "C:" on "Server".
+    "\\127.0.0.1\C$\temp\file.txt"       You can see there may be dots in server name!!
+    "\\LOCALHOST\C$\temp\file.txt"       Special "\\LOCALHOST\C$" maps to "C:".
+    "\\.\UNC\LOCALHOST\C$\temp\file.txt" This is just nuts.
+    "\\.\C:\temp\file.txt"               DOS device path.
+    "\\?\C:\temp\file.txt"               DOS device path.
+    "\\.\CON"                            Devices like LPT1, COM1, etc.
 
   - Paths "\\?\" are supposedly long pathnames on Windows.
 
@@ -98,9 +90,6 @@
       - The first character of the name must not be numeric.
 */
 
-#define TOPIC_DETAIL  1019
-
-
 using namespace FX;
 
 /*******************************************************************************/
@@ -111,31 +100,33 @@ namespace FX {
 #if defined(WIN32)
 
 // Return root of absolute path.
-// On Windows, this is of the form "C:\", "\", or "\\Server\Share\",
+// On Windows, this is of the form:
+//
+//     "\",
+//     "C:\",
+//     "\\Server\Share\",
+//
 // for paths starting with these strings.
 // The empty string is returned if the path is not absolute.
 FXString FXPath::root(const FXString& file){
-  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])){
-    return FXString(&file[0],3);
+  FXint p=0,s;
+  if(Ascii::isLetter(file[0]) && file[1]==':'){
+    p=2;
     }
-  if(ISPATHSEP(file[0]) && !ISPATHSEP(file[1])){
-    return FXString(&file[0],1);
-    }
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      if(ISPATHSEP(file[p])){
-        p++;
-        if(ISPATHCOMP(file[p])){
-          p++;
-          while(ISPATHCOMP(file[p])) p++;
-          if(ISPATHSEP(file[p])){
-            return FXString(&file[0],p+1);
-            }
-          }
+  else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    if(file[s]==PATHSEP){
+      s++;
+      if(file[s] && file[s]!=PATHSEP){
+        s++;
+        while(file[s] && file[s]!=PATHSEP) s++;
+        p=s;
         }
       }
+    }
+  if(file[p]==PATHSEP){
+    return FXString(&file[0],p+1);
     }
   return FXString::null;
   }
@@ -146,17 +137,15 @@ FXString FXPath::root(const FXString& file){
 // yields "\\Server\Share".
 // The empty string is returned if path is not a network share.
 FXString FXPath::share(const FXString& file){
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      if(ISPATHSEP(file[p])){
-        p++;
-        if(ISPATHCOMP(file[p])){
-          p++;
-          while(ISPATHCOMP(file[p])) p++;
-          return FXString(&file[0],p);
-          }
+  if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    FXint s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    if(file[s]==PATHSEP){
+      s++;
+      if(file[s] && file[s]!=PATHSEP){
+        s++;
+        while(file[s] && file[s]!=PATHSEP) s++;
+        return FXString(&file[0],s);
         }
       }
     }
@@ -169,12 +158,10 @@ FXString FXPath::share(const FXString& file){
 // yields "\\Server".
 // The empty string is returned if path is not a network share.
 FXString FXPath::server(const FXString& file){
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      return FXString(&file[0],p);
-      }
+  if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    FXint s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    return FXString(&file[0],s);
     }
   return FXString::null;
   }
@@ -192,20 +179,15 @@ FXString FXPath::drive(const FXString& file){
 
 // Return true if path is the form "\\Server\Share".
 FXbool FXPath::isShare(const FXString& file){
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      if(ISPATHSEP(file[p])){
-        p++;
-        if(ISPATHCOMP(file[p])){
-          p++;
-          while(file[p]){
-            if(ISPATHSEP(file[p])) return false;
-            p++;
-            }
-          return true;
-          }
+  if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    FXint s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    if(file[s]==PATHSEP){
+      s++;
+      if(file[s] && file[s]!=PATHSEP){
+        s++;
+        while(file[s] && file[s]!=PATHSEP) s++;
+        return (file[s]=='\0');
         }
       }
     }
@@ -215,15 +197,10 @@ FXbool FXPath::isShare(const FXString& file){
 
 // Return true if path is of the form "\\Server".
 FXbool FXPath::isServer(const FXString& file){
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(file[p]){
-        if(ISPATHSEP(file[p])) return false;
-        p++;
-        }
-      return true;
-      }
+  if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    FXint s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    return (file[s]=='\0');
     }
   return false;
   }
@@ -233,7 +210,7 @@ FXbool FXPath::isServer(const FXString& file){
 // Return root of absolute path; on Unix, this is just "/".
 // The empty string is returned if the path is not absolute.
 FXString FXPath::root(const FXString& file){
-  if(ISPATHSEP(file[0])){
+  if(file[0]==PATHSEP){
     return PATHSEPSTRING;
     }
   return FXString::null;
@@ -287,26 +264,26 @@ FXString FXPath::directory(const FXString& file){
   if(!file.empty()){
     FXint p=0,s;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':'){ p=2; }
-    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-      if(ISPATHCOMP(file[2])){
-        s=3;
-        while(ISPATHCOMP(file[s])) s++;
-        if(ISPATHSEP(file[s])){
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
           s++;
-          if(ISPATHCOMP(file[s])){
-            s++;
-            while(ISPATHCOMP(file[s])) s++;
-            p=s;
-            }
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
 #endif
-    if(ISPATHSEP(file[p])) p++;
+    if(file[p]==PATHSEP) p++;
     s=p;
     while(file[p]){
-      if(ISPATHSEP(file[p])){ s=p++; continue; }
+      if(file[p]==PATHSEP){ s=p++; continue; }
       p++;
       }
     return FXString(&file[0],s);
@@ -321,28 +298,28 @@ FXString FXPath::directory(const FXString& file){
 // However, name("/bla/bla") is "bla" as we expect!
 FXString FXPath::name(const FXString& file){
   if(!file.empty()){
-    FXint s=0,p;
+    FXint p=0,s;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
-    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-      if(ISPATHCOMP(file[2])){
-        p=3;
-        while(ISPATHCOMP(file[p])) p++;
-        if(ISPATHSEP(file[p])){
-          p++;
-          if(ISPATHCOMP(file[p])){
-            p++;
-            while(ISPATHCOMP(file[p])) p++;
-            s=p;
-            }
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
+          s++;
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
 #endif
-    p=s;
+    s=p;
     while(file[s]){
-      if(ISPATHSEP(file[s])) p=s+1;
-      s++;
+      if(file[s]==PATHSEP){ p=++s; continue; }
+      ++s;
       }
     return FXString(&file[p],s-p);
     }
@@ -359,28 +336,28 @@ FXString FXPath::name(const FXString& file){
 //  /path/.aa       -> .aa
 FXString FXPath::stem(const FXString& file){
   if(!file.empty()){
-    FXint s=0,p,b,e;
+    FXint p=0,s,b,e;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
-    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-      if(ISPATHCOMP(file[2])){
-        p=3;
-        while(ISPATHCOMP(file[p])) p++;
-        if(ISPATHSEP(file[p])){
-          p++;
-          if(ISPATHCOMP(file[p])){
-            p++;
-            while(ISPATHCOMP(file[p])) p++;
-            s=p;
-            }
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
+          s++;
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
 #endif
-    p=s;
+    s=p;
     while(file[s]){
-      if(ISPATHSEP(file[s])) p=s+1;
-      s++;
+      if(file[s]==PATHSEP){ p=++s; continue; }
+      ++s;
       }
     b=p;
     e=s;
@@ -403,28 +380,28 @@ FXString FXPath::stem(const FXString& file){
 //  /path/.aa       -> ""
 FXString FXPath::extension(const FXString& file){
   if(!file.empty()){
-    FXint s=0,p,b,e;
+    FXint p=0,s,b,e;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
-    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-      if(ISPATHCOMP(file[2])){
-        p=3;
-        while(ISPATHCOMP(file[p])) p++;
-        if(ISPATHSEP(file[p])){
-          p++;
-          if(ISPATHCOMP(file[p])){
-            p++;
-            while(ISPATHCOMP(file[p])) p++;
-            s=p;
-            }
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
+          s++;
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
 #endif
-    p=s;
+    s=p;
     while(file[s]){
-      if(ISPATHSEP(file[s])) p=s+1;
-      s++;
+      if(file[s]==PATHSEP){ p=++s; continue; }
+      ++s;
       }
     b=e=s;
     if(file[p]=='.') p++;     // Stuff following leading '.' is NOT an extension
@@ -446,28 +423,28 @@ FXString FXPath::extension(const FXString& file){
 //  /path/.aa       -> /path/.aa
 FXString FXPath::stripExtension(const FXString& file){
   if(!file.empty()){
-    FXint s=0,p,e;
+    FXint p=0,s,e;
 #if defined(WIN32)
-    if(Ascii::isLetter(file[0]) && file[1]==':'){ s=2; }
-    else if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-      if(ISPATHCOMP(file[2])){
-        p=3;
-        while(ISPATHCOMP(file[p])) p++;
-        if(ISPATHSEP(file[p])){
-          p++;
-          if(ISPATHCOMP(file[p])){
-            p++;
-            while(ISPATHCOMP(file[p])) p++;
-            s=p;
-            }
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
+          s++;
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
 #endif
-    p=s;
+    s=p;
     while(file[s]){
-      if(ISPATHSEP(file[s])) p=s+1;
-      s++;
+      if(file[s]==PATHSEP){ p=++s; continue; }
+      ++s;
       }
     e=s;
     if(file[p]=='.') p++;     // Stuff following leading '.' is NOT an extension
@@ -545,7 +522,7 @@ FXString FXPath::expand(const FXString& file,FXint level){
 #else
     if(file[0]=='~'){
       FXint e=1;
-      while(ISPATHCOMP(file[e])){
+      while(file[e] && file[e]!=PATHSEP){
         if(file[e]=='\\' && file[e+1]) e++;
         e++;
         }
@@ -571,33 +548,42 @@ FXString FXPath::expand(const FXString& file,FXint level){
 
 /*******************************************************************************/
 
-#if defined(WIN32)
-
-// Convert a Unix path or paths to Windows conventions:
+// Convert a UNIX path to Windows conventions:
 //
 //  - Replace "/" with "\" for path separator.
-//  - Replace ":" with ";" for pathlist separator.
-//  - Replace "${ENVVAR}" or "$ENVVAR" with "%ENVVAR%", which takes
-//    one extra character for every SINGLE $.
+//  - Replace "${ENVVAR}" or "$ENVVAR" with "%ENVVAR%".
 //
-// Maybe also, if path starting with a single "/":
+// Also, if path starting with a single "/", prefix it by:
 //
-//  - Insert "C:" drive letter at the front, OR
-//  - Insert "\\Server\Share" at the front, based on current directory.
+//  - Drive letter "C:" from the current working directory.
+//  - Share name "\\Server\Share" from the current working directory.
 //
-FXString FXPath::convert(const FXString& path){
+FXString FXPath::convertToWindows(const FXString& path){
   FXString result;
   if(!path.empty()){
-    if(result.length(path.length()+path.contains('$'))){        // Size estimate
-      FXint p=0,q=0,s;
+    FXint p=0,q=0,s=0;
+    if(path[0]=='/' && path[1]!='/'){                           // Not fully qualified absolute
+      result=FXSystem::getCurrentDirectory();
+      if(Ascii::isLetter(result[0]) && result[1]==':'){
+        p=2;                                                    // Prefix "C:"
+        }
+      else if(result[0]=='\\' && result[1]=='\\' && result[2]!='\\' && result[2]){
+        s=3;
+        while(result[s] && result[s]!='\\') s++;
+        if(result[s]=='\\'){
+          s++;
+          if(result[s] && result[s]!='\\'){
+            s++;
+            while(result[s] && result[s]!='\\') s++;
+            p=s;                                                // Prefix "\\Server\Share"
+            }
+          }
+        }
+      }
+    if(result.length(p+path.length()+path.contains('$'))){      // Size estimate
       while(path[q]){
         if(path[q]=='/'){                                       // Path separator
-          result[p++]=PATHSEP;
-          q++;
-          continue;
-          }
-        if(path[q]==':'){                                       // Pathlist separator
-          result[p++]=';';
+          result[p++]='\\';
           q++;
           continue;
           }
@@ -641,54 +627,47 @@ FXString FXPath::convert(const FXString& path){
   return result;
   }
 
-#else
 
-// Convert Windows path or paths to unix conventions:
+// Convert Windows path to UNIX conventions:
 //
-//  - Remove drive letter of the form "C:" at the front.
-//  - Remove file share of the form "\\Server\Share" at the front.
 //  - Replace "\" with "/" for path separator.
-//  - Replace ";" with ":" for pathlist separator.
-//  - Replace "%ENVVAR%" with "${ENVVAR}", which takes one extra
-//    character for every PAIR of %'s.
+//  - Replace "%ENVVAR%" with "${ENVVAR}".
 //
-FXString FXPath::convert(const FXString& path){
+// If prefixed by drive letter "C:" or share name "\\Server\Share":
+//
+//  - Drop drive letter "C:" from the front.
+//  - Drop share name "\\Server\Share" from the front.
+//
+FXString FXPath::convertFromWindows(const FXString& path){
   FXString result;
   if(!path.empty()){
     if(result.length(path.length()+path.contains('%')/2)){      // Size estimate
       FXint p=0,q=0,s;
-      if(Ascii::isLetter(path[0]) && path[1]==':'){             // Strip "C:"
-        q=2;
+      if(Ascii::isLetter(path[0]) && path[1]==':'){
+        q=2;                                                    // Strip "C:"
         }
-      else if(path[0]=='\\' && path[1]=='\\'){                  // Strip "\\Server\Share"
-        if(path[2] && path[2]!='\\'){
-          s=3;
-          while(path[s] && path[s]!='\\') s++;
-          if(path[s]=='\\'){
+      else if(path[0]=='\\' && path[1]=='\\' && path[2]!='\\' && path[2]){
+        s=3;
+        while(path[s] && path[s]!='\\') s++;
+        if(path[s]=='\\'){
+          s++;
+          if(path[s] && path[s]!='\\'){
             s++;
-            if(path[s] && path[s]!='\\'){
-              s++;
-              while(path[s] && path[s]!='\\') s++;
-              q=s;
-              }
+            while(path[s] && path[s]!='\\') s++;
+            q=s;                                                // Strip "\\Server\Share"
             }
           }
         }
       while(path[q]){
-        if(path[q]=='\\'){                                    // Path separator
-          result[p++]=PATHSEP;
+        if(path[q]=='\\'){                                      // Path separator
+          result[p++]='/';
           q++;
           continue;
           }
-        if(path[q]==';'){                                     // Pathlist separator
-          result[p++]=':';
-          q++;
-          continue;
-          }
-        if(path[q]=='%'){                                     // Environment variable
+        if(path[q]=='%'){                                       // Environment variable
           s=q+1;
           while(Ascii::isWord(path[s])) s++;
-          if(path[s]=='%' && q+1<s){                          // Non-empty %VARIABLE%
+          if(path[s]=='%' && q+1<s){                            // Non-empty %VARIABLE%
             result[p++]='$';
             result[p++]='{';
             q+=1;
@@ -701,7 +680,7 @@ FXString FXPath::convert(const FXString& path){
             continue;
             }
           }
-        result[p++]=path[q++];                                // Normal character
+        result[p++]=path[q++];                                  // Normal character
         }
       FXASSERT(p<=result.length());
       result.trunc(p);
@@ -710,7 +689,38 @@ FXString FXPath::convert(const FXString& path){
   return result;
   }
 
+
+// Convert a path to local conventions
+FXString FXPath::convert(const FXString& path){
+#if defined(WIN32)
+  return FXPath::convertToWindows(path);
+#else
+  return FXPath::convertFromWindows(path);
 #endif
+  }
+
+
+// Convert a path-list to local conventions
+FXString FXPath::convertPathList(const FXString& path){
+  FXString result;
+  if(!path.empty()){
+    FXint b=0,e=0;
+    while(e<path.length()){
+#if defined(WIN32)
+      while(e<path.length() && path[e]!=':') e++;
+      result+=FXPath::convertToWindows(path.mid(b,e-b));
+      if(path[e]==':'){ result+=';'; e++; }
+      b=e;
+#else
+      while(e<path.length() && path[e]!=';') e++;
+      result+=FXPath::convertFromWindows(path.mid(b,e-b));
+      if(path[e]==';'){ result+=':'; e++; }
+      b=e;
+#endif
+      }
+    }
+  return result;
+  }
 
 /*******************************************************************************/
 
@@ -736,7 +746,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
       if(!val.empty()){
         FXint pos=result.find(val);
         if(0<=pos){
-          if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+          if((pos==0 || result[pos-1]==PATHSEP) && (pos+val.length()==result.length() || result[pos+val.length()]==PATHSEP)){
             result.replace(pos,val.length(),"%"+var+"%");
             }
           }
@@ -748,7 +758,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
     if(FXPath::isAbsolute(result)){
       FXString dir=FXSystem::getUserDirectory(user);
       if(!dir.empty()){
-        if(FXString::compare(result,dir,dir.length())==0 && (dir.length()==result.length() || ISPATHSEP(result[dir.length()]))){
+        if(FXString::compare(result,dir,dir.length())==0 && (dir.length()==result.length() || result[dir.length()]==PATHSEP)){
           result.replace(0,dir.length(),"~"+user);
           }
         }
@@ -758,7 +768,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
       if(!val.empty()){
         FXint pos=result.find(val);
         if(0<=pos){
-          if((pos==0 || ISPATHSEP(result[pos-1])) && (pos+val.length()==result.length() || ISPATHSEP(result[pos+val.length()]))){
+          if((pos==0 || result[pos-1]==PATHSEP) && (pos+val.length()==result.length() || result[pos+val.length()]==PATHSEP)){
             result.replace(pos,val.length(),"$"+var);
             }
           }
@@ -827,19 +837,19 @@ FXString FXPath::simplify(const FXString& file){
       result[p++]=':';
       q+=2;
       }
-    else if(ISPATHSEP(result[q]) && ISPATHSEP(result[q+1])){
+    else if(result[q]==PATHSEP && result[q+1]==PATHSEP){
       result[p++]=PATHSEP;
       result[p++]=PATHSEP;
       q+=2;
-      if(ISPATHCOMP(result[q])){
-        while(ISPATHCOMP(result[q])){
+      if(result[q] && result[q]!=PATHSEP){
+        while(result[q] && result[q]!=PATHSEP){
           result[p++]=result[q++];
           }
-        if(ISPATHSEP(result[q])){
+        if(result[q]==PATHSEP){
           result[p++]=PATHSEP;
           q++;
-          if(ISPATHCOMP(result[q])){
-            while(ISPATHCOMP(result[q])){
+          if(result[q] && result[q]!=PATHSEP){
+            while(result[q] && result[q]!=PATHSEP){
               result[p++]=result[q++];
               }
             }
@@ -847,8 +857,8 @@ FXString FXPath::simplify(const FXString& file){
         }
       }
 #endif
-    if(ISPATHSEP(result[q])){                   // Keep root
-      while(ISPATHSEP(result[q])) q++;          // Eat duplicate path separators
+    if(result[q]==PATHSEP){                     // Keep root
+      while(result[q]==PATHSEP) q++;            // Eat duplicate path separators
       result[p++]=PATHSEP;
       }
     s=p;                                        // We can not back up past this point
@@ -856,7 +866,7 @@ FXString FXPath::simplify(const FXString& file){
       if(result[q]=='.'){
         if(result[q+1]=='\0'){                  // '.'
           q++;
-          if(s<p && ISPATHSEP(result[p-1])){    // Back up over '/' if not first
+          if(s<p && result[p-1]==PATHSEP){      // Back up over '/' if not first
             p--;
             }
           if(p==0){                             // Output '.' if it would be empty otherwise
@@ -864,9 +874,9 @@ FXString FXPath::simplify(const FXString& file){
             }
           continue;
           }
-        if(ISPATHSEP(result[q+1])){             // './'
+        if(result[q+1]==PATHSEP){               // './'
           q+=2;
-          while(ISPATHSEP(result[q])) q++;      // Eat duplicate path separators
+          while(result[q]==PATHSEP) q++;        // Eat duplicate path separators
           if(p==0 && result[q]=='\0'){          // Output './' if it would be empty otherwise
             result[p++]='.';
             result[p++]=PATHSEP;
@@ -883,7 +893,7 @@ FXString FXPath::simplify(const FXString& file){
               continue;
               }
             p=components[--c];                  // Reset to last-seen component
-            if(s<p && ISPATHSEP(result[p-1])){  // Back up over '/' if not first
+            if(s<p && result[p-1]==PATHSEP){    // Back up over '/' if not first
               p--;
               }
             if(p==0){                           // Output '.' if it would be empty otherwise
@@ -891,9 +901,9 @@ FXString FXPath::simplify(const FXString& file){
               }
             continue;
             }
-          if(ISPATHSEP(result[q+2])){           // '../'
+          if(result[q+2]==PATHSEP){             // '../'
             q+=3;
-            while(ISPATHSEP(result[q])) q++;    // Eat duplicate path separators
+            while(result[q]==PATHSEP) q++;      // Eat duplicate path separators
             if(c==0){                           // No prior path component
               if(s) continue;                   // Pathological: can't go above root
               result[p++]='.';                  // Leading '../'
@@ -912,11 +922,11 @@ FXString FXPath::simplify(const FXString& file){
         }
       if(__unlikely(c>=64)) return file;        // Insanely many components (not simplified)
       components[c++]=p;                        // Remember backup point
-      while(result[q] && !ISPATHSEP(result[q])){// Advance to end of component
+      while(result[q] && result[q]!=PATHSEP){   // Advance to end of component
         result[p++]=result[q++];
         }
-      if(ISPATHSEP(result[q])){                 // A path separator
-        while(ISPATHSEP(result[q])) q++;        // Eat duplicate path separators
+      if(result[q]==PATHSEP){                   // A path separator
+        while(result[q]==PATHSEP) q++;          // Eat duplicate path separators
         result[p++]=PATHSEP;                    // Copy it
         }
       }
@@ -929,6 +939,56 @@ FXString FXPath::simplify(const FXString& file){
 
 #if defined(WIN32)
 
+// Check if file represents absolute pathname
+//
+// On Windows, isAbsolute() returns true for paths of the form:
+//
+//   "\"
+//   "C:\"
+//   "\\Server\Share\"
+//
+FXbool FXPath::isAbsolute(const FXString& file){
+  FXint p=0,s;
+  if(Ascii::isLetter(file[0]) && file[1]==':'){
+    p=2;
+    }
+  else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    if(file[s]==PATHSEP){
+      s++;
+      if(file[s] && file[s]!=PATHSEP){
+        s++;
+        while(file[s] && file[s]!=PATHSEP) s++;
+        p=s;
+        }
+      }
+    }
+  return (file[p]==PATHSEP);
+  }
+
+
+// Fully qualified absolute, i.e. has "C:\" or "\\Server\Share\"
+static inline FXbool fq(const FXString& file){
+  if(Ascii::isLetter(file[0]) && file[1]==':'){
+    return (file[2]==PATHSEP);
+    }
+  if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+    FXint s=3;
+    while(file[s] && file[s]!=PATHSEP) s++;
+    if(file[s]==PATHSEP){
+      s++;
+      if(file[s] && file[s]!=PATHSEP){
+        s++;
+        while(file[s] && file[s]!=PATHSEP) s++;
+        return (file[s]==PATHSEP);
+        }
+      }
+    }
+  return false;
+  }
+
+
 // Return absolute path name.
 // If file started with "\" but is not fully qualified i.e. has
 // no drive letter ["C:"] or file share prefix ["\\Server\Share"],
@@ -937,29 +997,27 @@ FXString FXPath::simplify(const FXString& file){
 // Otherwise, place the current directory in front, and simplify
 // the result to obtain canonical path.
 FXString FXPath::absolute(const FXString& file){
-  if(!FXPath::isAbsolute(file)){
+  if(!fq(file)){
     FXString result(FXSystem::getCurrentDirectory());
-    if(ISPATHSEP(file[0])){
+    if(file[0]==PATHSEP && file[1]!=PATHSEP){
       if(Ascii::isLetter(result[0]) && result[1]==':'){
         result.trunc(2);
         }
-      else if(ISPATHSEP(result[0]) && ISPATHSEP(result[1])){
-        if(ISPATHCOMP(result[2])){
-          FXint p=3;
-          while(ISPATHCOMP(result[p])) p++;
-          if(ISPATHSEP(result[p])){
+      else if(result[0]==PATHSEP && result[1]==PATHSEP && result[2]!=PATHSEP && result[2]){
+        FXint p=3;
+        while(result[p] && result[p]!=PATHSEP) p++;
+        if(result[p]==PATHSEP){
+          p++;
+          if(result[p] && result[p]!=PATHSEP){
             p++;
-            if(ISPATHCOMP(result[p])){
-              p++;
-              while(ISPATHCOMP(result[p])) p++;
-              result.trunc(p);
-              }
+            while(result[p] && result[p]!=PATHSEP) p++;
+            result.trunc(p);
             }
           }
         }
       }
     if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      if(result.tail()!=PATHSEP) result.append(PATHSEP);
       result.append(file);
       }
     return FXPath::simplify(result);
@@ -976,29 +1034,27 @@ FXString FXPath::absolute(const FXString& file){
 // Otherwise, place the base-directory in front, and simplify
 // the result to obtain canonical path.
 FXString FXPath::absolute(const FXString& base,const FXString& file){
-  if(!FXPath::isAbsolute(file)){
+  if(!fq(file)){
     FXString result(FXPath::absolute(base));
-    if(ISPATHSEP(file[0])){
+    if(file[0]==PATHSEP && file[1]!=PATHSEP){
       if(Ascii::isLetter(result[0]) && result[1]==':'){
         result.trunc(2);
         }
-      else if(ISPATHSEP(result[0]) && ISPATHSEP(result[1])){
-        if(ISPATHCOMP(result[2])){
-          FXint p=3;
-          while(ISPATHCOMP(result[p])) p++;
-          if(ISPATHSEP(result[p])){
+      else if(result[0]==PATHSEP && result[1]==PATHSEP && result[2]!=PATHSEP && result[2]){
+        FXint p=3;
+        while(result[p] && result[p]!=PATHSEP) p++;
+        if(result[p]==PATHSEP){
+          p++;
+          if(result[p] && result[p]!=PATHSEP){
             p++;
-            if(ISPATHCOMP(result[p])){
-              p++;
-              while(ISPATHCOMP(result[p])) p++;
-              result.trunc(p);
-              }
+            while(result[p] && result[p]!=PATHSEP) p++;
+            result.trunc(p);
             }
           }
         }
       }
     if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      if(result.tail()!=PATHSEP) result.append(PATHSEP);
       result.append(file);
       }
     return FXPath::simplify(result);
@@ -1008,14 +1064,25 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 
 #else
 
+// Check if file represents absolute pathname
+//
+// On Linux, isAbsolute() returns true for paths of the form:
+//
+//   "/"
+//
+FXbool FXPath::isAbsolute(const FXString& file){
+  return file[0]==PATHSEP;
+  }
+
+
 // Return absolute path name
 // If file is not absolute, place the current directory in
 // front, and simplify the result to obtain canonical path.
 FXString FXPath::absolute(const FXString& file){
-  if(!FXPath::isAbsolute(file)){
+  if(file[0]!=PATHSEP){
     FXString result(FXSystem::getCurrentDirectory());
     if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      if(result.tail()!=PATHSEP) result.append(PATHSEP);
       result.append(file);
       }
     return FXPath::simplify(result);
@@ -1028,10 +1095,10 @@ FXString FXPath::absolute(const FXString& file){
 // If file is not absolute, place the base-directory in
 // front, and simplify the result to obtain canonical path.
 FXString FXPath::absolute(const FXString& base,const FXString& file){
-  if(!FXPath::isAbsolute(file)){
+  if(file[0]!=PATHSEP){
     FXString result(FXPath::absolute(base));
     if(!file.empty()){
-      if(!ISPATHSEP(result.tail())) result.append(PATHSEP);
+      if(result.tail()!=PATHSEP) result.append(PATHSEP);
       result.append(file);
       }
     return FXPath::simplify(result);
@@ -1042,6 +1109,14 @@ FXString FXPath::absolute(const FXString& base,const FXString& file){
 #endif
 
 /*******************************************************************************/
+
+// Return true if file name is relative
+// Which means "." or "./blabla" or ".." or "../blabla".
+// But ".blabla" is NOT relative.
+FXbool FXPath::isRelative(const FXString& file){
+  return file[0]=='.' && ((file[1]=='\0' || file[1]==PATHSEP) || (file[1]=='.' && (file[2]=='\0' || file[2]==PATHSEP)));
+  }
+
 
 // Return relative path of file to given absolute base directory
 //
@@ -1089,20 +1164,20 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
       }
 
     // Server and share same?
-    else if(ISPATHSEP(base[0]) && ISPATHSEP(base[1])){
-      if(!ISPATHSEP(file[0]) || !ISPATHSEP(file[1])) goto x;
+    else if(base[0]==PATHSEP && base[1]==PATHSEP){
+      if(file[0]!=PATHSEP || file[1]!=PATHSEP) goto x;
       p=2;
       q=2;
-      while(ISPATHCOMP(base[p])){
+      while(base[p] && base[p]!=PATHSEP){
         if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) goto x;
         p++;
         q++;
         }
-      if(ISPATHSEP(base[p])){
-        if(!ISPATHSEP(file[q])) goto x;
+      if(base[p]==PATHSEP){
+        if(file[q]!=PATHSEP) goto x;
         p++;
         q++;
-        while(ISPATHCOMP(base[p])){
+        while(base[p] && base[p]!=PATHSEP){
           if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) goto x;
           p++;
           q++;
@@ -1112,9 +1187,9 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
 
     // Find branch point
     while(base[p] && file[q]){
-      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
-        bp=p; while(ISPATHSEP(base[p])) p++;  // Eat multiple slashes
-        bq=q; while(ISPATHSEP(file[q])) q++;
+      if(base[p]==PATHSEP && file[q]==PATHSEP){
+        bp=p; while(base[p]==PATHSEP) p++;  // Eat multiple slashes
+        bq=q; while(file[q]==PATHSEP) q++;
         continue;
         }
       if(Ascii::toLower(base[p])==Ascii::toLower(file[q])){
@@ -1129,9 +1204,9 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
 
     // Find branch point
     while(base[p] && file[q]){
-      if(ISPATHSEP(base[p]) && ISPATHSEP(file[q])){
-        bp=p; while(ISPATHSEP(base[p])) p++;  // Eat multiple slashes
-        bq=q; while(ISPATHSEP(file[q])) q++;
+      if(base[p]==PATHSEP && file[q]==PATHSEP){
+        bp=p; while(base[p]==PATHSEP) p++;  // Eat multiple slashes
+        bq=q; while(file[q]==PATHSEP) q++;
         continue;
         }
       if(base[p]==file[q]){
@@ -1148,19 +1223,19 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
    // The branch point MUST be at a proper head, i.e. at least a
    // "C:\" or "\\Server\Share\" on Windows ["/" on Linux] if it is
    // an absolute path.
-   if(ISPATHSEP(base[bq])==ISPATHSEP(file[bq])){
+   if((base[bq]==PATHSEP) == (file[bq]==PATHSEP)){
 
       // Check if common prefix extends to the end of the base-path.
       // If the file-path ends in "/", the final component is a directory,
       // in which case it is OK to return ".".  Otherwise we prefer
       // to prefix the file-part with "../".
-      if((base[p]=='\0' || ISPATHSEP(base[p])) && ISPATHSEP(file[q])){
+      if((base[p]=='\0' || base[p]==PATHSEP) && file[q]==PATHSEP){
         bp=p;
         bq=q;
         }
 
       // Strip leading path character off, if any
-      while(ISPATHSEP(file[bq])) bq++;
+      while(file[bq]==PATHSEP) bq++;
 
       // Non trivial
       if(file[bq]){
@@ -1168,9 +1243,9 @@ FXString FXPath::relative(const FXString& base,const FXString& file){
 
         // Up to branch point
         while(base[bp]){
-          while(ISPATHSEP(base[bp])) bp++;
+          while(base[bp]==PATHSEP) bp++;
           if(base[bp]){
-            while(ISPATHCOMP(base[bp])) bp++;
+            while(base[bp] && base[bp]!=PATHSEP) bp++;
             result.append(".." PATHSEPSTRING);
             }
           }
@@ -1231,21 +1306,21 @@ FXbool FXPath::isInside(const FXString& base,const FXString& file){
       }
 
     // Server and share same?
-    else if(ISPATHSEP(base[0]) && ISPATHSEP(base[1])){
-      if(!ISPATHSEP(file[0])) return false;
-      if(!ISPATHSEP(file[1])) return false;
+    else if(base[0]==PATHSEP && base[1]==PATHSEP){
+      if(file[0]!=PATHSEP) return false;
+      if(file[1]!=PATHSEP) return false;
       p=2;
       q=2;
-      while(ISPATHCOMP(base[p])){
+      while(base[p] && base[p]!=PATHSEP){
         if(Ascii::toLower(base[p])!=Ascii::toLower(file[q])) return false;
         p++;
         q++;
         }
-      if(ISPATHSEP(base[p])){
-        if(!ISPATHSEP(file[q])) return false;
+      if(base[p]==PATHSEP){
+        if(file[q]!=PATHSEP) return false;
         p++;
         q++;
-        while(ISPATHCOMP(base[p])){
+        while(base[p] && base[p]!=PATHSEP){
           if((Ascii::toLower(base[p])!=Ascii::toLower(file[q]))) return false;
           p++;
           q++;
@@ -1255,29 +1330,29 @@ FXbool FXPath::isInside(const FXString& base,const FXString& file){
 
     // Process potentially non-canonical, case-insensitive paths
     while(base[p]){
-      if(ISPATHSEP(base[p])){
-        if(!ISPATHSEP(file[q])) return false;
-        while(ISPATHSEP(base[p])) p++;                          // Eat '/'
-        while(ISPATHSEP(file[q])) q++;                          // Eat '/'
+      if(base[p]==PATHSEP){
+        if(file[q]!=PATHSEP) return false;
+        while(base[p]==PATHSEP) p++;                            // Eat '/'
+        while(file[q]==PATHSEP) q++;                            // Eat '/'
         }
 a:    if(base[p]=='.'){
         if(base[p+1]=='\0'){ p+=1; goto a; }                    // Eat '.'
-        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }               // Eat './'
+        if(base[p+1]==PATHSEP){ p+=2; goto a; }                 // Eat './'
         if(base[p+1]=='.'){
           if(base[p+2]=='\0'){ p+=2; v++; goto a; }             // Eat '..'
-          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }        // Eat '../'
+          if(base[p+2]==PATHSEP){ p+=3; v++; goto a; }          // Eat '../'
           }
         }
 b:    if(file[q]=='.'){
         if(file[q+1]=='\0'){ q+=1; goto b; }                    // Eat '.'
-        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }               // Eat './'
+        if(file[q+1]==PATHSEP){ q+=2; goto b; }                 // Eat './'
         if(file[q+1]=='.'){
           if(file[q+2]=='\0'){ q+=2; v--; goto b; }             // Eat '..'
-          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }        // Eat '../'
+          if(file[q+2]==PATHSEP){ q+=3; v--; goto b; }          // Eat '../'
           }
         }
       if(v<0) return false;
-      while(ISPATHCOMP(base[p])){
+      while(base[p] && base[p]!=PATHSEP){
         if(Ascii::toUpper(base[p])!=Ascii::toUpper(file[q])) return false;
         p++;
         q++;
@@ -1287,29 +1362,29 @@ b:    if(file[q]=='.'){
 #else
     // Process potentially non-canonical paths
     while(base[p]){
-      if(ISPATHSEP(base[p])){
-        if(!ISPATHSEP(file[q])) return false;
-        while(ISPATHSEP(base[p])) p++;                          // Eat '/'
-        while(ISPATHSEP(file[q])) q++;                          // Eat '/'
+      if(base[p]==PATHSEP){
+        if(file[q]!=PATHSEP) return false;
+        while(base[p]==PATHSEP) p++;                            // Eat '/'
+        while(file[q]==PATHSEP) q++;                            // Eat '/'
         }
 a:    if(base[p]=='.'){
         if(base[p+1]=='\0'){ p+=1; goto a; }                    // Eat '.'
-        if(ISPATHSEP(base[p+1])){ p+=2; goto a; }               // Eat './'
+        if(base[p+1]==PATHSEP){ p+=2; goto a; }                 // Eat './'
         if(base[p+1]=='.'){
           if(base[p+2]=='\0'){ p+=2; v++; goto a; }             // Eat '..'
-          if(ISPATHSEP(base[p+2])){ p+=3; v++; goto a; }        // Eat '../'
+          if(base[p+2]==PATHSEP){ p+=3; v++; goto a; }          // Eat '../'
           }
         }
 b:    if(file[q]=='.'){
         if(file[q+1]=='\0'){ q+=1; goto b; }                    // Eat '.'
-        if(ISPATHSEP(file[q+1])){ q+=2; goto b; }               // Eat './'
+        if(file[q+1]==PATHSEP){ q+=2; goto b; }                 // Eat './'
         if(file[q+1]=='.'){
           if(file[q+2]=='\0'){ q+=2; v--; goto b; }             // Eat '..'
-          if(ISPATHSEP(file[q+2])){ q+=3; v--; goto b; }        // Eat '../'
+          if(file[q+2]==PATHSEP){ q+=3; v--; goto b; }          // Eat '../'
           }
         }
       if(v<0) return false;
-      while(ISPATHCOMP(base[p])){
+      while(base[p] && base[p]!=PATHSEP){
         if(base[p]!=file[q]) return false;
         p++;
         q++;
@@ -1329,48 +1404,12 @@ b:    if(file[q]=='.'){
 // a regular path.
 FXString FXPath::upLevel(const FXString& file){
   if(!file.empty()){
-    if(ISPATHSEP(file.tail())){
+    if(file.tail()==PATHSEP){
       return FXPath::simplify(file+"..");
       }
     return FXPath::simplify(file+PATHSEPSTRING "..");
     }
   return ".";
-  }
-
-/*******************************************************************************/
-
-// Check if file represents absolute pathname
-// On Linux, this means first character is "/".
-// On Windows, this means "C:\", or "\\Server\Share\".
-FXbool FXPath::isAbsolute(const FXString& file){
-#if defined(WIN32)
-  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2])) return true;
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      if(ISPATHSEP(file[p])){
-        p++;
-        if(ISPATHCOMP(file[p])){
-          p++;
-          while(ISPATHCOMP(file[p])) p++;
-          if(ISPATHSEP(file[p])) return true;
-          }
-        }
-      }
-    }
-  return false;
-#else
-  return ISPATHSEP(file[0]);
-#endif
-  }
-
-
-// Return true if file name is relative
-// Which means "." or "./blabla" or ".." or "../blabla".
-// But ".blabla" is NOT relative.
-FXbool FXPath::isRelative(const FXString& file){
-  return file[0]=='.' && ((file[1]=='\0' || ISPATHSEP(file[1])) || (file[1]=='.' && (file[2]=='\0' || ISPATHSEP(file[2]))));
   }
 
 /*******************************************************************************/
@@ -1388,27 +1427,30 @@ FXbool FXPath::isRelative(const FXString& file){
 //   "/"
 //
 FXbool FXPath::isTopDirectory(const FXString& file){
+  if(!file.empty()){
 #if defined(WIN32)
-  if(ISPATHSEP(file[0]) && file[1]=='\0') return true;
-  if(Ascii::isLetter(file[0]) && file[1]==':' && ISPATHSEP(file[2]) && file[3]=='\0') return true;
-  if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
-    if(ISPATHCOMP(file[2])){
-      FXint p=3;
-      while(ISPATHCOMP(file[p])) p++;
-      if(ISPATHSEP(file[p])){
-        p++;
-        if(ISPATHCOMP(file[p])){
-          p++;
-          while(ISPATHCOMP(file[p])) p++;
-          if(ISPATHSEP(file[p]) && file[p+1]=='\0') return true;
+    FXint p=0,s;
+    if(Ascii::isLetter(file[0]) && file[1]==':'){
+      p=2;
+      }
+    else if(file[0]==PATHSEP && file[1]==PATHSEP && file[2]!=PATHSEP && file[2]){
+      s=3;
+      while(file[s] && file[s]!=PATHSEP) s++;
+      if(file[s]==PATHSEP){
+        s++;
+        if(file[s] && file[s]!=PATHSEP){
+          s++;
+          while(file[s] && file[s]!=PATHSEP) s++;
+          p=s;
           }
         }
       }
+    return file[p]==PATHSEP && file[p+1]=='\0';
+#else
+    return file[0]==PATHSEP && file[1]=='\0';
+#endif
     }
   return false;
-#else
-  return ISPATHSEP(file[0]) && file[1]=='\0';
-#endif
   }
 
 /*******************************************************************************/
@@ -1441,7 +1483,7 @@ FXbool FXPath::isHidden(const FXString& file){
 FXbool FXPath::isHidden(const FXString& file){
   if(!file.empty()){
     FXint i=file.length();
-    while(0<i && !ISPATHSEP(file[i-1])){ --i; }
+    while(0<i && file[i-1]!=PATHSEP){ --i; }
     return file[i]=='.';
     }
   return false;
@@ -1465,7 +1507,7 @@ FXString FXPath::validPath(const FXString& file){
 
 /*******************************************************************************/
 
-// Return true if path is valid
+// Return true if absolute path is valid
 FXbool FXPath::isValidPath(const FXString& file){
   if(FXPath::isAbsolute(file)){
     return FXStat::exists(file);
@@ -1478,208 +1520,265 @@ FXbool FXPath::isValidPath(const FXString& file){
 #if defined(WIN32)           // WINDOWS
 
 // Enquote filename to make safe for shell
-// Enclose with double quotes if needed:
-//   - If force=true
-//   - If white space before, in, or after letters
-//   - If filename is empty
-// Escaping is done when:
-//   - Special characters (^ " < > | & * ?) are encountered
+//
+// Enclosing with double quotes if needed:
+//
+//   - If force is true.
+//   - If filename is empty.
+//   - If any whitespace in file.
+//   - If special shell characters encountered.
+//
+// Backslashes are doubled if:
+//
+//   - Followed by closing quote '"'.
+//   - Followed by escaped quote '\"'.
+//
+// Possible alternative for '"', if '\"' proves troublesome:
+//
+//   - Replace by '""' if inside quotes and not preceeded by '\'.
+//   - Replace by '""""' if outside quotes and not preceeded by '\'.
+//
+// Presence of shell characters forces quotes; this way, special
+// symbols pass through cmd shell unmolested.
+// We could also escape shell characters with the shell escape symbol
+// '^'; however, this means other programs which only process quoted
+// strings will have problems.  So quotation is best here.
 FXString FXPath::enquote(const FXString& file,FXbool force){
-  if(0<file.length()){
-    FXString result(file);
+  if(!file.empty()){
     FXint p,q,c,n;
-
-    // Check if quotes needed, if not already forced
-    if(!force){
-      force=(0<=file.find_first_of(" \t\n\v\"",5,0));
-      }
-
-    // Measure new string size
     p=q=n=0;
-    while(p<=file.length()){
-      switch(file[p++]){
-      case '\0':                // End of string
-        if(force){
-          q+=n;                 // Extra n backslashes makes for 2n backslashes
-          }
-        continue;
-      case '\\':                // Backslashes
-        q++;
+    do{
+      c=file[q++];
+      switch(c){
+      case '\\':                        // Backslash
+        p++;
         n++;
-        continue;
-      case '"':                 // Quotes
-        if(force){
-          q+=n+2;               // Extra n+1 backslashes makes for 2n+1 backslashes
-          }
-        else{
-          q+=2;                 // Escaped normally
-          }
+        break;
+      case '"':                         // Embedded '"'
+        p+=n;                           // Double '\'
+        p+=2;                           // Plus escaped '"'
         n=0;
-        continue;
-      case '^':                 // Escape character
-      case '<':                 // Redirection
+        break;
+      case '\0':                        // End of string
+        if(!force) break;
+        p+=n;                           // Double '\'
+        n=0;
+        break;
+      case ' ':                         // White space
+      case '\t':
+        force=true;
+        p++;
+        n=0;
+        break;
+      case '^':                         // Escape character
+      case '<':                         // Redirection
       case '>':
       case '(':
       case ')':
-      case '|':                 // Pipe
-      case '%':                 // Environment variables
-      case '!':                 // Wildcard
-      case '&':                 // Command separators
-      case '*':                 // Wildcard
+      case '|':                         // Pipe
+      case '%':                         // Environment variables
+      case '!':                         // Wildcard
+      case '&':                         // Command separators
+      case '*':                         // Wildcard
       case '?':
-        if(!force) q++;
+      case '@':
+       force=true;                      // Must quote shell characters
         /*FALL*/
-      default:                  // Normal characters
-        q++;
+      default:                          // Normal characters
+        p++;
         n=0;
-        continue;
+        break;
         }
       }
+    while(c);
 
-    // Surround by quotes as well
-    if(force) q+=2;
+    // Space for quotes or space for escapes
+    if(force) p+=2;
 
-    // Size changed, so transformation needed
-    if(result.length()<q){
-      result.length(q);         // Make longer if quoted
-      p=q=0;
-      if(force) result[q++]='"';
-      while(p<=file.length()){
-        switch(c=file[p++]){
-        case '\0':              // End of string
-          if(force){
-            while(--n>=0) result[q++]='\\';
-            }
-          continue;
-        case '\\':              // Backslashes
-          result[q++]='\\';
+    // File must be escaped or quoted
+    if(file.length()<p){
+      FXString result('\0',p);
+      p=q=n=0;
+      if(force) result[p++]='"';        // Opening quote
+      do{
+        c=file[q++];
+        switch(c){
+        case '\\':                      // Backslash
+          result[p++]='\\';
           n++;
-          continue;
-        case '"':               // Quotes not preceeded by backslashes
-          if(force){
-            while(--n>=0) result[q++]='\\';
-            result[q++]='\\';
+          break;
+        case '"':                       // Embedded '"'
+          while(n){
+            result[p++]='\\';           // Double the '\'
+            n--;
             }
-          else{
-            result[q++]='^';
-            }
-          result[q++]='"';
+          result[p++]='\\';             // Escaped '\"'
+          result[p++]='"';
           n=0;
-          continue;
-        case '^':               // Escape character
-        case '<':               // Redirection
+          break;
+        case '\0':                      // End of string
+          if(!force) break;
+          while(n){
+            result[p++]='\\';           // Double the '\'
+            n--;
+            }
+          n=0;
+          break;
+        case ' ':                       // White space
+        case '\t':
+          result[p++]=c;
+          n=0;
+          break;
+        case '^':                       // Escape character
+        case '<':                       // Redirection
         case '>':
         case '(':
         case ')':
-        case '|':               // Pipe
-        case '%':               // Environment variables
-        case '!':               // Wildcard
-        case '&':               // Command separators
-        case '*':               // Wildcard
+        case '|':                       // Pipe
+        case '%':                       // Environment variables
+        case '!':                       // Wildcard
+        case '&':                       // Command separators
+        case '*':                       // Wildcards
         case '?':
-          if(!force) result[q++]='^';
+        case '@':
           /*FALL*/
-        default:                // Normal characters
-          result[q++]=c;
+        default:                        // Normal characters
+          result[p++]=c;
           n=0;
-          continue;
+          break;
           }
         }
-      if(force) result[q++]='"';
+      while(c);
+      if(force) result[p++]='"';        // Closing quote
+      FXASSERT(p==result.length());
+      return result;
       }
-    FXASSERT(result.length()==q);
-    return result;
+
+    // Unchanged filename
+    return file;
     }
   return "\"\"";
   }
 
 
-// Decode quoted or escaped filename.
-// Examples:
+// Dequote filename that was enquoted for the command line.
 //
 //  Input       Result          Comment
-//  "a b"       a b             Quotes serve as optional argument delimiters.
 //
-//  \"          "               Escaped quotes are converted back to '"'.
+//  ""          (empty)         To pass empty string.
 //
-//  \\\"        \"              Odd number of \ followed by " correspond to half that
-//  \\\\\"      \\"             number of \ followed by a ".
+//  "a b"       a b             Use quotes for embedded spaces.
+//  a^ b        a b             Escape for embedded spaces to cmd.exe.
+//  a b         a               Only first parameter will be returned.
 //
-//  a\\"b c"    a\b c           An even number of \ followed by a " correspond to half that
-//  a\\\\"b c"  a\\b c          number of \, with quotes serving as an argument delimiters.
 //
-//  a\b         a\b             When not followed by a ", a \ is copied literally.
-//  a\\b        a\\b
+//  \"          "               Escape with '\'' to embed quotes.
+// """"         "               Inside quotes, '""' yields one '"'.
 //
-//  ^<file      <file           Caret ^ serves as escape in non quoted string.
-//  a^^b        a^b
+//  \\\"        \"              Odd number of '\' followed by '"' yields half that
+//  \\\\\"      \\"             number of '\' followed by a '"'.
 //
-//  "^>file"    ^>file          Caret passed unchanged when inside quoted string.
-//  "ab^\c"     ab^\c
+//  a\\"b c"    a\b c           Even number of '\' followed by a '"' yields to half that
+//  a\\\\"b c"  a\\b c          number of '\', with quotes serving as delimiter.
+//
+//  a\b         a\b             When not followed by a '"', a '\' is copied literally.
+//  "a\\b"      a\\b
+//
+//  ^<file      <file           Caret ^ serves as escape ONLY in non-quoted string.
+//  ^^          ^               Embed the escape charecter itself.
+//
+//  ^<LF>abc    abc             Line continuation; first character on next line
+//  ^<CR><LF>"  "               is treated as having been escaped!
+//
+// Here we do handle special shell characters via standard shell escape '^'.
+// Line-continuation is performen when '^' followed by a CR, LF, or CRLF.
+// Be careful with the first character after line-continuation, it will be
+// interpreted as having been escaped!
 FXString FXPath::dequote(const FXString& file){
-  FXString result(file);
-  if(0<result.length()){
-    FXint e=file.length(),b=0,r=0,q=0,n=0;
-
-    // Trim head
-    while(b<e && Ascii::isSpace(file[b])) ++b;
-
-    // Trim tail
-    while(b<e && Ascii::isSpace(file[e-1])) --e;
-
-    // Dequote the rest
-    while(b<e){
-      while(file[b]=='\\'){     // Track runs of backslashes
-        result[r++]=file[b++];
-        n++;
-        continue;
-        }
-      if(file[b]=='"'){         // Start or end of quoted part
-        if(n&1){                // Quotes were escaped by odd number of backslashes
-          r=r-n/2-1;
-          result[r++]='"';      // So insert the quote
-          b++;
+  if(!file.empty()){
+    FXString result(file);
+    FXint quote=0,param=0,slash=0,p=0,q=0;
+    FXchar c;
+    while(c=file[q++]!='\0'){
+      switch(c){
+      case '\\':                        // Backslashes get special handling
+        result[p++]=c;
+        slash++;
+        param=1;
+        break;
+      case '"':                         // Double quoted
+        p-=(slash>>1);                  // Back of over half the '\'
+        if((slash&1)==0){               // Even number of '\'
+          if(file[q]=='"' && quote){    // Second '"' after '"' in quote
+            result[p++]='"';            // Embedded quote
+            q++;
+            }
+          else{
+            quote^=1;                   // Unescaped '"'
+            }
           }
-        else{                   // Quotes not escaped
-          r=r-n/2;
-          q=!q;                 // So toggle the quotes flag
-          b++;
+        else{                           // Odd number of '\'
+          result[p-1]='"';              // Overwrite '\' with '"'
           }
-        n=0;
-        continue;
+        slash=0;
+        param=1;
+        break;
+      case ' ':                         // White space
+      case '\t':
+        if(quote) goto nrm;             // Embedded whitespace
+        if(param) goto fin;             // Finished parameter
+        break;
+      case '^':                         // Shell escape if not quoted
+        if(quote) goto nrm;
+        if(file[q]){
+          c=file[q++];                  // Escaped character
+          if(c=='\r' && file[q]){       // CR line continuation
+            c=file[q++];                // Escape character after continuation
+            }
+          if(c=='\n' && file[q]){       // LF or CRLF line continuation
+            c=file[q++];                // Escape character after continuation
+            }
+          }
+        /*FALL*/
+      default:                          // Normal characters
+nrm:    result[p++]=c;                  // Append it
+        slash=0;
+        param=1;
+        break;
         }
-      if(file[b]=='^'){         // Escape character if not not in quoted part
-        if(!q && b+1<e) b++;
-        }
-      result[r++]=file[b++];    // Normal characters are copied
-      n=0;
       }
-    result.trunc(r);
+    FXASSERT(p<=result.length());
+fin:result.trunc(p);
+    return result;
     }
-  return result;
+  return FXString::null;
   }
+
 
 #else                         // UNIX
 
-// Enquote filename to make safe for shell
-// Enclose with single quotes when:
-//   - If force=true
-//   - If white space before, in, or after letters
-//   - If filename is empty
-//   - If any special character from the set |&;<>()$`\"'*+?[]#~!^=% is found
-// Escaping is done when:
-//   - Quote character (') are encountered
-FXString FXPath::enquote(const FXString& file,FXbool force){
-  if(0<file.length()){
-    FXString result(file);
-    FXint p,q,e,c;
 
-    // Measure new string size
+// Enquote filename to make safe for shell
+//
+// Enclose with single quotes when:
+//
+//   - If force is true.
+//   - If filename is empty.
+//   - If white space before, in, or after letters.
+//   - If special shell characters encountered.
+//
+// Escaping is done when:
+//
+//   - Quote character (') are encountered
+//
+FXString FXPath::enquote(const FXString& file,FXbool force){
+  if(!file.empty()){
+    FXint p,q,e,c;
     p=q=e=0;
-    while(p<file.length()){
-      switch(file[p++]){
+    while((c=file[q++])!='\0'){
+      switch(c){
       case '\'':                // Single quote
-        q+=2;                   // Escaped as xxx\'xxx if outside quotes
+        p+=2;                   // Escaped as xxx\'xxx if outside quotes
         e+=2;                   // Escaped as 'xxx'\''xxx' if inside quotes
         continue;
       case '`':                 // Command substitution
@@ -1705,99 +1804,122 @@ FXString FXPath::enquote(const FXString& file,FXbool force){
       case '=':                 // Equals
       case '%':                 // Job control
       case '#':                 // Comments
-      case '\t':                // White space
+      case '\r':
       case '\n':
-      case '\v':
-      case ' ':
+      case ' ':                 // White space
+      case '\t':
         force=true;             // Force quotes
-        q++;
+        p++;
         continue;
       case '~':                 // Username substitution
         if(p==1) force=true;    // Force quotes if at beginning
         /*FALL*/
       default:                  // Normal character
-        q++;
+        p++;
         continue;
         }
       }
 
-    // Each escape adds two, quoting adds two more
-    if(force) q+=e+2;
+    // Extra space when quoted
+    if(force) p+=e+2;
 
-    // Size changed, so transformation needed
-    if(result.length()<q){
-      result.length(q);                 // Adjust to new length
+    // File must be escaped or quoted
+    if(file.length()<p){
+      FXString result('\0',p);
       p=q=0;
-      if(force) result[q++]='\'';
-      while(p<file.length()){
-        if((c=file[p++])=='\''){        // Quote needs to be escaped
-          if(force) result[q++]='\'';   // End quotation run first
-          result[q++]='\\';
-          result[q++]=c;
-          if(force) result[q++]='\'';   // Start next quotation run
+      if(force) result[p++]='\'';       // Opening quote
+      while((c=file[q++])!='\0'){
+        if(c=='\''){                    // Quote needs to be escaped
+          if(force) result[p++]='\'';   // Closing quote
+          result[p++]='\\';
+          result[p++]='\'';
+          if(force) result[p++]='\'';   // Opening quote
           continue;
           }
-        result[q++]=c;
+        result[p++]=c;                  // Normal characters
         }
-      if(force) result[q++]='\'';
+      if(force) result[p++]='\'';       // Closing quote
+      FXASSERT(p<=result.length());
+      return result;
       }
-    FXASSERT(result.length()==q);
-    return result;
+
+    // Unchanged filename
+    return file;
     }
   return "''";
   }
 
 
-// Dequote filename to get original again
-// The input text may contain multiple quoted segments, or even no quoted
-// segments at all, but leading and trailing spaces are removed.
-// Single quotes preserve the literal string exactly; escape sequences are
-// not allowed; not even \' - if you want a ' in the quoted text, you have
-// to do something like 'foo'\''bar'.
-// Double quotes allow $\`" and newline to be escaped with backslash; otherwise
-// they preserve things literally.
-// Unquoted segments may escape any character except newline; an escaped
-// newline is treated as a continuation, i.e. both escape and newline are
-// removed.
+// Dequote filename that was enquoted for the command line.
+//
+//  Input       Result          Comment
+//
+//  ""          (empty)         To pass empty string.
+//
+//  "a b c"     a b c           Double quotes for embedded spaces.
+//  'a b c'     a b c           Single quotes for embedded spaces.
+//  a\ b\ c     a b c           Escapes for embedded spaces.
+//
+//  \<          <               Outside of quotes, '\' escapes characters.
+//  \\          \               Embed escape character itself.
+//
+//  '\$ENV'     \$ENV           Inside single quotes, '\' has no special meaning.
+//  "\$ENV"     $ENV            Inside double quotes, '\' only escapes '$', '\', '`', and '"'.
+//  "\ENV"      \ENV            No special meaning for '\', unless followed by '$', '\', '`', or '"'.
+//
+//  'a'\''b'    a'b             Cannot escape '\'' inside single quotes.
+//
+//  a b         a               Only first parameter will be returned.
+//
+//  '"'         "               Enquote '"' inside '..' is fine.
+//  "'"         '               As is '\'' inside "...".
+//
+//  \<NL>       (nothing)       Line continuation for '\' followed by newline.
+//
 FXString FXPath::dequote(const FXString& file){
-  FXString result(file);
-  if(0<file.length()){
-    FXint b=0;
-    FXint e=file.length();
-    FXint r=0;
-    FXint q='\0';
-
-    // Trim head
-    while(b<e && Ascii::isSpace(file[b])) ++b;
-
-    // Trim tail
-    while(b<e && Ascii::isSpace(file[e-1])) --e;
-
-    // Dequote the rest
-    while(b<e){
-      if(file[b]=='"'){                 // Double quoted
-        if(q=='\0'){ q='"'; b++; continue; }
-        if(q=='"'){ q='\0'; b++; continue; }
-        }
-      else if(file[b]=='\''){           // Single quoted
-        if(q=='\0'){ q='\''; b++; continue; }
-        if(q=='\''){ q='\0'; b++; continue; }
-        }
-      else if(file[b]=='\\'){           // Quoting rules
-        if(q=='\0'){
-          if(file[b+1]=='\n'){ b+=2; continue; }        // Line continuation if \ followed by newline
-          if(file[b+1]) b++;
+  if(!file.empty()){
+    FXString result(file);
+    FXint quote=0,param=0,p=0,q=0;
+    FXchar c;
+    while(c=file[q++]!='\0'){
+      switch(c){
+      case '\'':                        // Single quoted, no escape codes in here
+        if(quote==2) goto nrm;          // "...'..."
+        quote^=1;
+        param=1;
+        break;
+      case '"':                         // Double quoted, escape codes only for $\`"
+        if(quote==1) goto nrm;          // '..."...'
+        quote^=2;
+        param=1;
+        break;
+      case '\r':
+      case '\n':
+      case ' ':                         // Whitespace
+      case '\t':
+        if(quote) goto nrm;             // Embedded whitespace
+        if(param) goto fin;             // Finished parameter
+        break;
+      case '\\':
+        if(quote==1) goto nrm;
+        if(file[q]){
+          c=file[q++];                  // Escaped character
+          if(c=='\n') break;            // Line continuation
+          if(quote==2 && c!='$' && c!='\\' && c!='`' && c!='"'){
+            result[p++]='\\';           // Backslash remains inside "..."
+            }
           }
-        else if(q=='"'){
-          if(file[b+1]=='\n'){ b+=2; continue; }        // Line continuation if \ followed by newline
-          if(file[b+1]=='"' || file[b+1]=='\\' || file[b+1]=='$') b++;
-          }
+        /*FALL*/
+      default:                          // Normal characters
+nrm:    result[p++]=c;                  // Append it
+        param=1;
+        break;
         }
-      result[r++]=file[b++];            // Just copy character over
       }
-    result.trunc(r);
+    FXASSERT(p<=result.length());
+fin:result.trunc(p);
     }
-  return result;
+  return FXString::null;
   }
 
 #endif
@@ -1812,15 +1934,17 @@ FXString FXPath::dequote(const FXString& file){
 // 2N backslashes + '"'   : N backslashes and begin/end of quoted text
 // N backslashes          : N backslashes
 //
+// '""' inside quote      : Inserts one '"'
+//
 FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
   argv=nullptr;
   if(command){
-    const FXchar *p=command;
+    const FXchar* p;
     FXint token=0;
+    FXint quote=0;
+    FXint slash=0;
     FXint count=0;
     FXint space=0;
-    FXint slash=0;
-    FXint quote=0;
     FXchar* buffer;
     FXchar** ptr;
     FXchar* arg;
@@ -1828,50 +1952,52 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
     FXchar c;
 
     // First pass: measure output
+    p=command;
     while((c=*p++)!='\0'){
       switch(c){
       case '\\':                        // Backslashes get special handling
-        space++;
-        slash++;
         token=1;
+        slash++;
+        space++;
         break;
-      case '"':                         // Double quoted
-        space-=(slash>>1);              // Halve the number of slashes, if any
-        if(slash&1){                    // Odd number of slashes
-          space++;                      // Literal " added
-          }
-        else{                           // Even number of slashes
-          if(quote && *(p+1)=='"'){
-            space++;                    // Escaped quote inside quotation
+      case '"':                         // Double quotes
+        token=1;                        // NO back up by slash/2
+        if((slash&1)==0){               // Even number of '\'
+          if(*p=='"' && quote){         // Double '"'
+            space++;
+            p++;
             }
           else{
-            quote^=1;
+            quote^=1;                   // Unescaped '"'
             }
           }
-        token=1;
         slash=0;
         break;
       case ' ':                         // White space
       case '\t':
+        if(quote) goto nrm1;            // White space in parameter
+        /*FALL*/
       case '\v':
       case '\r':
       case '\f':
       case '\n':
-        count+=token;
-        token=0;
         slash=0;
+        if(!token) break;               // No preceeding token
+        token=0;
+        count++;
+        space++;
         break;
       default:                          // Normal characters
+nrm1:   token=1;
         space++;
-        token=1;
         slash=0;
         break;
         }
       }
 
-    // Wrap up last one
+    // Final closeout
     count+=token;
-    space+=count;
+    space+=token;
 
     // We got at least one argument
     if(count){
@@ -1885,67 +2011,68 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
         // Point to where the characters start
         arg=a=(FXchar*)&argv[count+1];
 
-        // Reset string input
-        p=command;
-
-        token=0;
-        slash=0;
-        quote=0;
+        quote=token=slash=0;
 
         // Second pass: generate output
+        p=command;
         while((c=*p++)!='\0'){
           switch(c){
           case '\\':                    // Backslashes get special handling
-            *a++='\\';
-            slash++;
             token=1;
+            slash++;
+            *a++=c;
             break;
           case '"':                     // Double quoted
-            a-=(slash>>1);              // Halve number of slashes, if any
-            if(slash&1){                // Odd number of slashes
-              *a++='"';                 // Literal " added
-              }
-            else{                       // Even number of slashes
-              if(quote && *(p+1)=='"'){
-                *a++='"';               // Escaped quote inside quotation
+            token=1;
+            a-=(slash>>1);              // Back up by slash/2
+            if((slash&1)==0){           // Even number of '\'
+              if(*p=='"' && quote){     // Double '"'
+                *a++='"';
+                p++;
                 }
               else{
-                quote^=1;
+                quote^=1;               // Unescaped '"'
                 }
               }
-            token=1;
+            else{                       // Odd number of '\'
+              *(a-1)='"';               // Overwrite '\' with '"'
+              }
             slash=0;
             break;
           case ' ':                     // White space
           case '\t':
+            if(quote) goto nrm2;        // White space in parameter
+            /*FALL*/
           case '\v':
           case '\r':
           case '\f':
           case '\n':
-            if(token){                  // Close out argument
-              *ptr++=arg;
-              *a++='\0';
-              arg=a;
-              token=0;
-              }
             slash=0;
+            if(!token) break;           // No preceeding token
+            token=0;
+            *ptr++=arg;
+            *a++='\0';
+            arg=a;
             break;
           default:                      // Normal characters
-            *a++=c;
-            token=1;
+nrm2:       token=1;
             slash=0;
+            *a++=c;
             break;
             }
           }
 
-        // Final token closeout
+        // Final closeout
         if(token){
           *ptr++=arg;
-          *a='\0';
+          *a++='\0';
           }
 
         // Argv closeout
         *ptr=nullptr;
+
+        // Make sure it all fitted
+        FXASSERT(a<=buffer+(count+1)*sizeof(FXchar*)+space);
         return count;
         }
       }
@@ -1953,22 +2080,21 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
   return 0;
   }
 
-
 #else
 
 // Parse command to argc and argv, according to os-native rules
 //
 // \<nl>        : Line continuation NOT counted as a space
 // \X           : Escaped character (when outside quotes)
-// #...<nl>     : Comments are ignored same as whitespace
 // "......"     : Only $, \, and ' need escaping inside double-quoted text
 // '......'     : No characters can be escaped inside single-quoted text
 //
 FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
   argv=nullptr;
   if(command){
-    const FXchar *p=command;
+    const FXchar *p;
     FXint token=0;
+    FXint quote=0;
     FXint count=0;
     FXint space=0;
     FXchar* buffer;
@@ -1978,62 +2104,48 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
     FXchar c;
 
     // First pass: measure output
+    p=command;
     while((c=*p++)!='\0'){
       switch(c){
       case '\\':                        // Escape
-        c=*p++;
-        if(c=='\0'){ return 0; }        // Error, \ with nothing to follow
-        if(c=='\n'){ continue; }        // Line continuation if \ followed by newline
-        space++;
-        token=1;
-        break;
-      case '"':                         // Double quoted, escape codes only for $\`"
-        while((c=*p)!='\0' && c!='"'){
-          p++;
-          if(c=='\\'){
-            c=*p++;
-            if(c=='\n'){ continue; }    // Line continuation if \ followed by newline
-            if(c!='"' && c!='\\' && c!='$' && c!='`'){ p--; }
-            }
-          space++;
+        if(quote!=1) c=*p++;            // No escape inside single quote
+        if(c=='\n') break;              // Line continuation
+        if(quote==2 && c!='$' && c!='\\' && c!='`' && c!='"'){
+          space++;                      // Backslash remains inside "..."
           }
-        if(c=='\0'){ return 0; }        // Error, unclosed quotes
-        p++;
+        space++;
         token=1;
         break;
       case '\'':                        // Single quoted, no escape codes in here
-        while((c=*p)!='\0' && c!='\''){
-          p++;
-          space++;
-          }
-        if(c=='\0'){ return 0; }        // Error, unclosed quote
-        p++;
+        if(quote==2) goto nrm1;         // "...'..."
+        quote^=1;
         token=1;
         break;
-      case '#':                         // Comment characters ignored up to (but not including) newline
-        while((c=*p)!='\0' && c!='\n'){
-          p++;
-          }
+      case '"':                         // Double quoted, escape codes only for $\`"
+        if(quote==1) goto nrm1;         // '..."...'
+        quote^=2;
+        token=1;
         break;
       case ' ':                         // White space
       case '\t':
-      case '\v':
       case '\r':
-      case '\f':
       case '\n':
-        count+=token;
+        if(quote) goto nrm1;            // White space in parameter
+        if(!token) break;               // No preceeding token
         token=0;
+        count++;                        // Another argument
+        space++;
         break;
       default:                          // Normal characters
-        space++;
+nrm1:   space++;
         token=1;
         break;
         }
       }
 
-    // Wrap up last one
+    // Final closeout
     count+=token;
-    space+=count;
+    space+=token;
 
     // We got at least one argument
     if(count){
@@ -2047,61 +2159,44 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
         // Point to where the characters start
         arg=a=(FXchar*)&argv[count+1];
 
-        // Reset string input
-        p=command;
-
-        token=0;
+        quote=token=0;
 
         // Second pass: generate output
+        p=command;
         while((c=*p++)!='\0'){
           switch(c){
           case '\\':                    // Escape
-            c=*p++;
-            if(c=='\n'){ continue; }    // Line continuation if \ followed by newline
-            *a++=c;
-            token=1;
-            break;
-          case '"':                     // Double quoted, escape codes only for $\`"
-            while((c=*p)!='\0' && c!='"'){
-              p++;
-              if(c=='\\'){
-                c=*p++;
-                if(c=='\n'){ continue; }    // Line continuation if \ followed by newline
-                if(c!='"' && c!='\\' && c!='$' && c!='`'){ c='\\'; p--; }
-                }
-              *a++=c;
+            if(quote!=1) c=*p++;        // No escape inside single quote
+            if(c=='\n') break;          // Line continuation
+            if(quote==2 && c!='$' && c!='\\' && c!='`' && c!='"'){
+              *a++='\\';                // Backslash remains inside "..."
               }
-            p++;
+            *a++=c;
             token=1;
             break;
           case '\'':                    // Single quoted, no escape codes in here
-            while((c=*p)!='\0' && c!='\''){
-              p++;
-              *a++=c;
-              }
-            p++;
-            token=1;
+            if(quote==2) goto nrm2;     // "...'..."
+            quote^=1;
+            token=1;                    // Allow for empty argument ''
             break;
-          case '#':                     // Comment characters ignored up to (but not including) newline
-            while((c=*p) && c!='\n'){
-              p++;
-              }
+          case '"':                     // Double quoted, escape codes only for $\`"
+            if(quote==1) goto nrm2;     // '..."...'
+            quote^=2;
+            token=1;                    // Allow for empty argument ""
             break;
           case ' ':                     // White space
           case '\t':
-          case '\v':
           case '\r':
-          case '\f':
           case '\n':
-            if(token){                  // Close out argument
-              *ptr++=arg;
-              *a++='\0';
-              arg=a;
-              token=0;
-              }
+            if(quote) goto nrm2;        // White space in parameter
+            if(!token) break;           // No preceeding token
+            token=0;
+            *ptr++=arg;                 // Another argument
+            *a++='\0';
+            arg=a;
             break;
           default:                      // Normal characters
-            *a++=c;
+nrm2:       *a++=c;
             token=1;
             break;
             }
@@ -2110,11 +2205,14 @@ FXint FXPath::parseArgs(FXchar**& argv,const FXchar* command){
         // Final token closeout
         if(token){
           *ptr++=arg;
-          *a='\0';
+          *a++='\0';
           }
 
         // Argv closeout
         *ptr=nullptr;
+
+        // Make sure it all fitted
+        FXASSERT(a<=buffer+(count+1)*sizeof(FXchar*)+space);
         return count;
         }
       }
@@ -2248,24 +2346,24 @@ static FXbool domatch(const FXchar* string,const FXchar* s,const FXchar* p,FXuin
       case '?':         // Single character wildcard
         p++;                                                    // Eat '?'
         if(*s=='\0') return false;
-        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
-        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
+        if((*s==PATHSEP) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((*(s-1)==PATHSEP) && (flags&FXPath::PathName)))) return false;
         s=wcinc(s);
         break;
       case '*':         // Multiple character wildcard
         while(*p=='*') p++;                                     // Eat '*'
         while(*s!='\0'){
           if(domatch(string,s,p,flags)) return true;
-          if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || (ISPATHSEP(*(s-1)) && (flags&FXPath::PathName)))) return false;
-          if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
+          if((*s=='.') && (flags&FXPath::DotFile) && ((s==string) || ((*(s-1)==PATHSEP) && (flags&FXPath::PathName)))) return false;
+          if((*s==PATHSEP) && (flags&FXPath::PathName)) return false;
           s=wcinc(s);
           }
         break;
       case '[':         // Single character against character-set
         p++;                                                    // Eat '['
         if(*s=='\0') return false;
-        if(ISPATHSEP(*s) && (flags&FXPath::PathName)) return false;
-        if((*s=='.') && ((s==string) || ISPATHSEP(*(s-1))) && (flags&FXPath::DotFile)) return false;
+        if((*s==PATHSEP) && (flags&FXPath::PathName)) return false;
+        if((*s=='.') && ((s==string) || (*(s-1)==PATHSEP)) && (flags&FXPath::DotFile)) return false;
         neg=(*p=='!' || *p=='^');
         if(neg) p++;
         ss=wc(s);
@@ -2311,7 +2409,7 @@ static FXbool domatch(const FXchar* string,const FXchar* s,const FXchar* p,FXuin
         break;
       }
     }
-  return (*s=='\0') || (ISPATHSEP(*s) && (flags&FXPath::LeadDir));
+  return (*s=='\0') || ((*s==PATHSEP) && (flags&FXPath::LeadDir));
   }
 
 
@@ -2340,7 +2438,6 @@ FXbool FXPath::match(const FXString& string,const FXchar* pattern,FXuint flags){
 FXbool FXPath::match(const FXchar* string,const FXString& pattern,FXuint flags){
   return FXPath::match(string,pattern.text(),flags);
   }
-
 
 
 // Match string against pattern (like *, ?, [^a-z], and so on)
@@ -2395,7 +2492,6 @@ FXString FXPath::search(const FXString& pathlist,const FXString& file){
       while(pathlist[end] && pathlist[end]!=PATHLISTSEP) end++;
       if(beg==end) break;
       path=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)),file);
-      FXTRACE((TOPIC_DETAIL,"FXPath::search: try: %s\n",path.text()));
       if(FXStat::exists(path)) return path;
       }
     }
@@ -2417,6 +2513,7 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
     FXString result(file);
     FXString base;
     FXString res;
+    FXint length=2147483647;
     FXint beg=0;
     FXint end=0;
     while(pathlist[end]){
@@ -2427,8 +2524,9 @@ FXString FXPath::relativize(const FXString& pathlist,const FXString& file){
       base=FXPath::absolute(FXPath::expand(pathlist.mid(beg,end-beg)));
       if(FXPath::isInside(base,file)){
         res=FXPath::relative(base,file);
-        if(res.length()<result.length()){
+        if(res.length()<length){
           if(FXPath::search(pathlist,res)==file){
+            length=res.length();
             result=res;
             }
           }
@@ -2465,13 +2563,15 @@ FXbool FXPath::hasExecExtension(const FXString& file){
 
 // Check if given name is controversial
 FXbool FXPath::isReservedName(const FXString& file){
-  static const FXchar reserved3[]="CON\nPRN\nAUX\nNUL\n";
-  static const FXchar reserved4[]="COM1\nCOM2\nCOM3\nCOM4\nCOM5\nCOM6\nCOM7\nCOM8\nCOM9\nLPT1\nLPT2\nLPT3\nLPT4\nLPT5\nLPT6\nLPT7\nLPT8\nLPT9\n";
-  if(file.length()==3){
-    return (fxstrcasestr(reserved3,file.text())!=nullptr);
-    }
-  if(file.length()==4){
-    return (fxstrcasestr(reserved4,file.text())!=nullptr);
+  if(!file.empty()){
+    static const FXchar reserved3[]="CON\nPRN\nAUX\nNUL\n";
+    static const FXchar reserved4[]="COM1\nCOM2\nCOM3\nCOM4\nCOM5\nCOM6\nCOM7\nCOM8\nCOM9\nLPT1\nLPT2\nLPT3\nLPT4\nLPT5\nLPT6\nLPT7\nLPT8\nLPT9\n";
+    if(file.length()==3){
+      return (fxstrcasestr(reserved3,file.text())!=nullptr);
+      }
+    if(file.length()==4){
+      return (fxstrcasestr(reserved4,file.text())!=nullptr);
+      }
     }
   return false;
   }

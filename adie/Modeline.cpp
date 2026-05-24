@@ -150,48 +150,62 @@ FXbool Modeline::parseVimModeline(const FXchar* s){
 
 
 // Parse emacs modeline
-FXbool Modeline::parseEmacsModeline(const FXchar* s){
+FXbool Modeline::parseEmacsModeline(const FXchar* ptr){
+  const FXchar* beg=ptr;
+  const FXchar* end=ptr;
   FXString key;
   FXString val;
-  while(*s!='\0' && !(*s=='-' && *(s+1)=='*' && *(s+2)=='-')){
-
+  
+  // Skip to end
+  while(*end && !(*end=='-' && *(end+1)=='*' && *(end+2)=='-')){
+    end++;
+    }
+    
+  // Parse stuff in between
+  while(ptr<end){
+    
     // Skip white space
-    while(*s=='\t' || *s==' ') s++;
-
+    while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
+    
     // Parse string
-    key=FXString::null;
-    val=FXString::null;
-    while(*s!='\0' && *s!=':' && *s!='\t' && *s!=' '){
-      val+=*s++;
+    beg=ptr;
+    while(ptr<end && !(*ptr==' ' || *ptr=='\t' || *ptr==':')){
+      ptr++;
       }
+      
+    // Set value
+    val.assign(beg,ptr-beg);
 
     // Skip white space
-    while(*s=='\t' || *s==' ') s++;
+    while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
 
     // This was a key
-    if(*s==':'){
-      s++;
-
-      // Skip white space
-      while(*s=='\t' || *s==' ') s++;
+    if(*ptr==':'){
+      ptr++;
 
       // Keep the key
-      key=val;
+      key.adopt(val);
+
+      // Skip white space
+      while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
 
       // Parse string
-      val=FXString::null;
-      while(*s!='\0' && *s!=';' && *s!='\t' && *s!=' '){
-        val+=*s++;
+      beg=ptr;
+      while(ptr<end && !(*ptr==' ' || *ptr=='\t' || *ptr==';')){
+        ptr++;
         }
 
+      // Set value
+      val.assign(beg,ptr-beg);
+
       // Skip white space
-      while(*s=='\t' || *s==' ') s++;
+      while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
 
       // End of that
-      if(*s==';') s++;
+      if(*ptr==';') ptr++;
 
       // Skip white space
-      while(*s=='\t' || *s==' ') s++;
+      while(ptr<end && (*ptr==' ' || *ptr=='\t')) ptr++;
       }
 
     // Got nothing

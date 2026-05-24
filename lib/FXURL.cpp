@@ -419,9 +419,12 @@ static FXString convertPathSep(const FXString& file,FXchar septo,FXchar sepfm){
 
 /*******************************************************************************/
 
+// FIXME check for file share...
+
 // Return URL of filename
 FXString FXURL::fileToURL(const FXString& file){
 #ifdef WIN32
+/*
   if(ISPATHSEP(file[0]) && ISPATHSEP(file[1])){
     return "file:"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://share/path-with-slashes
     }
@@ -429,6 +432,8 @@ FXString FXURL::fileToURL(const FXString& file){
     return "file:///"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);      // file:///c:/path-with-slashes
     }
   return "file://"+encode(convertPathSep(file,'/','\\'),ENCODE_THESE);         // file://path-with-slashes
+*/
+  return "file://"+encode(FXPath::convertFromWindows(file),ENCODE_THESE);
 #else
   return "file://"+encode(file,ENCODE_THESE);                                   // file://path
 #endif
@@ -440,10 +445,13 @@ FXString FXURL::fileFromURL(const FXString& string){
   if(FXString::comparecase(string,"file:",5)==0){
 #ifdef WIN32
     URL url(string);
+/*
     if(url.host[0]<url.host[1]){
       return "\\\\"+string.mid(url.host[0],url.host[1]-url.host[0])+decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
       }
     return decode(convertPathSep(string.mid(url.path[0],url.path[1]-url.path[0]),'\\','/'));
+*/
+    return FXPath::convertToWindows(decode(string.mid(url.path[0],url.path[1]-url.path[0])));
 #else
     URL url(string);
     return decode(string.mid(url.path[0],url.path[1]-url.path[0]));

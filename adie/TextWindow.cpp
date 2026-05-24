@@ -5097,9 +5097,6 @@ void TextWindow::parseModeline(){
     if(modes.getStripSpaces()==0) setStripSpaces(false);
     if(modes.getStripSpaces()==1) setStripSpaces(true);
 
-    if(syntax->getStripSpaces()==0) setStripSpaces(false);
-    if(syntax->getStripSpaces()==1) setStripSpaces(true);
-
     // Tab and wrap widths
     if(modes.getTabWidth()>0) tabwidth=modes.getTabWidth();
     if(modes.getWrapWidth()>0) wrapwidth=modes.getWrapWidth();
@@ -5345,86 +5342,90 @@ long TextWindow::onUpdStyleBold(FXObject* sender,FXSelector sel,void*){
 
 /*******************************************************************************/
 
-// Set language
+// Switch syntax
 void TextWindow::setSyntax(Syntax* syn){
-  syntax=syn;
+  if(syntax!=syn){
+  
+    // Switch
+    syntax=syn;
 
-  // Set editor attributes to syntax mode
-  if(syntax){
+    // Syntax coloring mode
+    if(syntax){
 
-    // Show extension
-    language->setText(syntax->getName());
+      // Update language setting
+      language->setText(syntax->getName());
 
-    // Get original parameters
-    FXuint modebits=editor->getTextStyle();
-    FXint  tabwidth=editor->getTabColumns();
-    FXint  wrapwidth=editor->getWrapColumns();
+      // Set number of syntax styles
+      styles.no(syntax->getNumRules()-1);
 
-    // Set number of syntax styles
-    styles.no(syntax->getNumRules()-1);
+      // Read attributes for each style; fallback style from syntax itself
+      for(FXint rule=1; rule<syntax->getNumRules(); rule++){
+        styles[rule-1]=readStyleForRule(syntax->getGroup(),syntax->getRule(rule)->getName(),syntax->getRule(rule)->getStyle());
+        }
 
-    // Read attributes for each style
-    for(FXint rule=1; rule<syntax->getNumRules(); rule++){
-      styles[rule-1]=readStyleForRule(syntax->getGroup(),syntax->getRule(rule)->getName(),syntax->getRule(rule)->getStyle());
+      // Set styles
+      editor->setHiliteStyles(styles.data());
+      editor->setStyled(colorize);
+
+      // Delimiters
+      editor->setDelimiters(syntax->getDelimiters().text());
+
+      // Get original parameters
+      FXuint modebits=editor->getTextStyle();
+      FXint  tabwidth=editor->getTabColumns();
+      FXint  wrapwidth=editor->getWrapColumns();
+
+      // Modes from the syntax
+      if(syntax->getAutoIndent()==0) modebits&=~TEXT_AUTOINDENT;
+      if(syntax->getAutoIndent()==1) modebits|=TEXT_AUTOINDENT;
+      if(syntax->getWrapMode()==0) modebits&=~(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+      if(syntax->getWrapMode()==1) modebits|=(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
+      if(syntax->getTabMode()==0) modebits&=~TEXT_NO_TABS;
+      if(syntax->getTabMode()==1) modebits|=TEXT_NO_TABS;
+  
+      // Tab and wrap widths
+      if(syntax->getTabWidth()>0) tabwidth=syntax->getTabWidth();
+      if(syntax->getWrapWidth()>0) wrapwidth=syntax->getWrapWidth();
+  
+      // Strip trailing spaces
+      if(syntax->getStripSpaces()==0) setStripSpaces(false);
+      if(syntax->getStripSpaces()==1) setStripSpaces(true);
+  
+      // Put back (modified) parameters
+      editor->setTextStyle(modebits);
+      editor->setTabColumns(tabwidth);
+      editor->setWrapColumns(wrapwidth);
       }
-
-    // Set styles
-    editor->setHiliteStyles(styles.data());
-    editor->setStyled(colorize);
-
-    // Delimiters
-    editor->setDelimiters(syntax->getDelimiters().text());
-
-    // Modes from the syntax
-    if(syntax->getAutoIndent()==0) modebits&=~TEXT_AUTOINDENT;
-    if(syntax->getAutoIndent()==1) modebits|=TEXT_AUTOINDENT;
-    if(syntax->getWrapMode()==0) modebits&=~(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
-    if(syntax->getWrapMode()==1) modebits|=(TEXT_WORDWRAP|TEXT_FIXEDWRAP);
-    if(syntax->getTabMode()==0) modebits&=~TEXT_NO_TABS;
-    if(syntax->getTabMode()==1) modebits|=TEXT_NO_TABS;
-
-    // Tab and wrap widths
-    if(syntax->getTabWidth()>0) tabwidth=syntax->getTabWidth();
-    if(syntax->getWrapWidth()>0) wrapwidth=syntax->getWrapWidth();
-
-    // Strip trailing spaces
-    if(syntax->getStripSpaces()==0) setStripSpaces(false);
-    if(syntax->getStripSpaces()==1) setStripSpaces(true);
-
-    // Put back (modified) parameters
-    editor->setTextStyle(modebits);
-    editor->setTabColumns(tabwidth);
-    editor->setWrapColumns(wrapwidth);
-
-    // Full recolorization is called for
-    restyleText();
+      
+    // Plain mode
+    else{
+    
+      // Update language setting
+      language->setText("---");
+  
+      // Set styles
+      editor->setStyled(false);
+      editor->setHiliteStyles(nullptr);
+  
+      // Delimiters
+      editor->setDelimiters(delimiters.text());
+  
+      // Mode bits
+      FXuint modebits=editor->getTextStyle();
+      if(autoindent) modebits|=TEXT_AUTOINDENT; else modebits&=~TEXT_AUTOINDENT;
+      if(wrapping) modebits|=TEXT_WORDWRAP; else modebits&=~TEXT_WORDWRAP;
+      if(fixedwrap) modebits|=TEXT_FIXEDWRAP; else modebits&=~TEXT_FIXEDWRAP;
+      if(hardtabs) modebits&=~TEXT_NO_TABS; else modebits|=TEXT_NO_TABS;
+  
+      // Put back default parameters
+      editor->setTextStyle(modebits);
+      editor->setTabColumns(tabcols);
+      editor->setWrapColumns(wrapcols);
+      }
     }
-
-  // Reset editor attributes to defaults
-  else{
-
-    // Update language setting
-    language->setText("---");
-
-    // Set styles
-    editor->setHiliteStyles(nullptr);
-    editor->setStyled(false);
-
-    // Delimiters
-    editor->setDelimiters(delimiters.text());
-
-    // Mode bits
-    FXuint modebits=editor->getTextStyle();
-    if(autoindent) modebits|=TEXT_AUTOINDENT; else modebits&=~TEXT_AUTOINDENT;
-    if(wrapping) modebits|=TEXT_WORDWRAP; else modebits&=~TEXT_WORDWRAP;
-    if(fixedwrap) modebits|=TEXT_FIXEDWRAP; else modebits&=~TEXT_FIXEDWRAP;
-    if(hardtabs) modebits&=~TEXT_NO_TABS; else modebits|=TEXT_NO_TABS;
-
-    // Put back default parameters
-    editor->setTextStyle(modebits);
-    editor->setTabColumns(tabcols);
-    editor->setWrapColumns(wrapcols);
-    }
+  
+  // Restyle buffer
+  restyleText();
   }
 
 
