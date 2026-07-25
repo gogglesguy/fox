@@ -1985,12 +1985,12 @@ long FXFoldingList::onTripleClicked(FXObject*,FXSelector,void* ptr){
 
 // Compare sectioned strings
 FXint FXFoldingList::compareSection(const FXchar *p,const FXchar* q,FXint s){
-  FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t')){}
-  for(x=s; x && *q; x-=(*q++=='\t')){}
+  FXuchar c1,c2;
+  for(FXint d=s; d && *p; d-=(*p++=='\t')){}
+  for(FXint d=s; d && *q; d-=(*q++=='\t')){}
   do{
-    c1=(FXuchar) *p++;
-    c2=(FXuchar) *q++;
+    c1=*p++;
+    c2=*q++;
     }
   while((c1==c2) && (' '<=c1));
   if(c1<' ') c1=0;
@@ -2001,9 +2001,9 @@ FXint FXFoldingList::compareSection(const FXchar *p,const FXchar* q,FXint s){
 
 // Compare sectioned strings, case-insensitive
 FXint FXFoldingList::compareSectionCase(const FXchar *p,const FXchar* q,FXint s){
-  FXint c1,c2,x;
-  for(x=s; x && *p; x-=(*p++=='\t')){}
-  for(x=s; x && *q; x-=(*q++=='\t')){}
+  FXuchar c1,c2;
+  for(FXint d=s; d && *p; d-=(*p++=='\t')){}
+  for(FXint d=s; d && *q; d-=(*q++=='\t')){}
   do{
     c1=Ascii::toLower(*p++);
     c2=Ascii::toLower(*q++);
@@ -2608,10 +2608,10 @@ void FXFoldingList::clearItems(FXbool notify){
 // Compare strings up to n
 static FXint comp(const FXchar* s1,const FXchar* s2,FXint n){
   if(0<n){
-    FXint c1,c2;
+    FXuchar c1,c2;
     do{
-      c1=(FXuchar)*s1++;
-      c2=(FXuchar)*s2++;
+      c1=*s1++;
+      c2=*s2++;
       }
     while((c1==c2) && (' '<=c1) && --n);
     if(c1<' ') c1=0;
@@ -2625,10 +2625,10 @@ static FXint comp(const FXchar* s1,const FXchar* s2,FXint n){
 // Compare strings case insensitive up to n
 static FXint compcase(const FXchar* s1,const FXchar* s2,FXint n){
   if(0<n){
-    FXint c1,c2;
+    FXuchar c1,c2;
     do{
-      c1=Ascii::toLower((FXuchar)*s1++);
-      c2=Ascii::toLower((FXuchar)*s2++);
+      c1=Ascii::toLower(*s1++);
+      c2=Ascii::toLower(*s2++);
       }
     while((c1==c2) && (' '<=c1) && --n);
     if(c1<' ') c1=0;

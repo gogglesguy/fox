@@ -44,9 +44,15 @@
     S.I. units and we only conver to/frm other units for human presentation
     purposes.
 
-  - To recognize utf8 superscripts like ^2 (\xC2\xB2) or ^3 (\xC2\xB3), we will
-    need unicode character-classes; we don't have those in TL but we do have them
-    in FOX [to replace ISIN(nonpunct,c)].
+  - To recognize utf8 superscripts like ^2 (\xC2\xB2) or ^3 (\xC2\xB3), we might
+    need unicode character-classes.  For now, use nonpunct[] table to map only
+    nonpunctuation characters, all the rest maps to '\0'.
+
+  - UTF8 superscripts ^1 '\xC2\xB9' (¹), ^2 '\xC2\xB2' (²) and ^3 '\xC2\xB3' (³).
+    We also have superscript minus ^- '\xE2\x81\xBB' (⁻), ^+ '\xE2\x81\xBA' (⁺), 
+    ^0 '\xE2\x81\xB0' (⁰), ^4 '\xE2\x81\xB4', ... ^9 '\xE2\x81\xB9' (⁴⁵⁶⁷⁸⁹).
+    Currently, this does not yet work even though code is in place; it is masked
+    by all multi-byte unicode being classified as "word-character". 
 
   - Reference: "Conversion of Units of Measurement," Gordon S. Novak, Jr.,
     IEEE Trans. on Software Engineering, Vol. 21, No. 8, 1995, pp. 651-661.
@@ -129,8 +135,8 @@ static const FXUnitData UnitDataArray[]={
    {"Wb",           "Weber",               "Kg*m^2/A*s^2",   1.0},
    {"a",            "Are",                 "m^2",            100.0},
    {"acre",         "Acre",                "ha",             0.40468564224},
-   {"arcmin",       "ArcMinute",           "r",              2.9088820866E-4},
-   {"arcs",         "ArcSecond",           "r" ,             4.84813681109535993589914E-06},
+   {"arcmin",       "ArcMinute",           "rad",            0.000290888208665721596153949},
+   {"arcs",         "ArcSecond",           "rad" ,           4.84813681109535993589914E-06},
    {"atm",          "Atmosphere",          "Kg/m*s^2",       101325.0},
    {"au",           "AstronomicalUnit",    "m",              149597870700.0},
    {"b",            "Barn",                "m^2",            1E-28},
@@ -149,11 +155,11 @@ static const FXUnitData UnitDataArray[]={
    {"dyn",          "Dyne",                "Kg*m/s^2",       0.00001},
    {"eV",           "ElectronVolt",        "Kg*m^2/s^2",     1.60217733e-19},
    {"erg",          "Erg",                 "Kg*m^2/s^2",     0.0000001},
+   {"fL",           "FootLambert",         "cd/m^2",         3.42625909963539052691674},
    {"fath",         "Fathom",              "m",              1.828803658},
    {"fbm",          "BoardFoot",           "m^3",            0.002359737216},
-   {"fc",           "FootCandle",          "cd*sr/m^2",      10.7639104167},
-   {"flam",         "FootLambert",         "cd/m^2",         3.42625909964},
-   {"ft",           "InternationalFoot",   "m",              0.3048},
+   {"fc",           "FootCandle",          "cd*sr/m^2",      10.764},
+   {"ft",           "Foot",                "m",              0.3048},
    {"ftUS",         "SurveyFoot",          "m",              0.304800609601},
    {"ftn",          "Fortnight",           "s",              1209600.0},
    {"fur",          "Furlong",             "m",              201.168402337},
@@ -161,18 +167,18 @@ static const FXUnitData UnitDataArray[]={
    {"gal",          "USGallon",            "m^3",            0.003785411784},
    {"gee",          "StandardGravity",     "m/s^2",          9.80665},
    {"gf",           "GramForce",           "Kg*m/s^2",       0.00980665},
-   {"grad",         "Grade",               "rad",            0.015707963267948966192313},
    {"gr",           "Grain",               "mg",             64.79891},
+   {"grad",         "Gradian",             "rad",            0.015707963267948966192313},
    {"h",            "Hour",                "s",              3600.0},
    {"ha",           "Hectare",             "m^2",            10000.0},
    {"hour",         "Hour",                "s",              3600.0},
-   {"hp",           "Horsepower",          "Kg*m^2/s^2",     745.699871582},
+   {"hp",           "HorsePower",          "Kg*m^2/s^2",     745.699871582},
    {"in",           "Inch",                "m",              0.0254},
    {"kat",          "Katal",               "mol/s",          1.0},
    {"kip",          "KiloPoundForce",      "Kg*m/s^2",       4448.22161526},
    {"kph",          "KilometersPerHour",   "m/s",            5.0/18.0},
    {"kt",           "Knot",                "m/s",            463.0/900.0},
-   {"lam",          "Lambert",             "cd/m^2",         3183.09886184},
+   {"lam",          "Lambert",             "cd/m^2",         3183.09886183790671537768},
    {"lb",           "AvoirdupoisPound",    "Kg",             0.45359267},
    {"lbf",          "PoundForce",          "Kg*m/s^2",       4.44822161526},
    {"lbt",          "TroyPound",           "Kg",             0.3732417216},
@@ -225,30 +231,56 @@ static const FXUnitData UnitDataArray[]={
 
 /*******************************************************************************/
 
-// Set of non-punctation characters that may legitimately
-// appear in a unit abbreviation.
-static const FXuchar nonpunct[32]={
-  0x00,0x00,0x00,0x00,0x00,0x00,0xff,0x03,0xfe,0xff,0xff,0x87,0xfe,0xff,0xff,0x07,
-  0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,
+// Map all punctuation characters to 0, non-puncuation characters to themselves
+static const FXuchar nonpunct[256]={
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,
+  0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x00,0x00,0x00,0x00,0x5f,
+  0x00,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,
+  0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x00,0x00,0x00,0x00,0x00,
+  0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,
+  0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,
+  0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,
+  0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,
+  0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,
+  0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,
+  0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,
+  0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   };
 
-
-// Check if character is in set
-static inline FXuchar ISIN(const FXuchar set[],FXuchar ch){
-  return (set[ch>>3]>>(ch&7))&1;
-  }
-
+static const FXuchar nonpunct_[256]={
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,
+  0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x00,0x00,0x00,0x00,0x5f,
+  0x00,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,
+  0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  };
 
 // Compare unit-string against abbreviation.
+// Proper units consist of non-punctuation characters only.
 static FXint unitCompare(const FXchar* unit,const FXchar* abbr){
-  while(*unit && *abbr){
-    if(*unit != *abbr) return (FXint)((FXuchar)*unit - (FXuchar)*abbr);
-    unit++;
-    abbr++;
+  FXuchar ab,un;
+  do{
+    ab=*abbr++;
+    un=*unit++;
+    un=nonpunct[un];
     }
-  if(*abbr) return -1;
-  if(ISIN(nonpunct,*unit)) return 1;
-  return 0;
+  while((un==ab) && ab);
+  return un-ab;
   }
 
 
@@ -313,42 +345,6 @@ const FXchar* Units::expression(FXuint x){
 static const char* divex(const FXchar* unit,FXUnitConv& u);
 
 
-// Divide unit
-static void divUnit(FXUnitConv& u1,const FXUnitConv& u2){
-  u1.dims-=u2.dims-DIMSBIAS;
-  u1.mult/=u2.mult;
-  }
-
-
-// Multiply unit
-static void mulUnit(FXUnitConv& u1,const FXUnitConv& u2){
-  u1.dims+=u2.dims-DIMSBIAS;
-  u1.mult*=u2.mult;
-  }
-
-
-// Set factor to power
-static void powUnit(FXUnitConv& u,FXint p){
-  u.dims=(u.dims-DIMSBIAS)*p+DIMSBIAS;
-  u.mult=Math::powi(u.mult,p);
-  }
-
-
-// Set basic unit in u
-static void setunit(FXUnitConv& u,FXdouble k,FXuint x){
-  FXASSERT(x<NumBasicUnits);
-  u.dims=DIMSBIAS+(1<<(x*5));
-  u.mult=k;
-  }
-
-
-// Expand derived unit in u
-static void expunit(FXUnitConv& u,FXdouble k,const FXchar* expr){
-  divex(expr,u);
-  u.mult*=k;
-  }
-
-
 // Lookup unit type and populate u
 static const FXchar* unitex(const FXchar* unit,FXUnitConv& u){
   FXuint x=Units::lookup(unit);
@@ -357,12 +353,14 @@ static const FXchar* unitex(const FXchar* unit,FXUnitConv& u){
 
     // Basic unit: we're done!
     if((FXuval)info.expr<NumBasicUnits){
-      setunit(u,info.mult,(FXuint)(FXuval)info.expr);
+      u.dims=DIMSBIAS+(1<<(x*5));
+      u.mult=info.mult;
       }
 
     // Derived unit: expand it further!
     else{
-      expunit(u,info.mult,info.expr);
+      divex(info.expr,u);
+      u.mult*=info.mult;
       }
 
     // Advance past unit
@@ -440,56 +438,91 @@ static const FXchar* scalex(const FXchar* unit,FXUnitConv& u){
 // Parse power-expression
 static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
   const FXchar* mark;
+  FXint expo=0;
+  FXint sign=0;
 
   // Parse scaling-expression
-  unit=scalex(unit,u);
-  if(unit==nullptr) return nullptr;
-  mark=unit;
+  mark=scalex(unit,u);
+  if(mark==nullptr) return nullptr;
 
   // Skip white space
-  while(Ascii::isSpace(*unit)) unit++;
+  while(Ascii::isSpace(mark[0])) mark++;
 
-  // Exponentiation
-  if(*unit=='^'){
-    unit++;
+  unit=mark;
+
+  // Exponentiation syntax like: x^2.
+  if(mark[0]=='^'){
+    mark++;
 
     // Skip white space
-    while(Ascii::isSpace(*unit)) unit++;
+    while(Ascii::isSpace(mark[0])) mark++;
 
     // Sign of exponent
-    FXint sign=(*unit=='-');
+    sign=(mark[0]=='-');
 
     // Advance past sign
-    if(*unit=='-' || *unit=='+') unit++;
+    if(mark[0]=='-' || mark[0]=='+') mark++;
 
     // Expected a digit
-    if(Ascii::isDigit(*unit)){
-      FXint expo=*unit-'0';
-      unit++;
+    if(Ascii::isDigit(mark[0])){
+      expo=mark[0]-'0';
+      mark++;
 
       // Parse exponent
-      while(Ascii::isDigit(*unit)){
-        expo=expo*10+(*unit-'0');
-        unit++;
+      while(Ascii::isDigit(mark[0])){
+        expo=expo*10+(mark[0]-'0');
+        mark++;
         }
 
       // Extreme exponent won't fit in 5 bits
       if(expo>15) return nullptr;
 
-      // Skip white space
-      while(Ascii::isSpace(*unit)) unit++;
-
-      // Apply sign
-      if(sign) expo=-expo;
-
-      // Perform the power
-      powUnit(u,expo);
-
       // Absorb input
-      mark=unit;
+      unit=mark;
       }
     }
-  return mark;
+
+  // Exponentiation syntax like: x².
+  else{
+  
+    // Superscript sign
+    if(mark[0]=='\xE2' && mark[1]=='\x81'){
+      sign=(mark[2]=='\xBB');
+      if(mark[2]=='\xBB' || mark[2]=='\xBA') mark+=3;
+      }
+      
+    // Superscript 1, 2, 3
+    if(mark[0]=='\xC2'){
+      if(mark[1]=='\xB9'){              // ^1
+        expo=1;
+        unit=mark+2;
+        }
+      else if(mark[1]=='\xB2'){         // ^2
+        expo=2;
+        unit=mark+2;
+        }
+      else if(mark[1]=='\xB3'){         // ^3
+        expo=3;
+        unit=mark+2;
+        }
+      }
+    }
+
+  // Skip white space
+  while(Ascii::isSpace(unit[0])) unit++;
+
+  // Exponent is not zero
+  if(expo){
+
+    // Apply sign
+    if(sign) expo=-expo;
+
+    // Perform the power
+    u.dims=(u.dims-DIMSBIAS)*expo+DIMSBIAS;
+    u.mult=Math::powi(u.mult,expo);
+    }
+
+  return unit;
   }
 
 
@@ -518,7 +551,8 @@ static const FXchar* mulex(const FXchar* unit,FXUnitConv& u){
     mark=unit;
 
     // Perform multiply
-    mulUnit(u,m);
+    u.dims+=m.dims-DIMSBIAS;
+    u.mult*=m.mult;
 
     // Skip white space
     while(Ascii::isSpace(*unit)) unit++;
@@ -555,7 +589,8 @@ static const FXchar* divex(const FXchar* unit,FXUnitConv& u){
     mark=unit;
 
     // Perform division
-    divUnit(u,d);
+    u.dims-=d.dims-DIMSBIAS;
+    u.mult/=d.mult;
 
     // Skip white space
     while(Ascii::isSpace(*unit)) unit++;

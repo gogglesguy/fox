@@ -234,10 +234,10 @@ static inline FXulong clz64(FXulong x){
 #elif defined(_MSC_VER) && defined(_M_IX86)
   unsigned long result;
   if(x>>32){
-    _BitScanReverse(&result,(TUInt)(x>>32));
+    _BitScanReverse(&result,(FXuint)(x>>32));
     return 63-(32+result);
     }
-  _BitScanReverse(&result,(TUInt)x);
+  _BitScanReverse(&result,(FXuint)x);
   return 63-result;
 #else
   FXulong g,f,e,d,c,b;
@@ -280,11 +280,11 @@ static inline FXulong ctz64(FXulong x){
   return result;
 #elif defined(_MSC_VER) && defined(_M_IX86)
   unsigned long result;
-  if((TUInt)x){
-    _BitScanForward(&result,(TUInt)x);
+  if((FXuint)x){
+    _BitScanForward(&result,(FXuint)x);
     return result;
     }
-  _BitScanForward(&result,(TUInt)(x>>32));
+  _BitScanForward(&result,(FXuint)(x>>32));
   return result+32;
 #else
   return FXULONG(63)-clz64(x&-x);
@@ -410,13 +410,15 @@ static inline FXulong unhash64(FXulong x){
 
 /// Hash of 32-bit float
 static inline FXuint hash32(FXfloat x){
-  return x!=0.0f ? hash32(Math::fpBits(x)) : 0;
+  FXuint u=Math::fpBits(x);
+  return hash32(u&-((u<<1)!=0));
   }
 
 
 /// Hash of 64-bit double
 static inline FXulong hash64(FXdouble x){
-  return x!=0.0 ? hash64(Math::fpBits(x)) : 0;
+  FXulong u=Math::fpBits(x);
+  return hash64(u&-((u<<1)!=0));
   }
 
 }

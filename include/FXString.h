@@ -74,7 +74,7 @@ public:
   FXString(FXchar c,FXint n);
 
   /// Length of text in bytes
-  FXint length() const { return *(((FXint*)str)-1); }
+  FXint length() const { return ((FXint*)(void*)str)[-1]; }
 
   /// Change the length of the string to len
   FXbool length(FXint len);
@@ -122,10 +122,10 @@ public:
   const FXchar* text() const { return str; }
 
   /// See if string is empty
-  FXbool empty() const { return (((FXint*)str)[-1]==0); }
+  FXbool empty() const { return ((FXint*)(void*)str)[-1]==0; }
 
   /// See if string is empty
-  FXbool operator!() const { return (((FXint*)str)[-1]==0); }
+  FXbool operator!() const { return ((FXint*)(void*)str)[-1]==0; }
 
   /// Return a non-const reference to the ith character
   FXchar& operator[](FXint i){ return str[i]; }

@@ -265,7 +265,7 @@ long FXColorWell::onDNDDrop(FXObject* sender,FXSelector sel,void* ptr){
 
   // Try and obtain the color first
   if(getDNDData(FROM_DRAGNDROP,colorType,pointer,length)){
-    color=FXRGBA((((FXushort*)pointer)[0]+128)/257,(((FXushort*)pointer)[1]+128)/257,(((FXushort*)pointer)[2]+128)/257,(((FXushort*)pointer)[3]+128)/257);
+    color=FXRGBA((((FXushort*)(void*)pointer)[0]+128)/257,(((FXushort*)(void*)pointer)[1]+128)/257,(((FXushort*)(void*)pointer)[2]+128)/257,(((FXushort*)(void*)pointer)[3]+128)/257);
     freeElms(pointer);
     setRGBA(color,true);
     return 1;

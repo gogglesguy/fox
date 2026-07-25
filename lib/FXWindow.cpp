@@ -484,45 +484,6 @@ FXWindow* FXWindow::getChildWithKey(FXuint k) const {
   return nullptr;
   }
 
-/*
-  /// Get window from Dewey decimal key
-  FXWindow *getChildFromKey(const FXString& key) const;
-
-  /// Get Dewey decimal key from window
-  FXString getKeyFromChild(FXWindow* window) const;
-
-// Get window from Dewey decimal key
-FXWindow *FXWindow::getChildFromKey(const FXString& key) const {
-  FXWindow *window=(FXWindow*)this;
-  const FXchar *s=key.text();
-  FXuint num;
-  do{
-    if(!('0'<=*s && *s<='9')) return nullptr;
-    for(num=0; '0'<=*s && *s<='9'; s++){ num=10*num+*s-'0'; }
-    for(window=window->first; window && window->wk!=num; window=window->next);
-    }
-  while(*s++ == '.' && window);
-  return window;
-  }
-
-
-// Get Dewey decimal key from window
-FXString FXWindow::getKeyFromChild(FXWindow* window) const {
-  FXchar buf[1024];
-  FXchar *p=buf+1023;
-  FXuint num;
-  *p='\0';
-  while(window && window!=this && buf+10<=p){
-    num=window->getKey();
-    do{ *--p=num%10+'0'; num/=10; }while(num);
-    window=window->getParent();
-    *--p='.';
-    }
-  if(*p=='.') p++;
-  return p;
-  }
-*/
-
 
 // Return true if this window contains child in its subtree
 FXbool FXWindow::containsChild(const FXWindow* child) const {

@@ -30,7 +30,7 @@
 #include "FXBZFileStream.h"
 
 #ifdef HAVE_BZ2LIB_H
-#include <bzlib.h>
+#include "bzlib.h"
 
 /*
   Notes:

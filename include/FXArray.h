@@ -66,7 +66,7 @@ public:
     }
 
   /// Return number of items
-  FXival no() const { return *(((FXival*)ptr)-1); }
+  FXival no() const { return ((FXival*)(void*)ptr)[-1]; }
 
   /// Change number of elements in array to n
   FXbool no(FXival n){

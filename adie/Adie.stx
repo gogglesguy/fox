@@ -68,6 +68,7 @@
 language "Adie Syntax"
   filesmatch "*.stx"
   contextlines 1
+  stripspaces yes
   rule "Comment"
     open  "#"
     close "$"
@@ -321,10 +322,10 @@ language "C++"
   # File patterns for this language mode
   filesmatch "*.C,*.cpp,*.cc,*.cxx,*.c++,*.cu,*.H,*.hpp,*.hh,*.hxx,*.h++,*.h,*.cuh,*.ino"
 
-  contextlines 40
-
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
+  contextlines 40
+  stripspaces yes
 
   # All C-like languages use similar color schemes
   group "C-Like"
@@ -533,8 +534,8 @@ language "C"
 
   # Word delimiters
   delimiters "~.,/\`'!@#$%^&*()-=+{}|[]\":;<>?"
-
   contextlines 1
+  stripspaces yes
 
   # All C-like languages use similar color schemes
   group "C-Like"

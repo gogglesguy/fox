@@ -32,6 +32,7 @@ class HelpWindow;
 class Preferences;
 class TextWindow;
 class FindInFiles;
+class ReplaceInFiles;
 struct ParseInfo;
 
 
@@ -40,6 +41,7 @@ class Adie : public FXApp {
   FXDECLARE(Adie)
   friend class TextWindow;
   friend class FindInFiles;
+  friend class ReplaceInFiles;
 protected:
   TextWindowList      windowlist;               // Window list
   FXFileAssociations *associations;             // File association table

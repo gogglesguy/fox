@@ -34,7 +34,7 @@
 #include "FXPerformance.h"
 #include "FXPNGImage.h"
 #ifdef HAVE_ZLIB_H
-#include <zlib.h>
+#include "zlib.h"
 #endif
 
 
@@ -1528,11 +1528,11 @@ PERFORMANCE_RECORDER(PNGDecoder_inflate);
 // exceeds the expected amount for the full image (totbytes). However, inflate()
 // stops further processing of data when the full image has been decompressed.
 //
-//  buffer          next_out
-//   |                |
+//  buffer
+//   |              next_out
 //   |                |           next_in
-//   |                |             |
-//   |                |             |
+//   |                |             |            end
+//   |                |             |             |
 //   +----------------+-------------+-------------+
 //   | uncompressed   | inflating   | compressed  |
 //   +----------------+-------------+-------------+

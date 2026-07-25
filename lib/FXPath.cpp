@@ -785,7 +785,7 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 //    /aa/bb/../..      -> /
 //    /..               -> /
 //    ./aa/bb/../../    -> ./
-//    ./aa/bb/../.."    -> .
+//    ./aa/bb/../..     -> .
 //    ./aa/bb/../../../ -> ../
 //    ./aa/bb/../../..  -> ..
 //    /aa/bb/../../../  -> /
@@ -818,19 +818,20 @@ FXString FXPath::contract(const FXString& file,const FXString& user,const FXStri
 FXString FXPath::simplify(const FXString& file){
   if(!file.empty()){
     FXString result(file);
-    FXint components[64];
-    FXint c=0,p=0,q=0,s;
+    FXint p=0,q=0,s=0,r=0;
 #if defined(WIN32)
-    if(Ascii::isLetter(result[q]) && result[q+1]==':'){
-      result[p++]=result[q];
-      result[p++]=':';
-      q+=2;
+    if(Ascii::isLetter(result[0]) && result[1]==':'){
+      result[0]=result[0];
+      result[1]=':';
+      p=2;
+      q=2;
       }
-    else if(result[q]==PATHSEP && result[q+1]==PATHSEP){
-      result[p++]=PATHSEP;
-      result[p++]=PATHSEP;
-      q+=2;
-      if(result[q] && result[q]!=PATHSEP){
+    else if(result[0]==PATHSEP && result[1]==PATHSEP){
+      result[0]=PATHSEP;
+      result[1]=PATHSEP;
+      p=2;
+      q=2;
+      if(result[2] && result[2]!=PATHSEP){
         while(result[q] && result[q]!=PATHSEP){
           result[p++]=result[q++];
           }
@@ -846,80 +847,80 @@ FXString FXPath::simplify(const FXString& file){
         }
       }
 #endif
-    if(result[q]==PATHSEP){                     // Keep root
-      while(result[q]==PATHSEP) q++;            // Eat duplicate path separators
+    if(result[q]==PATHSEP){
+      while(result[q]==PATHSEP) q++;
       result[p++]=PATHSEP;
       }
-    s=p;                                        // We can not back up past this point
+    s=r=p;
     while(result[q]){
       if(result[q]=='.'){
-        if(result[q+1]=='\0'){                  // '.'
-          q++;
-          if(s<p && result[p-1]==PATHSEP){      // Back up over '/' if not first
-            p--;
-            }
-          if(p==0){                             // Output '.' if it would be empty otherwise
+        q++;
+        if(!result[q]){                 // '.'
+          if(s<p && result[p-1]==PATHSEP) p--;
+          if(!p){
             result[p++]='.';
             }
           continue;
           }
-        if(result[q+1]==PATHSEP){               // './'
-          q+=2;
-          while(result[q]==PATHSEP) q++;        // Eat duplicate path separators
-          if(p==0 && result[q]=='\0'){          // Output './' if it would be empty otherwise
+        if(result[q]==PATHSEP){        // './'
+          while(result[q]==PATHSEP) q++;
+          if(!result[q] && !p){
             result[p++]='.';
             result[p++]=PATHSEP;
             }
-          continue;                             // Otherwise, eat the './'
+          continue;
           }
-        if(result[q+1]=='.'){
-          if(result[q+2]=='\0'){                // '..'
-            q+=2;
-            if(c==0){                           // No prior path component
-              if(s) continue;                   // Pathological: can't go above root
-              result[p++]='.';                  // Leading '..'
-              result[p++]='.';
+        if(result[q]=='.'){
+          q++;
+          if(!result[q]){               // '..'
+            if(s<p && result[p-1]==PATHSEP){
+              p--;
+              while(s<p && result[p-1]!=PATHSEP) p--;
+              if(s<p && result[p-1]==PATHSEP) p--;
+              if(!p){
+                result[p++]='.';
+                }
               continue;
               }
-            p=components[--c];                  // Reset to last-seen component
-            if(s<p && result[p-1]==PATHSEP){    // Back up over '/' if not first
-              p--;
-              }
-            if(p==0){                           // Output '.' if it would be empty otherwise
+            if(!r){                     // Can't go up from root
               result[p++]='.';
+              result[p++]='.';
+              s=p;
               }
             continue;
             }
-          if(result[q+2]==PATHSEP){             // '../'
-            q+=3;
-            while(result[q]==PATHSEP) q++;      // Eat duplicate path separators
-            if(c==0){                           // No prior path component
-              if(s) continue;                   // Pathological: can't go above root
-              result[p++]='.';                  // Leading '../'
-              result[p++]='.';
-              result[p++]=PATHSEP;
+          if(result[q]==PATHSEP){       // '../'
+            while(result[q]==PATHSEP) q++;
+            if(s<p && result[p-1]==PATHSEP){
+              p--;
+              while(s<p && result[p-1]!=PATHSEP) p--;
+              if(!result[q] && !p){
+                result[p++]='.';
+                result[p++]=PATHSEP;
+                }
               continue;
               }
-            p=components[--c];                  // Reset to last-seen component
-            if(p==0 && result[q]=='\0'){        // Output './' if it would be empty otherwise
+            if(!r){                     // Can't go up from root
+              result[p++]='.';
               result[p++]='.';
               result[p++]=PATHSEP;
+              s=p;
               }
-            continue;                           // Otherwise, eat the '../'
+            continue;
             }
+          q--;
           }
+        q--;
         }
-      if(__unlikely(c>=64)) return file;        // Insanely many components (not simplified)
-      components[c++]=p;                        // Remember backup point
-      while(result[q] && result[q]!=PATHSEP){   // Advance to end of component
+      while(result[q] && result[q]!=PATHSEP){
         result[p++]=result[q++];
         }
-      if(result[q]==PATHSEP){                   // A path separator
-        while(result[q]==PATHSEP) q++;          // Eat duplicate path separators
-        result[p++]=PATHSEP;                    // Copy it
+      if(result[q]==PATHSEP){
+        while(result[q]==PATHSEP) q++;
+        result[p++]=PATHSEP;
         }
       }
-    return result.trunc(p);                     // Reached the end
+    return result.trunc(p);
     }
   return FXString::null;
   }

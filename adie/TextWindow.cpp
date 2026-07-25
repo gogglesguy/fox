@@ -31,6 +31,7 @@
 #include "TextWindow.h"
 #include "Adie.h"
 #include "FindInFiles.h"
+#include "ReplaceInFiles.h"
 #include "ShellCommand.h"
 #include "ShellDialog.h"
 #include "icons.h"
@@ -250,6 +251,7 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_SEARCHPATH,TextWindow::onUpdSearchPath),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_SAVE_SETTINGS,TextWindow::onCmdSaveSettings),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_FINDFILES,TextWindow::onCmdFindInFiles),
+  FXMAPFUNC(SEL_COMMAND,TextWindow::ID_REPLACEFILES,TextWindow::onCmdReplaceInFiles),
 
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_INSERTPOINT,TextWindow::onUpdInsertPoint),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_INSERTPOINT,TextWindow::onCmdInsertPoint),
@@ -260,8 +262,8 @@ FXDEFMAP(TextWindow) TextWindowMap[]={
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_NEXT_MARK,TextWindow::onCmdNextMark),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_PREV_MARK,TextWindow::onUpdPrevMark),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_PREV_MARK,TextWindow::onCmdPrevMark),
-  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onUpdGotoMark),
-  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_MARK_0,TextWindow::ID_MARK_9,TextWindow::onCmdGotoMark),
+  FXMAPFUNCS(SEL_UPDATE,TextWindow::ID_MARK_0,TextWindow::ID_MARK_19,TextWindow::onUpdGotoMark),
+  FXMAPFUNCS(SEL_COMMAND,TextWindow::ID_MARK_0,TextWindow::ID_MARK_19,TextWindow::onCmdGotoMark),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_DEL_MARK,TextWindow::onUpdDelMark),
   FXMAPFUNC(SEL_COMMAND,TextWindow::ID_DEL_MARK,TextWindow::onCmdDelMark),
   FXMAPFUNC(SEL_UPDATE,TextWindow::ID_CLEAR_MARKS,TextWindow::onUpdClearMarks),
@@ -629,7 +631,8 @@ void TextWindow::createMenubar(){
   new FXMenuCommand(searchmenu,tr("Select expression (..)\tShift-Alt-)\tSelect enclosing parentheses."),nullptr,editor,FXText::ID_SELECT_PAREN);
   new FXMenuSeparator(searchmenu);
   new FXMenuCommand(searchmenu,tr("Incremental search\tCtl-I\tSearch for a string."),nullptr,this,ID_ISEARCH_START);
-  new FXMenuCommand(searchmenu,tr("Search &Files\tShift-Ctl-F\tSearch files for a string."),getApp()->searchfilesicon,this,ID_FINDFILES);
+new FXMenuCommand(searchmenu,tr("Search In &Files\tShift-Ctl-F\tSearch string in files."),getApp()->searchfilesicon,this,ID_FINDFILES);
+new FXMenuCommand(searchmenu,tr("Replace In Files\tShift-Ctl-R\tReplace string in files."),getApp()->searchfilesicon,this,ID_REPLACEFILES);
   new FXMenuCommand(searchmenu,tr("Find Backward\tShift-Ctl-G\tSearch backward for another occurrence."),getApp()->searchprevicon,this,ID_SEARCH_NXT_BACK);
   new FXMenuCommand(searchmenu,tr("Find Forward\tCtl-G\tSearch forward for another occurrence."),getApp()->searchnexticon,this,ID_SEARCH_NXT_FORW);
   new FXMenuCommand(searchmenu,tr("Find Backward Selected\tShift-Ctl-H\tSearch backward for selected text."),getApp()->searchprevicon,this,ID_SEARCH_SEL_BACK);
@@ -2211,16 +2214,28 @@ FXbool TextWindow::openDoc(){
 FXbool TextWindow::openDoc(const FXString& file){
   TextWindow *window=getApp()->findWindow(file);
   if(!window){
+
+    // Use already created window
     window=getApp()->findUnused();
-    if(!window){
+    if(window){
+      if(!window->loadFile(file)){
+        FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+        return false;
+        }
+      }
+
+    // Make new window
+    else{
       window=new TextWindow(getApp());
       window->create();
+      if(!window->loadFile(file)){
+        FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+        delete window;
+        return false;
+        }
       }
-    if(!window->loadFile(file)){
-      FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-      delete window;
-      return false;
-      }
+
+    // Set up
     window->setBrowserCurrentFile(file);
     window->readBookmarks(file);
     window->readView(file);
@@ -2352,15 +2367,25 @@ FXbool TextWindow::openSelDoc(){
         // File loaded already?
         TextWindow *window=getApp()->findWindow(file);
         if(!window){
+
+          // Use already created window
           window=getApp()->findUnused();
-          if(!window){
+          if(window){
+            if(!window->loadFile(file)){
+              FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+              return false;
+              }
+            }
+
+          // Use a new window
+          else{
             window=new TextWindow(getApp());
             window->create();
-            }
-          if(!window->loadFile(file)){
-            FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
-            delete window;
-            return false;
+            if(!window->loadFile(file)){
+              FXMessageBox::error(this,MBOX_OK,tr("Error Loading File"),tr("Unable to load file: %s"),file.text());
+              delete window;
+              return false;
+              }
             }
 
           // Set file browser, bookmarks, etc.
@@ -3359,6 +3384,17 @@ long TextWindow::onCmdFindInFiles(FXObject*,FXSelector,void*){
   return 1;
   }
 
+
+// Replace in files
+long TextWindow::onCmdReplaceInFiles(FXObject*,FXSelector,void*){
+  ReplaceInFiles *replacewindow=new ReplaceInFiles(getApp());
+  replacewindow->setPatternList(getPatternList());
+  replacewindow->setDirectory(FXPath::directory(getFilename()));
+  replacewindow->setSearchText(searchstring);
+  replacewindow->create();
+  replacewindow->show(PLACEMENT_CURSOR);
+  return 1;
+  }
 
 /*******************************************************************************/
 
@@ -4762,6 +4798,16 @@ long TextWindow::onTextRightMouse(FXObject*,FXSelector,void* ptr){
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_7);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_8);
     new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_9);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_10);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_11);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_12);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_13);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_14);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_15);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_16);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_17);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_18);
+    new FXMenuCheck(&popupmenu,FXString::null,this,ID_MARK_19);
     new FXMenuCommand(&popupmenu,tr("Delete bookmark\t\tDelete bookmark at cursor."),getApp()->bookdelicon,this,ID_DEL_MARK);
     new FXMenuCommand(&popupmenu,tr("Clear all bookmarks\t\tClear all bookmarks."),getApp()->bookclricon,this,ID_CLEAR_MARKS);
 
@@ -5076,21 +5122,24 @@ void TextWindow::updateBookmarks(FXint pos,FXint nd,FXint ni){
 
 // Clear bookmarks
 void TextWindow::clearBookmarks(){
-  bookmark[0]=bookmark[1]=bookmark[2]=bookmark[3]=bookmark[4]=bookmark[5]=bookmark[6]=bookmark[7]=bookmark[8]=bookmark[9]=0;
+  clearElms(bookmark,ARRAYNUMBER(bookmark));
   }
 
+
+// Format for bookmarks
+const FXchar bookformat[]="%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d";
 
 // Read bookmarks associated with file
 void TextWindow::readBookmarks(const FXString& file){
   clearBookmarks();
-  getApp()->reg().readFormatEntry("BOOKMARKS",FXPath::name(file),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",&bookmark[0],&bookmark[1],&bookmark[2],&bookmark[3],&bookmark[4],&bookmark[5],&bookmark[6],&bookmark[7],&bookmark[8],&bookmark[9]);
+  getApp()->reg().readFormatEntry("BOOKMARKS",FXPath::name(file),bookformat,&bookmark[0],&bookmark[1],&bookmark[2],&bookmark[3],&bookmark[4],&bookmark[5],&bookmark[6],&bookmark[7],&bookmark[8],&bookmark[9],&bookmark[10],&bookmark[11],&bookmark[12],&bookmark[13],&bookmark[14],&bookmark[15],&bookmark[16],&bookmark[17],&bookmark[18],&bookmark[19]);
   }
 
 
 // Write bookmarks associated with file, if any were set
 void TextWindow::writeBookmarks(const FXString& file){
   if(savemarks && bookmark[0]){
-    getApp()->reg().writeFormatEntry("BOOKMARKS",FXPath::name(file).text(),"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",bookmark[0],bookmark[1],bookmark[2],bookmark[3],bookmark[4],bookmark[5],bookmark[6],bookmark[7],bookmark[8],bookmark[9]);
+    getApp()->reg().writeFormatEntry("BOOKMARKS",FXPath::name(file).text(),bookformat,bookmark[0],bookmark[1],bookmark[2],bookmark[3],bookmark[4],bookmark[5],bookmark[6],bookmark[7],bookmark[8],bookmark[9],bookmark[10],bookmark[11],bookmark[12],bookmark[13],bookmark[14],bookmark[15],bookmark[16],bookmark[17],bookmark[18],bookmark[19]);
     }
   }
 

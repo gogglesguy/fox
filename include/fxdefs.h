@@ -575,7 +575,7 @@ enum {
 
 
 /**
-* FXASSERT_STATIC performs a compile time assert (requires C++11 or newer).
+* FXSTATIC_ASSERT performs a compile time assert (requires C++11 or newer).
 * When assertion (which must be const expression) fails, a compile-time
 * error message is generated.  Thus, there is no run-time overhead whatsoever.
 * In addition, the condition is checked even if code is never executed.

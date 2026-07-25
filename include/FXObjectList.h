@@ -56,7 +56,7 @@ public:
   FXObjectList& adopt(FXObjectList& other);
 
   /// Return number of objects
-  FXival no() const { return *((FXival*)(ptr-1)); }
+  FXival no() const { return ((FXival*)(void*)ptr)[-1]; }
 
   /// Set number of objects
   FXbool no(FXival num);

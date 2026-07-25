@@ -43,10 +43,10 @@ protected:
   FXbool no(FXival n);
 
   // Change number of used entries
-  void used(FXival u){ ((FXival*)table)[-2]=u; }
+  void used(FXival u){ ((FXival*)(void*)table)[-2]=u; }
 
   // Change number of free entries
-  void free(FXival f){ ((FXival*)table)[-3]=f; }
+  void free(FXival f){ ((FXival*)(void*)table)[-3]=f; }
 
   // Resize the table to the given size, keeping contents
   FXbool resize(FXival n);
@@ -59,16 +59,16 @@ public:
   FXVariantMap(const FXVariantMap& other);
 
   /// Return the size of the table, including the empty slots
-  FXival no() const { return ((FXival*)table)[-1]; }
+  FXival no() const { return ((FXival*)(void*)table)[-1]; }
 
   /// Return number of used slots in the table
-  FXival used() const { return ((FXival*)table)[-2]; }
+  FXival used() const { return ((FXival*)(void*)table)[-2]; }
 
   /// Return number of free slots in the table
-  FXival free() const { return ((FXival*)table)[-3]; }
+  FXival free() const { return ((FXival*)(void*)table)[-3]; }
 
   /// See if map is empty
-  FXbool empty() const { return ((FXival*)table)[-1]<=1; }
+  FXbool empty() const { return ((FXival*)(void*)table)[-1]<=1; }
 
   /// Assignment operator
   FXVariantMap& operator=(const FXVariantMap& other);

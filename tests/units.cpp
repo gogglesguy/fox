@@ -42,8 +42,23 @@ void printusage(const FXchar* prog){
   fxmessage("  --from <units>           Increment value .\n");
   fxmessage("  --to <units>             Add increment this many times.\n");
   fxmessage("  --span <units>           Dump every so many times.\n");
+  fxmessage("  --dims <units>           Show dimensions code.\n");
   fxmessage("  --trace-topics <topics>  Set trace topics.\n");
+  fxmessage("  --check-table            Check table correctness.\n");
   fxmessage("  -h, --help               Print help.\n");
+  }
+
+
+// Table should remain sorted; check this here.
+void checktable(){
+  FXuint N=Units::number();
+  for(FXuint u=1; u<N; ++u){
+    if(strcmp(Units::symbol(u),Units::symbol(u-1))<=0){
+      fxmessage("Units table: %s > %s is false\n",Units::symbol(u),Units::symbol(u-1));
+      return;
+      }
+    }
+  fxmessage("Units table is OK\n");
   }
 
 
@@ -55,11 +70,20 @@ int main(int argc,char *argv[]){
   FXdouble originalvalue=1.0;
   FXdouble convertedvalue=1.0;
   FXint    length=0;
+  FXulong  dims;
 
   // Grab a few arguments
   for(int arg=1; arg<argc; ++arg){
     if(FXString::compare(argv[arg],"-h")==0 || FXString::compare(argv[arg],"--help")==0){
       printusage(argv[0]);
+      return 0;
+      }
+    else if(FXString::compare(argv[arg],"--check-table")==0){
+      checktable();
+      return 0;
+      }
+    else if(FXString::compare(argv[arg],"--table-size")==0){
+      fxmessage("table size=%u\n",Units::number());
       return 0;
       }
     else if(FXString::compare(argv[arg],"--trace-topics")==0){
@@ -81,6 +105,11 @@ int main(int argc,char *argv[]){
     else if(FXString::compare(argv[arg],"--span")==0){
       if(++arg>=argc){ fxwarning("Missing argument for --span option.\n"); return 1; }
       sp_unit=argv[arg];
+      }
+    else if(FXString::compare(argv[arg],"--dims")==0){
+      if(++arg>=argc){ fxwarning("Missing argument for --dims option.\n"); return 1; }
+      dims=Units::dimensions(argv[arg]);
+      fxmessage("dimensions(%s) = 0x%llx\n",argv[arg],dims);
       }
     else{
       fxwarning("Bad argument.\n");
@@ -125,3 +154,4 @@ int main(int argc,char *argv[]){
     }
   return 0;
   }
+

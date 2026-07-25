@@ -105,9 +105,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_adie_OBJECTS = Adie.$(OBJEXT) Commands.$(OBJEXT) \
 	FindInFiles.$(OBJEXT) help.$(OBJEXT) HelpWindow.$(OBJEXT) \
 	icons.$(OBJEXT) main.$(OBJEXT) Modeline.$(OBJEXT) \
-	Preferences.$(OBJEXT) ShellCommand.$(OBJEXT) \
-	ShellDialog.$(OBJEXT) Syntax.$(OBJEXT) SyntaxParser.$(OBJEXT) \
-	TextWindow.$(OBJEXT)
+	Preferences.$(OBJEXT) ReplaceInFiles.$(OBJEXT) \
+	ShellCommand.$(OBJEXT) ShellDialog.$(OBJEXT) Syntax.$(OBJEXT) \
+	SyntaxParser.$(OBJEXT) TextWindow.$(OBJEXT)
 adie_OBJECTS = $(am_adie_OBJECTS)
 adie_LDADD = $(LDADD)
 adie_DEPENDENCIES = $(top_builddir)/lib/libFOX-1.7.la
@@ -484,6 +484,8 @@ Modeline.h \
 Modeline.cpp \
 Preferences.h \
 Preferences.cpp \
+ReplaceInFiles.h \
+ReplaceInFiles.cpp \
 ShellCommand.h \
 ShellCommand.cpp \
 ShellDialog.h \
@@ -643,6 +645,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpWindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Modeline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Preferences.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReplaceInFiles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShellCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShellDialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Syntax.Po@am__quote@

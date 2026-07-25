@@ -303,32 +303,50 @@ FXIconItem *FXFileList::createItem(const FXString& text,FXIcon *big,FXIcon* mini
 
 // Compare string and string with natural interpretation of decimal numbers
 FXint FXFileList::compareSectionNatural(const FXchar* s1,const FXchar* s2,FXint s,FXbool ci){
-  const FXchar *ns1,*ne1,*ns2,*ne2;
-  FXint diff=0,c1=0,c2=0,d;
-  for(d=s; d && *s1; d-=(*s1++=='\t')){}
-  for(d=s; d && *s2; d-=(*s2++=='\t')){}
-  while((c1=(FXuchar)*s1)>=' ' && (c2=(FXuchar)*s2)>=' '){
+  FXint   diff=0;
+  FXuchar c1=0;
+  FXuchar c2=0;
+  
+  // Walk to given section number
+  for(FXint d=s; d && *s1; d-=(*s1++=='\t')){}
+  for(FXint d=s; d && *s2; d-=(*s2++=='\t')){}
+  
+  // Now compare sections
+  while((c1=*s1)>=' ' && (c2=*s2)>=' '){
 
     // Both are numbers: special treatment
     if(c1<='9' && c2<='9' && '0'<=c1 && '0'<=c2){
+    
+      // Start of first non-zero digit
+      const FXchar *ns1=s1;
+      const FXchar *ns2=s2;
 
       // Parse over leading zeroes
-      for(ns1=s1; *ns1=='0'; ++ns1){ }
-      for(ns2=s2; *ns2=='0'; ++ns2){ }
+      while(*ns1=='0') ++ns1;
+      while(*ns2=='0') ++ns2;
 
       // Use number of leading zeroes as tie-breaker
       if(diff==0){ diff=(ns1-s1)-(ns2-s2); }
 
+      // End of digits
+      const FXchar *ne1=ns1;
+      const FXchar *ne2=ns2;
+
       // Parse over numbers
-      for(ne1=ns1; '0'<=*ne1 && *ne1<='9'; ++ne1){ }
-      for(ne2=ns2; '0'<=*ne2 && *ne2<='9'; ++ne2){ }
+      while('0'<=(c1=*ne1) && c1<='9') ++ne1;
+      while('0'<=(c2=*ne2) && c2<='9') ++ne2;
 
       // Check length difference of the numbers
-      if((d=(ne1-ns1)-(ne2-ns2))!=0){ return d; }
+      FXint x=(ne1-ns1)-(ne2-ns2);
+        
+      // Longest one is bigger
+      if(x){ return x; }
 
       // Compare the numbers
       while(ns1<ne1){
-        if((d=*ns1++ - *ns2++)!=0){ return d; }
+        c1=*ns1++;
+        c2=*ns2++;
+        if(c1!=c2){ return c1-c2; }
         }
 
       // Continue with the rest
@@ -1370,7 +1388,7 @@ long FXFileList::onCmdRefresh(FXObject*,FXSelector,void*){
 
 // Compare till '\t' or '\0'
 static FXbool fileequal(const FXchar* p1,const FXchar* p2){
-  FXint c1,c2;
+  FXuchar c1,c2;
   do{
     c1=*p1++;
     c2=*p2++;

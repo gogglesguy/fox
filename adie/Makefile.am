@@ -129,6 +129,8 @@ Modeline.h \
 Modeline.cpp \
 Preferences.h \
 Preferences.cpp \
+ReplaceInFiles.h \
+ReplaceInFiles.cpp \
 ShellCommand.h \
 ShellCommand.cpp \
 ShellDialog.h \

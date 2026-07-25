@@ -73,7 +73,7 @@ void FXMainWindow::create(){
     if(getApp()->isInitialized()){
 #ifndef WIN32
       // Set the WM_COMMAND hint on non-owned toplevel windows
-      XSetCommand(DISPLAY(getApp()),xid,const_cast<char**>((const char *const *)getApp()->getArgv()),getApp()->getArgc());
+      XSetCommand(DISPLAY(getApp()),xid,const_cast<char**>(getApp()->getArgv()),getApp()->getArgc());
 #endif
       }
     }

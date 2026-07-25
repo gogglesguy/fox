@@ -77,7 +77,7 @@ protected:
   FXUndoList           undolist;                // Undo list
   FXRecentFiles        mrufiles;                // Recent files list
   FXHiliteArray        styles;                  // Highlight styles
-  FXint                bookmark[10];            // Book marks
+  FXint                bookmark[20];            // Book marks
   FXint                insertpoint;             // Insert point
   FXString             filename;                // File being edited
   FXTime               filetime;                // Original modtime of file
@@ -330,12 +330,13 @@ public:
   long onCmdSearchPath(FXObject*,FXSelector,void*);
   long onUpdSearchPath(FXObject*,FXSelector,void*);
   long onCmdFindInFiles(FXObject*,FXSelector,void*);
+  long onCmdReplaceInFiles(FXObject*,FXSelector,void*);
   long onQueryTextTip(FXObject*,FXSelector,void*);
   long onLoggerRightMouse(FXObject*,FXSelector,void*);
   long onCmdMergeUndos(FXObject*,FXSelector,void*);
   long onUpdMergeUndos(FXObject*,FXSelector,void*);
 
-  // Copy filename to clipboard  
+  // Copy filename to clipboard
   long onClipboardLost(FXObject*,FXSelector,void*);
   long onClipboardGained(FXObject*,FXSelector,void*);
   long onClipboardRequest(FXObject*,FXSelector,void*);
@@ -495,6 +496,16 @@ public:
     ID_MARK_7,
     ID_MARK_8,
     ID_MARK_9,
+    ID_MARK_10,
+    ID_MARK_11,
+    ID_MARK_12,
+    ID_MARK_13,
+    ID_MARK_14,
+    ID_MARK_15,
+    ID_MARK_16,
+    ID_MARK_17,
+    ID_MARK_18,
+    ID_MARK_19,
     ID_DEL_MARK,
     ID_CLEAR_MARKS,
     ID_SAVEMARKS,
@@ -546,6 +557,7 @@ public:
     ID_TOGGLE_BROWSER,
     ID_TOGGLE_DOTFILES,
     ID_FINDFILES,
+    ID_REPLACEFILES,
     ID_SEARCHPATH,
     ID_EXPRESSION,
     ID_GOTO_LINE,

@@ -5102,6 +5102,9 @@ FXbool FXRex::amatch(const FXString& string,FXint pos,FXint mode,FXint* beg,FXin
 
 /*******************************************************************************/
 
+// FIXME we should change the API; return true if match, the location(s) of
+// FIXME the match are already in beg[], end[], anyway....
+
 // Search for pattern in string, starting at fm; return position or -1
 FXint FXRex::search(const FXchar* string,FXint len,FXint fm,FXint to,FXint mode,FXint* beg,FXint* end,FXint npar) const {
   FXExecute ms(string,string+len,beg,end,npar,mode);
