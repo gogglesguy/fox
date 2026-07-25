@@ -13,6 +13,8 @@ Modeline.cpp
 Modeline.h
 Preferences.cpp
 Preferences.h
+ReplaceInFiles.cpp
+ReplaceInFiles.h
 ShellCommand.cpp
 ShellCommand.h
 ShellDialog.cpp
