@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 cmake_policy(VERSION 3.23...4.2)
 
-project(FOX VERSION 1.7.90 LANGUAGES CXX)
+project(FOX VERSION 1.7.91 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
