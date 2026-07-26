@@ -42,8 +42,15 @@ target_link_libraries(foursplit FX::FOX)
 add_executable(gaugetest gaugetest.cpp)
 target_link_libraries(gaugetest FX::FOX)
 
-add_executable(gltest gltest.cpp)
-target_link_libraries(gltest FX::FOX ${OPENGL_LIBRARIES})
+# gltest calls gluGetString/gluPerspective/gluLookAt directly, so it links GLU
+# itself rather than relying on FX::FOX to export it. FOX does not need GLU, so
+# skip this test when GLU is unavailable instead of failing the build.
+if(TARGET OpenGL::GL AND TARGET OpenGL::GLU)
+  add_executable(gltest gltest.cpp)
+  target_link_libraries(gltest FX::FOX OpenGL::GL OpenGL::GLU)
+else()
+  message(STATUS "gltest: skipped, OpenGL Utility Library (GLU) not found")
+endif()
 
 add_executable(groupbox groupbox.cpp)
 target_link_libraries(groupbox FX::FOX)

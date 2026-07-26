@@ -62,9 +62,10 @@ if(WITH_OPENGL)
 
     target_link_libraries(FOX_DEPS INTERFACE
         opengl32  # OpenGL
-        glu32     # OpenGL Utility Library
     )
 
+    # Note, FOX itself never calls any glu* functions so it does not need to link to it
+    # But fx3d does have a HAVE_GLU_H macro so we add it here to the interface.
     target_compile_definitions(FOX INTERFACE
         HAVE_GL_H
         HAVE_GLU_H
