@@ -1,8 +1,12 @@
 if(WITH_OPENGL)
 
   find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+
+  # glviewer calls glu* directly. FOX itself does not need GLU, so a missing GLU
+  # skips this sample rather than failing the whole build.
   if (NOT TARGET OpenGL::GLU)
-    message(FATAL_ERROR "OpenGL Utility Library not found")
+    message(STATUS "glviewer: skipped, OpenGL Utility Library (GLU) not found")
+    return()
   endif()
 
   set(SOURCES FXGLCone.cpp
