@@ -370,11 +370,22 @@ endif()
 
 if(WITH_OPENGL)
   find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
-  if (NOT TARGET OpenGL::GLU)
-    message(FATAL_ERROR "OpenGL Utility Library not found")
+
+  target_link_libraries(FOX_DEPS INTERFACE OpenGL::GL OpenGL::GLX)
+  target_compile_definitions(FOX PUBLIC HAVE_GL_H HAVE_GLX_H)
+
+  # HAVE_GLU_H only controls whether fx3d.h includes <GL/glu.h>. That is a
+  # header requirement, not a link requirement as FOX itself never makes any glu* calls,
+  # so a missing GLU is not fatal.
+  if(TARGET OpenGL::GLU)
+    target_compile_definitions(FOX PUBLIC HAVE_GLU_H)
+  else()
+    message(WARNING
+      "OpenGL Utility Library (GLU) not found.\n"
+      "  FOX itself does not need it, but as a consequence:\n"
+      "   - fx3d.h will not include <GL/glu.h>\n"
+      "   - the glviewer and gltest samples will be skipped")
   endif()
-  target_link_libraries(FOX_DEPS INTERFACE OpenGL::GL OpenGL::GLU OpenGL::GLX)
-  target_compile_definitions(FOX PUBLIC HAVE_GL_H HAVE_GLU_H HAVE_GLX_H)
 endif()
 
 # Track dependencies that were actually linked (for generating fox-config.cmake)
