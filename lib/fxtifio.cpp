@@ -130,58 +130,65 @@ static toff_t tif_size_store(thandle_t handle){
 
 // Check if stream contains a TIFF
 FXbool fxcheckTIF(FXStream& store){
-  FXuchar signature[2];
-  store.load(signature,2);
-  store.position(-2,FXFromCurrent);
-  return (signature[0]==0x4d && signature[1]==0x4d) || (signature[0]==0x49 && signature[1]==0x49);
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[2];
+    store.load(signature,2);
+    store.position(-2,FXFromCurrent);
+    return (signature[0]==0x4d && signature[1]==0x4d) || (signature[0]==0x49 && signature[1]==0x49);
+    }
+  return false;
   }
 
 
 // Load a TIFF image
 FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
-  tiff_store_handle s_handle;
-  FXuval size,s;
 
   // Null out
   data=nullptr;
   width=0;
   height=0;
 
-  // Set error/warning handlers
-  TIFFSetErrorHandler(nullptr);
-  TIFFSetWarningHandler(nullptr);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    tiff_store_handle s_handle;
+    FXuval size,s;
 
-  // Initialize
-  s_handle.store=&store;
-  s_handle.begin=store.position();
-  s_handle.end=store.position();
+    // Set error/warning handlers
+    TIFFSetErrorHandler(nullptr);
+    TIFFSetWarningHandler(nullptr);
 
-  FXTRACE(TOPIC_DETAIL,"fxloadTIF\n");
+    // Initialize
+    s_handle.store=&store;
+    s_handle.begin=store.position();
+    s_handle.end=store.position();
 
-  // Open image
-  TIFF* image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,nullptr,nullptr);
-  if(image){
+    FXTRACE(TOPIC_DETAIL,"fxloadTIF\n");
 
-    // Get sizes
-    TIFFGetField(image,TIFFTAG_IMAGEWIDTH,&width);
-    TIFFGetField(image,TIFFTAG_IMAGELENGTH,&height);
-    TIFFGetField(image,TIFFTAG_COMPRESSION,&codec);
+    // Open image
+    TIFF* image=TIFFClientOpen("tiff","rm",(thandle_t)&s_handle,tif_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,nullptr,nullptr);
+    if(image){
 
-    FXTRACE(TOPIC_DETAIL,"fxloadTIF: width=%d height=%d codec=%d\n",width,height,codec);
+      // Get sizes
+      TIFFGetField(image,TIFFTAG_IMAGEWIDTH,&width);
+      TIFFGetField(image,TIFFTAG_IMAGELENGTH,&height);
+      TIFFGetField(image,TIFFTAG_COMPRESSION,&codec);
 
-    // Make room for data
-    size=width*height;
-    if(allocElms(data,size)){
-      if(TIFFReadRGBAImageOriented(image,width,height,data,ORIENTATION_TOPLEFT,0)){
-        for(s=0; s<size; s++){
-          data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);
+      FXTRACE(TOPIC_DETAIL,"fxloadTIF: width=%d height=%d codec=%d\n",width,height,codec);
+
+      // Make room for data
+      size=width*height;
+      if(allocElms(data,size)){
+        if(TIFFReadRGBAImageOriented(image,width,height,data,ORIENTATION_TOPLEFT,0)){
+          for(s=0; s<size; s++){
+            data[s]=((data[s]&0xff)<<16)|((data[s]&0xff0000)>>16)|(data[s]&0xff00)|(data[s]&0xff000000);
+            }
+          TIFFClose(image);
+          return true;
           }
-        TIFFClose(image);
-        return true;
+        freeElms(data);
         }
-      freeElms(data);
+      TIFFClose(image);
       }
-    TIFFClose(image);
     }
   return false;
   }
@@ -341,73 +348,77 @@ FXbool fxloadTIF__(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXu
 FXbool fxsaveTIF(FXStream& store,const FXColor* data,FXint width,FXint height,FXushort codec){
   FXbool result=false;
 
-  // Must make sense
-  if(data && 0<width && 0<height){
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-    // Correct for unsupported codecs
-    const TIFFCodec* coder=TIFFFindCODEC(codec);
-    if(coder==nullptr) codec=COMPRESSION_PACKBITS;
+    // Must make sense
+    if(data && 0<width && 0<height){
 
-    // Due to the infamous UNISYS patent, we can read LZW TIFF's but not
-    // write them back as that would require the LZW compression algorithm!
-    if(codec==COMPRESSION_LZW) codec=COMPRESSION_PACKBITS;
+      // Correct for unsupported codecs
+      const TIFFCodec* coder=TIFFFindCODEC(codec);
+      if(coder==nullptr) codec=COMPRESSION_PACKBITS;
 
-    FXTRACE(TOPIC_DETAIL,"fxsaveTIF: codec=%d\n",codec);
+      // Due to the infamous UNISYS patent, we can read LZW TIFF's but not
+      // write them back as that would require the LZW compression algorithm!
+      if(codec==COMPRESSION_LZW) codec=COMPRESSION_PACKBITS;
 
-    // Set error/warning handlers
-    TIFFSetErrorHandler(nullptr);
-    TIFFSetWarningHandler(nullptr);
+      FXTRACE(TOPIC_DETAIL,"fxsaveTIF: codec=%d\n",codec);
 
-    // Initialize
-    tiff_store_handle s_handle;
-    s_handle.store=&store;
-    s_handle.begin=store.position();
-    s_handle.end=store.position();
+      // Set error/warning handlers
+      TIFFSetErrorHandler(nullptr);
+      TIFFSetWarningHandler(nullptr);
 
-    // Open image
-    TIFF* image=TIFFClientOpen("tiff","w",(thandle_t)&s_handle,tif_dummy_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,nullptr,nullptr);
-    if(image){
-      FXColor *buffer=nullptr;
+      // Initialize
+      tiff_store_handle s_handle;
+      s_handle.store=&store;
+      s_handle.begin=store.position();
+      s_handle.end=store.position();
 
-      // Size of a strip is 16kb
-      FXint rows_per_strip=16*1024/width;
-      if(rows_per_strip<1) rows_per_strip=1;
+      // Open image
+      TIFF* image=TIFFClientOpen("tiff","w",(thandle_t)&s_handle,tif_dummy_read_store,tif_write_store,tif_seek_store,tif_close_store,tif_size_store,nullptr,nullptr);
+      if(image){
+        FXColor *buffer=nullptr;
 
-      // Set fields
-      TIFFSetField(image,TIFFTAG_IMAGEWIDTH,width);
-      TIFFSetField(image,TIFFTAG_IMAGELENGTH,height);
-      TIFFSetField(image,TIFFTAG_COMPRESSION,codec);
-      TIFFSetField(image,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-      TIFFSetField(image,TIFFTAG_ROWSPERSTRIP,rows_per_strip);
-      TIFFSetField(image,TIFFTAG_BITSPERSAMPLE,8);
-      TIFFSetField(image,TIFFTAG_SAMPLESPERPIXEL,4);
-      TIFFSetField(image,TIFFTAG_PLANARCONFIG,PLANARCONFIG_CONTIG);
-      TIFFSetField(image,TIFFTAG_PHOTOMETRIC,PHOTOMETRIC_RGB);
+        // Size of a strip is 16kb
+        FXint rows_per_strip=16*1024/width;
+        if(rows_per_strip<1) rows_per_strip=1;
 
-      // Allocate scanline buffer
-      if(allocElms(buffer,width)){
+        // Set fields
+        TIFFSetField(image,TIFFTAG_IMAGEWIDTH,width);
+        TIFFSetField(image,TIFFTAG_IMAGELENGTH,height);
+        TIFFSetField(image,TIFFTAG_COMPRESSION,codec);
+        TIFFSetField(image,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+        TIFFSetField(image,TIFFTAG_ROWSPERSTRIP,rows_per_strip);
+        TIFFSetField(image,TIFFTAG_BITSPERSAMPLE,8);
+        TIFFSetField(image,TIFFTAG_SAMPLESPERPIXEL,4);
+        TIFFSetField(image,TIFFTAG_PLANARCONFIG,PLANARCONFIG_CONTIG);
+        TIFFSetField(image,TIFFTAG_PHOTOMETRIC,PHOTOMETRIC_RGB);
 
-        // Dump each line
-        for(FXint y=0; y<height; data+=width,y++){
+        // Allocate scanline buffer
+        if(allocElms(buffer,width)){
 
-          // Convert byte order
-          for(FXint x=0; x<width; x++){
-            buffer[x]=FXREDVAL(data[x]) | FXGREENVAL(data[x])<<8 | FXBLUEVAL(data[x])<<16 | FXALPHAVAL(data[x])<<24;
+          // Dump each line
+          for(FXint y=0; y<height; data+=width,y++){
+
+            // Convert byte order
+            for(FXint x=0; x<width; x++){
+              buffer[x]=FXREDVAL(data[x]) | FXGREENVAL(data[x])<<8 | FXBLUEVAL(data[x])<<16 | FXALPHAVAL(data[x])<<24;
+              }
+
+            // Write scanline
+            if(TIFFWriteScanline(image,buffer,y,1)!=1) goto x;
             }
 
-          // Write scanline
-          if(TIFFWriteScanline(image,buffer,y,1)!=1) goto x;
+          // All done
+          result=true;
+
+          // Delete scanline buffer
+x:        freeElms(buffer);
           }
 
-        // All done
-        result=true;
-
-        // Delete scanline buffer
-x:      freeElms(buffer);
+        // Close image
+        TIFFClose(image);
         }
-
-      // Close image
-      TIFFClose(image);
       }
     }
   return result;
@@ -424,28 +435,32 @@ FXbool fxcheckTIF(FXStream&){
 
 
 // Stub routine
-FXbool fxloadTIF(FXStream&,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
-  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
-  static const FXuchar tiff_bits[]={
-   0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xf5, 0x39, 0x9f, 0xaf,
-   0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x87, 0xa3,
-   0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0,
-   0x45, 0x38, 0x81, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
-   0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff};
-  allocElms(data,32*32);
-  for(FXint p=0; p<32*32; p++){
-    data[p]=color[(tiff_bits[p>>3]>>(p&7))&1];
+FXbool fxloadTIF(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXushort& codec){
+  if(store.direction()==FXStreamLoad){
+    static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
+    static const FXuchar tiff_bits[]={
+     0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xf5, 0x39, 0x9f, 0xaf,
+     0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x87, 0xa3,
+     0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0, 0x45, 0x10, 0x81, 0xa0,
+     0x45, 0x38, 0x81, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+     0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
+     0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff};
+    if(allocElms(data,32*32)){
+      for(FXint p=0; p<32*32; p++){
+        data[p]=color[(tiff_bits[p>>3]>>(p&7))&1];
+        }
+      width=32;
+      height=32;
+      codec=1;
+      return true;
+      }
     }
-  width=32;
-  height=32;
-  codec=1;
-  return true;
+  return false;
   }
 
 

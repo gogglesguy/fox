@@ -44,6 +44,7 @@
 #include "FXTGAImage.h"
 #include "FXRGBImage.h"
 #include "FXPCXImage.h"
+#include "FXEXEImage.h"
 
 
 
@@ -2134,13 +2135,16 @@ FXbool PathFinderMain::previewImage(const FXString& filename){
   else if(FXString::comparecase(ext,"qoi")==0 || FXString::comparecase(ext,"qoif")==0){
     img=new FXQOIFImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
+  else if(FXString::comparecase(ext,"exe")==0){
+    img=new FXEXEImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
+    }
 #ifdef HAVE_ZLIB_H
   else if(FXString::comparecase(ext,"png")==0){
     img=new FXPNGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 #endif
 #ifdef HAVE_JPEG_H
-  else if(FXString::comparecase(ext,"jpg")==0){
+  else if(FXString::comparecase(ext,"jpg")==0 || FXString::comparecase(ext,"jpeg")==0){
     img=new FXJPGImage(getApp(),nullptr,IMAGE_KEEP|IMAGE_SHMI|IMAGE_SHMP);
     }
 #endif

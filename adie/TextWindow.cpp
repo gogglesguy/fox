@@ -4437,29 +4437,29 @@ long TextWindow::onCmdISearchText(FXObject*,FXSelector,void*){
 // Incremental search text command
 long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
   switch(((FXEvent*)ptr)->code){
-    case KEY_Escape:
-      finishISearch();
-      return 1;
-    case KEY_Page_Down:
-      return onCmdISearchNext(this,FXSEL(SEL_COMMAND,ID_ISEARCH_NEXT),nullptr);
-    case KEY_Page_Up:
-      return onCmdISearchPrev(this,FXSEL(SEL_COMMAND,ID_ISEARCH_PREV),nullptr);
-    case KEY_Down:
-      return onCmdISearchHistDn(this,FXSEL(SEL_COMMAND,ID_ISEARCH_HIST_DN),nullptr);
-    case KEY_Up:
-      return onCmdISearchHistUp(this,FXSEL(SEL_COMMAND,ID_ISEARCH_HIST_UP),nullptr);
-    case KEY_i:
-      if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
-      return onCmdISearchCase(this,FXSEL(SEL_COMMAND,ID_ISEARCH_IGNCASE),nullptr);
-    case KEY_e:
-      if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
-      return onCmdISearchRegex(this,FXSEL(SEL_COMMAND,ID_ISEARCH_REGEX),nullptr);
-    case KEY_w:
-      if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
-      return onCmdISearchWords(this,FXSEL(SEL_COMMAND,ID_ISEARCH_WORDS),nullptr);
-    case KEY_d:
-      if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
-      return onCmdISearchDir(this,FXSEL(SEL_COMMAND,ID_ISEARCH_REVERSE),nullptr);
+  case KEY_Escape:
+    finishISearch();
+    return 1;
+  case KEY_Page_Down:
+    return onCmdISearchNext(this,FXSEL(SEL_COMMAND,ID_ISEARCH_NEXT),nullptr);
+  case KEY_Page_Up:
+    return onCmdISearchPrev(this,FXSEL(SEL_COMMAND,ID_ISEARCH_PREV),nullptr);
+  case KEY_Down:
+    return onCmdISearchHistDn(this,FXSEL(SEL_COMMAND,ID_ISEARCH_HIST_DN),nullptr);
+  case KEY_Up:
+    return onCmdISearchHistUp(this,FXSEL(SEL_COMMAND,ID_ISEARCH_HIST_UP),nullptr);
+  case KEY_i:
+    if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
+    return onCmdISearchCase(this,FXSEL(SEL_COMMAND,ID_ISEARCH_IGNCASE),nullptr);
+  case KEY_e:
+    if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
+    return onCmdISearchRegex(this,FXSEL(SEL_COMMAND,ID_ISEARCH_REGEX),nullptr);
+  case KEY_w:
+    if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
+    return onCmdISearchWords(this,FXSEL(SEL_COMMAND,ID_ISEARCH_WORDS),nullptr);
+  case KEY_d:
+    if(!(((FXEvent*)ptr)->state&CONTROLMASK)) return 0;
+    return onCmdISearchDir(this,FXSEL(SEL_COMMAND,ID_ISEARCH_REVERSE),nullptr);
     }
   return 0;
   }
@@ -4469,7 +4469,7 @@ long TextWindow::onKeyISearchText(FXObject*,FXSelector,void* ptr){
 void TextWindow::addSearchHistory(const FXString& pat,FXuint opt,FXbool rep){
   if(!pat.empty()){
     if(!rep && isearchString[0]!=pat){
-      for(FXint i=19; i>0; --i){
+      for(FXint i=ARRAYNUMBER(isearchString)-1; i>0; --i){
         swap(isearchString[i],isearchString[i-1]);
         swap(isearchOption[i],isearchOption[i-1]);
         }
@@ -4480,9 +4480,6 @@ void TextWindow::addSearchHistory(const FXString& pat,FXuint opt,FXbool rep){
     }
   }
 
-
-// Search history section key
-const FXchar sectionKey[]="ISearch";
 
 // Search history search string keys
 static const FXchar skey[20][3]={
@@ -4499,9 +4496,9 @@ static const FXchar mkey[20][3]={
 
 // Load incremental search history
 void TextWindow::loadSearchHistory(){
-  for(FXint i=0; i<20; ++i){
-    isearchString[i]=getApp()->reg().readStringEntry(sectionKey,skey[i],FXString::null);
-    isearchOption[i]=getApp()->reg().readUIntEntry(sectionKey,mkey[i],SEARCH_EXACT|SEARCH_FORWARD|SEARCH_WRAP);
+  for(FXint i=0; i<ARRAYNUMBER(isearchString); ++i){
+    isearchString[i]=getApp()->reg().readStringEntry("ISearch",skey[i],FXString::null);
+    isearchOption[i]=getApp()->reg().readUIntEntry("ISearch",mkey[i],SEARCH_EXACT|SEARCH_FORWARD|SEARCH_WRAP);
     }
   isearchIndex=-1;
   }
@@ -4509,18 +4506,18 @@ void TextWindow::loadSearchHistory(){
 
 // Save incremental search history
 void TextWindow::saveSearchHistory(){
-  for(FXint i=0; i<20; ++i){
-    getApp()->reg().writeStringEntry(sectionKey,skey[i],isearchString[i].text());
-    getApp()->reg().writeUIntEntry(sectionKey,mkey[i],isearchOption[i]);
+  for(FXint i=0; i<ARRAYNUMBER(isearchString); ++i){
+    getApp()->reg().writeStringEntry("ISearch",skey[i],isearchString[i].text());
+    getApp()->reg().writeUIntEntry("ISearch",mkey[i],isearchOption[i]);
     }
   }
 
 
 // Scroll back in incremental search history
 long TextWindow::onCmdISearchHistUp(FXObject*,FXSelector,void*){
-  if(isearchIndex+1<20 && !isearchString[isearchIndex+1].empty()){
+  if(isearchIndex+1<ARRAYNUMBER(isearchString) && !isearchString[isearchIndex+1].empty()){
     isearchIndex++;
-    FXASSERT(0<=isearchIndex && isearchIndex<20);
+    FXASSERT(0<=isearchIndex && isearchIndex<ARRAYNUMBER(isearchString));
     searchstring=isearchString[isearchIndex];
     searchtext->setText(searchstring);
     performISearch(searchstring,searchflags,false,true);
@@ -4536,7 +4533,7 @@ long TextWindow::onCmdISearchHistUp(FXObject*,FXSelector,void*){
 long TextWindow::onCmdISearchHistDn(FXObject*,FXSelector,void*){
   if(0<isearchIndex){
     isearchIndex--;
-    FXASSERT(0<=isearchIndex && isearchIndex<20);
+    FXASSERT(0<=isearchIndex && isearchIndex<ARRAYNUMBER(isearchString));
     searchstring=isearchString[isearchIndex];
     searchtext->setText(searchstring);
     performISearch(searchstring,searchflags,false,true);

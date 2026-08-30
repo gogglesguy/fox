@@ -49,10 +49,10 @@
     nonpunctuation characters, all the rest maps to '\0'.
 
   - UTF8 superscripts ^1 '\xC2\xB9' (¹), ^2 '\xC2\xB2' (²) and ^3 '\xC2\xB3' (³).
-    We also have superscript minus ^- '\xE2\x81\xBB' (⁻), ^+ '\xE2\x81\xBA' (⁺), 
+    We also have superscript minus ^- '\xE2\x81\xBB' (⁻), ^+ '\xE2\x81\xBA' (⁺),
     ^0 '\xE2\x81\xB0' (⁰), ^4 '\xE2\x81\xB4', ... ^9 '\xE2\x81\xB9' (⁴⁵⁶⁷⁸⁹).
     Currently, this does not yet work even though code is in place; it is masked
-    by all multi-byte unicode being classified as "word-character". 
+    by all multi-byte unicode being classified as "word-character".
 
   - Reference: "Conversion of Units of Measurement," Gordon S. Novak, Jr.,
     IEEE Trans. on Software Engineering, Vol. 21, No. 8, 1995, pp. 651-661.
@@ -130,7 +130,7 @@ static const FXUnitData UnitDataArray[]={
    {"Sv",           "Sievert",             "m^2/s^2",        1.0},
    {"T",            "Tesla",               "Kg/A*s^2",       1.0},
    {"U",            "UnifiedAtomicMass",   "Kg",             1.66053906892E-27},
-   {"V",            "Volt",                "Kg*m^2/A*s^2",   1.0},
+   {"V",            "Volt",                "Kg*m^2/A*s^3",   1.0},
    {"W",            "Watt",                "Kg*m^2/s^3",     1.0},
    {"Wb",           "Weber",               "Kg*m^2/A*s^2",   1.0},
    {"a",            "Are",                 "m^2",            100.0},
@@ -152,6 +152,8 @@ static const FXUnitData UnitDataArray[]={
    {"d",            "Day",                 "s",              86400.0},
    {"day",          "Day",                 "s",              86400.0},
    {"deg",          "Degree",              "rad",            0.0174532925199432957692369},
+   {"dr",           "Dram",                "g",              1.7718451953125},
+   {"dwt",          "Pennyweight",         "g",              1.55517384},
    {"dyn",          "Dyne",                "Kg*m/s^2",       0.00001},
    {"eV",           "ElectronVolt",        "Kg*m^2/s^2",     1.60217733e-19},
    {"erg",          "Erg",                 "Kg*m^2/s^2",     0.0000001},
@@ -484,13 +486,13 @@ static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
 
   // Exponentiation syntax like: x².
   else{
-  
+
     // Superscript sign
     if(mark[0]=='\xE2' && mark[1]=='\x81'){
       sign=(mark[2]=='\xBB');
       if(mark[2]=='\xBB' || mark[2]=='\xBA') mark+=3;
       }
-      
+
     // Superscript 1, 2, 3
     if(mark[0]=='\xC2'){
       if(mark[1]=='\xB9'){              // ^1
@@ -601,37 +603,30 @@ static const FXchar* divex(const FXchar* unit,FXUnitConv& u){
 /*******************************************************************************/
 
 // Convert from src unit to dst unit; return true if sucess.
+// We *do* ensure both srcUnit and dstUnit are actually known units.
 FXbool Units::convert(FXdouble& value,const FXchar* srcUnit,const FXchar* dstUnit){
   if(srcUnit && dstUnit){
+    FXUnitConv srcu={0.0,DIMSBIAS};
+    FXUnitConv dstu={0.0,DIMSBIAS};
 
-    // Pointers match?
-    if(srcUnit!=dstUnit){
+    // Skip past spaces
+    while(Ascii::isSpace(*srcUnit)) srcUnit++;
+    while(Ascii::isSpace(*dstUnit)) dstUnit++;
 
-      // Skip past spaces
-      while(Ascii::isSpace(*srcUnit)) srcUnit++;
-      while(Ascii::isSpace(*dstUnit)) dstUnit++;
+    // Parse source unit into
+    srcUnit=divex(srcUnit,srcu);
+    if(srcUnit==nullptr) return false;
 
-      // Do unit strings match?
-      if(FXString::compare(srcUnit,dstUnit)){
-        FXUnitConv srcu={0.0,DIMSBIAS};
-        FXUnitConv dstu={0.0,DIMSBIAS};
+    // Parse destination unit info
+    dstUnit=divex(dstUnit,dstu);
+    if(dstUnit==nullptr) return false;
 
-        // Parse source unit into
-        srcUnit=divex(srcUnit,srcu);
-        if(srcUnit==nullptr) return false;
+    // Dimensional difference?
+    if(srcu.dims!=dstu.dims) return false;
 
-        // Parse destination unit info
-        dstUnit=divex(dstUnit,dstu);
-        if(dstUnit==nullptr) return false;
-
-        // Dimensional difference?
-        if(srcu.dims!=dstu.dims) return false;
-
-        // Compute conversion
-        value*=srcu.mult;
-        value/=dstu.mult;
-        }
-      }
+    // Compute conversion
+    value*=srcu.mult;
+    value/=dstu.mult;
     return true;
     }
   return false;

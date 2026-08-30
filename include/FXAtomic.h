@@ -361,14 +361,14 @@ static inline FXlong atomicSet(volatile FXlong* ptr,FXlong v){
                         "lock\n\t"
                         "cmpxchg8b (%1)\n\t"
                         "jnz 1b\n\t"
-                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((TInt)v), "c"((TInt)(v>>32)), "A"(*ptr) : "memory", "cc");
+                        "xchgl %%esi, %%ebx\n\t" : "=A"(ret) : "D"(ptr), "S"((FXint)v), "c"((FXint)(v>>32)), "A"(*ptr) : "memory", "cc");
   return ret;
 #elif (defined(__GNUC__) && defined(__i386__))
   FXlong ret;
   __asm__ __volatile__ ("1:\n\t"
                         "lock\n\t"
                         "cmpxchg8b (%1)\n\t"
-                        "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "b"((TInt)v), "c"((TInt)(v>>32)), "A"(*ptr) : "memory", "cc");
+                        "jnz 1b\n\t" : "=A"(ret) : "D"(ptr), "b"((FXint)v), "c"((FXint)(v>>32)), "A"(*ptr) : "memory", "cc");
   return ret;
 #elif (defined(__GNUC__) && defined(__x86_64__))
   FXlong ret;
@@ -809,7 +809,7 @@ static inline FXptr atomicSet(volatile FXptr* ptr,FXptr v){
 #elif defined(__GNUC__) && defined(__ATOMIC_SEQ_CST) && (__GCC_ATOMIC_POINTER_LOCK_FREE == 2)
   return __atomic_exchange_n(ptr,v,__ATOMIC_SEQ_CST);
 #elif ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
-  return (TPtr)__sync_lock_test_and_set(ptr,v);
+  return (FXptr)__sync_lock_test_and_set(ptr,v);
 #elif (defined(__GNUC__) && defined(__i386__))
   FXptr ret=v;
   __asm__ __volatile__("xchgl %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
@@ -898,7 +898,7 @@ static inline FXbool atomicBoolDCas(volatile FXptr* ptr,FXptr cmpa,FXptr cmpb,FX
 //#elif defined(__GNUC__) && defined(__ATOMIC_SEQ_CST) && defined(ILP32)
 //  FXulong ex=(((FXulong)(FXuval)cmpa)|((FXulong)(FXuval)cmpb)<<32);
 //  FXulong v=(((FXulong)(FXuval)a)|((FXulong)(FXuval)b)<<32);
-//  return __atomic_compare_exchange_n((volatile TLong*)ptr,&ex,v,false,__ATOMIC_SEQ_CST,__ATOMIC_RELAXED);
+//  return __atomic_compare_exchange_n((volatile FXlong*)ptr,&ex,v,false,__ATOMIC_SEQ_CST,__ATOMIC_RELAXED);
 //#elif defined(__GNUC__) && defined(__ATOMIC_SEQ_CST) && (defined(LLP64) || defined(LP64))
 //  __int128 ex=(((__int128)(FXuval)cmpa)|((__int128)(FXuval)cmpb)<<32);
 //  __int128 v=(((__int128)(FXuval)a)|((__int128)(FXuval)b)<<32);
@@ -949,12 +949,12 @@ static inline FXptr atomicAdd(volatile FXptr* ptr,FXival v){
 #elif ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)))
   return __sync_fetch_and_add(ptr,v);
 #elif (defined(__GNUC__) && defined(__i386__))
-  FXptr ret=(TPtr)v;
+  FXptr ret=(FXptr)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddl %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0"(ret) : "memory", "cc");
   return ret;
 #elif (defined(__GNUC__) && defined(__x86_64__))
-  FXptr ret=(TPtr)v;
+  FXptr ret=(FXptr)v;
   __asm__ __volatile__ ("lock\n\t"
                         "xaddq %0,(%1)\n\t" : "=r"(ret) : "r"(ptr), "0" (ret) : "memory", "cc");
   return ret;

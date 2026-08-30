@@ -170,7 +170,7 @@ int main(int argc,char *argv[]){
     var["map"]["more"]["e"]=2.718281828;
     var["map"]["more"]["c"]=299792458.0;
     var["map"]["more"]["answer"]=42.0;
-    var["map"]["more"]["letter"]="Unicode: \xC3\xBC Hex:\377\xff\b\n\f\v\"";
+    var["map"]["more"]["letter"]="Unicode: \xC3\xBC Hex:\377\xffQABCDEF\"GH\xC2\xB0K\a\b\t\n\v\f\r\\";
     var["emptymap"].setType(FXVariant::MapType);
     var["emptyarray"].setType(FXVariant::ArrayType);
     for(FXival i=0; i<100; ++i){

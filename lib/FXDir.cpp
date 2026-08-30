@@ -310,6 +310,55 @@ FXint FXDir::listFiles(FXString*& filelist,const FXString& path,const FXString& 
   }
 
 
+// List all the files in directory
+FXint FXDir::removeFiles(const FXString& path,const FXString& pattern,FXuint flags){
+  FXDir dir(path);
+  if(dir.isOpen()){
+    FXuint    matching=(flags&CaseFold)?(FXPath::PathName|FXPath::NoEscape|FXPath::CaseFold):(FXPath::PathName|FXPath::NoEscape);
+    FXint     count=0;
+    FXString  pathname;
+    FXString  name;
+    FXStat    data;
+
+    // Loop over directory entries
+    while(dir.next(name)){
+
+      // Build full pathname
+      pathname=path;
+      if(!ISPATHSEP(pathname.tail())) pathname+=PATHSEPSTRING;
+      pathname+=name;
+
+      // Get info on file
+      if(!FXStat::statFile(pathname,data)) continue;
+
+#ifdef WIN32
+
+      // Filter out files; a bit tricky...
+      if(!data.isDirectory() && ((flags&NoFiles) || (!(flags&HiddenFiles) && data.isHidden()) || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
+
+      // Filter out directories; even more tricky!
+      if(data.isDirectory() && ((flags&NoDirs) || ((flags&NoParent) && (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))) || (!(flags&HiddenDirs) && data.isHidden()) || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
+
+#else
+
+      // Filter out files; a bit tricky...
+      if(!data.isDirectory() && ((flags&NoFiles) || (!(flags&HiddenFiles) && name[0]=='.') || (!(flags&AllFiles) && !FXPath::match(name,pattern,matching)))) continue;
+
+      // Filter out directories; even more tricky!
+      if(data.isDirectory() && ((flags&NoDirs) || ((flags&NoParent) && (name[0]=='.' && (name[1]==0 || (name[1]=='.' && name[2]==0)))) || (!(flags&HiddenDirs) && name[0]=='.') || (!(flags&AllDirs) && !FXPath::match(name,pattern,matching)))) continue;
+
+#endif
+
+      // Remove file or folder, recursively
+      if(FXFile::removeFiles(pathname,true)){
+        count++;
+        }
+      }
+    return count;
+    }
+  return 0;
+  }
+
 
 // List drives, i.e. roots of directory trees.
 FXint FXDir::listDrives(FXString*& drivelist){

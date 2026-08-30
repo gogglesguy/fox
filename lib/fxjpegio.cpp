@@ -167,133 +167,135 @@ static void term_source(j_decompress_ptr){
 
 // Check if stream contains a JPG
 FXbool fxcheckJPG(FXStream& store){
-  FXuchar signature[3];
-  store.load(signature,3);
-  store.position(-3,FXFromCurrent);
-  return signature[0]==0xFF && signature[1]==0xD8 && signature[2]==0xFF;
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[3];
+    store.load(signature,3);
+    store.position(-3,FXFromCurrent);
+    return signature[0]==0xFF && signature[1]==0xD8 && signature[2]==0xFF;
+    }
+  return false;
   }
 
 
 // Load a JPEG image
 FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
-  jpeg_decompress_struct srcinfo;
-  FOX_jpeg_error_mgr jerr;
-  FOX_jpeg_source_mgr src;
-  JSAMPLE *buffer[1];
-  FXColor *pp;
-  JSAMPLE *qq;
-  int row_stride,color,i;
 
   // Null out
   data=nullptr;
   width=0;
   height=0;
 
-  // No sample buffer
-  buffer[0]=nullptr;
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    JSAMPLE *buffer[1]={nullptr};
 
-  // initialize the jpeg data structure;
-  clearElms(&srcinfo,1);
-  jpeg_create_decompress(&srcinfo);
+    // Initialize the jpeg data structure;
+    jpeg_decompress_struct srcinfo;
+    clearElms(&srcinfo,1);
+    jpeg_create_decompress(&srcinfo);
 
-  // setup the error handler
-  srcinfo.err=jpeg_std_error(&jerr.error_mgr);
-  jerr.error_mgr.error_exit=fatal_error;
+    // Setup the error handler
+    FOX_jpeg_error_mgr jerr;
+    srcinfo.err=jpeg_std_error(&jerr.error_mgr);
+    jerr.error_mgr.error_exit=fatal_error;
 
-  // Set error handling
-  if(setjmp(jerr.jmpbuf)){
-    jpeg_destroy_decompress(&srcinfo);
-    return false;
-    }
-
-  // setup our src manager
-  src.pub.init_source=init_source;
-  src.pub.fill_input_buffer=fill_input_buffer;
-  src.pub.resync_to_restart=jpeg_resync_to_restart;   // Use the default method
-  src.pub.skip_input_data=skip_input_data;
-  src.pub.term_source=term_source;
-  src.pub.bytes_in_buffer=0;
-  src.pub.next_input_byte=nullptr;
-  src.stream=&store;
-
-  // Set our src manager
-  srcinfo.src=&src.pub;
-
-  // read the header from the jpg;
-  jpeg_read_header(&srcinfo,TRUE);
-
-  // Output format supported by libjpeg
-  switch (srcinfo.jpeg_color_space) {
-    case JCS_GRAYSCALE: // 1
-    case JCS_RGB:       // 2
-    case JCS_YCbCr:     // 3
-      srcinfo.out_color_space=JCS_RGB;
-      break;
-    case JCS_CMYK:      // 4
-    case JCS_YCCK:      // 5
-      srcinfo.out_color_space=JCS_CMYK;
-      break;
-    default:
+    // Set error handling
+    if(setjmp(jerr.jmpbuf)){
+      jpeg_destroy_decompress(&srcinfo);
       return false;
-    }
+      }
 
-  jpeg_start_decompress(&srcinfo);
+    // setup our src manager
+    FOX_jpeg_source_mgr src;
+    src.pub.init_source=init_source;
+    src.pub.fill_input_buffer=fill_input_buffer;
+    src.pub.resync_to_restart=jpeg_resync_to_restart;   // Use the default method
+    src.pub.skip_input_data=skip_input_data;
+    src.pub.term_source=term_source;
+    src.pub.bytes_in_buffer=0;
+    src.pub.next_input_byte=nullptr;
+    src.stream=&store;
 
-  row_stride=srcinfo.output_width*srcinfo.output_components;
+    // Set our src manager
+    srcinfo.src=&src.pub;
 
-  // Data to receive
-  if(!allocElms(data,srcinfo.image_height*srcinfo.image_width)){
-    jpeg_destroy_decompress(&srcinfo);
-    return false;
-    }
+    // read the header from the jpg;
+    jpeg_read_header(&srcinfo,TRUE);
 
-  height=srcinfo.image_height;
-  width=srcinfo.image_width;
+    // Output format supported by libjpeg
+    switch (srcinfo.jpeg_color_space) {
+      case JCS_GRAYSCALE: // 1
+      case JCS_RGB:       // 2
+      case JCS_YCbCr:     // 3
+        srcinfo.out_color_space=JCS_RGB;
+        break;
+      case JCS_CMYK:      // 4
+      case JCS_YCCK:      // 5
+        srcinfo.out_color_space=JCS_CMYK;
+        break;
+      default:
+        return false;
+      }
 
-  // Sample buffer
-  if(!allocElms(buffer[0],row_stride)){
-    freeElms(data);
-    jpeg_destroy_decompress(&srcinfo);
-    return false;
-    }
+    jpeg_start_decompress(&srcinfo);
 
-  // Read the jpeg data
-  pp=data;
-  color=srcinfo.out_color_space;
-  while(srcinfo.output_scanline<srcinfo.output_height){
-    jpeg_read_scanlines(&srcinfo,buffer,1);
-    qq=buffer[0];
-    if(color==JCS_RGB){
-      for(i=0; i<width; i++,pp++){
-        ((FXuchar*)pp)[3]=255;
-        ((FXuchar*)pp)[2]=*qq++;
-        ((FXuchar*)pp)[1]=*qq++;
-        ((FXuchar*)pp)[0]=*qq++;
+    FXint row_stride=srcinfo.output_width*srcinfo.output_components;
+    FXint color=srcinfo.out_color_space;
+
+    // Data to receive
+    if(!allocElms(data,srcinfo.image_height*srcinfo.image_width)){
+      jpeg_destroy_decompress(&srcinfo);
+      return false;
+      }
+
+    height=srcinfo.image_height;
+    width=srcinfo.image_width;
+
+    // Sample buffer
+    if(!allocElms(buffer[0],row_stride)){
+      freeElms(data);
+      jpeg_destroy_decompress(&srcinfo);
+      return false;
+      }
+
+    // Read the jpeg data
+    FXColor *pp=data;
+    while(srcinfo.output_scanline<srcinfo.output_height){
+      jpeg_read_scanlines(&srcinfo,buffer,1);
+      JSAMPLE *qq=buffer[0];
+      if(color==JCS_RGB){
+        for(FXint i=0; i<width; i++,pp++){
+          ((FXuchar*)pp)[3]=255;
+          ((FXuchar*)pp)[2]=*qq++;
+          ((FXuchar*)pp)[1]=*qq++;
+          ((FXuchar*)pp)[0]=*qq++;
+          }
+        }
+      else{
+        for(FXint i=0; i<width; i++,pp++){
+          ((FXuchar*)pp)[3]=255;
+          if(qq[3]==255){
+            ((FXuchar*)pp)[2]=qq[0];                      // No black
+            ((FXuchar*)pp)[1]=qq[1];
+            ((FXuchar*)pp)[0]=qq[2];
+            }
+          else{
+            ((FXuchar*)pp)[2]=(qq[0]*qq[3])/255;          // Approximated CMYK -> RGB
+            ((FXuchar*)pp)[1]=(qq[1]*qq[3])/255;
+            ((FXuchar*)pp)[0]=(qq[2]*qq[3])/255;
+            }
+          qq+=4;
+          }
         }
       }
-    else{
-      for(i=0; i<width; i++,pp++){
-        ((FXuchar*)pp)[3]=255;
-        if(qq[3]==255){
-          ((FXuchar*)pp)[2]=qq[0];                      // No black
-          ((FXuchar*)pp)[1]=qq[1];
-          ((FXuchar*)pp)[0]=qq[2];
-          }
-        else{
-          ((FXuchar*)pp)[2]=(qq[0]*qq[3])/255;          // Approximated CMYK -> RGB
-          ((FXuchar*)pp)[1]=(qq[1]*qq[3])/255;
-          ((FXuchar*)pp)[0]=(qq[2]*qq[3])/255;
-          }
-        qq+=4;
-        }
-      }
-    }
 
-  // Clean up
-  jpeg_finish_decompress(&srcinfo);
-  jpeg_destroy_decompress(&srcinfo);
-  freeElms(buffer[0]);
-  return true;
+    // Clean up
+    jpeg_finish_decompress(&srcinfo);
+    jpeg_destroy_decompress(&srcinfo);
+    freeElms(buffer[0]);
+    return true;
+    }
+  return false;
   }
 
 
@@ -327,81 +329,82 @@ static void term_destination(j_compress_ptr cinfo){
 
 // Save a JPEG image
 FXbool fxsaveJPG(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality){
-  jpeg_compress_struct dstinfo;
-  FOX_jpeg_error_mgr jerr;
-  FOX_jpeg_dest_mgr dst;
-  JSAMPLE *buffer[1];
-  const FXColor *pp;
-  JSAMPLE *qq;
+  FXbool result=false;
 
-  // Must make sense
-  if(!data || width<=0 || height<=0 || quality<=0 || 100<quality) return false;
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-  // Row buffer
-  if(!allocElms(buffer[0],width*3)) return false;
+    // Must make sense
+    if(data && 0<width && 0<height && 0<quality && quality<=100){
+      JSAMPLE *buffer[1];
+      if(allocElms(buffer[0],width*3)){
 
-  // Specify the error manager
-  clearElms(&dstinfo,1);
-  dstinfo.err=jpeg_std_error(&jerr.error_mgr);
-  jerr.error_mgr.error_exit=fatal_error;
+        // Initialize the structure
+        jpeg_compress_struct dstinfo;
+        clearElms(&dstinfo,1);
+        jpeg_create_compress(&dstinfo);
 
-  // Set error handling
-  if(setjmp(jerr.jmpbuf)){
-    freeElms(buffer[0]);
-    jpeg_destroy_compress(&dstinfo);
-    return false;
-    }
+        // Specify the error manager
+        FOX_jpeg_error_mgr jerr;
+        dstinfo.err=jpeg_std_error(&jerr.error_mgr);
+        jerr.error_mgr.error_exit=fatal_error;
 
-  // initialize the structure
-  jpeg_create_compress(&dstinfo);
+        // Set error handling
+        if(setjmp(jerr.jmpbuf)){
+          freeElms(buffer[0]);
+          jpeg_destroy_compress(&dstinfo);
+          return false;
+          }
 
-  // Specify the use of our destination manager
-  dst.pub.init_destination=init_destination;
-  dst.pub.empty_output_buffer=empty_output_buffer;
-  dst.pub.term_destination=term_destination;
-  dst.pub.free_in_buffer=0;
-  dst.pub.next_output_byte=nullptr;
-  dst.stream=&store;
+        // Specify the use of our destination manager
+        FOX_jpeg_dest_mgr dst;
+        dst.pub.init_destination=init_destination;
+        dst.pub.empty_output_buffer=empty_output_buffer;
+        dst.pub.term_destination=term_destination;
+        dst.pub.free_in_buffer=0;
+        dst.pub.next_output_byte=nullptr;
+        dst.stream=&store;
 
-  // Set up the input parameters for the file
-  dstinfo.image_width=width;
-  dstinfo.image_height=height;
-  dstinfo.input_components=3;
-  dstinfo.in_color_space=JCS_RGB;
-  dstinfo.dest=&dst.pub;
+        // Set up the input parameters for the file
+        dstinfo.image_width=width;
+        dstinfo.image_height=height;
+        dstinfo.input_components=3;
+        dstinfo.in_color_space=JCS_RGB;
+        dstinfo.dest=&dst.pub;
 
-  // Based on Sander's recommendation
-  dstinfo.optimize_coding=true;
+        // Based on Sander's recommendation
+        dstinfo.optimize_coding=true;
 
-  jpeg_set_defaults(&dstinfo);
-  jpeg_set_quality(&dstinfo,quality,TRUE);
-  jpeg_start_compress(&dstinfo,TRUE);
+        jpeg_set_defaults(&dstinfo);
+        jpeg_set_quality(&dstinfo,quality,TRUE);
+        jpeg_start_compress(&dstinfo,TRUE);
 
-  // Write the jpeg data
-  pp=data;
-  while(dstinfo.next_scanline<dstinfo.image_height){
-    qq=buffer[0];
-    for(FXint i=0; i<width; i++,pp++){
-      *qq++=((const FXuchar*)pp)[2];
-      *qq++=((const FXuchar*)pp)[1];
-      *qq++=((const FXuchar*)pp)[0];
+        // Write the jpeg data
+        const FXColor *pp=data;
+        while(dstinfo.next_scanline<dstinfo.image_height){
+          JSAMPLE *qq=buffer[0];
+          for(FXint i=0; i<width; i++,pp++){
+            *qq++=((const FXuchar*)pp)[2];
+            *qq++=((const FXuchar*)pp)[1];
+            *qq++=((const FXuchar*)pp)[0];
+            }
+          jpeg_write_scanlines(&dstinfo,buffer,1);
+          }
+
+        // Clean up
+        jpeg_finish_compress(&dstinfo);
+        jpeg_destroy_compress(&dstinfo);
+        freeElms(buffer[0]);
+        return true;
+        }
       }
-    jpeg_write_scanlines(&dstinfo,buffer,1);
     }
-
-  // Clean up
-  jpeg_finish_compress(&dstinfo);
-  jpeg_destroy_compress(&dstinfo);
-  freeElms(buffer[0]);
-  return true;
+  return false;
   }
-
 
 /*******************************************************************************/
 
-
 #else
-
 
 // Check if stream contains a JPG
 FXbool fxcheckJPG(FXStream&){
@@ -410,28 +413,33 @@ FXbool fxcheckJPG(FXStream&){
 
 
 // Stub routine
-FXbool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
-  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
-  static const FXuchar jpeg_bits[]={
-   0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xf5, 0x3d, 0x9f, 0xa3,
-   0x05, 0x45, 0x41, 0xa4, 0x05, 0x45, 0x41, 0xa0, 0x05, 0x45, 0x47, 0xa0,
-   0x05, 0x3d, 0x41, 0xa6, 0x05, 0x05, 0x41, 0xa4, 0x15, 0x05, 0x41, 0xa4,
-   0xe5, 0x04, 0x9f, 0xa3, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
-   0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff};
-  allocElms(data,32*32);
-  for(FXint p=0; p<32*32; p++){
-    data[p]=color[(jpeg_bits[p>>3]>>(p&7))&1];
+FXbool fxloadJPG(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality){
+  if(store.direction()==FXStreamLoad){
+    static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
+    static const FXuchar jpeg_bits[]={
+      0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xf5, 0x3d, 0x9f, 0xa3,
+      0x05, 0x45, 0x41, 0xa4, 0x05, 0x45, 0x41, 0xa0, 0x05, 0x45, 0x47, 0xa0,
+      0x05, 0x3d, 0x41, 0xa6, 0x05, 0x05, 0x41, 0xa4, 0x15, 0x05, 0x41, 0xa4,
+      0xe5, 0x04, 0x9f, 0xa3, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
+      0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff
+      };
+    if(allocElms(data,32*32)){
+      for(FXint p=0; p<32*32; p++){
+        data[p]=color[(jpeg_bits[p>>3]>>(p&7))&1];
+        }
+      width=32;
+      height=32;
+      quality=75;
+      return true;
+      }
     }
-  width=32;
-  height=32;
-  quality=75;
-  return true;
+  return false;
   }
 
 
@@ -439,7 +447,6 @@ FXbool fxloadJPG(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& qual
 FXbool fxsaveJPG(FXStream&,const FXColor*,FXint,FXint,FXint){
   return false;
   }
-
 
 #endif
 

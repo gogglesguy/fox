@@ -117,6 +117,9 @@ public:
   FXbool insert(const FXchar* ky,const FXchar* str,FXbool mrk=false){ at(ky,mrk)=str; return true; }
 
   /// Insert association with given key; return reference to the string
+  FXbool insert(const FXchar* ky,const FXString& str,FXbool mrk=false){ at(ky,mrk)=str; return true; }
+
+  /// Insert association with given key; return reference to the string
   FXbool insert(const FXString& ky,const FXchar* str,FXbool mrk=false){ at(ky,mrk)=str; return true; }
 
   /// Insert association with given key; return reference to the string

@@ -23,7 +23,7 @@
 
 
 /// OpenGL Line Object
-class FXAPI FXGLLine : public FXGLObject {
+class FXGLLine : public FXGLObject {
   FXDECLARE(FXGLLine)
 public:
   FXGLPoint fm,to;

@@ -119,157 +119,166 @@ void j2k_info_callback(const char *msg, void *client_data){
 
 // Check if stream contains a JPG
 FXbool fxcheckJP2(FXStream& store){
-  FXuchar ss[12];
-  store.load(ss,12);
-  store.position(-12,FXFromCurrent);
-  return ss[0]==0 && ss[1]==0 && ss[2]==0 && ss[3]==12 && ss[4]=='j' && ss[5]=='P' && ss[6]==' ' && ss[7]==' ' && ss[8]==0x0D && ss[9]==0x0A && ss[10]==0x87 && ss[11]==0x0A;
+  if(store.direction()==FXStreamLoad){
+    FXuchar ss[12];
+    store.load(ss,12);
+    store.position(-12,FXFromCurrent);
+    return ss[0]==0 && ss[1]==0 && ss[2]==0 && ss[3]==12 && ss[4]=='j' && ss[5]=='P' && ss[6]==' ' && ss[7]==' ' && ss[8]==0x0D && ss[9]==0x0A && ss[10]==0x87 && ss[11]==0x0A;
+    }
+  return false;
   }
 
 
 // Load a JPEG image
 FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint&){
-  FXint x,y,cw,rsh,gsh,bsh,ash,rof,gof,bof,aof;
-  FXuchar r,g,b,a;
-  FXbool swap=store.swapBytes();
-  FXlong pos=store.position();
   FXbool result=false;
-  FXuint box[4];
-  FXlong boxsize;
-  FXuint size;
-  FXuchar *ptr;
 
   // Null out
   data=nullptr;
   width=0;
   height=0;
 
-  // Switch big-endian to grab header
-  store.setBigEndian(true);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXuint box[4];
 
-  // Grab signature
-  store.load(box,3);
+    // Old swap state
+    FXbool swap=store.swapBytes();
 
-  // Check signature, bail quickly if no match
-  if(box[0]==12 && box[1]==BOX_JP && box[2]==SIGNATURE){
+    // Switch big-endian to grab header
+    store.setBigEndian(true);
 
-    // Figure size
-    store.position(0,FXFromEnd);
-    size=store.position()-pos;
-    store.position(pos);
+    // Save start
+    FXlong pos=store.position();
 
-    FXTRACE(TOPIC_DETAIL,"fxloadJP2: file size=%d\n",size);
+    // Grab signature
+    store.load(box,3);
 
-    // Allocate chunk for file data
-    if(allocElms(ptr,size)){
+    // Check signature, bail quickly if no match
+    if(box[0]==12 && box[1]==BOX_JP && box[2]==SIGNATURE){
+      FXuchar *ptr=nullptr;
+      FXlong   size;
 
-      // Load entire file
-      store.load(ptr,size);
+      // Figure size
+      store.position(0,FXFromEnd);
+      size=store.position()-pos;
+      store.position(pos);
 
-      // Create decompressor
-      opj_dinfo_t *decompressor=opj_create_decompress(CODEC_JP2);
-      if(decompressor){
-        opj_dparameters_t     parameters;
-        opj_event_mgr_t       event_mgr;
-        opj_cio_t            *cio=nullptr;
-        opj_image_t          *image=nullptr;
+      FXTRACE(TOPIC_DETAIL,"fxloadJP2: file size=%d\n",size);
 
-        // Set up callbacks
-        event_mgr.error_handler=j2k_error_callback;
-        event_mgr.warning_handler=j2k_warning_callback;
-        event_mgr.info_handler=j2k_info_callback;
+      // Allocate chunk for file data
+      if(allocElms(ptr,size)){
 
-        // Set event manager
-        opj_set_event_mgr((opj_common_ptr)decompressor,&event_mgr,nullptr);
+        // Load entire file
+        store.load(ptr,size);
 
-        // Initialize decompression parameters
-        opj_set_default_decoder_parameters(&parameters);
+        // Create decompressor
+        opj_dinfo_t *decompressor=opj_create_decompress(CODEC_JP2);
+        if(decompressor){
 
-        // Setup the decoder decoding parameters using user parameters
-        opj_setup_decoder(decompressor,&parameters);
+          // Set up callbacks
+          opj_event_mgr_t event_mgr;
+          event_mgr.error_handler=j2k_error_callback;
+          event_mgr.warning_handler=j2k_warning_callback;
+          event_mgr.info_handler=j2k_info_callback;
 
-        // Open a byte stream */
-        cio=opj_cio_open((opj_common_ptr)decompressor,ptr,size);
-        if(cio){
+          // Set event manager
+          opj_set_event_mgr((opj_common_ptr)decompressor,&event_mgr,nullptr);
 
-          // Decode the stream and fill the image structure
-          image=opj_decode(decompressor,cio);
-          if(image){
+          // Initialize decompression parameters
+          opj_dparameters_t parameters;
+          opj_set_default_decoder_parameters(&parameters);
 
-            // Image size
-            width=image->x1-image->x0;
-            height=image->y1-image->y0;
+          // Setup the decoder decoding parameters using user parameters
+          opj_setup_decoder(decompressor,&parameters);
 
-            FXTRACE(TOPIC_DETAIL,"fxloadJP2: width=%d height=%d numcomps=%d color_space=%d\n",width,height,image->numcomps,image->color_space);
+          // Open a byte stream */
+          opj_cio_t* cio=opj_cio_open((opj_common_ptr)decompressor,ptr,size);
+          if(cio){
 
-            // Only support GREY, RGB, and RGBA
-            if(((image->numcomps==1) && (image->color_space==CLRSPC_GRAY)) || ((image->numcomps==3 || image->numcomps==4) && (image->color_space==CLRSPC_SRGB))){
+            // Decode the stream and fill the image structure
+            opj_image_t* image=opj_decode(decompressor,cio);
+            if(image){
 
-              // Allocate image data
-              if(allocElms(data,width*height)){
-                rof=gof=bof=aof=rsh=gsh=bsh=ash=0;
-                switch(image->numcomps){
-                  case 1:
-                    if(image->comps[0].sgnd) gof=1<<(image->comps[0].prec-1);
-                    gsh=image->comps[0].prec-8;
-                    cw=image->comps[0].w;
-                    for(y=0; y<height; ++y){
-                      for(x=0; x<width; ++x){
-                        g=(image->comps[0].data[y*cw+x]+gof)>>gsh;
-                        data[y*width+x]=FXRGB(g,g,g);
+              // Image size
+              width=image->x1-image->x0;
+              height=image->y1-image->y0;
+
+              FXTRACE(TOPIC_DETAIL,"fxloadJP2: width=%d height=%d numcomps=%d color_space=%d\n",width,height,image->numcomps,image->color_space);
+
+              // Only support GREY, RGB, and RGBA
+              if(((image->numcomps==1) && (image->color_space==CLRSPC_GRAY)) || ((image->numcomps==3 || image->numcomps==4) && (image->color_space==CLRSPC_SRGB))){
+
+                // Allocate image data
+                if(allocElms(data,width*height)){
+                  FXint cw,rsh,gsh,bsh,ash,rof,gof,bof,aof;
+                  FXuchar r,g,b,a;
+                  FXlong boxsize;
+                  rof=gof=bof=aof=rsh=gsh=bsh=ash=0;
+                  switch(image->numcomps){
+                    case 1:
+                      if(image->comps[0].sgnd) gof=1<<(image->comps[0].prec-1);
+                      gsh=image->comps[0].prec-8;
+                      cw=image->comps[0].w;
+                      for(FXint y=0; y<height; ++y){
+                        for(FXint x=0; x<width; ++x){
+                          g=(image->comps[0].data[y*cw+x]+gof)>>gsh;
+                          data[y*width+x]=FXRGB(g,g,g);
+                          }
                         }
-                      }
-                    break;
-                  case 3:
-                    if(image->comps[0].sgnd) rof=1<<(image->comps[0].prec-1);
-                    if(image->comps[1].sgnd) gof=1<<(image->comps[1].prec-1);
-                    if(image->comps[2].sgnd) bof=1<<(image->comps[2].prec-1);
-                    rsh=image->comps[0].prec-8;
-                    gsh=image->comps[1].prec-8;
-                    bsh=image->comps[2].prec-8;
-                    cw=image->comps[0].w;
-                    for(y=0; y<height; ++y){
-                      for(x=0; x<width; ++x){
-                        r=(image->comps[0].data[y*cw+x]+rof)>>rsh;
-                        g=(image->comps[1].data[y*cw+x]+gof)>>gsh;
-                        b=(image->comps[2].data[y*cw+x]+bof)>>bsh;
-                        data[y*width+x]=FXRGB(r,g,b);
+                      break;
+                    case 3:
+                      if(image->comps[0].sgnd) rof=1<<(image->comps[0].prec-1);
+                      if(image->comps[1].sgnd) gof=1<<(image->comps[1].prec-1);
+                      if(image->comps[2].sgnd) bof=1<<(image->comps[2].prec-1);
+                      rsh=image->comps[0].prec-8;
+                      gsh=image->comps[1].prec-8;
+                      bsh=image->comps[2].prec-8;
+                      cw=image->comps[0].w;
+                      for(FXint y=0; y<height; ++y){
+                        for(FXint x=0; x<width; ++x){
+                          r=(image->comps[0].data[y*cw+x]+rof)>>rsh;
+                          g=(image->comps[1].data[y*cw+x]+gof)>>gsh;
+                          b=(image->comps[2].data[y*cw+x]+bof)>>bsh;
+                          data[y*width+x]=FXRGB(r,g,b);
+                          }
                         }
-                      }
-                    break;
-                  default:
-                    if(image->comps[0].sgnd) rof=1<<(image->comps[0].prec-1);
-                    if(image->comps[1].sgnd) gof=1<<(image->comps[1].prec-1);
-                    if(image->comps[2].sgnd) bof=1<<(image->comps[2].prec-1);
-                    if(image->comps[3].sgnd) aof=1<<(image->comps[3].prec-1);
-                    rsh=image->comps[0].prec-8;
-                    gsh=image->comps[1].prec-8;
-                    bsh=image->comps[2].prec-8;
-                    ash=image->comps[3].prec-8;
-                    cw=image->comps[0].w;
-                    for(y=0; y<height; ++y){
-                      for(x=0; x<width; ++x){
-                        r=(image->comps[0].data[y*cw+x]+rof)>>rsh;
-                        g=(image->comps[1].data[y*cw+x]+gof)>>gsh;
-                        b=(image->comps[2].data[y*cw+x]+bof)>>bsh;
-                        a=(image->comps[3].data[y*cw+x]+aof)>>ash;
-                        data[y*width+x]=FXRGBA(r,g,b,a);
+                      break;
+                    default:
+                      if(image->comps[0].sgnd) rof=1<<(image->comps[0].prec-1);
+                      if(image->comps[1].sgnd) gof=1<<(image->comps[1].prec-1);
+                      if(image->comps[2].sgnd) bof=1<<(image->comps[2].prec-1);
+                      if(image->comps[3].sgnd) aof=1<<(image->comps[3].prec-1);
+                      rsh=image->comps[0].prec-8;
+                      gsh=image->comps[1].prec-8;
+                      bsh=image->comps[2].prec-8;
+                      ash=image->comps[3].prec-8;
+                      cw=image->comps[0].w;
+                      for(FXint y=0; y<height; ++y){
+                        for(FXint x=0; x<width; ++x){
+                          r=(image->comps[0].data[y*cw+x]+rof)>>rsh;
+                          g=(image->comps[1].data[y*cw+x]+gof)>>gsh;
+                          b=(image->comps[2].data[y*cw+x]+bof)>>bsh;
+                          a=(image->comps[3].data[y*cw+x]+aof)>>ash;
+                          data[y*width+x]=FXRGBA(r,g,b,a);
+                          }
                         }
-                      }
-                    break;
+                      break;
+                    }
+                  result=true;
                   }
-                result=true;
                 }
+              opj_image_destroy(image);
               }
-            opj_image_destroy(image);
+            opj_cio_close(cio);
             }
-          opj_cio_close(cio);
+          opj_destroy_decompress(decompressor);
           }
-        opj_destroy_decompress(decompressor);
+        freeElms(ptr);
         }
-      freeElms(ptr);
       }
+    store.swapBytes(swap);
     }
-  store.swapBytes(swap);
   return result;
   }
 
@@ -279,98 +288,102 @@ FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
 
 // Save a JPEG image
 FXbool fxsaveJP2(FXStream& store,const FXColor* data,FXint width,FXint height,FXint quality){
-  FXint x,y,c,p;
   FXbool result=false;
 
-  // Must make sense
-  if(data && 0<width && 0<height){
-    opj_cinfo_t* compressor=opj_create_compress(CODEC_JP2);
-    if(compressor){
-      opj_event_mgr_t       event_mgr;
-      opj_cparameters_t     parameters;
-      opj_cio_t            *cio=nullptr;
-      opj_image_t          *image=nullptr;
-      opj_image_cmptparm_t  components[3];
-      FXColor               color;
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-      // Set up callbacks
-      event_mgr.error_handler=j2k_error_callback;
-      event_mgr.warning_handler=j2k_warning_callback;
-      event_mgr.info_handler=j2k_info_callback;
+    // Must make sense
+    if(data && 0<width && 0<height){
+      opj_cinfo_t* compressor=opj_create_compress(CODEC_JP2);
+      if(compressor){
+        opj_event_mgr_t       event_mgr;
+        opj_cparameters_t     parameters;
+        opj_cio_t            *cio=nullptr;
+        opj_image_t          *image=nullptr;
+        opj_image_cmptparm_t  components[3];
+        FXColor               color;
+        FXint                 x,y,c,p;
 
-      // Set event manager
-      opj_set_event_mgr((opj_common_ptr)compressor,&event_mgr,nullptr);
+        // Set up callbacks
+        event_mgr.error_handler=j2k_error_callback;
+        event_mgr.warning_handler=j2k_warning_callback;
+        event_mgr.info_handler=j2k_info_callback;
 
-      // Set encoding parameters to default values
-      opj_set_default_encoder_parameters(&parameters);
+        // Set event manager
+        opj_set_event_mgr((opj_common_ptr)compressor,&event_mgr,nullptr);
 
-//      parameters.tcp_rates[0]=((100-quality)/90.0f*99.0f)+1;
-      parameters.tcp_rates[0]=16;
-      parameters.tcp_numlayers=1;
-      parameters.cp_disto_alloc=1;
+        // Set encoding parameters to default values
+        opj_set_default_encoder_parameters(&parameters);
 
-      // Set up parameters
-      for(c=0; c<3; c++){
-        components[c].dx=parameters.subsampling_dx;
-        components[c].dy=parameters.subsampling_dy;
-        components[c].w=width;
-        components[c].h=height;
-        components[c].x0=0;
-        components[c].y0=0;
-        components[c].prec=8;
-        components[c].bpp=8;
-        components[c].sgnd=0;
-        }
+//        parameters.tcp_rates[0]=((100-quality)/90.0f*99.0f)+1;
+        parameters.tcp_rates[0]=16;
+        parameters.tcp_numlayers=1;
+        parameters.cp_disto_alloc=1;
 
-      // Create image
-      image=opj_image_create(3,components,CLRSPC_SRGB);
-      if(image){
-
-	/* set image offset and reference grid */
-	image->x0=parameters.image_offset_x0;
-	image->y0=parameters.image_offset_y0;
-	image->x1=parameters.image_offset_x0+(width-1)*parameters.subsampling_dx+1;
-	image->y1=parameters.image_offset_y0+(height-1)*parameters.subsampling_dy+1;
-
-        // Setup encoder for image
-        opj_setup_encoder(compressor,&parameters,image);
-
-        // Fill image buffers
-	for(y=p=0; y<height; ++y){
-          for(x=0; x<width; ++x){
-            color=data[y*width+x];
-            image->comps[0].data[p]=FXREDVAL(color);
-            image->comps[1].data[p]=FXGREENVAL(color);
-            image->comps[2].data[p]=FXBLUEVAL(color);
-            p++;
-            }
+        // Set up parameters
+        for(c=0; c<3; c++){
+          components[c].dx=parameters.subsampling_dx;
+          components[c].dy=parameters.subsampling_dy;
+          components[c].w=width;
+          components[c].h=height;
+          components[c].x0=0;
+          components[c].y0=0;
+          components[c].prec=8;
+          components[c].bpp=8;
+          components[c].sgnd=0;
           }
 
-        // Open code stream
-        cio=opj_cio_open((opj_common_ptr)compressor,nullptr,0);
-        if(cio){
+        // Create image
+        image=opj_image_create(3,components,CLRSPC_SRGB);
+        if(image){
 
-          // Encode the image
-          result=opj_encode(compressor,cio,image,nullptr);
+          /* set image offset and reference grid */
+          image->x0=parameters.image_offset_x0;
+          image->y0=parameters.image_offset_y0;
+          image->x1=parameters.image_offset_x0+(width-1)*parameters.subsampling_dx+1;
+          image->y1=parameters.image_offset_y0+(height-1)*parameters.subsampling_dy+1;
 
-          // Encoded properly
-          if(result){
+          // Setup encoder for image
+          opj_setup_encoder(compressor,&parameters,image);
 
-            // Write to store
-            store.save(cio->buffer,cio_tell(cio));
-
-            // Check if write was successful
-            if(store.status()!=FXStreamOK) result=false;
+          // Fill image buffers
+          for(y=p=0; y<height; ++y){
+            for(x=0; x<width; ++x){
+              color=data[y*width+x];
+              image->comps[0].data[p]=FXREDVAL(color);
+              image->comps[1].data[p]=FXGREENVAL(color);
+              image->comps[2].data[p]=FXBLUEVAL(color);
+              p++;
+              }
             }
 
-          // Close stream
-          opj_cio_close(cio);
-          }
+          // Open code stream
+          cio=opj_cio_open((opj_common_ptr)compressor,nullptr,0);
+          if(cio){
 
-        // Destroy image
-        opj_image_destroy(image);
+            // Encode the image
+            result=opj_encode(compressor,cio,image,nullptr);
+
+            // Encoded properly
+            if(result){
+
+              // Write to store
+              store.save(cio->buffer,cio_tell(cio));
+
+              // Check if write was successful
+              if(store.status()!=FXStreamOK) result=false;
+              }
+
+            // Close stream
+            opj_cio_close(cio);
+            }
+
+          // Destroy image
+          opj_image_destroy(image);
+          }
+        opj_destroy_compress(compressor);
         }
-      opj_destroy_compress(compressor);
       }
     }
   return result;
@@ -387,28 +400,33 @@ FXbool fxcheckJP2(FXStream&){
 
 
 // Stub routine
-FXbool fxloadJP2(FXStream&,FXColor*& data,FXint& width,FXint& height,FXint& quality){
-  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
-  static const FXuchar image_bits[]={
-   0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xc5, 0xe7, 0xc3, 0xa1,
-   0x45, 0x44, 0x24, 0xa2, 0x05, 0x44, 0x04, 0xa2, 0x05, 0x44, 0x04, 0xa2,
-   0x05, 0x44, 0x04, 0xa1, 0x05, 0xc4, 0xc3, 0xa0, 0x05, 0x44, 0x20, 0xa0,
-   0x45, 0x44, 0x20, 0xa2, 0x85, 0xe3, 0xe0, 0xa3, 0x05, 0x00, 0x00, 0xa0,
-   0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
-   0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff};
-  allocElms(data,32*32);
-  for(FXint p=0; p<32*32; p++){
-    data[p]=color[(image_bits[p>>3]>>(p&7))&1];
+FXbool fxloadJP2(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& quality){
+  if(store.direction()==FXStreamLoad){
+    static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
+    static const FXuchar image_bits[]={
+      0xff, 0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0x80, 0xfd, 0xff, 0xff, 0xbf,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xc5, 0xe7, 0xc3, 0xa1,
+      0x45, 0x44, 0x24, 0xa2, 0x05, 0x44, 0x04, 0xa2, 0x05, 0x44, 0x04, 0xa2,
+      0x05, 0x44, 0x04, 0xa1, 0x05, 0xc4, 0xc3, 0xa0, 0x05, 0x44, 0x20, 0xa0,
+      0x45, 0x44, 0x20, 0xa2, 0x85, 0xe3, 0xe0, 0xa3, 0x05, 0x00, 0x00, 0xa0,
+      0x05, 0x00, 0x00, 0xa0, 0x05, 0x00, 0x00, 0xa0, 0xfd, 0xff, 0xff, 0xbf,
+      0x01, 0x00, 0x00, 0x80, 0xff, 0xff, 0xff, 0xff
+      };
+    if(allocElms(data,32*32)){
+      for(FXint p=0; p<32*32; p++){
+        data[p]=color[(image_bits[p>>3]>>(p&7))&1];
+        }
+      width=32;
+      height=32;
+      quality=75;
+      return true;
+      }
     }
-  width=32;
-  height=32;
-  quality=75;
-  return true;
+  return false;
   }
 
 

@@ -64,17 +64,6 @@ FXReadWriteLock::FXReadWriteLock(){
   InitializeCriticalSection(((RWLOCK*)data)->mutex);
   InitializeCriticalSection(((RWLOCK*)data)->access);
   ((RWLOCK*)data)->readers=0;
-#elif (_XOPEN_SOURCE >= 500) || (_POSIX_C_SOURCE >= 200809L)
-  // If this fails on your machine, determine what value
-  // of sizeof(pthread_rwlock_t) is supposed to be on your
-  // machine and mail it to: jeroen@fox-toolkit.net!!
-  //FXTRACE(TOPIC_CONSTRUCT,"sizeof(pthread_rwlock_t)=%d\n",sizeof(pthread_rwlock_t));
-  FXSTATIC_ASSERT(sizeof(data)>=sizeof(pthread_rwlock_t));
-  pthread_rwlockattr_t rwlockatt;
-  pthread_rwlockattr_init(&rwlockatt);
-  pthread_rwlockattr_setkind_np(&rwlockatt,PTHREAD_RWLOCK_PREFER_WRITER_NP);
-  pthread_rwlock_init((pthread_rwlock_t*)data,&rwlockatt);
-  pthread_rwlockattr_destroy(&rwlockatt);
 #else
   // If this fails on your machine, determine what value
   // of sizeof(pthread_rwlock_t) is supposed to be on your

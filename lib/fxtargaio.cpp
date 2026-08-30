@@ -718,177 +718,181 @@ FXbool fxcheckTGA(FXStream& store){
 
 // Load Targa image from stream
 FXbool fxloadTGA(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXuchar  IDLength;
-  FXuchar  ColorMapType;
-  FXuchar  ImageType;
-  FXshort  ColorMapOrigin;
-  FXshort  ColorMapLength;
-  FXuchar  ColorMapEntrySize;
-  FXshort  XOrg;
-  FXshort  YOrg;
-  FXshort  Width;
-  FXshort  Height;
-  FXuchar  PixelDepth;
-  FXuchar  ImageDescriptor;
-  FXushort rgb16;
-  FXuchar  colormap[256][4];
-  FXbool   swap;
-  FXbool   ok=false;
-  FXint    i;
+  FXbool result=false;
 
   // Null out
   data=nullptr;
   width=0;
   height=0;
 
-  // Length of Image ID Field
-  store >> IDLength;
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXuchar  colormap[256][4];
+    FXuchar  IDLength;
+    FXuchar  ColorMapType;
+    FXuchar  ImageType;
+    FXshort  ColorMapOrigin;
+    FXshort  ColorMapLength;
+    FXuchar  ColorMapEntrySize;
+    FXshort  XOrg;
+    FXshort  YOrg;
+    FXshort  Width;
+    FXshort  Height;
+    FXuchar  PixelDepth;
+    FXuchar  ImageDescriptor;
+    FXushort rgb16;
+    FXbool   swap;
+    FXint    i;
 
-  // Type of color map (if any) included with the image
-  // 0 - indicates that no color-map data is included with this image
-  // 1 - indicates that a color-map is included with this image
-  store >> ColorMapType;
+    // Length of Image ID Field
+    store >> IDLength;
 
-  // Image Type
-  //  0 - No image data included.
-  //  1 - Uncompressed, color-mapped images.
-  //  2 - Uncompressed, RGB images.
-  //  3 - Uncompressed, black and white images.
-  //  9 - Runlength encoded color-mapped images.
-  // 10 - Runlength encoded RGB images.
-  // 11 - Compressed, black and white images.
-  // 32 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
-  // 33 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
-  //      4-pass quadtree-type process.
-  store >> ImageType;
+    // Type of color map (if any) included with the image
+    // 0 - indicates that no color-map data is included with this image
+    // 1 - indicates that a color-map is included with this image
+    store >> ColorMapType;
 
-  FXTRACE(TOPIC_DETAIL,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType);
+    // Image Type
+    //  0 - No image data included.
+    //  1 - Uncompressed, color-mapped images.
+    //  2 - Uncompressed, RGB images.
+    //  3 - Uncompressed, black and white images.
+    //  9 - Runlength encoded color-mapped images.
+    // 10 - Runlength encoded RGB images.
+    // 11 - Compressed, black and white images.
+    // 32 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
+    // 33 - Compressed color-mapped data, using Huffman, Delta, and runlength encoding.
+    //      4-pass quadtree-type process.
+    store >> ImageType;
 
-  // Check for supported image type
-  if(ImageType==1 || ImageType==2 || ImageType==3 || ImageType==9 || ImageType==10 || ImageType==11 || ImageType==32 || ImageType==33){
+    FXTRACE(TOPIC_DETAIL,"fxloadTGA IDLength=%d ColorMapType=%d ImageType=%d\n",IDLength,ColorMapType,ImageType);
 
-    // Switch to little-endian
-    swap=store.swapBytes();
-    store.setBigEndian(false);
+    // Check for supported image type
+    if(ImageType==1 || ImageType==2 || ImageType==3 || ImageType==9 || ImageType==10 || ImageType==11 || ImageType==32 || ImageType==33){
 
-    // First color map entry
-    store >> ColorMapOrigin;
+      // Switch to little-endian
+      swap=store.swapBytes();
+      store.setBigEndian(false);
 
-    // Color map length
-    store >> ColorMapLength;
+      // First color map entry
+      store >> ColorMapOrigin;
 
-    // Don't load too many colors
-    if(ColorMapLength>256) goto x;
+      // Color map length
+      store >> ColorMapLength;
 
-    // Color map Entry Size
-    // Establishes the number of bits per entry.
-    // Typically 15, 16, 24 or 32-bit values are used.
-    store >> ColorMapEntrySize;
+      // Don't load too many colors
+      if(ColorMapLength>256) goto x;
 
-    // X-origin of image and Y-origin of image
-    store >> XOrg;
-    store >> YOrg;
+      // Color map Entry Size
+      // Establishes the number of bits per entry.
+      // Typically 15, 16, 24 or 32-bit values are used.
+      store >> ColorMapEntrySize;
 
-    // This field specifies the width of the image in pixels
-    store >> Width;
+      // X-origin of image and Y-origin of image
+      store >> XOrg;
+      store >> YOrg;
 
-    // This field specifies the height of the image in pixels
-    store >> Height;
+      // This field specifies the width of the image in pixels
+      store >> Width;
 
-    // This field indicates the number of bits per pixel. This number includes
-    // the Attribute or Alpha channel bits. Common values are 8, 16, 24 and 32
-    // but other pixel depths could be used.
-    store >> PixelDepth;
+      // This field specifies the height of the image in pixels
+      store >> Height;
 
-    FXTRACE(TOPIC_DETAIL,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d Width=%d Height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,Width,Height);
+      // This field indicates the number of bits per pixel. This number includes
+      // the Attribute or Alpha channel bits. Common values are 8, 16, 24 and 32
+      // but other pixel depths could be used.
+      store >> PixelDepth;
 
-    // Sanity check
-    if(PixelDepth!=1 && PixelDepth!=8 && PixelDepth!=15 && PixelDepth!=16 && PixelDepth!=24 && PixelDepth!=32) goto x;
+      FXTRACE(TOPIC_DETAIL,"fxloadTGA PixelDepth=%d ColorMapLength=%d ColorMapEntrySize=%d Width=%d Height=%d\n",PixelDepth,ColorMapLength,ColorMapEntrySize,Width,Height);
 
-    // Bits 3-0 - number of attribute bits associated with each pixel
-    // Bit 4    - reserved.  Must be set to 0
-    // Bit 5    - screen origin bit:
-    //            0 = Origin in lower left-hand corner
-    //            1 = Origin in upper left-hand corner
-    //            Must be 0 for Truevision images
-    // Bits 7-6 - Data storage interleaving flag:
-    //            00 = non-interleaved
-    //            01 = two-way (even/odd) interleaving
-    //            10 = four way interleaving
-    //            11 = reserved
-    store >> ImageDescriptor;
+      // Sanity check
+      if(PixelDepth!=1 && PixelDepth!=8 && PixelDepth!=15 && PixelDepth!=16 && PixelDepth!=24 && PixelDepth!=32) goto x;
 
-    // Skip over Image Identification Field; its length is IDLength
-    store.position(IDLength,FXFromCurrent);
+      // Bits 3-0 - number of attribute bits associated with each pixel
+      // Bit 4    - reserved.  Must be set to 0
+      // Bit 5    - screen origin bit:
+      //            0 = Origin in lower left-hand corner
+      //            1 = Origin in upper left-hand corner
+      //            Must be 0 for Truevision images
+      // Bits 7-6 - Data storage interleaving flag:
+      //            00 = non-interleaved
+      //            01 = two-way (even/odd) interleaving
+      //            10 = four way interleaving
+      //            11 = reserved
+      store >> ImageDescriptor;
 
-    // Allocate memory
-    if(allocElms(data,Width*Height)){
+      // Skip over Image Identification Field; its length is IDLength
+      store.position(IDLength,FXFromCurrent);
 
-      // Set return size
-      width=Width;
-      height=Height;
+      // Allocate memory
+      if(allocElms(data,Width*Height)){
 
-      // Read color map
-      if(0<ColorMapLength){
-        switch(ColorMapEntrySize){
-          case 15:          // 15- or 16-bit RGB
-          case 16:
-            for(i=0; i<ColorMapLength; i++){
-              store >> rgb16;
-              colormap[i][0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);      // Blue
-              colormap[i][1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);      // Green
-              colormap[i][2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);     // Red
-              colormap[i][3]=255;                                   // Alpha
-              }
-            break;
-          case 24:           // 24-bit RGB
-            for(i=0; i<ColorMapLength; i++){
-              store >> colormap[i][0];                              // Red
-              store >> colormap[i][1];                              // Green
-              store >> colormap[i][2];                              // Blue
-              colormap[i][3]=255;                                   // Alpha
-              }
-            break;
-          case 32:          // 32-bit RGBA
-            for(i=0; i<ColorMapLength; i++){
-              store >> colormap[i][0];                              // Red
-              store >> colormap[i][1];                              // Green
-              store >> colormap[i][2];                              // Blue
-              store >> colormap[i][3];                              // Alpha
-              }
-            break;
-          default:          // Unexpected depth
-            goto x;
+        // Set return size
+        width=Width;
+        height=Height;
+
+        // Read color map
+        if(0<ColorMapLength){
+          switch(ColorMapEntrySize){
+            case 15:          // 15- or 16-bit RGB
+            case 16:
+              for(i=0; i<ColorMapLength; i++){
+                store >> rgb16;
+                colormap[i][0]=((rgb16<<3)&0xf8)+((rgb16>>2)&7);      // Blue
+                colormap[i][1]=((rgb16>>2)&0xf8)+((rgb16>>7)&7);      // Green
+                colormap[i][2]=((rgb16>>7)&0xf8)+((rgb16>>12)&7);     // Red
+                colormap[i][3]=255;                                   // Alpha
+                }
+              break;
+            case 24:           // 24-bit RGB
+              for(i=0; i<ColorMapLength; i++){
+                store >> colormap[i][0];                              // Red
+                store >> colormap[i][1];                              // Green
+                store >> colormap[i][2];                              // Blue
+                colormap[i][3]=255;                                   // Alpha
+                }
+              break;
+            case 32:          // 32-bit RGBA
+              for(i=0; i<ColorMapLength; i++){
+                store >> colormap[i][0];                              // Red
+                store >> colormap[i][1];                              // Green
+                store >> colormap[i][2];                              // Blue
+                store >> colormap[i][3];                              // Alpha
+                }
+              break;
+            default:          // Unexpected depth
+              goto x;
+            }
+          }
+
+        FXTRACE(TOPIC_DETAIL,"fxloadTARGA: Width=%d Height=%d IDLength=%d ColorMapType=%d ColorMapLength=%d ColorMapEntrySize=%d ImageType=%d PixelDepth=%d ImageDescriptor=%02x\n",Width,Height,IDLength,ColorMapType,ColorMapLength,ColorMapEntrySize,ImageType,PixelDepth,ImageDescriptor);
+
+        // Load up the image
+        if(PixelDepth==32 && (ImageType==2 || ImageType==10)){
+          result=loadTarga32(store,data,Width,Height,ImageDescriptor,ImageType);
+          }
+        else if(PixelDepth==24 && (ImageType==2 || ImageType==10)){
+          result=loadTarga24(store,data,Width,Height,ImageDescriptor,ImageType);
+          }
+        else if(PixelDepth==16 && (ImageType==2 || ImageType==10)){
+          result=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
+          }
+        else if(PixelDepth==15 && (ImageType==2 || ImageType==10)){
+          result=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
+          }
+        else if(PixelDepth==8 && (ImageType==1 || ImageType==9)){
+          result=loadTarga8(store,data,Width,Height,colormap,ImageDescriptor,ImageType);
+          }
+        else if(ImageType==3 || ImageType==11){
+          result=loadTargaGray(store,data,Width,Height,ImageDescriptor,ImageType);
           }
         }
 
-      FXTRACE(TOPIC_DETAIL,"fxloadTARGA: Width=%d Height=%d IDLength=%d ColorMapType=%d ColorMapLength=%d ColorMapEntrySize=%d ImageType=%d PixelDepth=%d ImageDescriptor=%02x\n",Width,Height,IDLength,ColorMapType,ColorMapLength,ColorMapEntrySize,ImageType,PixelDepth,ImageDescriptor);
-
-      // Load up the image
-      if(PixelDepth==32 && (ImageType==2 || ImageType==10)){
-        ok=loadTarga32(store,data,Width,Height,ImageDescriptor,ImageType);
-        }
-      else if(PixelDepth==24 && (ImageType==2 || ImageType==10)){
-        ok=loadTarga24(store,data,Width,Height,ImageDescriptor,ImageType);
-        }
-      else if(PixelDepth==16 && (ImageType==2 || ImageType==10)){
-        ok=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
-        }
-      else if(PixelDepth==15 && (ImageType==2 || ImageType==10)){
-        ok=loadTarga16(store,data,Width,Height,ImageDescriptor,ImageType);
-        }
-      else if(PixelDepth==8 && (ImageType==1 || ImageType==9)){
-        ok=loadTarga8(store,data,Width,Height,colormap,ImageDescriptor,ImageType);
-        }
-      else if(ImageType==3 || ImageType==11){
-        ok=loadTargaGray(store,data,Width,Height,ImageDescriptor,ImageType);
-        }
+      // Reset byte order
+x:    store.swapBytes(swap);
       }
-
-    // Reset byte order
-x:  store.swapBytes(swap);
     }
-  return ok;
+  return result;
   }
 
 /*******************************************************************************/
@@ -896,85 +900,90 @@ x:  store.swapBytes(swap);
 
 // Save a Targa file to a stream
 FXbool fxsaveTGA(FXStream& store,const FXColor *data,FXint width,FXint height){
-  FXuchar IDLength=0;
-  FXuchar ColorMapType=0;
-  FXuchar ImageType=2;
-  FXshort ColorMapOrigin=0;
-  FXshort ColorMapLength=0;
-  FXuchar ColorMapEntrySize=0;
-  FXshort XOrg=0;
-  FXshort YOrg=0;
-  FXshort Width=width;
-  FXshort Height=height;
-  FXuchar PixelDepth=32;
-  FXuchar ImageDescriptor=8;
-  FXbool  swap;
-  FXint   i,j;
 
-  // Must make sense
-  if(!data || width<=0 || height<=0) return false;
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-  // Switch to little-endian
-  swap=store.swapBytes();
-  store.setBigEndian(false);
+    // Must make sense
+    if(data && 0<width && 0<height){
+      FXuchar IDLength=0;
+      FXuchar ColorMapType=0;
+      FXuchar ImageType=2;
+      FXshort ColorMapOrigin=0;
+      FXshort ColorMapLength=0;
+      FXuchar ColorMapEntrySize=0;
+      FXshort XOrg=0;
+      FXshort YOrg=0;
+      FXshort Width=width;
+      FXshort Height=height;
+      FXuchar PixelDepth=32;
+      FXuchar ImageDescriptor=8;
+      FXbool  swap;
 
-  // Length of Image ID Field
-  store << IDLength;
+      // Switch to little-endian
+      swap=store.swapBytes();
+      store.setBigEndian(false);
 
-  // Type of color map
-  store << ColorMapType;
+      // Length of Image ID Field
+      store << IDLength;
 
-  // Image Type
-  store << ImageType;
+      // Type of color map
+      store << ColorMapType;
 
-  // Index of the first color map entry
-  store << ColorMapOrigin;
+      // Image Type
+      store << ImageType;
 
-  // Color map length
-  store << ColorMapLength;
+      // Index of the first color map entry
+      store << ColorMapOrigin;
 
-  // Color map entry size
-  store << ColorMapEntrySize;
+      // Color map length
+      store << ColorMapLength;
 
-  // X-origin of image and Y-origin of image
-  store << XOrg;
-  store << YOrg;
+      // Color map entry size
+      store << ColorMapEntrySize;
 
-  // Width of the image in pixels
-  store << Width;
+      // X-origin of image and Y-origin of image
+      store << XOrg;
+      store << YOrg;
 
-  // Height of the image in pixels
-  store << Height;
+      // Width of the image in pixels
+      store << Width;
 
-  // This field indicates the number of bits per pixel
-  store << PixelDepth;
+      // Height of the image in pixels
+      store << Height;
 
-  // Bits 3-0 - number of attribute bits associated with each pixel
-  // Bit 4    - reserved.  Must be set to 0
-  // Bit 5    - screen origin bit:
-  //            0 = Origin in lower left-hand corner
-  //            1 = Origin in upper left-hand corner
-  //            Must be 0 for Truevision images
-  // Bits 7-6 - Data storage interleaving flag:
-  //            00 = non-interleaved
-  //            01 = two-way (even/odd) interleaving
-  //            10 = four way interleaving
-  //            11 = reserved
-  store << ImageDescriptor;
+      // This field indicates the number of bits per pixel
+      store << PixelDepth;
 
-  // Write image
-  for(i=height-1; i>=0; i--){
-    for(j=0; j<width; j++){
-      store << ((const FXuchar*)(&data[i*width+j]))[0];
-      store << ((const FXuchar*)(&data[i*width+j]))[1];
-      store << ((const FXuchar*)(&data[i*width+j]))[2];
-      store << ((const FXuchar*)(&data[i*width+j]))[3];
+      // Bits 3-0 - number of attribute bits associated with each pixel
+      // Bit 4    - reserved.  Must be set to 0
+      // Bit 5    - screen origin bit:
+      //            0 = Origin in lower left-hand corner
+      //            1 = Origin in upper left-hand corner
+      //            Must be 0 for Truevision images
+      // Bits 7-6 - Data storage interleaving flag:
+      //            00 = non-interleaved
+      //            01 = two-way (even/odd) interleaving
+      //            10 = four way interleaving
+      //            11 = reserved
+      store << ImageDescriptor;
+
+      // Write image
+      for(FXint i=height-1; i>=0; i--){
+        for(FXint j=0; j<width; j++){
+          store << ((const FXuchar*)(&data[i*width+j]))[0];
+          store << ((const FXuchar*)(&data[i*width+j]))[1];
+          store << ((const FXuchar*)(&data[i*width+j]))[2];
+          store << ((const FXuchar*)(&data[i*width+j]))[3];
+          }
+        }
+
+      // Reset byte order
+      store.swapBytes(swap);
+      return true;
       }
     }
-
-  // Reset byte order
-  store.swapBytes(swap);
-  return true;
+  return false;
   }
 
 }

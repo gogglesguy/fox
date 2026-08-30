@@ -2050,7 +2050,7 @@ FXint FXString::comparenatural(const FXchar* s1,const FXchar* s2){
 
       // Both are numbers: special treatment
       if(c1<='9' && c2<='9' && '0'<=c1 && '0'<=c2){
-      
+
         // Start of first non-zero digit
         const FXchar *ns1=s1;
         const FXchar *ns2=s2;
@@ -2072,7 +2072,7 @@ FXint FXString::comparenatural(const FXchar* s1,const FXchar* s2){
 
         // Check length difference of the numbers
         FXint x=(ne1-ns1)-(ne2-ns2);
-        
+
         // Longest one is bigger
         if(x){ return x; }
 
@@ -2133,7 +2133,7 @@ FXint FXString::comparenaturalcase(const FXchar* s1,const FXchar* s2){
 
       // Both are numbers: special treatment
       if(c1<='9' && c2<='9' && '0'<=c1 && '0'<=c2){
-      
+
         // Start of first non-zero digit
         const FXchar *ns1=s1;
         const FXchar *ns2=s2;
@@ -2155,7 +2155,7 @@ FXint FXString::comparenaturalcase(const FXchar* s1,const FXchar* s2){
 
         // Check length difference of the numbers
         FXint x=(ne1-ns1)-(ne2-ns2);
-        
+
         // Longest one is bigger
         if(x){ return x; }
 
@@ -2256,31 +2256,31 @@ FXbool FXString::shouldEscape(const FXString& str,FXchar lquote,FXchar rquote,FX
 /*******************************************************************************/
 
 // Escape special characters and optionally, enclose with left and right quotes.
-// Pass utf8 through if flag=0, escape it as \xHH if flag=1, and as \uHHHH if flag=2.
+//
+// Pass UTF8 through if flag=0, escape it as \xHH if flag=1, and as \uHHHH if flag=2.
+//
 // UTF8 characters may be encoded as hex (in the form of: \xHH), or as Unicode
 // escape sequences (of the form \uHHHH).  Code points exceeding 16-bits will be
 // encoded as hex-encoded surrogate-pairs (\uHHHH\uHHHH) in Unicode escape mode.
-// UTF8 followers will be always escaped if not preceeded by UTF8 leaders, if
-// escaping is enabled.
+//
+// Control characters will always be escaped as hex (\xHH) except for special ones
+// that will be escaped by the usual two-character escapes.
+//
+// To avoid confusion, if an hex-escaped character is followed by a character in the
+// set 0-9,a-f,A-F, then the subsequent character will also be escaped as hex, even
+// if escaping would not have been necessary otherwise.
+//
+// Non-UTF8 sequences (followers not preceeded by leaders, bad leaders, etc. will
+// always be escaped as hex.
 FXString FXString::escape(const FXchar* str,FXint num,FXchar lquote,FXchar rquote,FXint flag){
   FXString result;
-  FXint p,q,w,v;
+  FXint p,q,x,w,v;
   FXuchar c,cc;
-  p=q=0;
+  p=q=x=0;
   if(lquote) q++;                               // Opening quote
   while(p<num){                                 // Measure length of converted string
     c=str[p++];
     switch(c){
-      case '\a':                                // Special control characters
-      case '\b':
-      case '\n':
-      case '\v':
-      case '\f':
-      case '\r':
-      case '\\':
-      case '\t':
-        q+=2;
-        continue;
       case 0x00:                                // Non-special control characters
       case 0x01:
       case 0x02:
@@ -2307,15 +2307,6 @@ FXString FXString::escape(const FXchar* str,FXint num,FXchar lquote,FXchar rquot
       case 0x1E:
       case 0x1F:
       case 0x7F:                                // DEL
-      case 0xF8:                                // Bad UTF8 leaders
-      case 0xF9:
-      case 0xFA:
-      case 0xFB:
-      case 0xFC:
-      case 0xFD:
-      case 0xFF:
-hex1:   q+=4;                                   // Escape as \xHH
-        continue;
       case 0x80:                                // UTF8 followers
       case 0x81:
       case 0x82:
@@ -2380,8 +2371,83 @@ hex1:   q+=4;                                   // Escape as \xHH
       case 0xBD:
       case 0xBE:
       case 0xBF:
-        if(flag==0) goto nml1;                  // Pass UTF8 through
-        goto hex1;                              // Escape UTF8 follower not preceeded by UTF8 leader
+      case 0xF8:                                // Bad UTF8 leaders
+      case 0xF9:
+      case 0xFA:
+      case 0xFB:
+      case 0xFC:
+      case 0xFD:
+      case 0xFF:
+hex1:   q+=4;                                   // Escape as \xHH
+        x=1;
+        continue;
+      case '0':                                 // Possible hex digits
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+        if(__unlikely(x)) goto hex1;            // Escaped if following \xHH
+      case 'g':                                 // Normal ascii
+      case 'h':
+      case 'i':
+      case 'j':
+      case 'k':
+      case 'l':
+      case 'm':
+      case 'n':
+      case 'o':
+      case 'p':
+      case 'q':
+      case 'r':
+      case 's':
+      case 't':
+      case 'u':
+      case 'v':
+      case 'w':
+      case 'x':
+      case 'y':
+      case 'z':
+      case 'G':
+      case 'H':
+      case 'I':
+      case 'J':
+      case 'K':
+      case 'L':
+      case 'M':
+      case 'N':
+      case 'O':
+      case 'P':
+      case 'Q':
+      case 'R':
+      case 'S':
+      case 'T':
+      case 'U':
+      case 'V':
+      case 'W':
+      case 'X':
+      case 'Y':
+      case 'Z':
+      case ' ':
+        q+=1;
+        x=0;
+        continue;
       case 0xC0:                                // 2-byte UTF8 sequences
       case 0xC1:
       case 0xC2:
@@ -2414,6 +2480,13 @@ hex1:   q+=4;                                   // Escape as \xHH
       case 0xDD:
       case 0xDE:
       case 0xDF:
+        if(__unlikely(flag==1)) goto hex1;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex1;
+        if(__unlikely(flag==2)) goto uni1;
+        q+=2;
+        p+=1;
+        x=0;
+        continue;
       case 0xE0:                                // 3-byte UTF8 sequences
       case 0xE1:
       case 0xE2:
@@ -2430,6 +2503,14 @@ hex1:   q+=4;                                   // Escape as \xHH
       case 0xED:
       case 0xEE:
       case 0xEF:
+        if(__unlikely(flag==1)) goto hex1;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex1;
+        if(__unlikely(!followUTF8(str[p+1]))) goto hex1;
+        if(__unlikely(flag==2)) goto uni1;
+        q+=3;
+        p+=2;
+        x=0;
+        continue;
       case 0xF0:                                // 4-byte UTF8 sequences
       case 0xF1:
       case 0xF2:
@@ -2438,80 +2519,98 @@ hex1:   q+=4;                                   // Escape as \xHH
       case 0xF5:
       case 0xF6:
       case 0xF7:
-        if(flag==0) goto nml1;                  // Pass UTF8 through
-        if(flag==1) goto hex1;                  // Simple hex escaping
-        cc=str[p];
-        if(!followUTF8(cc)) goto hex1;          // UTF8 follower?
+        if(__unlikely(flag==1)) goto hex1;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex1;
+        if(__unlikely(!followUTF8(str[p+1]))) goto hex1;
+        if(__unlikely(!followUTF8(str[p+2]))) goto hex1;
+        if(__unlikely(flag==2)) goto uni1;
+        q+=4;
+        p+=3;
+        x=0;
+        continue;
+uni1:   cc=str[p++];                            // Encode as unicode escape \uHHHH
         w=(c<<6)^cc^0x3080;
         if(0x800<=w){
-          cc=str[p+1];
-          if(!followUTF8(cc)) goto hex1;        // UTF8 follower?
+          cc=str[p++];
           w=(w<<6)^cc^0x20080;
           if(0x10000<=w){                       // Surrogate pair needed
-            cc=str[p+2];
-            if(!followUTF8(cc)) goto hex1;      // UTF8 follower?
+            cc=str[p++];
             w=(w<<6)^cc^0x400080;
-            if(0x110000<=w) goto hex1;          // Beyond assigned code space?
             q+=6;
-            p++;
             }
-          p++;
           }
         q+=6;
-        p++;
+        x=0;
+        continue;
+      case '\a':                                // Special control characters
+      case '\b':
+      case '\n':
+      case '\v':
+      case '\f':
+      case '\r':
+      case '\\':
+      case '\t':
+        if(__unlikely(flag==1)) goto hex1;      // Simple hex escaping
+        q+=2;
+        x=0;
+        continue;
+      case '!':                                 // Check these for quotes
+      case '"':
+      case '#':
+      case '$':
+      case '%':
+      case '&':
+      case '\'':
+      case '(':
+      case ')':
+      case '*':
+      case '+':
+      case ',':
+      case '-':
+      case '.':
+      case '/':
+      case ':':
+      case ';':
+      case '<':
+      case '=':
+      case '>':
+      case '?':
+      case '@':
+      case '[':
+      case ']':
+      case '^':
+      case '_':
+      case '{':
+      case '|':
+      case '}':
+      case '~':
+      case '`':
+        if(__unlikely(c==lquote)){              // Escape opening quote if found in string
+          if(__unlikely(flag==1)) goto hex1;    // Simple hex escaping
+          q+=2;
+          x=0;
+          continue;
+          }
+        if(__unlikely(c==rquote)){              // Escape closing quote if found in string
+          if(__unlikely(flag==1)) goto hex1;    // Simple hex escaping
+          q+=2;
+          x=0;
+          continue;
+          }
+        q+=1;                                   // Normal characters
+        x=0;
         continue;
       default:
-        if(c==lquote && lquote){                // Escape opening quote if found in string
-          q+=2;
-          continue;
-          }
-        if(c==rquote && rquote){                // Escape closing quote if found in string
-          q+=2;
-          continue;
-          }
-nml1:   q+=1;                                   // Normal characters
-        continue;
+        __unreachable();
       }
     }
   if(rquote) q++;                               // Closing quote
   result.length(q);
-  p=q=0;
+  p=q=x=0;
   if(lquote) result[q++]=lquote;                // Opening quote
   while(p<num){                                 // Then convert the string
     c=str[p++];
     switch(c){
-      case '\a':                                // Special control characters
-        result[q++]='\\';
-        result[q++]='a';
-        continue;
-      case '\b':
-        result[q++]='\\';
-        result[q++]='b';
-        continue;
-      case '\n':
-        result[q++]='\\';
-        result[q++]='n';
-        continue;
-      case '\v':
-        result[q++]='\\';
-        result[q++]='v';
-        continue;
-      case '\f':
-        result[q++]='\\';
-        result[q++]='f';
-        continue;
-      case '\r':
-        result[q++]='\\';
-        result[q++]='r';
-        continue;
-      case '\\':
-        result[q++]='\\';
-        result[q++]='\\';
-        continue;
-      case '\t':
-        result[q++]='\\';
-        result[q++]='t';
-        continue;
       case 0x00:                                // Non-special control characters
       case 0x01:
       case 0x02:
@@ -2538,6 +2637,70 @@ nml1:   q+=1;                                   // Normal characters
       case 0x1E:
       case 0x1F:
       case 0x7F:                                // DEL
+      case 0x80:                                // UTF8 followers
+      case 0x81:
+      case 0x82:
+      case 0x83:
+      case 0x84:
+      case 0x85:
+      case 0x86:
+      case 0x87:
+      case 0x88:
+      case 0x89:
+      case 0x8A:
+      case 0x8B:
+      case 0x8C:
+      case 0x8D:
+      case 0x8E:
+      case 0x8F:
+      case 0x90:
+      case 0x91:
+      case 0x92:
+      case 0x93:
+      case 0x94:
+      case 0x95:
+      case 0x96:
+      case 0x97:
+      case 0x98:
+      case 0x99:
+      case 0x9A:
+      case 0x9B:
+      case 0x9C:
+      case 0x9D:
+      case 0x9E:
+      case 0x9F:
+      case 0xA0:
+      case 0xA1:
+      case 0xA2:
+      case 0xA3:
+      case 0xA4:
+      case 0xA5:
+      case 0xA6:
+      case 0xA7:
+      case 0xA8:
+      case 0xA9:
+      case 0xAA:
+      case 0xAB:
+      case 0xAC:
+      case 0xAD:
+      case 0xAE:
+      case 0xAF:
+      case 0xB0:
+      case 0xB1:
+      case 0xB2:
+      case 0xB3:
+      case 0xB4:
+      case 0xB5:
+      case 0xB6:
+      case 0xB7:
+      case 0xB8:
+      case 0xB9:
+      case 0xBA:
+      case 0xBB:
+      case 0xBC:
+      case 0xBD:
+      case 0xBE:
+      case 0xBF:
       case 0xF8:                                // Bad UTF8 leaders
       case 0xF9:
       case 0xFA:
@@ -2550,72 +2713,73 @@ hex2:   result[q++]='\\';                       // Escape as \xHH
         result[q++]=Ascii::valueDigit((c>>4)&15);
         result[q++]=Ascii::valueDigit(c&15);
         continue;
-      case 0x80:                                // UTF8 followers
-      case 0x81:
-      case 0x82:
-      case 0x83:
-      case 0x84:
-      case 0x85:
-      case 0x86:
-      case 0x87:
-      case 0x88:
-      case 0x89:
-      case 0x8A:
-      case 0x8B:
-      case 0x8C:
-      case 0x8D:
-      case 0x8E:
-      case 0x8F:
-      case 0x90:
-      case 0x91:
-      case 0x92:
-      case 0x93:
-      case 0x94:
-      case 0x95:
-      case 0x96:
-      case 0x97:
-      case 0x98:
-      case 0x99:
-      case 0x9A:
-      case 0x9B:
-      case 0x9C:
-      case 0x9D:
-      case 0x9E:
-      case 0x9F:
-      case 0xA0:
-      case 0xA1:
-      case 0xA2:
-      case 0xA3:
-      case 0xA4:
-      case 0xA5:
-      case 0xA6:
-      case 0xA7:
-      case 0xA8:
-      case 0xA9:
-      case 0xAA:
-      case 0xAB:
-      case 0xAC:
-      case 0xAD:
-      case 0xAE:
-      case 0xAF:
-      case 0xB0:
-      case 0xB1:
-      case 0xB2:
-      case 0xB3:
-      case 0xB4:
-      case 0xB5:
-      case 0xB6:
-      case 0xB7:
-      case 0xB8:
-      case 0xB9:
-      case 0xBA:
-      case 0xBB:
-      case 0xBC:
-      case 0xBD:
-      case 0xBE:
-      case 0xBF:
-        if(flag==0) goto nml2;                  // Pass UTF8 through
-        goto hex2;                              // Escape UTF8 follower not preceeded by UTF8 leader
+      case '0':                                 // Possible hex digits
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+        if(__unlikely(x)) goto hex2;            // Escaped if following \xHH
+      case 'g':                                 // Normal ascii
+      case 'h':
+      case 'i':
+      case 'j':
+      case 'k':
+      case 'l':
+      case 'm':
+      case 'n':
+      case 'o':
+      case 'p':
+      case 'q':
+      case 'r':
+      case 's':
+      case 't':
+      case 'u':
+      case 'v':
+      case 'w':
+      case 'x':
+      case 'y':
+      case 'z':
+      case 'G':
+      case 'H':
+      case 'I':
+      case 'J':
+      case 'K':
+      case 'L':
+      case 'M':
+      case 'N':
+      case 'O':
+      case 'P':
+      case 'Q':
+      case 'R':
+      case 'S':
+      case 'T':
+      case 'U':
+      case 'V':
+      case 'W':
+      case 'X':
+      case 'Y':
+      case 'Z':
+      case ' ':
+        result[q++]=c;                          // Normal characters
+        x=0;
+        continue;
       case 0xC0:                                // 2-byte UTF8 sequences
       case 0xC1:
       case 0xC2:
@@ -2648,6 +2812,13 @@ hex2:   result[q++]='\\';                       // Escape as \xHH
       case 0xDD:
       case 0xDE:
       case 0xDF:
+        if(__unlikely(flag==1)) goto hex2;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex2;
+        if(__unlikely(flag==2)) goto uni2;
+        result[q++]=c;
+        result[q++]=str[p++];
+        x=0;
+        continue;
       case 0xE0:                                // 3-byte UTF8 sequences
       case 0xE1:
       case 0xE2:
@@ -2664,6 +2835,15 @@ hex2:   result[q++]='\\';                       // Escape as \xHH
       case 0xED:
       case 0xEE:
       case 0xEF:
+        if(__unlikely(flag==1)) goto hex2;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex2;
+        if(__unlikely(!followUTF8(str[p+1]))) goto hex2;
+        if(__unlikely(flag==2)) goto uni2;
+        result[q++]=c;
+        result[q++]=str[p++];
+        result[q++]=str[p++];
+        x=0;
+        continue;
       case 0xF0:                                 // 4-byte UTF8 sequences
       case 0xF1:
       case 0xF2:
@@ -2672,53 +2852,116 @@ hex2:   result[q++]='\\';                       // Escape as \xHH
       case 0xF5:
       case 0xF6:
       case 0xF7:
-        if(flag==0) goto nml2;                  // Pass UTF8 through
-        if(flag==1) goto hex2;                  // Simple hex escaping
-        cc=str[p];
-        if(!followUTF8(cc)) goto hex2;          // UTF8 follower?
+        if(__unlikely(flag==1)) goto hex2;      // Simple hex escaping
+        if(__unlikely(!followUTF8(str[p]))) goto hex2;
+        if(__unlikely(!followUTF8(str[p+1]))) goto hex2;
+        if(__unlikely(!followUTF8(str[p+2]))) goto hex2;
+        if(__unlikely(flag==2)) goto uni2;
+        result[q++]=c;
+        result[q++]=str[p++];
+        result[q++]=str[p++];
+        result[q++]=str[p++];
+        x=0;
+        continue;
+uni2:   cc=str[p++];                            // Encode as unicode escape \uHHHH
         w=(c<<6)^cc^0x3080;
         if(0x800<=w){
-          cc=str[p+1];
-          if(!followUTF8(cc)) goto hex2;        // UTF8 follower?
+          cc=str[p++];
           w=(w<<6)^cc^0x20080;
           if(0x10000<=w){                       // Surrogate pair needed
-            cc=str[p+2];
-            if(!followUTF8(cc)) goto hex2;      // UTF8 follower?
+            cc=str[p++];
             w=(w<<6)^cc^0x400080;
-            if(0x110000<=w) goto hex2;          // Beyond assigned code space?
             v=LEAD_OFFSET+(w>>10);
             w=TAIL_OFFSET+(w&0x3FF);
-            result[q++]='\\';                   // Escape as \uHHHH
+            result[q++]='\\';
             result[q++]='u';
             result[q++]=Ascii::valueDigit((v>>12)&15);
             result[q++]=Ascii::valueDigit((v>>8)&15);
             result[q++]=Ascii::valueDigit((v>>4)&15);
             result[q++]=Ascii::valueDigit(v&15);
-            p++;
             }
-          p++;
           }
-        result[q++]='\\';                       // Escape as \uHHHH
+        result[q++]='\\';
         result[q++]='u';
         result[q++]=Ascii::valueDigit((w>>12)&15);
         result[q++]=Ascii::valueDigit((w>>8)&15);
         result[q++]=Ascii::valueDigit((w>>4)&15);
         result[q++]=Ascii::valueDigit(w&15);
-        p++;
+        x=0;
+        continue;
+      case '\a':                                // Special control characters
+      case '\b':
+      case '\t':
+      case '\n':
+      case '\v':
+      case '\f':
+      case '\r':
+      case '\\':
+        if(__unlikely(flag==1)) goto hex2;      // Simple hex escaping
+        switch(c){
+          case '\a': c='a'; break;
+          case '\b': c='b'; break;
+          case '\t': c='t'; break;
+          case '\n': c='n'; break;
+          case '\v': c='v'; break;
+          case '\f': c='f'; break;
+          case '\r': c='r'; break;
+          case '\\': c='\\';break;
+          }
+        result[q++]='\\';
+        result[q++]=c;
+        x=0;
+        continue;
+      case '!':                                 // Check these for quotes
+      case '"':
+      case '#':
+      case '$':
+      case '%':
+      case '&':
+      case '\'':
+      case '(':
+      case ')':
+      case '*':
+      case '+':
+      case ',':
+      case '-':
+      case '.':
+      case '/':
+      case ':':
+      case ';':
+      case '<':
+      case '=':
+      case '>':
+      case '?':
+      case '@':
+      case '[':
+      case ']':
+      case '^':
+      case '_':
+      case '{':
+      case '|':
+      case '}':
+      case '~':
+      case '`':
+        if(__unlikely(c==lquote)){              // Escape opening quote if found in string
+          if(__unlikely(flag==1)) goto hex2;    // Simple hex escaping
+          result[q++]='\\';
+          result[q++]=c;
+          x=0;
+          continue;
+          }
+        if(__unlikely(c==rquote)){              // Escape closing quote if found in string
+          if(__unlikely(flag==1)) goto hex2;    // Simple hex escaping
+          result[q++]='\\';
+          result[q++]=c;
+          x=0;
+          continue;
+          }
+        result[q++]=c;                          // Normal characters
+        x=0;
         continue;
       default:
-        if(__unlikely(c==lquote && lquote)){    // Escape opening quote if found in string
-          result[q++]='\\';
-          result[q++]=lquote;
-          continue;
-          }
-        if(__unlikely(c==rquote && rquote)){    // Escape closing quote if found in string
-          result[q++]='\\';
-          result[q++]=rquote;
-          continue;
-          }
-nml2:   result[q++]=c;                          // Normal characters
-        continue;
+        __unreachable();
       }
     }
   if(rquote) result[q++]=rquote;                // Closing quote

@@ -191,251 +191,261 @@ extern FXAPI FXbool fxsaveRAS(FXStream& store,const FXColor *data,FXint width,FX
 
 // Check if stream contains a RAS
 FXbool fxcheckRAS(FXStream& store){
-  FXuchar signature[4];
-  store.load(signature,4);
-  store.position(-4,FXFromCurrent);
-  return signature[0]==0x59 && signature[1]==0xA6 && signature[2]==0x6A && signature[3]==0x95;
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[4];
+    store.load(signature,4);
+    store.position(-4,FXFromCurrent);
+    return signature[0]==0x59 && signature[1]==0xA6 && signature[2]==0x6A && signature[3]==0x95;
+    }
+  return false;
   }
 
 
 // Load SUN raster image file format
 FXbool fxloadRAS(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXuchar red[256],green[256],blue[256],*line,*p,*q,count,c,bit;
-  FXint   npixels,linesize,x,y,i,b;
-  HEADER  header;
-  FXbool  swap;
-  FXbool  ok=false;
+  FXbool result=false;
 
   // Null out
   data=nullptr;
-  line=nullptr;
   width=0;
   height=0;
 
-  // Set big-endian
-  swap=store.swapBytes();
-  store.setBigEndian(true);
+  if(store.direction()==FXStreamLoad){
+    HEADER  header;
+    FXbool  swap;
 
-  // Read header
-  store >> header.magic;
-  store >> header.width;
-  store >> header.height;
-  store >> header.depth;
-  store >> header.length;
-  store >> header.type;
-  store >> header.maptype;
-  store >> header.maplength;
+    // Set big-endian
+    swap=store.swapBytes();
+    store.setBigEndian(true);
 
-  FXTRACE(TOPIC_DETAIL,"fxloadRAS: magic=%08x width=%d height=%d depth=%d length=%d type=%d maptype=%d maplength=%d\n",header.magic,header.width,header.height,header.depth,header.length,header.type,header.maptype,header.maplength);
+    // Read header
+    store >> header.magic;
+    store >> header.width;
+    store >> header.height;
+    store >> header.depth;
+    store >> header.length;
+    store >> header.type;
+    store >> header.maptype;
+    store >> header.maplength;
 
-  // Check magic code
-  if(header.magic==RAS_MAGIC){
+    FXTRACE(TOPIC_DETAIL,"fxloadRAS: magic=%08x width=%d height=%d depth=%d length=%d type=%d maptype=%d maplength=%d\n",header.magic,header.width,header.height,header.depth,header.length,header.type,header.maptype,header.maplength);
 
-    // Verify depth options; must be 1,8,24, or 32
-    if(header.depth==1 || header.depth==8 || header.depth==24 || header.depth==32){
+    // Check magic code
+    if(header.magic==RAS_MAGIC){
 
-      // Verify supported types
-      if(header.type==RT_OLD || header.type==RT_STANDARD || header.type==RT_BYTE_ENCODED || header.type==RT_FORMAT_RGB){
+      // Verify depth options; must be 1,8,24, or 32
+      if(header.depth==1 || header.depth==8 || header.depth==24 || header.depth==32){
 
-        // Verify map types
-        if(header.maptype==RMT_RAW || header.maptype==RMT_NONE || header.maptype==RMT_EQUAL_RGB){
+        // Verify supported types
+        if(header.type==RT_OLD || header.type==RT_STANDARD || header.type==RT_BYTE_ENCODED || header.type==RT_FORMAT_RGB){
 
-          // Bad colormap size
-          if(0<=header.maplength && header.maplength<=768){
+          // Verify map types
+          if(header.maptype==RMT_RAW || header.maptype==RMT_NONE || header.maptype==RMT_EQUAL_RGB){
 
-            // Read in the colormap
-            if(header.maptype==RMT_EQUAL_RGB && header.maplength){
-              FXTRACE(TOPIC_DETAIL,"fxloadRAS: RMT_EQUAL_RGB\n");
-              store.load(red,header.maplength/3);
-              store.load(green,header.maplength/3);
-              store.load(blue,header.maplength/3);
-              }
+            // Bad colormap size
+            if(0<=header.maplength && header.maplength<=768){
+              FXuchar  red[256],green[256],blue[256],count,c,bit;
+              FXuchar* line=nullptr;
+              FXuchar* p=nullptr;
+              FXuchar* q=nullptr;
+              FXint    npixels,linesize,x,y,i,b;
 
-            // Skip colormap
-            else if(header.maptype==RMT_RAW && header.maplength){
-              FXTRACE(TOPIC_DETAIL,"fxloadRAS: RMT_RAW\n");
-              store.position(header.maplength,FXFromCurrent);
-              }
-
-            // Black and white
-            else if(header.depth==1){
-              FXTRACE(TOPIC_DETAIL,"fxloadRAS: 1 bit\n");
-              red[0]=green[0]=blue[0]=0;
-              red[1]=green[1]=blue[1]=255;
-              }
-
-            // Gray scale
-            else if(header.depth==8){
-              FXTRACE(TOPIC_DETAIL,"fxloadRAS: 8 bit\n");
-              for(i=0; i<256; i++){
-                red[i]=green[i]=blue[i]=i;
+              // Read in the colormap
+              if(header.maptype==RMT_EQUAL_RGB && header.maplength){
+                FXTRACE(TOPIC_DETAIL,"fxloadRAS: RMT_EQUAL_RGB\n");
+                store.load(red,header.maplength/3);
+                store.load(green,header.maplength/3);
+                store.load(blue,header.maplength/3);
                 }
-              }
 
-            // Get sizes
-            linesize=((header.width*header.depth+15)/16)*2;
-            npixels=header.width*header.height;
+              // Skip colormap
+              else if(header.maptype==RMT_RAW && header.maplength){
+                FXTRACE(TOPIC_DETAIL,"fxloadRAS: RMT_RAW\n");
+                store.position(header.maplength,FXFromCurrent);
+                }
 
-            // Allocate scanline
-            if(allocElms(line,linesize)){
+              // Black and white
+              else if(header.depth==1){
+                FXTRACE(TOPIC_DETAIL,"fxloadRAS: 1 bit\n");
+                red[0]=green[0]=blue[0]=0;
+                red[1]=green[1]=blue[1]=255;
+                }
 
-              // Allocate pixel data
-              if(allocElms(data,npixels)){
+              // Gray scale
+              else if(header.depth==8){
+                FXTRACE(TOPIC_DETAIL,"fxloadRAS: 8 bit\n");
+                for(i=0; i<256; i++){
+                  red[i]=green[i]=blue[i]=i;
+                  }
+                }
 
-                // Save size
-                width=header.width;
-                height=header.height;
+              // Get sizes
+              linesize=((header.width*header.depth+15)/16)*2;
+              npixels=header.width*header.height;
 
-                FXTRACE(TOPIC_DETAIL,"fxloadRAS: header.length=%d linesize=%d 4*npixels=%d\n",header.length,linesize,4*npixels);
+              // Allocate scanline
+              if(allocElms(line,linesize)){
 
-                // Now read the image
-                for(y=0,p=(FXuchar*)data,count=c=0; y<height; y++){
-                  if(header.type!=RT_BYTE_ENCODED){           // Load uncompressed
-                    store.load(line,linesize);
-                    }
-                  else{
-                    for(i=0; i<linesize; i++){                // Load RLE compressed
-                      if(count){
-                        line[i]=c;
-                        count--;
-                        }
-                      else{
-                        store >> c;
-                        if(c==0x80){
-                          store >> count;
-                          if(count==0){
-                            line[i]=0x80;
+                // Allocate pixel data
+                if(allocElms(data,npixels)){
+
+                  // Save size
+                  width=header.width;
+                  height=header.height;
+
+                  FXTRACE(TOPIC_DETAIL,"fxloadRAS: header.length=%d linesize=%d 4*npixels=%d\n",header.length,linesize,4*npixels);
+
+                  // Now read the image
+                  for(y=0,p=(FXuchar*)data,count=c=0; y<height; y++){
+                    if(header.type!=RT_BYTE_ENCODED){           // Load uncompressed
+                      store.load(line,linesize);
+                      }
+                    else{
+                      for(i=0; i<linesize; i++){                // Load RLE compressed
+                        if(count){
+                          line[i]=c;
+                          count--;
+                          }
+                        else{
+                          store >> c;
+                          if(c==0x80){
+                            store >> count;
+                            if(count==0){
+                              line[i]=0x80;
+                              }
+                            else{
+                              store >> c;
+                              line[i]=c;
+                              }
                             }
                           else{
-                            store >> c;
                             line[i]=c;
                             }
                           }
-                        else{
-                          line[i]=c;
+                        }
+                      }
+                    if(header.depth==1){                          // 1 bits/pixel
+                      for(x=0,q=line,b=-1; x<width; x++,p+=4){
+                        if(b<0){ c=~*q++; b=7; }
+                        bit=(c>>(b--))&1;
+                        p[0]=blue[bit];
+                        p[1]=green[bit];
+                        p[2]=red[bit];
+                        p[3]=255;
+                        }
+                      }
+                    else if(header.depth==8){                     // 8 bits/pixel
+                      for(x=0,q=line; x<width; x++,p+=4,q+=1){
+                        p[0]=blue[q[0]];
+                        p[1]=green[q[0]];
+                        p[2]=red[q[0]];
+                        p[3]=255;
+                        }
+                      }
+                    else if(header.depth==24){                    // 24 bits/pixel
+                      if(header.type==RT_FORMAT_RGB){
+                        for(x=0,q=line; x<width; x++,p+=4,q+=3){
+                          p[0]=q[2];
+                          p[1]=q[1];
+                          p[2]=q[0];
+                          p[3]=255;
+                          }
+                        }
+                      else{
+                        for(x=0,q=line; x<width; x++,p+=4,q+=3){
+                          p[0]=q[0];
+                          p[1]=q[1];
+                          p[2]=q[2];
+                          p[3]=255;
+                          }
+                        }
+                      }
+                    else{                                       // 32 bits/pixel
+                      if(header.type==RT_FORMAT_RGB){
+                        for(x=0,q=line; x<width; x++,p+=4,q+=4){
+                          p[0]=q[2];
+                          p[1]=q[1];
+                          p[2]=q[0];
+                          p[3]=q[3];
+                          }
+                        }
+                      else{
+                        for(x=0,q=line; x<width; x++,p+=4,q+=4){
+                          p[0]=q[0];
+                          p[1]=q[1];
+                          p[2]=q[2];
+                          p[3]=q[3];
                           }
                         }
                       }
                     }
-                  if(header.depth==1){                          // 1 bits/pixel
-                    for(x=0,q=line,b=-1; x<width; x++,p+=4){
-                      if(b<0){ c=~*q++; b=7; }
-                      bit=(c>>(b--))&1;
-                      p[0]=blue[bit];
-                      p[1]=green[bit];
-                      p[2]=red[bit];
-                      p[3]=255;
-                      }
-                    }
-                  else if(header.depth==8){                     // 8 bits/pixel
-                    for(x=0,q=line; x<width; x++,p+=4,q+=1){
-                      p[0]=blue[q[0]];
-                      p[1]=green[q[0]];
-                      p[2]=red[q[0]];
-                      p[3]=255;
-                      }
-                    }
-                  else if(header.depth==24){                    // 24 bits/pixel
-                    if(header.type==RT_FORMAT_RGB){
-                      for(x=0,q=line; x<width; x++,p+=4,q+=3){
-                        p[0]=q[2];
-                        p[1]=q[1];
-                        p[2]=q[0];
-                        p[3]=255;
-                        }
-                      }
-                    else{
-                      for(x=0,q=line; x<width; x++,p+=4,q+=3){
-                        p[0]=q[0];
-                        p[1]=q[1];
-                        p[2]=q[2];
-                        p[3]=255;
-                        }
-                      }
-                    }
-                  else{                                       // 32 bits/pixel
-                    if(header.type==RT_FORMAT_RGB){
-                      for(x=0,q=line; x<width; x++,p+=4,q+=4){
-                        p[0]=q[2];
-                        p[1]=q[1];
-                        p[2]=q[0];
-                        p[3]=q[3];
-                        }
-                      }
-                    else{
-                      for(x=0,q=line; x<width; x++,p+=4,q+=4){
-                        p[0]=q[0];
-                        p[1]=q[1];
-                        p[2]=q[2];
-                        p[3]=q[3];
-                        }
-                      }
-                    }
+                  result=true;
                   }
-                ok=true;
-                }
 
-              // Release temporary stuff
-              freeElms(line);
+                // Release temporary stuff
+                freeElms(line);
+                }
               }
             }
           }
         }
       }
+    store.swapBytes(swap);
     }
-  store.swapBytes(swap);
-  return ok;
+  return result;
   }
-
-
-
 
 /*******************************************************************************/
 
 
 // Save SUN raster image file format
 FXbool fxsaveRAS(FXStream& store,const FXColor *data,FXint width,FXint height){
-  const FXuchar *pp=(const FXuchar*)data;
-  HEADER header;
-  FXbool swap;
 
-  // Must make sense
-  if(!data || width<=0 || height<=0) return false;
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-  // Set big-endian
-  swap=store.swapBytes();
-  store.setBigEndian(true);
+    // Must make sense
+    if(data && 0<width && 0<height){
+      const FXuchar *pp=(const FXuchar*)data;
+      HEADER header;
+      FXbool swap;
 
-  // Fill in header
-  header.magic=RAS_MAGIC;
-  header.width=width;
-  header.height=height;
-  header.depth=32;
-  header.length=4*width*height;
-  header.type=RT_FORMAT_RGB;
-  header.maptype=RMT_NONE;
-  header.maplength=0;
+      // Set big-endian
+      swap=store.swapBytes();
+      store.setBigEndian(true);
 
-  // Write header
-  store << header.magic;
-  store << header.width;
-  store << header.height;
-  store << header.depth;
-  store << header.length;
-  store << header.type;
-  store << header.maptype;
-  store << header.maplength;
+      // Fill in header
+      header.magic=RAS_MAGIC;
+      header.width=width;
+      header.height=height;
+      header.depth=32;
+      header.length=4*width*height;
+      header.type=RT_FORMAT_RGB;
+      header.maptype=RMT_NONE;
+      header.maplength=0;
 
-  // No RLE, or any other attempt to reduce size; sorry!
-  for(FXint i=0; i<width*height; i++,pp+=4){
-    store << pp[2]; // Red
-    store << pp[1]; // Green
-    store << pp[0]; // Blue
-    store << pp[3]; // Alpha
+      // Write header
+      store << header.magic;
+      store << header.width;
+      store << header.height;
+      store << header.depth;
+      store << header.length;
+      store << header.type;
+      store << header.maptype;
+      store << header.maplength;
+
+      // No RLE, or any other attempt to reduce size; sorry!
+      for(FXint i=0; i<width*height; i++,pp+=4){
+        store << pp[2]; // Red
+        store << pp[1]; // Green
+        store << pp[0]; // Blue
+        store << pp[3]; // Alpha
+        }
+      store.swapBytes(swap);
+      return true;
+      }
     }
-  store.swapBytes(swap);
-  return true;
+  return false;
   }
-
 
 }

@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\adie\main.cpp" />
     <ClCompile Include="..\..\adie\Modeline.cpp" />
     <ClCompile Include="..\..\adie\Preferences.cpp" />
+    <ClCompile Include="..\..\adie\ReplaceInFiles.cpp" />
     <ClCompile Include="..\..\adie\ShellCommand.cpp" />
     <ClCompile Include="..\..\adie\ShellDialog.cpp" />
     <ClCompile Include="..\..\adie\Syntax.cpp" />

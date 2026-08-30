@@ -185,7 +185,9 @@
 #endif
 
 // Define parameters not-aliased hint
-#if defined(__GNUC__)
+#if defined(__clang__)
+#define __restrict
+#elif defined(__GNUC__)
 #define __restrict  __restrict__
 #elif !defined(_MSC_VER)
 #define __restrict

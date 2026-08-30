@@ -23,7 +23,7 @@
 
 
 /// OpenGL Point Object
-class FXAPI FXGLPoint : public FXGLObject {
+class FXGLPoint : public FXGLObject {
   FXDECLARE(FXGLPoint)
 public:
   FXVec3f pos;

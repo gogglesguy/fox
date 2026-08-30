@@ -465,6 +465,20 @@ FXint FXSettings::readFormatEntry(const FXchar* section,const FXchar* name,const
 
 
 // Read a formatted registry entry
+FXint FXSettings::readFormatEntry(const FXchar* section,const FXString& name,const FXchar* fmt,...) const {
+  const FXString& value=at(section).at(name);
+  FXint result=0;
+  if(!value.empty()){
+    va_list args;
+    va_start(args,fmt);
+    result=value.vscan(fmt,args);
+    va_end(args);
+    }
+  return result;
+  }
+
+
+// Read a formatted registry entry
 FXint FXSettings::readFormatEntry(const FXString& section,const FXchar* name,const FXchar* fmt,...) const {
   const FXString& value=at(section).at(name);
   FXint result=0;
@@ -494,6 +508,17 @@ FXint FXSettings::readFormatEntry(const FXString& section,const FXString& name,c
 
 // Write a formatted registry entry
 FXint FXSettings::writeFormatEntry(const FXchar* section,const FXchar* name,const FXchar* fmt,...){
+  FXint result;
+  va_list args;
+  va_start(args,fmt);
+  result=at(section).at(name,true).vformat(fmt,args);
+  va_end(args);
+  return result;
+  }
+
+
+// Write a formatted registry entry
+FXint FXSettings::writeFormatEntry(const FXchar* section,const FXString& name,const FXchar* fmt,...){
   FXint result;
   va_list args;
   va_start(args,fmt);
@@ -537,6 +562,12 @@ const FXchar* FXSettings::readStringEntry(const FXchar* section,const FXchar* na
 
 
 // Read a string-valued registry entry
+const FXchar* FXSettings::readStringEntry(const FXchar* section,const FXString& name,const FXchar* def) const {
+  return readStringEntry(section,name.text(),def);
+  }
+
+
+// Read a string-valued registry entry
 const FXchar* FXSettings::readStringEntry(const FXString& section,const FXchar* name,const FXchar* def) const {
   return readStringEntry(section.text(),name,def);
   }
@@ -552,6 +583,12 @@ const FXchar* FXSettings::readStringEntry(const FXString& section,const FXString
 FXbool FXSettings::writeStringEntry(const FXchar* section,const FXchar* name,const FXchar* val){
   at(section).at(name,true)=val;
   return true;
+  }
+
+
+// Write a string-valued registry entry
+FXbool FXSettings::writeStringEntry(const FXchar* section,const FXString& name,const FXchar* val){
+  return writeStringEntry(section,name.text(),val);
   }
 
 
@@ -581,6 +618,12 @@ FXint FXSettings::readIntEntry(const FXchar* section,const FXchar* name,FXint de
 
 
 // Read a int-valued registry entry
+FXint FXSettings::readIntEntry(const FXchar* section,const FXString& name,FXint def) const {
+  return readIntEntry(section,name.text(),def);
+  }
+
+
+// Read a int-valued registry entry
 FXint FXSettings::readIntEntry(const FXString& section,const FXchar* name,FXint def) const {
   return readIntEntry(section.text(),name,def);
   }
@@ -596,6 +639,12 @@ FXint FXSettings::readIntEntry(const FXString& section,const FXString& name,FXin
 FXbool FXSettings::writeIntEntry(const FXchar* section,const FXchar* name,FXint val){
   at(section).at(name,true).fromInt(val);
   return true;
+  }
+
+
+// Write a int-valued registry entry
+FXbool FXSettings::writeIntEntry(const FXchar* section,const FXString& name,FXint val){
+  return writeIntEntry(section,name.text(),val);
   }
 
 
@@ -625,6 +674,12 @@ FXuint FXSettings::readUIntEntry(const FXchar* section,const FXchar* name,FXuint
 
 
 // Read a unsigned int-valued registry entry
+FXuint FXSettings::readUIntEntry(const FXchar* section,const FXString& name,FXuint def) const {
+  return readUIntEntry(section,name.text(),def);
+  }
+
+
+// Read a unsigned int-valued registry entry
 FXuint FXSettings::readUIntEntry(const FXString& section,const FXchar* name,FXuint def) const {
   return readUIntEntry(section.text(),name,def);
   }
@@ -640,6 +695,12 @@ FXuint FXSettings::readUIntEntry(const FXString& section,const FXString& name,FX
 FXbool FXSettings::writeUIntEntry(const FXchar* section,const FXchar* name,FXuint val){
   at(section).at(name,true).fromUInt(val);
   return true;
+  }
+
+
+// Write a unsigned int-valued registry entry
+FXbool FXSettings::writeUIntEntry(const FXchar* section,const FXString& name,FXuint val){
+  return writeUIntEntry(section,name.text(),val);
   }
 
 
@@ -669,6 +730,12 @@ FXlong FXSettings::readLongEntry(const FXchar* section,const FXchar* name,FXlong
 
 
 // Read a 64-bit long integer registry entry
+FXlong FXSettings::readLongEntry(const FXchar* section,const FXString& name,FXlong def) const {
+  return readLongEntry(section,name.text(),def);
+  }
+
+
+// Read a 64-bit long integer registry entry
 FXlong FXSettings::readLongEntry(const FXString& section,const FXchar* name,FXlong def) const {
   return readLongEntry(section.text(),name,def);
   }
@@ -684,6 +751,12 @@ FXlong FXSettings::readLongEntry(const FXString& section,const FXString& name,FX
 FXbool FXSettings::writeLongEntry(const FXchar* section,const FXchar* name,FXlong val){
   at(section).at(name,true).fromLong(val);
   return true;
+  }
+
+
+// Write a 64-bit long integer registry entry
+FXbool FXSettings::writeLongEntry(const FXchar* section,const FXString& name,FXlong val){
+  return writeLongEntry(section,name.text(),val);
   }
 
 
@@ -713,6 +786,12 @@ FXulong FXSettings::readULongEntry(const FXchar* section,const FXchar* name,FXul
 
 
 // Read a 64-bit unsigned long integer registry entry
+FXulong FXSettings::readULongEntry(const FXchar* section,const FXString& name,FXulong def) const {
+  return readULongEntry(section,name.text(),def);
+  }
+
+
+// Read a 64-bit unsigned long integer registry entry
 FXulong FXSettings::readULongEntry(const FXString& section,const FXchar* name,FXulong def) const {
   return readULongEntry(section.text(),name,def);
   }
@@ -728,6 +807,12 @@ FXulong FXSettings::readULongEntry(const FXString& section,const FXString& name,
 FXbool FXSettings::writeULongEntry(const FXchar* section,const FXchar* name,FXulong val){
   at(section).at(name,true).fromULong(val);
   return true;
+  }
+
+
+// Write a 64-bit long integer registry entry
+FXbool FXSettings::writeULongEntry(const FXchar* section,const FXString& name,FXulong val){
+  return writeULongEntry(section,name.text(),val);
   }
 
 
@@ -755,6 +840,13 @@ FXdouble FXSettings::readRealEntry(const FXchar* section,const FXchar* name,FXdo
   return def;
   }
 
+
+// Read a double-valued registry entry
+FXdouble FXSettings::readRealEntry(const FXchar* section,const FXString& name,FXdouble def) const {
+  return readRealEntry(section,name.text(),def);
+  }
+
+
 // Read a double-valued registry entry
 FXdouble FXSettings::readRealEntry(const FXString& section,const FXchar* name,FXdouble def) const {
   return readRealEntry(section.text(),name,def);
@@ -771,6 +863,12 @@ FXdouble FXSettings::readRealEntry(const FXString& section,const FXString& name,
 FXbool FXSettings::writeRealEntry(const FXchar* section,const FXchar* name,FXdouble val){
   at(section).at(name,true).fromDouble(val,16,2);
   return true;
+  }
+
+
+// Write a double-valued registry entry
+FXbool FXSettings::writeRealEntry(const FXchar* section,const FXString& name,FXdouble val){
+  return writeRealEntry(section,name.text(),val);
   }
 
 
@@ -797,6 +895,12 @@ FXColor FXSettings::readColorEntry(const FXchar* section,const FXchar* name,FXCo
 
 
 // Read a color registry entry
+FXColor FXSettings::readColorEntry(const FXchar* section,const FXString& name,FXColor def) const {
+  return readColorEntry(section,name.text(),def);
+  }
+
+
+// Read a color registry entry
 FXColor FXSettings::readColorEntry(const FXString& section,const FXchar* name,FXColor def) const {
   return readColorEntry(section.text(),name,def);
   }
@@ -812,6 +916,12 @@ FXColor FXSettings::readColorEntry(const FXString& section,const FXString& name,
 FXbool FXSettings::writeColorEntry(const FXchar* section,const FXchar* name,FXColor val){
   at(section).at(name,true)=nameFromColor(val);
   return true;
+  }
+
+
+// Write a color registry entry
+FXbool FXSettings::writeColorEntry(const FXchar* section,const FXString& name,FXColor val){
+  return writeColorEntry(section,name.text(),val);
   }
 
 
@@ -845,6 +955,12 @@ FXbool FXSettings::readBoolEntry(const FXchar* section,const FXchar* name,FXbool
 
 
 // Read a boolean registry entry
+FXbool FXSettings::readBoolEntry(const FXchar* section,const FXString& name,FXbool def) const {
+  return readBoolEntry(section,name.text(),def);
+  }
+
+
+// Read a boolean registry entry
 FXbool FXSettings::readBoolEntry(const FXString& section,const FXchar* name,FXbool def) const {
   return readBoolEntry(section.text(),name,def);
   }
@@ -864,6 +980,12 @@ FXbool FXSettings::writeBoolEntry(const FXchar* section,const FXchar* name,FXboo
 
 
 // Write a boolean registry entry
+FXbool FXSettings::writeBoolEntry(const FXchar* section,const FXString& name,FXbool val){
+  return writeBoolEntry(section,name.text(),val);
+  }
+
+
+// Write a boolean registry entry
 FXbool FXSettings::writeBoolEntry(const FXString& section,const FXchar* name,FXbool val){
   return writeBoolEntry(section.text(),name,val);
   }
@@ -878,6 +1000,12 @@ FXbool FXSettings::writeBoolEntry(const FXString& section,const FXString& name,F
 // See if entry exists
 FXbool FXSettings::existingEntry(const FXchar* section,const FXchar* name) const {
   return 0<=at(section).find(name);
+  }
+
+
+// See if entry exists
+FXbool FXSettings::existingEntry(const FXchar* section,const FXString& name) const {
+  return existingEntry(section,name.text());
   }
 
 
@@ -908,6 +1036,12 @@ FXbool FXSettings::existingSection(const FXString& section) const {
 // Delete a registry entry
 void FXSettings::deleteEntry(const FXchar* section,const FXchar* name){
   at(section).remove(name);
+  }
+
+
+// Delete a registry entry
+void FXSettings::deleteEntry(const FXchar* section,const FXString& name){
+  deleteEntry(section,name.text());
   }
 
 

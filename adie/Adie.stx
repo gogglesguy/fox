@@ -1436,7 +1436,7 @@ language "JavaScript"
       style   "fuchsia"
     end
     rule "ControlEscape"
-      pattern "\\[0'\"\\nrvtbf]"
+      pattern "\\[0'\"\\anrvtbf]"
       style   "fuchsia"
     end
   end
@@ -1456,7 +1456,7 @@ language "JavaScript"
       style   "fuchsia"
     end
     rule "ControlEscape"
-      pattern "\\[0'\"\\nrvtbf]"
+      pattern "\\[0'\"\\anrvtbf]"
       style   "fuchsia"
     end
   end

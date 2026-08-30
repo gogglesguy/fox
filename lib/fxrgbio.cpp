@@ -184,160 +184,167 @@ static void rgbatorgba(FXColor *l,const FXuchar *r,const FXuchar *g,const FXucha
 
 // Check if stream contains a RGB
 FXbool fxcheckRGB(FXStream& store){
-  FXuchar signature[2];
-  store.load(signature,2);
-  store.position(-2,FXFromCurrent);
-  return signature[0]==0x01 && signature[1]==0xDA;
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[2];
+    store.load(signature,2);
+    store.position(-2,FXFromCurrent);
+    return signature[0]==0x01 && signature[1]==0xDA;
+    }
+  return false;
   }
 
 
 // Load image from stream
 FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXlong   base=store.position();
-  FXbool   swap=store.swapBytes();
-  FXbool   result=false;
-  FXushort magic;
-  FXuchar  storage;
-  FXuchar  bpc;
-  FXushort dimension;
-  FXushort w;
-  FXushort h;
-  FXushort channels;
-  FXuint   maxpix;
-  FXuint   minpix;
-  FXuint   dummy;
-  FXchar   name[80];
-  FXuint   colormap;
+  FXbool result=false;
 
   // Null out
   data=nullptr;
   width=0;
   height=0;
 
-  // Remember swap state
-  store.setBigEndian(true);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXlong   base=store.position();
+    FXbool   swap=store.swapBytes();
+    FXushort magic;
+    FXuchar  storage;
+    FXuchar  bpc;
+    FXushort dimension;
+    FXushort w;
+    FXushort h;
+    FXushort channels;
+    FXuint   maxpix;
+    FXuint   minpix;
+    FXuint   dummy;
+    FXchar   name[80];
+    FXuint   colormap;
 
-  // Load header
-  store >> magic;       // MAGIC (2)
-  store >> storage;     // STORAGE (1)
-  store >> bpc;         // BPC (1)
-  store >> dimension;   // DIMENSION (2)
-  store >> w;           // XSIZE (2)
-  store >> h;           // YSIZE (2)
-  store >> channels;    // ZSIZE (2)
-  store >> minpix;      // PIXMIN (4)
-  store >> maxpix;      // PIXMAX (4)
-  store >> dummy;       // DUMMY (4)
-  store.load(name,80);  // IMAGENAME (80)
-  store >> colormap;    // Colormap ID (4)
+    // Remember swap state
+    store.setBigEndian(true);
 
-  FXTRACE(TOPIC_DETAIL,"fxloadRGB: magic=%d name=%s width=%d height=%d nchannels=%d dimension=%d storage=%d bpc=%d\n",magic,name,w,h,channels,dimension,storage,bpc);
+    // Load header
+    store >> magic;       // MAGIC (2)
+    store >> storage;     // STORAGE (1)
+    store >> bpc;         // BPC (1)
+    store >> dimension;   // DIMENSION (2)
+    store >> w;           // XSIZE (2)
+    store >> h;           // YSIZE (2)
+    store >> channels;    // ZSIZE (2)
+    store >> minpix;      // PIXMIN (4)
+    store >> maxpix;      // PIXMAX (4)
+    store >> dummy;       // DUMMY (4)
+    store.load(name,80);  // IMAGENAME (80)
+    store >> colormap;    // Colormap ID (4)
 
-  // Check magic number and other parameters
-  if(magic==474 && 1<=channels && channels<=4 && bpc==1 && 0<w && 0<h){
-    FXint tablen=h*channels;    // Number of chunk start/chunk length table entries
-    FXint size=w*h;             // Total number of pixels
-    FXint total=channels*size;  // Total number of samples
-    FXuchar *planar;
+    FXTRACE(TOPIC_DETAIL,"fxloadRGB: magic=%d name=%s width=%d height=%d nchannels=%d dimension=%d storage=%d bpc=%d\n",magic,name,w,h,channels,dimension,storage,bpc);
 
-    // Skip to data
-    store.position(404,FXFromCurrent);
+    // Check magic number and other parameters
+    if(magic==474 && 1<=channels && channels<=4 && bpc==1 && 0<w && 0<h){
+      FXint tablen=h*channels;    // Number of chunk start/chunk length table entries
+      FXint size=w*h;             // Total number of pixels
+      FXint total=channels*size;  // Total number of samples
+      FXuchar *planar;
 
-    // Allocate planar array
-    if(allocElms(planar,total)){
+      // Skip to data
+      store.position(404,FXFromCurrent);
 
-      // Allocate image data
-      if(allocElms(data,size)){
-        FXint i,j,k;
+      // Allocate planar array
+      if(allocElms(planar,total)){
 
-        // Set width and height
-        width=w;
-        height=h;
+        // Allocate image data
+        if(allocElms(data,size)){
+          FXint i,j,k;
 
-        // Compressed
-        if(storage){
-          FXuint *starttab;
-          FXuint *lengthtab;
+          // Set width and height
+          width=w;
+          height=h;
 
-          // Allocate line tables
-          if(allocElms(starttab,tablen<<1)){
-            lengthtab=&starttab[tablen];
+          // Compressed
+          if(storage){
+            FXuint *starttab;
+            FXuint *lengthtab;
 
-            // Read line tables
-            store.load(starttab,tablen);
-            store.load(lengthtab,tablen);
+            // Allocate line tables
+            if(allocElms(starttab,tablen<<1)){
+              lengthtab=&starttab[tablen];
 
-            // Offset of RLE chunks in the file
-            FXuint sub=store.position()-base;
-            FXuint chunklen=0;
-            FXuchar *chunk;
+              // Read line tables
+              store.load(starttab,tablen);
+              store.load(lengthtab,tablen);
 
-            // Fix up the line table & figure space for RLE chunks
-            // Intelligent RGB writers (not ours ;-)) may re-use RLE
-            // chunks for more than 1 line...
-            for(i=0; i<tablen; i++){
-              starttab[i]-=sub;
-              chunklen=FXMAX(chunklen,(starttab[i]+lengthtab[i]));
-              }
+              // Offset of RLE chunks in the file
+              FXuint sub=store.position()-base;
+              FXuint chunklen=0;
+              FXuchar *chunk;
 
-            // Make room for the compressed lines
-            if(allocElms(chunk,chunklen)){
-
-              // Load all RLE chunks in one fell swoop
-              store.load(chunk,chunklen);
-
-              // Decompress chunks into planar
-              for(k=0; k<tablen; ++k){
-                expand(&planar[k*width],width,&chunk[starttab[k]],lengthtab[k]);
+              // Fix up the line table & figure space for RLE chunks
+              // Intelligent RGB writers (not ours ;-)) may re-use RLE
+              // chunks for more than 1 line...
+              for(i=0; i<tablen; i++){
+                starttab[i]-=sub;
+                chunklen=FXMAX(chunklen,(starttab[i]+lengthtab[i]));
                 }
 
-              // Free RLE chunks
-              freeElms(chunk);
-              }
+              // Make room for the compressed lines
+              if(allocElms(chunk,chunklen)){
 
-            // Free line tables
-            freeElms(starttab);
+                // Load all RLE chunks in one fell swoop
+                store.load(chunk,chunklen);
+
+                // Decompress chunks into planar
+                for(k=0; k<tablen; ++k){
+                  expand(&planar[k*width],width,&chunk[starttab[k]],lengthtab[k]);
+                  }
+
+                // Free RLE chunks
+                freeElms(chunk);
+                }
+
+              // Free line tables
+              freeElms(starttab);
+              }
             }
-          }
 
-        // Uncompressed
-        else{
-          store.load(planar,total);
-          }
+          // Uncompressed
+          else{
+            store.load(planar,total);
+            }
 
-        // Combine the channels properly
-        switch(channels){
-          case 1:
-            for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
-              bwtorgba(&data[i],&planar[j],width);
-              }
-            break;
-          case 2:
-            for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
-              latorgba(&data[i],&planar[j],&planar[j+size],width);
-              }
-            break;
-          case 3:
-            for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
-              rgbtorgba(&data[i],&planar[j],&planar[j+size],&planar[j+size+size],width);
-              }
-            break;
-          case 4:
-            for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
-              rgbatorgba(&data[i],&planar[j],&planar[j+size],&planar[j+size+size],&planar[j+size+size+size],width);
-              }
-            break;
-          }
+          // Combine the channels properly
+          switch(channels){
+            case 1:
+              for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
+                bwtorgba(&data[i],&planar[j],width);
+                }
+              break;
+            case 2:
+              for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
+                latorgba(&data[i],&planar[j],&planar[j+size],width);
+                }
+              break;
+            case 3:
+              for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
+                rgbtorgba(&data[i],&planar[j],&planar[j+size],&planar[j+size+size],width);
+                }
+              break;
+            case 4:
+              for(i=0,j=(height-1)*width; 0<=j; i+=width,j-=width){
+                rgbatorgba(&data[i],&planar[j],&planar[j+size],&planar[j+size+size],&planar[j+size+size+size],width);
+                }
+              break;
+            }
 
-        // We're good
-        result=true;
+          // We're good
+          result=true;
+          }
+        freeElms(planar);
         }
-      freeElms(planar);
       }
-    }
 
-  // Reset swap status
-  store.swapBytes(swap);
+    // Reset swap status
+    store.swapBytes(swap);
+    }
   return result;
   }
 
@@ -347,69 +354,73 @@ FXbool fxloadRGB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 // Save a bmp file to a stream
 FXbool fxsaveRGB(FXStream& store,const FXColor *data,FXint width,FXint height){
-  FXushort magic=474;
-  FXuchar  storage=0;
-  FXuchar  bpc=1;
-  FXushort dimension=3;
-  FXushort w=width;
-  FXushort h=height;
-  FXushort channels=3;
-  FXuint   maxpix=255;
-  FXuint   minpix=0;
-  FXuint   dummy=0;
-  FXuint   colormap=0;
-  FXint    size=width*height;
-  FXuchar  temp[512];
-  FXuchar *array;
-  FXint    i,j,k;
-  FXbool   swap;
 
-  // Must make sense
-  if(data && 0<width && 0<height){
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-    // Reorganize in planes
-    if(allocElms(array,size*channels)){
+    // Must make sense
+    if(data && 0<width && 0<height){
+      FXushort magic=474;
+      FXuchar  storage=0;
+      FXuchar  bpc=1;
+      FXushort dimension=3;
+      FXushort w=width;
+      FXushort h=height;
+      FXushort channels=3;
+      FXuint   maxpix=255;
+      FXuint   minpix=0;
+      FXuint   dummy=0;
+      FXuint   colormap=0;
+      FXint    size=width*height;
+      FXuchar  temp[512];
+      FXuchar *array;
+      FXint    i,j,k;
+      FXbool   swap;
 
-      // Remember swap state
-      swap=store.swapBytes();
-      store.setBigEndian(true);
+      // Reorganize in planes
+      if(allocElms(array,size*channels)){
 
-      // Save header
-      store << magic;             // MAGIC (2)
-      store << storage;           // STORAGE (1)
-      store << bpc;               // BPC (1)
-      store << dimension;         // DIMENSION (2)
-      store << w;                 // XSIZE (2)
-      store << h;                 // YSIZE (2)
-      store << channels;          // ZSIZE (2)
-      store << minpix;            // PIXMIN (4)
-      store << maxpix;            // PIXMAX (4)
-      store << dummy;             // DUMMY (4)
-      clearElms(temp,80);         // Clean it
-      copyElms(temp,"IRIS RGB",8);// Write name
-      store.save(temp,80);        // IMAGENAME (80)
-      store << colormap;          // COLORMAP (4)
-      clearElms(temp,404);        // Clean it
-      store.save(temp,404);       // DUMMY (404)
+        // Remember swap state
+        swap=store.swapBytes();
+        store.setBigEndian(true);
 
-      // Copy
-      for(j=height-1,k=0; j>=0; --j){
-        for(i=0; i<width; ++i,++k){
-          array[j*width+i]=((const FXuchar*)&data[k])[2];
-          array[j*width+i+size]=((const FXuchar*)&data[k])[1];
-          array[j*width+i+size+size]=((const FXuchar*)&data[k])[0];
+        // Save header
+        store << magic;             // MAGIC (2)
+        store << storage;           // STORAGE (1)
+        store << bpc;               // BPC (1)
+        store << dimension;         // DIMENSION (2)
+        store << w;                 // XSIZE (2)
+        store << h;                 // YSIZE (2)
+        store << channels;          // ZSIZE (2)
+        store << minpix;            // PIXMIN (4)
+        store << maxpix;            // PIXMAX (4)
+        store << dummy;             // DUMMY (4)
+        clearElms(temp,80);         // Clean it
+        copyElms(temp,"IRIS RGB",8);// Write name
+        store.save(temp,80);        // IMAGENAME (80)
+        store << colormap;          // COLORMAP (4)
+        clearElms(temp,404);        // Clean it
+        store.save(temp,404);       // DUMMY (404)
+
+        // Copy
+        for(j=height-1,k=0; j>=0; --j){
+          for(i=0; i<width; ++i,++k){
+            array[j*width+i]=((const FXuchar*)&data[k])[2];
+            array[j*width+i+size]=((const FXuchar*)&data[k])[1];
+            array[j*width+i+size+size]=((const FXuchar*)&data[k])[0];
+            }
           }
+
+        // Save it
+        store.save(array,size*channels);
+
+        // Clean up temp memory
+        freeElms(array);
+
+        // Reset swap status
+        store.swapBytes(swap);
+        return true;
         }
-
-      // Save it
-      store.save(array,size*channels);
-
-      // Clean up temp memory
-      freeElms(array);
-
-      // Reset swap status
-      store.swapBytes(swap);
-      return true;
       }
     }
   return false;

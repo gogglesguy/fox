@@ -321,10 +321,13 @@ struct Context {
 
 // Check if stream represents windows executable
 FXbool fxcheckEXE(FXStream& store){
-  FXuchar ss[2];
-  store.load(ss,2);
-  store.position(-2,FXFromCurrent);
-  return ss[0]=='M' && ss[1]=='Z';
+  if(store.direction()==FXStreamLoad){
+    FXuchar ss[2];
+    store.load(ss,2);
+    store.position(-2,FXFromCurrent);
+    return ss[0]=='M' && ss[1]=='Z';
+    }
+  return false;
   }
 
 
@@ -436,141 +439,144 @@ FXbool fxloadEXE(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   width=0;
   height=0;
 
-  // Loading other than these is not gonna work
-  if(type==RST_BITMAP || type==RST_ICON){
-    FXbool swap=store.swapBytes();
-    ImageDosHeader dos;
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
 
-    // Bitmaps are little-endian
-    store.setBigEndian(false);
+    // Loading other than these is not gonna work
+    if(type==RST_BITMAP || type==RST_ICON){
+      FXbool swap=store.swapBytes();
 
-    // Load DOS header
-    store >> dos.magic;                  // must contain "MZ"
-    store >> dos.cblp;                   // number of bytes on the last page of the file
-    store >> dos.cp;                     // number of pages in file
-    store >> dos.crlc;                   // relocations
-    store >> dos.cparhdr;                // size of the header in paragraphs
-    store >> dos.minalloc;               // minimum and maximum paragraphs to allocate
-    store >> dos.maxalloc;
-    store >> dos.ss;                     // initial SS:SP to set by Loader
-    store >> dos.sp;
-    store >> dos.csum;                   // checksum
-    store >> dos.ip;                     // initial CS:IP
-    store >> dos.cs;
-    store >> dos.lfarlc;                 // address of relocation table
-    store >> dos.ovno;                   // overlay number
-    store.load(dos.res,4);
-    store >> dos.oemid;                  // OEM id
-    store >> dos.oeminfo;                // OEM info
-    store.load(dos.res2,10);
-    store >> dos.lfanew;                 // address of new EXE header
+      // Bitmaps are little-endian
+      store.setBigEndian(false);
 
-    FXTRACE(TOPIC_DETAIL,"dos.magic: %#04x\n",dos.magic);
-    FXTRACE(TOPIC_DETAIL,"dos.cblp: %d\n",dos.cblp);
-    FXTRACE(TOPIC_DETAIL,"dos.cp: %d\n",dos.cp);
-    FXTRACE(TOPIC_DETAIL,"dos.crlc: %d\n",dos.crlc);
-    FXTRACE(TOPIC_DETAIL,"dos.cparhdr: %d\n",dos.cparhdr);
-    FXTRACE(TOPIC_DETAIL,"dos.minalloc: %d\n",dos.minalloc);
-    FXTRACE(TOPIC_DETAIL,"dos.maxalloc: %d\n",dos.maxalloc);
-    FXTRACE(TOPIC_DETAIL,"dos.ss: %d\n",dos.ss);
-    FXTRACE(TOPIC_DETAIL,"dos.sp: %d\n",dos.sp);
-    FXTRACE(TOPIC_DETAIL,"dos.csum: %d\n",dos.csum);
-    FXTRACE(TOPIC_DETAIL,"dos.ip: %d\n",dos.ip);
-    FXTRACE(TOPIC_DETAIL,"dos.cs: %d\n",dos.cs);
-    FXTRACE(TOPIC_DETAIL,"dos.lfarlc: %d\n",dos.lfarlc);
-    FXTRACE(TOPIC_DETAIL,"dos.oemid: %d\n",dos.oemid);
-    FXTRACE(TOPIC_DETAIL,"dos.oeminfo: %d\n",dos.oeminfo);
-    FXTRACE(TOPIC_DETAIL,"dos.lfanew: %d\n\n",dos.lfanew);
+      // Load DOS header
+      ImageDosHeader dos;
+      store >> dos.magic;                  // must contain "MZ"
+      store >> dos.cblp;                   // number of bytes on the last page of the file
+      store >> dos.cp;                     // number of pages in file
+      store >> dos.crlc;                   // relocations
+      store >> dos.cparhdr;                // size of the header in paragraphs
+      store >> dos.minalloc;               // minimum and maximum paragraphs to allocate
+      store >> dos.maxalloc;
+      store >> dos.ss;                     // initial SS:SP to set by Loader
+      store >> dos.sp;
+      store >> dos.csum;                   // checksum
+      store >> dos.ip;                     // initial CS:IP
+      store >> dos.cs;
+      store >> dos.lfarlc;                 // address of relocation table
+      store >> dos.ovno;                   // overlay number
+      store.load(dos.res,4);
+      store >> dos.oemid;                  // OEM id
+      store >> dos.oeminfo;                // OEM info
+      store.load(dos.res2,10);
+      store >> dos.lfanew;                 // address of new EXE header
 
-    // Expect MZ
-    if((dos.magic==IMAGE_DOS_SIGNATURE) && !store.eof()){
-      ImageNTHeader nt;
+      FXTRACE(TOPIC_DETAIL,"dos.magic: %#04x\n",dos.magic);
+      FXTRACE(TOPIC_DETAIL,"dos.cblp: %d\n",dos.cblp);
+      FXTRACE(TOPIC_DETAIL,"dos.cp: %d\n",dos.cp);
+      FXTRACE(TOPIC_DETAIL,"dos.crlc: %d\n",dos.crlc);
+      FXTRACE(TOPIC_DETAIL,"dos.cparhdr: %d\n",dos.cparhdr);
+      FXTRACE(TOPIC_DETAIL,"dos.minalloc: %d\n",dos.minalloc);
+      FXTRACE(TOPIC_DETAIL,"dos.maxalloc: %d\n",dos.maxalloc);
+      FXTRACE(TOPIC_DETAIL,"dos.ss: %d\n",dos.ss);
+      FXTRACE(TOPIC_DETAIL,"dos.sp: %d\n",dos.sp);
+      FXTRACE(TOPIC_DETAIL,"dos.csum: %d\n",dos.csum);
+      FXTRACE(TOPIC_DETAIL,"dos.ip: %d\n",dos.ip);
+      FXTRACE(TOPIC_DETAIL,"dos.cs: %d\n",dos.cs);
+      FXTRACE(TOPIC_DETAIL,"dos.lfarlc: %d\n",dos.lfarlc);
+      FXTRACE(TOPIC_DETAIL,"dos.oemid: %d\n",dos.oemid);
+      FXTRACE(TOPIC_DETAIL,"dos.oeminfo: %d\n",dos.oeminfo);
+      FXTRACE(TOPIC_DETAIL,"dos.lfanew: %d\n\n",dos.lfanew);
 
-      // Skip to NT header
-      store.position(dos.lfanew);
+      // Expect MZ
+      if((dos.magic==IMAGE_DOS_SIGNATURE) && !store.eof()){
+        ImageNTHeader nt;
 
-      // File header
-      store >> nt.signature;
-      store >> nt.fileHeader.machine;
-      store >> nt.fileHeader.numberOfSections;            // Number of sections in section table
-      store >> nt.fileHeader.timeDateStamp;               // Date and time of program link
-      store >> nt.fileHeader.pointerToSymbolTable;        // RVA of symbol table
-      store >> nt.fileHeader.numberOfSymbols;             // Number of symbols in table
-      store >> nt.fileHeader.sizeOfOptionalHeader;        // Size of IMAGE_OPTIONAL_HEADER in bytes
-      store >> nt.fileHeader.characteristics;
+        // Skip to NT header
+        store.position(dos.lfanew);
 
-      // Dump NT header
-      FXTRACE(TOPIC_DETAIL,"nt.signature: %#04x\n",nt.signature);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.machine: %4x\n",nt.fileHeader.machine);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSections: %u\n",nt.fileHeader.numberOfSections);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.timeDateStamp: %u\n",nt.fileHeader.timeDateStamp);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.pointerToSymbolTable: %u\n",nt.fileHeader.pointerToSymbolTable);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSymbols: %u\n",nt.fileHeader.numberOfSymbols);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.sizeOfOptionalHeader: %u\n",nt.fileHeader.sizeOfOptionalHeader);
-      FXTRACE(TOPIC_DETAIL,"nt.fileHeader.characteristics: %#04x\n\n",nt.fileHeader.characteristics);
+        // File header
+        store >> nt.signature;
+        store >> nt.fileHeader.machine;
+        store >> nt.fileHeader.numberOfSections;            // Number of sections in section table
+        store >> nt.fileHeader.timeDateStamp;               // Date and time of program link
+        store >> nt.fileHeader.pointerToSymbolTable;        // RVA of symbol table
+        store >> nt.fileHeader.numberOfSymbols;             // Number of symbols in table
+        store >> nt.fileHeader.sizeOfOptionalHeader;        // Size of IMAGE_OPTIONAL_HEADER in bytes
+        store >> nt.fileHeader.characteristics;
 
-      // Check NT signature
-      if((nt.signature==IMAGE_NT_SIGNATURE) && !store.eof()){
-        FXushort optionalheadermagic;
+        // Dump NT header
+        FXTRACE(TOPIC_DETAIL,"nt.signature: %#04x\n",nt.signature);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.machine: %4x\n",nt.fileHeader.machine);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSections: %u\n",nt.fileHeader.numberOfSections);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.timeDateStamp: %u\n",nt.fileHeader.timeDateStamp);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.pointerToSymbolTable: %u\n",nt.fileHeader.pointerToSymbolTable);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.numberOfSymbols: %u\n",nt.fileHeader.numberOfSymbols);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.sizeOfOptionalHeader: %u\n",nt.fileHeader.sizeOfOptionalHeader);
+        FXTRACE(TOPIC_DETAIL,"nt.fileHeader.characteristics: %#04x\n\n",nt.fileHeader.characteristics);
 
-        // Start of optional header here
-        FXlong optbase=store.position();
+        // Check NT signature
+        if((nt.signature==IMAGE_NT_SIGNATURE) && !store.eof()){
+          FXushort optionalheadermagic;
 
-        // Read magic number
-        store >> optionalheadermagic;
+          // Start of optional header here
+          FXlong optbase=store.position();
 
-        // Check if its PE or PE+
-        if((optionalheadermagic==IMAGE_NT_OPTIONAL_HDR32_MAGIC || optionalheadermagic==IMAGE_NT_OPTIONAL_HDR64_MAGIC) && !store.eof()){
-          ImageSectionHeader sec;
+          // Read magic number
+          store >> optionalheadermagic;
 
-          // Skip over to section headers
-          store.position(optbase+nt.fileHeader.sizeOfOptionalHeader);
+          // Check if its PE or PE+
+          if((optionalheadermagic==IMAGE_NT_OPTIONAL_HDR32_MAGIC || optionalheadermagic==IMAGE_NT_OPTIONAL_HDR64_MAGIC) && !store.eof()){
+            ImageSectionHeader sec;
 
-          // Hunt for the .rsrc section now
-          for(FXint s=0; s<nt.fileHeader.numberOfSections; ++s){
+            // Skip over to section headers
+            store.position(optbase+nt.fileHeader.sizeOfOptionalHeader);
 
-            // Load section header info
-            store.load(sec.name,sizeof(sec.name));
-            store >> sec.virtualSize;
-            store >> sec.virtualAddress;
-            store >> sec.sizeOfRawData;
-            store >> sec.pointerToRawData;
-            store >> sec.pointerToRelocations;
-            store >> sec.pointerToLinenumbers;
-            store >> sec.numberOfRelocations;
-            store >> sec.numberOfLinenumbers;
-            store >> sec.characteristics;
+            // Hunt for the .rsrc section now
+            for(FXint s=0; s<nt.fileHeader.numberOfSections; ++s){
 
-            // Bail if at end
-            if(store.eof()) break;
+              // Load section header info
+              store.load(sec.name,sizeof(sec.name));
+              store >> sec.virtualSize;
+              store >> sec.virtualAddress;
+              store >> sec.sizeOfRawData;
+              store >> sec.pointerToRawData;
+              store >> sec.pointerToRelocations;
+              store >> sec.pointerToLinenumbers;
+              store >> sec.numberOfRelocations;
+              store >> sec.numberOfLinenumbers;
+              store >> sec.characteristics;
 
-            FXTRACE(TOPIC_DETAIL,"sec%d.name: %.8s\n",s,sec.name);
-            FXTRACE(TOPIC_DETAIL,"sec%d.virtualSize: %u\n",s,sec.virtualSize);
-            FXTRACE(TOPIC_DETAIL,"sec%d.virtualAddress: %u\n",s,sec.virtualAddress);
-            FXTRACE(TOPIC_DETAIL,"sec%d.sizeOfRawData: %u\n",s,sec.sizeOfRawData);
-            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData);
-            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRelocations: %u\n",s,sec.pointerToRelocations);
-            FXTRACE(TOPIC_DETAIL,"sec%d.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers);
-            FXTRACE(TOPIC_DETAIL,"sec%d.numberOfRelocations: %u\n",s,sec.numberOfRelocations);
-            FXTRACE(TOPIC_DETAIL,"sec%d.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers);
-            FXTRACE(TOPIC_DETAIL,"sec%d.characteristics: %#08x\n\n",s,sec.characteristics);
+              // Bail if at end
+              if(store.eof()) break;
 
-            // Found the resource section in the pe file
-            if(FXString::compare(sec.name,".rsrc")==0){
-              Context context={sec.pointerToRawData,sec.virtualAddress,sec.sizeOfRawData,{type,id,-1}};
+              FXTRACE(TOPIC_DETAIL,"sec%d.name: %.8s\n",s,sec.name);
+              FXTRACE(TOPIC_DETAIL,"sec%d.virtualSize: %u\n",s,sec.virtualSize);
+              FXTRACE(TOPIC_DETAIL,"sec%d.virtualAddress: %u\n",s,sec.virtualAddress);
+              FXTRACE(TOPIC_DETAIL,"sec%d.sizeOfRawData: %u\n",s,sec.sizeOfRawData);
+              FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRawData: %u (%#08x)\n",s,sec.pointerToRawData,sec.pointerToRawData);
+              FXTRACE(TOPIC_DETAIL,"sec%d.pointerToRelocations: %u\n",s,sec.pointerToRelocations);
+              FXTRACE(TOPIC_DETAIL,"sec%d.pointerToLinenumbers: %u\n",s,sec.pointerToLinenumbers);
+              FXTRACE(TOPIC_DETAIL,"sec%d.numberOfRelocations: %u\n",s,sec.numberOfRelocations);
+              FXTRACE(TOPIC_DETAIL,"sec%d.numberOfLinenumbers: %u\n",s,sec.numberOfLinenumbers);
+              FXTRACE(TOPIC_DETAIL,"sec%d.characteristics: %#08x\n\n",s,sec.characteristics);
 
-              // Scan resources in resource section
-              result=scanresources(store,data,width,height,context,sec.pointerToRawData,0);
-              break;
+              // Found the resource section in the pe file
+              if(FXString::compare(sec.name,".rsrc")==0){
+                Context context={sec.pointerToRawData,sec.virtualAddress,sec.sizeOfRawData,{type,id,-1}};
+
+                // Scan resources in resource section
+                result=scanresources(store,data,width,height,context,sec.pointerToRawData,0);
+                break;
+                }
               }
             }
           }
         }
+      store.swapBytes(swap);
       }
-    store.swapBytes(swap);
     }
   return result;
   }
-
 
 }

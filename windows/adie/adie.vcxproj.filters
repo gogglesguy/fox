@@ -97,6 +97,9 @@
     <ClCompile Include="..\..\adie\ShellDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\adie\ReplaceInFiles.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\adie\adie_gif.gif">

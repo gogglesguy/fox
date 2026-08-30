@@ -6086,7 +6086,7 @@ long FXText::onCmdGotoMatching(FXObject*,FXSelector,void*){
 long FXText::onCmdCursorPos(FXObject* sender,FXSelector,void*){
   FXint pos=cursorpos;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&pos);
-  setCursorPos(pos,true);
+  moveCursor(pos,true);
   return 1;
   }
 
@@ -6102,7 +6102,7 @@ long FXText::onUpdCursorPos(FXObject* sender,FXSelector,void*){
 long FXText::onCmdCursorRow(FXObject* sender,FXSelector,void*){
   FXint row=cursorrow+1;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&row);
-  setCursorRow(row-1,true);
+  moveCursorRowColumn(row-1,cursorcol,true);
   return 1;
   }
 
@@ -6119,7 +6119,7 @@ long FXText::onUpdCursorRow(FXObject* sender,FXSelector,void*){
 long FXText::onCmdCursorColumn(FXObject* sender,FXSelector,void*){
   FXint col=cursorcol;
   sender->handle(this,FXSEL(SEL_COMMAND,ID_GETINTVALUE),(void*)&col);
-  setCursorColumn(col,true);
+  moveCursorRowColumn(cursorrow,col,true);
   return 1;
   }
 

@@ -346,6 +346,41 @@ static inline FXulong sar64(FXulong value,FXulong count){
   }
 
 
+/// Build bit-mask of n-bits
+static inline FXuint msk32(FXuint bits){
+  return shl32(1,bits)-1;
+  }
+
+/// Build bit-mask of n-bits
+static inline FXulong msk64(FXulong bits){
+  return shl64(1,bits)-1;
+  }
+
+
+/// Test if x is power of two
+static inline FXbool isPowerOf2(FXuint x){
+  return (x&(x-1))==0;
+  }
+
+/// Test if x is power of two
+static inline FXbool isPowerOf2(FXulong x){
+  return (x&(x-1))==0;
+  }
+
+
+///                p
+/// Calculate N = 2  such that N >= x
+static inline FXuint roundPowerOf2(FXuint x){
+  return shl32(1,clz32(x+x-1)^31);
+  }
+
+///                p
+/// Calculate N = 2  such that N >= x
+static inline FXulong roundPowerOf2(FXulong x){
+  return shl64(1,clz64(x+x+1)^63);
+  }
+
+
 /// Saturation int to unsigned char
 static inline FXuchar usatb(FXint x){
   x&=~sar32(x,31); x|=sar32(0xff-x,31);

@@ -98,6 +98,13 @@ public:
   static FXint listFiles(FXString*& filelist,const FXString& path,const FXString& pattern="*",FXuint flags=FXDir::MatchAll);
 
   /**
+  * Remove files in a given directory.
+  * Remove files matching the given pattern and flag conditions.
+  * Be carefull, this can delete a lot of files and directories!
+  */
+  static FXint removeFiles(const FXString& path,const FXString& pattern="*",FXuint flags=FXDir::MatchAll);
+
+  /**
   * List drives, i.e. the roots of directory trees.
   * On Windows, this returns an array of strings like {"C:\", "D:\", ..., ""},
   * while on Unix it will be just a two-element list like {"/", ""}.

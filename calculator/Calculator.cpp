@@ -170,6 +170,8 @@ static const union{ FXulong u; FXdouble f; } dblnan={FXULONG(0x7fffffffffffffff)
 // Physics constants
 const FXdouble LIGHTSPEED=299792458.0;          // Light speed in vacuum (m/s)
 const FXdouble PLANCK=6.62607015E-34;           // Planck constant h, (J*s)
+const FXdouble ASTRONOMICALUNIT=149597870700.0; // Average distance earth to sun (m)
+const FXdouble LIGHTYEAR=9460730472580800.0;    // Light Year (m)
 
 const FXdouble MU0=1.25663706127E-6;            // Vacuum magnetic permeability (H/m)
 const FXdouble EPS0=8.8541878188E-12;           // Vacuum electric permittivity (F/m)
@@ -1666,7 +1668,7 @@ long Calculator::onUpdBase(FXObject* sender,FXSelector sel,void*){
 
 // Physical constant names
 static const FXchar *const physicslabel[6][4]={
-  {"c","h",FXString::null,FXString::null},
+  {"c","h","ly","au"},
   {"\xCE\xB5\xE2\x82\x80","\xCE\xBC\xE2\x82\x80","\xCE\x96\xE2\x82\x80","G"},
   {"eV","e",FXString::null,FXString::null},
   {"F","NA",FXString::null,FXString::null},
@@ -1677,7 +1679,7 @@ static const FXchar *const physicslabel[6][4]={
 
 // Physical constant tooltips
 static const FXchar *const physicstip[6][4]={
-  {"Lightspeed (m/s)","Plank (J*s)",FXString::null,FXString::null},
+  {"Lightspeed (m/s)","Plank (J*s)","Light year (m)","Astronomical Unit (m)"},
   {"Vacuum permittivity (F/m)","Vacuum permeability (H/m)","Vacuum impedance (Ohm)","Gravity (m^3/(kg*s^2))"},
   {"Electron volt (J)","Charge electron (C)",FXString::null,FXString::null},
   {"Faraday (C/mol)","Avogadro (1/mol)",FXString::null,FXString::null},
@@ -1688,7 +1690,7 @@ static const FXchar *const physicstip[6][4]={
 
 // Physical constant names values
 static const FXdouble physicsconst[6][4]={
-  {LIGHTSPEED,PLANCK,0.0,0.0},
+  {LIGHTSPEED,PLANCK,LIGHTYEAR,ASTRONOMICALUNIT},
   {EPS0,MU0,ZETA0,GRAVITY},
   {ELECTRONVOLT,ELECTRONCHARGE,0.0,0.0},
   {FARADAY,AVOGADRO,0.0,0.0},

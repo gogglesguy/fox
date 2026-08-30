@@ -46,11 +46,13 @@
     use the DDSD_LINEARSIZE and DDPF_FOURCC flags.
   - For a mipmapped texture, use the DDSD_MIPMAPCOUNT, DDSCAPS_MIPMAP, and DDSCAPS_COMPLEX flags also as
     well as the mipmap count member. If mipmaps are generated, all levels down to 1-by-1 are usually written.
+  - Some info: https://docs.microsoft.com/en-us/windows/win32/api/dxgiformat/ne-dxgiformat-dxgi_format,
+    and: https://docs.microsoft.com/en-us/windows/win32/direct3d10/d3d10-graphics-programming-guide-resources-legacy-formats.
+  - FIXME reader doesn't cover some (popular) bases yet.
+  - FIXME collect specifications of actual formats, any new ENUMs?
 */
 
 #define TOPIC_DETAIL 1017
-
-
 
 // Magic file header constant
 #define DDSD_MAGIC                   0x20534444
@@ -118,8 +120,12 @@
 #define D3DFMT_A2XY                  0x59583241         // A2XY
 #define D3DFMT_UYVY                  0x59565955         // UYVY format
 #define D3DFMT_YUY2                  0x32595559         // YUY2 format
-#define D3DFMT_R8G8_B8G8             0x47424752         // Pairs of pixels, [RG][BG] consecutive pixels share R and G (G0R0,G1B0, G2R2,G3B2) etc.
-#define D3DFMT_G8R8_G8B8             0x42475247         // Pairs of pixels, [GR][GB] consecutive pixels share R and B (R0G0,B0G1, R2G2,B2G3) etc.
+#define D3DFMT_BC4U                  0x59344342         // BC4U format
+#define D3DFMT_BC4S                  0x53344342         // BC4S format
+#define D3DFMT_BC5U                  0x59354342         // BC4U format
+#define D3DFMT_BC5S                  0x53354342         // BC4S format
+#define D3DFMT_R8G8_B8G8             0x47424752         // RGBG format Pairs of pixels, [RG][BG] consecutive pixels share R and G (G0R0,G1B0, G2R2,G3B2) etc.
+#define D3DFMT_G8R8_G8B8             0x42475247         // GRGB format Pairs of pixels, [GR][GB] consecutive pixels share R and B (R0G0,B0G1, R2G2,B2G3) etc.
 
 // DDSPixelFormat FOURCC constants (Floating point)
 #define D3DFMT_R16F                  111                // 16-bit float format using 16 bits for the red channel.
@@ -841,6 +847,73 @@ static FXbool dds_decompress_BC4(const DDSImage& dds,FXuchar *image){
   return true;
   }
 
+// Decompress BC4 (ATI1) image
+static FXbool dds_decompress_BC4_S(const DDSImage& dds,FXuchar *image){
+  FXuchar *temp=dds.data;
+  FXuint x,y,z,i,j,bits,offset;
+  FXint levels[8];
+
+  FXTRACE(TOPIC_DETAIL,"dds_decompress_BC4\n");
+
+  // Loop over 4x4 blocks
+  for(z=0; z<dds.header.dwDepth; z+=1){
+    for(y=0; y<dds.header.dwHeight; y+=4){
+      for(x=0; x<dds.header.dwWidth; x+=4){
+
+        // Grab two 8-bit grey levels
+        levels[0]=(FXschar)temp[0];
+        levels[1]=(FXschar)temp[1];
+
+        // Six interpolated grey levels
+        if(levels[0]>levels[1]){
+          levels[2]=(6*levels[0]+1*levels[1]+3)/7;
+          levels[3]=(5*levels[0]+2*levels[1]+3)/7;
+          levels[4]=(4*levels[0]+3*levels[1]+3)/7;
+          levels[5]=(3*levels[0]+4*levels[1]+3)/7;
+          levels[6]=(2*levels[0]+5*levels[1]+3)/7;
+          levels[7]=(1*levels[0]+6*levels[1]+3)/7;
+          }
+
+        // 4 interpolated grey levels
+        else{
+          levels[2]=(4*levels[0]+1*levels[1]+2)/5;
+          levels[3]=(3*levels[0]+2*levels[1]+2)/5;
+          levels[4]=(2*levels[0]+3*levels[1]+2)/5;
+          levels[5]=(1*levels[0]+4*levels[1]+2)/5;
+          levels[6]=-127;
+          levels[7]=127;
+          }
+
+        // First three bytes
+        bits=(((FXuint)temp[4])<<16)|(((FXuint)temp[3])<<8)|((FXuint)temp[2]);
+        for(j=0; j<2; ++j){
+          for(i=0; i<4; ++i){
+            if(((x+i)<dds.header.dwWidth) && ((y+j)<dds.header.dwHeight)){
+              offset=((z*dds.header.dwHeight+y+j)*dds.header.dwWidth+x+i)<<2;
+              image[offset+0]=image[offset+1]=image[offset+2]=image[offset+3]=(FXschar)levels[bits&7];
+              }
+            bits>>=3;
+            }
+          }
+
+        // Last three bytes
+        bits=(((FXuint)temp[7])<<16)|(((FXuint)temp[6])<<8)|((FXuint)temp[5]);
+        for(j=2; j<4; ++j){
+          for(i=0; i<4; ++i){
+            if(((x+i)<dds.header.dwWidth) && ((y+j)<dds.header.dwHeight)){
+              offset=((z*dds.header.dwHeight+y+j)*dds.header.dwWidth+x+i)<<2;
+              image[offset+0]=image[offset+1]=image[offset+2]=image[offset+3]=(FXschar)levels[bits&7];
+              }
+            bits>>=3;
+            }
+          }
+        temp+=8;
+        }
+      }
+    }
+  return true;
+  }
+
 
 // Decompress 3DC (ATI2) image
 static FXbool dds_decompress_3DC(const DDSImage& dds,FXuchar *image){
@@ -958,7 +1031,123 @@ static FXbool dds_decompress_3DC(const DDSImage& dds,FXuchar *image){
   }
 
 
-// Compute shifts
+// Decompress 3DC (ATI2) image
+static FXbool dds_decompress_BC5_S(const DDSImage& dds,FXuchar *image){
+  FXuchar *temp=dds.data;
+  FXuint x,y,z,i,j,redbits,grnbits,offset;
+  FXint tx,ty,t;
+  FXint red[8];
+  FXint grn[8];
+
+  FXTRACE(TOPIC_DETAIL,"dds_decompress_BC5_S\n");
+
+  // Loop over 4x4 blocks
+  for(z=0; z<dds.header.dwDepth; z+=1){
+    for(y=0; y<dds.header.dwHeight; y+=4){
+      for(x=0; x<dds.header.dwWidth; x+=4){
+
+        // Grab two reds
+        red[0]=(FXschar)temp[0];
+        red[1]=(FXschar)temp[1];
+
+        // Six interpolated values
+        if(red[0]>red[1]){
+          red[2]=(6*red[0]+1*red[1]+3)/7;
+          red[3]=(5*red[0]+2*red[1]+3)/7;
+          red[4]=(4*red[0]+3*red[1]+3)/7;
+          red[5]=(3*red[0]+4*red[1]+3)/7;
+          red[6]=(2*red[0]+5*red[1]+3)/7;
+          red[7]=(1*red[0]+6*red[1]+3)/7;
+          }
+
+        // Four interpolated values
+        else{
+          red[2]=(4*red[0]+1*red[1]+2)/5;
+          red[3]=(3*red[0]+2*red[1]+2)/5;
+          red[4]=(2*red[0]+3*red[1]+2)/5;
+          red[5]=(1*red[0]+4*red[1]+2)/5;
+          red[6]=-127;
+          red[7]=127;
+          }
+
+        // Grab two greens
+        grn[0]=(FXschar)temp[8];
+        grn[1]=(FXschar)temp[9];
+
+        // Six interpolated values
+        if(grn[0]>grn[1]){
+          grn[2]=(6*grn[0]+1*grn[1]+3)/7;
+          grn[3]=(5*grn[0]+2*grn[1]+3)/7;
+          grn[4]=(4*grn[0]+3*grn[1]+3)/7;
+          grn[5]=(3*grn[0]+4*grn[1]+3)/7;
+          grn[6]=(2*grn[0]+5*grn[1]+3)/7;
+          grn[7]=(1*grn[0]+6*grn[1]+3)/7;
+          }
+
+        // Four interpolated values
+        else{
+          grn[2]=(4*grn[0]+1*grn[1]+2)/5;
+          grn[3]=(3*grn[0]+2*grn[1]+2)/5;
+          grn[4]=(2*grn[0]+3*grn[1]+2)/5;
+          grn[5]=(1*grn[0]+4*grn[1]+2)/5;
+          grn[6]=-127;
+          grn[7]=127;
+          }
+
+        // Decode the first 3 bytes
+        redbits=(((FXuint)temp[4])<<16)|(((FXuint)temp[3])<<8)|((FXuint)temp[2]);
+        grnbits=(((FXuint)temp[12])<<16)|(((FXuint)temp[11])<<8)|((FXuint)temp[10]);
+        for(j=0; j<2; ++j){
+          for(i=0; i<4; ++i){
+            if(((x+i)<dds.header.dwWidth) && ((y+j)<dds.header.dwHeight)){
+              offset=((z*dds.header.dwHeight+y+j)*dds.header.dwWidth+x+i)<<2;
+              image[offset+1]=ty=grn[grnbits&7];
+              image[offset+2]=tx=red[redbits&7];
+              t=127*128-(tx-127)*(tx-128)-(ty-127)*(ty-128);
+              if(t>0){
+                image[offset+0]=(FXuchar)(isqrt(t)+128);
+                }
+              else{
+                image[offset+0]=127;
+                }
+              image[offset+3]=255;
+              }
+            redbits>>=3;
+            grnbits>>=3;
+            }
+          }
+
+        // Decode the last 3 bytes
+        redbits=(((FXuint)temp[7])<<16)|(((FXuint)temp[6])<<8)|((FXuint)temp[5]);
+        grnbits=(((FXuint)temp[15])<<16)|(((FXuint)temp[14])<<8)|((FXuint)temp[13]);
+        for(j=2; j<4; ++j){
+          for(i=0; i<4; ++i){
+            if(((x+i)<dds.header.dwWidth) && ((y+j)<dds.header.dwHeight)){
+              offset=((z*dds.header.dwHeight+y+j)*dds.header.dwWidth+x+i)<<2;
+              image[offset+2]=tx=red[redbits&7];
+              image[offset+1]=ty=grn[grnbits&7];
+              t=127*128-(tx-127)*(tx-128)-(ty-127)*(ty-128);
+              if(t>0){
+                image[offset+0]=(FXuchar)(isqrt(t)+128);
+                }
+              else{
+                image[offset+0]=127;
+                }
+              image[offset+3]=255;
+              }
+            redbits>>=3;
+            grnbits>>=3;
+            }
+          }
+        temp+=16;
+        }
+      }
+    }
+  return true;
+  }
+
+
+// Compute shifts (FIXME we could learn from new fxbmpio implementation)
 static void getShifts(FXuint mask,FXuint& shift,FXuint& mul,FXuint& sc){
   FXuint bits=0;
   shift=0;
@@ -1258,18 +1447,19 @@ static FXbool dds_decompress_GRGB(const DDSImage& dds,FXuchar *image){
 
 // Check if stream contains a BMP
 FXbool fxcheckDDS(FXStream& store){
-  FXuchar signature[4];
-  store.load(signature,4);
-  store.position(-4,FXFromCurrent);
-  return signature[0]=='D' && signature[1]=='D' && signature[2]=='S' && signature[3]==' ';
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[4];
+    store.load(signature,4);
+    store.position(-4,FXFromCurrent);
+    return signature[0]=='D' && signature[1]=='D' && signature[2]=='S' && signature[3]==' ';
+    }
+  return false;
   }
 
 
 // Load image from stream
 FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& depth){
-  FXbool swap=store.swapBytes();
-  FXbool ok=false;
-  DDSImage dds;
+  FXbool result=false;
 
   // Null out
   data=nullptr;
@@ -1277,417 +1467,480 @@ FXbool fxloadDDS(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
   height=0;
   depth=0;
 
-  // Bitmaps are little-endian
-  store.setBigEndian(false);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXbool swap=store.swapBytes();
 
-  // Check header
-  store >> dds.magic;
-  if(dds.magic==DDSD_MAGIC){
-    store >> dds.header.dwSize;
-    if(dds.header.dwSize!=124) goto x;                  // Unexpected size; bail!
-    store >> dds.header.dwFlags;
-    store >> dds.header.dwHeight;
-    store >> dds.header.dwWidth;
-    store >> dds.header.dwLinearSize;
-    store >> dds.header.dwDepth;
-    store >> dds.header.dwMipMapCount;
-    store.load(dds.header.dwReserved1,11);
-    store >> dds.header.ddpf.dwSize;
-    store >> dds.header.ddpf.dwFlags;
-    store >> dds.header.ddpf.dwFourCC;
-    store >> dds.header.ddpf.dwRGBBitCount;
-    store >> dds.header.ddpf.dwRBitMask;
-    store >> dds.header.ddpf.dwGBitMask;
-    store >> dds.header.ddpf.dwBBitMask;
-    store >> dds.header.ddpf.dwABitMask;
-    store >> dds.header.dwCaps;
-    store >> dds.header.dwCaps2;
-    store >> dds.header.dwCaps3;
-    store >> dds.header.dwCaps4;
-    store >> dds.header.dwReserved2;
+    // Bitmaps are little-endian
+    store.setBigEndian(false);
 
-    // Load DX10 Header if present
-    if(dds.header.ddpf.dwFourCC==D3DFMT_DX10){          // Parse over DX10 header
-      store >> dds.xheader.dxgiFormat;
-      store >> dds.xheader.resourceDimension;
-      store >> dds.xheader.miscFlag;
-      store >> dds.xheader.arraySize;
-      store >> dds.xheader.reserved;
-      }
-    else{
-      dds.xheader.dxgiFormat=DXGI_FORMAT_UNKNOWN;
-      dds.xheader.resourceDimension=D3D10_RESOURCE_DIMENSION_UNKNOWN;
-      dds.xheader.miscFlag=0;
-      dds.xheader.arraySize=1;
-      dds.xheader.reserved=0;
-      }
+    // Check header
+    DDSImage dds;
+    store >> dds.magic;
+    if(dds.magic==DDSD_MAGIC){
+      store >> dds.header.dwSize;
+      if(dds.header.dwSize!=124) goto x;                  // Unexpected size; bail!
+      store >> dds.header.dwFlags;
+      store >> dds.header.dwHeight;
+      store >> dds.header.dwWidth;
+      store >> dds.header.dwLinearSize;
+      store >> dds.header.dwDepth;
+      store >> dds.header.dwMipMapCount;
+      store.load(dds.header.dwReserved1,11);
+      store >> dds.header.ddpf.dwSize;
+      store >> dds.header.ddpf.dwFlags;
+      store >> dds.header.ddpf.dwFourCC;
+      store >> dds.header.ddpf.dwRGBBitCount;
+      store >> dds.header.ddpf.dwRBitMask;
+      store >> dds.header.ddpf.dwGBitMask;
+      store >> dds.header.ddpf.dwBBitMask;
+      store >> dds.header.ddpf.dwABitMask;
+      store >> dds.header.dwCaps;
+      store >> dds.header.dwCaps2;
+      store >> dds.header.dwCaps3;
+      store >> dds.header.dwCaps4;
+      store >> dds.header.dwReserved2;
 
-    FXTRACE(TOPIC_DETAIL,"dds.magic=0x%08x\n",dds.magic);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwSize=%d\n",dds.header.dwSize);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwFlags=0x%08x: %s%s%s%s%s%s%s%s\n",dds.header.dwFlags,(dds.header.dwFlags&DDSD_CAPS)?"DDSD_CAPS ":"",(dds.header.dwFlags&DDSD_HEIGHT)?"DDSD_HEIGHT ":"",(dds.header.dwFlags&DDSD_WIDTH)?"DDSD_WIDTH ":"",(dds.header.dwFlags&DDSD_PITCH)?"DDSD_PITCH ":"",(dds.header.dwFlags&DDSD_PIXELFORMAT)?"DDSD_PIXELFORMAT ":"",(dds.header.dwFlags&DDSD_MIPMAPCOUNT)?"DDSD_MIPMAPCOUNT ":"",(dds.header.dwFlags&DDSD_LINEARSIZE)?"DDSD_LINEARSIZE ":"",(dds.header.dwFlags&DDSD_DEPTH)?"DDSD_DEPTH":"");
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwHeight=%d\n",dds.header.dwHeight);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwWidth=%d\n",dds.header.dwWidth);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwDepth=%d\n",dds.header.dwDepth);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwLinearSize=%d\n",dds.header.dwLinearSize);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwMipMapCount=%d\n",dds.header.dwMipMapCount);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwSize=%d\n",dds.header.ddpf.dwSize);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFlags=0x%08x: %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",dds.header.ddpf.dwFlags,(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)?"DDPF_ALPHAPIXELS ":"",(dds.header.ddpf.dwFlags&DDPF_ALPHA)?"DDPF_ALPHA ":"",(dds.header.ddpf.dwFlags&DDPF_FOURCC)?"DDPF_FOURCC ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED4)?"DDPF_PALETTEINDEXED4 ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED8)?"DDPF_PALETTEINDEXED8 ":"",(dds.header.ddpf.dwFlags&DDPF_RGB)?"DDPF_RGB ":"",(dds.header.ddpf.dwFlags&DDPF_COMPRESSED)?"DDPF_COMPRESSED ":"",(dds.header.ddpf.dwFlags&DDPF_RGBTOYUV)?"DDPF_RGBTOYUV ":"",(dds.header.ddpf.dwFlags&DDPF_YUV)?"DDPF_YUV ":"",(dds.header.ddpf.dwFlags&DDPF_ZBUFFER)?"DDPF_ZBUFFER ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED1)?"DDPF_PALETTEINDEXED1 ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED2)?"DDPF_PALETTEINDEXED2 ":"",(dds.header.ddpf.dwFlags&DDPF_ZPIXELS)?"DDPF_ZPIXELS ":"",(dds.header.ddpf.dwFlags&DDPF_STENCILBUFFER)?"DDPF_STENCILBUFFER ":"",(dds.header.ddpf.dwFlags&DDPF_ALPHAPREMULT)?"DDPF_ALPHAPREMULT ":"",(dds.header.ddpf.dwFlags&DDPF_LUMINANCE)?"DDPF_LUMINANCE ":"",(dds.header.ddpf.dwFlags&DDPF_BUMPLUMINANCE)?"DDPF_BUMPLUMINANCE ":"",(dds.header.ddpf.dwFlags&DDPF_NORMAL)?"DDPF_NORMAL":"");
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFourCC=0x%08x (%d) (%c%c%c%c)\n",dds.header.ddpf.dwFourCC,dds.header.ddpf.dwFourCC,dds.header.ddpf.dwFourCC&255,(dds.header.ddpf.dwFourCC>>8)&255,(dds.header.ddpf.dwFourCC>>16)&255,(dds.header.ddpf.dwFourCC>>24)&255);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwRGBBitCount=%d\n",dds.header.ddpf.dwRGBBitCount);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwRBitMask=0x%08x\n",dds.header.ddpf.dwRBitMask);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwGBitMask=0x%08x\n",dds.header.ddpf.dwGBitMask);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwBBitMask=0x%08x\n",dds.header.ddpf.dwBBitMask);
-    FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwABitMask=0x%08x\n",dds.header.ddpf.dwABitMask);
-
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps =0x%08x: %s%s%s\n",dds.header.dwCaps,(dds.header.dwCaps&DDSCAPS_COMPLEX)?"DDSCAPS_COMPLEX ":"",(dds.header.dwCaps&DDSCAPS_TEXTURE)?"DDSCAPS_TEXTURE ":"",(dds.header.dwCaps&DDSCAPS_MIPMAP)?"DDSCAPS_MIPMAP":"");
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps2=0x%08x: %s%s%s%s%s%s%s%s\n",dds.header.dwCaps2,(dds.header.dwCaps2&DDSCAPS2_CUBEMAP)?"DDSCAPS2_CUBEMAP ":"",(dds.header.dwCaps2&DDSCAPS2_VOLUME)?"DDSCAPS2_VOLUME ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEX)?"DDSCAPS2_CUBEMAP_POSITIVEX ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEX)?"DDSCAPS2_CUBEMAP_NEGATIVEX ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEY)?"DDSCAPS2_CUBEMAP_POSITIVEY ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEY)?"DDSCAPS2_CUBEMAP_NEGATIVEY ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEZ)?"DDSCAPS2_CUBEMAP_POSITIVEZ ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEZ)?"DDSCAPS2_CUBEMAP_NEGATIVEZ ":"");
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps3=0x%08x\n",dds.header.dwCaps3);
-    FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps4=0x%08x\n",dds.header.dwCaps4);
-
-    FXTRACE(TOPIC_DETAIL,"dds.xheader.dxgiFormat=%d\n",dds.xheader.dxgiFormat);
-    FXTRACE(TOPIC_DETAIL,"dds.xheader.resourceDimension=%d\n",dds.xheader.resourceDimension);
-    FXTRACE(TOPIC_DETAIL,"dds.xheader.miscFlag=%d\n",dds.xheader.miscFlag);
-    FXTRACE(TOPIC_DETAIL,"dds.xheader.arraySize=%d\n",dds.xheader.arraySize);
-
-    // Fix depth
-    if(!(dds.header.dwFlags&DDSD_DEPTH) || (dds.header.dwDepth==0)) dds.header.dwDepth=1;
-
-    // Fix mipmap count
-    if(!(dds.header.dwFlags&DDSD_MIPMAPCOUNT) || (dds.header.dwMipMapCount==0)) dds.header.dwMipMapCount=1;
-
-    // Set image size to return
-    width=dds.header.dwWidth;
-    height=dds.header.dwHeight;
-    depth=dds.header.dwDepth;
-
-    // Perhaps broken format; assume DDPF_FOURCC
-    if(dds.header.ddpf.dwFlags==0 && dds.header.ddpf.dwFourCC!=0){
-      dds.header.ddpf.dwFlags=DDPF_FOURCC;
-      }
-
-    // Figure out how much to allocate for compressed data
-    if(dds.header.ddpf.dwFlags&DDPF_FOURCC){
-      switch(dds.header.ddpf.dwFourCC){
-        case D3DFMT_DXT1:
-        case D3DFMT_ATI1:
-          dds.size=((width+3)>>2)*((height+3)>>2)*depth*8;
-          break;
-        case D3DFMT_DXT2:
-        case D3DFMT_DXT3:
-        case D3DFMT_DXT4:
-        case D3DFMT_DXT5:
-        case D3DFMT_ATI2:
-        case D3DFMT_RXGB:
-          dds.size=((width+3)>>2)*((height+3)>>2)*depth*16;
-          break;
-        case D3DFMT_A1:
-          dds.size=((width+7)>>3)*height*depth;
-          break;
-        case D3DFMT_A2XY:
-        case D3DFMT_UYVY:
-        case D3DFMT_YUY2:
-          goto x;       // Unsupported compression code
-        case D3DFMT_R16F:
-        case D3DFMT_R5G6B5:
-        case D3DFMT_X1R5G5B5:
-        case D3DFMT_A1R5G5B5:
-        case D3DFMT_A4R4G4B4:
-        case D3DFMT_A8R3G3B2:
-        case D3DFMT_X4R4G4B4:
-        case D3DFMT_R8G8_B8G8:
-        case D3DFMT_G8R8_G8B8:
-        case D3DFMT_L16:
-        case D3DFMT_A8P8:
-        case D3DFMT_A8L8:
-          dds.size=width*height*depth*2;
-          break;
-        case D3DFMT_G16R16F:
-        case D3DFMT_A8R8G8B8:
-        case D3DFMT_X8R8G8B8:
-        case D3DFMT_A8B8G8R8:
-        case D3DFMT_X8B8G8R8:
-        case D3DFMT_G16R16:
-        case D3DFMT_A2R10G10B10:
-        case D3DFMT_R32F:
-        case D3DFMT_A2B10G10R10:
-        case D3DFMT_A2B10G10R10_XR_BIAS:
-          dds.size=width*height*depth*4;
-          break;
-        case D3DFMT_A32B32G32R32F:
-          dds.size=width*height*depth*16;
-          break;
-        case D3DFMT_R8G8B8:
-          dds.size=width*height*depth*3;
-          break;
-        case D3DFMT_R3G3B2:
-        case D3DFMT_A8:
-        case D3DFMT_P8:
-        case D3DFMT_L8:
-        case D3DFMT_A4L4:
-          dds.size=width*height*depth;
-          break;
-        case D3DFMT_A16B16G16R16F:
-        case D3DFMT_G32R32F:
-        case D3DFMT_A16B16G16R16:
-          dds.size=width*height*depth*8;
-          break;
-        default:
-          goto x;       // Unsupported compression code
+      // Load DX10 Header if present
+      if(dds.header.ddpf.dwFourCC==D3DFMT_DX10){          // Parse over DX10 header
+        store >> dds.xheader.dxgiFormat;
+        store >> dds.xheader.resourceDimension;
+        store >> dds.xheader.miscFlag;
+        store >> dds.xheader.arraySize;
+        store >> dds.xheader.reserved;
         }
-      }
+      else{
+        dds.xheader.dxgiFormat=DXGI_FORMAT_UNKNOWN;
+        dds.xheader.resourceDimension=D3D10_RESOURCE_DIMENSION_UNKNOWN;
+        dds.xheader.miscFlag=0;
+        dds.xheader.arraySize=1;
+        dds.xheader.reserved=0;
+        }
 
-    // Figure out how much to allocate for RGB
-    else if(dds.header.ddpf.dwFlags&DDPF_RGB){
-      dds.size=width*height*depth*dds.header.ddpf.dwRGBBitCount/8;
-      }
+      FXTRACE(TOPIC_DETAIL,"dds.magic=0x%08x\n",dds.magic);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwSize=%d\n",dds.header.dwSize);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwFlags=0x%08x: %s%s%s%s%s%s%s%s\n",dds.header.dwFlags,(dds.header.dwFlags&DDSD_CAPS)?"DDSD_CAPS ":"",(dds.header.dwFlags&DDSD_HEIGHT)?"DDSD_HEIGHT ":"",(dds.header.dwFlags&DDSD_WIDTH)?"DDSD_WIDTH ":"",(dds.header.dwFlags&DDSD_PITCH)?"DDSD_PITCH ":"",(dds.header.dwFlags&DDSD_PIXELFORMAT)?"DDSD_PIXELFORMAT ":"",(dds.header.dwFlags&DDSD_MIPMAPCOUNT)?"DDSD_MIPMAPCOUNT ":"",(dds.header.dwFlags&DDSD_LINEARSIZE)?"DDSD_LINEARSIZE ":"",(dds.header.dwFlags&DDSD_DEPTH)?"DDSD_DEPTH":"");
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwHeight=%d\n",dds.header.dwHeight);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwWidth=%d\n",dds.header.dwWidth);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwDepth=%d\n",dds.header.dwDepth);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwLinearSize=%d\n",dds.header.dwLinearSize);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwMipMapCount=%d\n",dds.header.dwMipMapCount);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwSize=%d\n",dds.header.ddpf.dwSize);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFlags=0x%08x: %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",dds.header.ddpf.dwFlags,(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)?"DDPF_ALPHAPIXELS ":"",(dds.header.ddpf.dwFlags&DDPF_ALPHA)?"DDPF_ALPHA ":"",(dds.header.ddpf.dwFlags&DDPF_FOURCC)?"DDPF_FOURCC ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED4)?"DDPF_PALETTEINDEXED4 ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED8)?"DDPF_PALETTEINDEXED8 ":"",(dds.header.ddpf.dwFlags&DDPF_RGB)?"DDPF_RGB ":"",(dds.header.ddpf.dwFlags&DDPF_COMPRESSED)?"DDPF_COMPRESSED ":"",(dds.header.ddpf.dwFlags&DDPF_RGBTOYUV)?"DDPF_RGBTOYUV ":"",(dds.header.ddpf.dwFlags&DDPF_YUV)?"DDPF_YUV ":"",(dds.header.ddpf.dwFlags&DDPF_ZBUFFER)?"DDPF_ZBUFFER ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED1)?"DDPF_PALETTEINDEXED1 ":"",(dds.header.ddpf.dwFlags&DDPF_PALETTEINDEXED2)?"DDPF_PALETTEINDEXED2 ":"",(dds.header.ddpf.dwFlags&DDPF_ZPIXELS)?"DDPF_ZPIXELS ":"",(dds.header.ddpf.dwFlags&DDPF_STENCILBUFFER)?"DDPF_STENCILBUFFER ":"",(dds.header.ddpf.dwFlags&DDPF_ALPHAPREMULT)?"DDPF_ALPHAPREMULT ":"",(dds.header.ddpf.dwFlags&DDPF_LUMINANCE)?"DDPF_LUMINANCE ":"",(dds.header.ddpf.dwFlags&DDPF_BUMPLUMINANCE)?"DDPF_BUMPLUMINANCE ":"",(dds.header.ddpf.dwFlags&DDPF_NORMAL)?"DDPF_NORMAL":"");
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFourCC=0x%08x (%d) (%c%c%c%c)\n",dds.header.ddpf.dwFourCC,dds.header.ddpf.dwFourCC,dds.header.ddpf.dwFourCC&255,(dds.header.ddpf.dwFourCC>>8)&255,(dds.header.ddpf.dwFourCC>>16)&255,(dds.header.ddpf.dwFourCC>>24)&255);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwRGBBitCount=%d\n",dds.header.ddpf.dwRGBBitCount);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwRBitMask=0x%08x\n",dds.header.ddpf.dwRBitMask);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwGBitMask=0x%08x\n",dds.header.ddpf.dwGBitMask);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwBBitMask=0x%08x\n",dds.header.ddpf.dwBBitMask);
+      FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwABitMask=0x%08x\n",dds.header.ddpf.dwABitMask);
 
-    // Luminance
-    else if(dds.header.ddpf.dwFlags&DDPF_LUMINANCE){
-      dds.size=width*height*depth*dds.header.ddpf.dwRGBBitCount/8;
-      }
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps =0x%08x: %s%s%s\n",dds.header.dwCaps,(dds.header.dwCaps&DDSCAPS_COMPLEX)?"DDSCAPS_COMPLEX ":"",(dds.header.dwCaps&DDSCAPS_TEXTURE)?"DDSCAPS_TEXTURE ":"",(dds.header.dwCaps&DDSCAPS_MIPMAP)?"DDSCAPS_MIPMAP":"");
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps2=0x%08x: %s%s%s%s%s%s%s%s\n",dds.header.dwCaps2,(dds.header.dwCaps2&DDSCAPS2_CUBEMAP)?"DDSCAPS2_CUBEMAP ":"",(dds.header.dwCaps2&DDSCAPS2_VOLUME)?"DDSCAPS2_VOLUME ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEX)?"DDSCAPS2_CUBEMAP_POSITIVEX ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEX)?"DDSCAPS2_CUBEMAP_NEGATIVEX ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEY)?"DDSCAPS2_CUBEMAP_POSITIVEY ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEY)?"DDSCAPS2_CUBEMAP_NEGATIVEY ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_POSITIVEZ)?"DDSCAPS2_CUBEMAP_POSITIVEZ ":"",(dds.header.dwCaps2&DDSCAPS2_CUBEMAP_NEGATIVEZ)?"DDSCAPS2_CUBEMAP_NEGATIVEZ ":"");
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps3=0x%08x\n",dds.header.dwCaps3);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwCaps4=0x%08x\n",dds.header.dwCaps4);
 
-    // Unsupported format
-    else{
-      goto x;           // Not supported
-      }
+      FXTRACE(TOPIC_DETAIL,"dds.xheader.dxgiFormat=%d\n",dds.xheader.dxgiFormat);
+      FXTRACE(TOPIC_DETAIL,"dds.xheader.resourceDimension=%d\n",dds.xheader.resourceDimension);
+      FXTRACE(TOPIC_DETAIL,"dds.xheader.miscFlag=%d\n",dds.xheader.miscFlag);
+      FXTRACE(TOPIC_DETAIL,"dds.xheader.arraySize=%d\n",dds.xheader.arraySize);
 
-    FXTRACE(TOPIC_DETAIL,"dds.size=%d\n",dds.size);
+      // Fix depth
+      if(!(dds.header.dwFlags&DDSD_DEPTH) || (dds.header.dwDepth==0)) dds.header.dwDepth=1;
 
-    // Allocate array for compressed data
-    if(allocElms(dds.data,dds.size)){
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwDepth=%d (fixed)\n",dds.header.dwDepth);
 
-      // Allocate output image
-      if(allocElms(data,width*height*depth)){
+      // Fix mipmap count
+      if(!(dds.header.dwFlags&DDSD_MIPMAPCOUNT) || (dds.header.dwMipMapCount==0)) dds.header.dwMipMapCount=1;
 
-        // Load temp array
-        store.load(dds.data,dds.size);
+      FXTRACE(TOPIC_DETAIL,"dds.header.dwMipMapCount=%d (fixed)\n",dds.header.dwMipMapCount);
 
-        // FOURCC format
-        if(dds.header.ddpf.dwFlags&DDPF_FOURCC){
-          switch(dds.header.ddpf.dwFourCC){
-            case D3DFMT_DXT1:
-              ok=dds_decompress_DXT1(dds,(FXuchar*)data);
+      // Set image size to return
+      width=dds.header.dwWidth;
+      height=dds.header.dwHeight;
+      depth=dds.header.dwDepth;
+
+      // Perhaps broken format; assume DDPF_FOURCC
+      if(dds.header.ddpf.dwFlags==0 && dds.header.ddpf.dwFourCC!=0){
+        dds.header.ddpf.dwFlags=DDPF_FOURCC;
+        }
+
+      // Figure out how much to allocate for compressed data
+      if(dds.header.ddpf.dwFlags&DDPF_FOURCC){
+        switch(dds.header.ddpf.dwFourCC){
+          case D3DFMT_DXT1:
+          case D3DFMT_ATI1:
+            dds.size=((width+3)>>2)*((height+3)>>2)*depth*8;
+            break;
+/*
+          case D3DFMT_DX10:
+            switch(dds.xheader.dxgiFormat){
+            case DXGI_FORMAT_BC4_UNORM:
+            case DXGI_FORMAT_BC4_SNORM:
+              dds.size=((width+3)>>2)*((height+3)>>2)*depth*8;
               break;
-            case D3DFMT_DXT2:
-              ok=dds_decompress_DXT2(dds,(FXuchar*)data);
+            case DXGI_FORMAT_BC5_UNORM:
+            case DXGI_FORMAT_BC5_SNORM:
+            case DXGI_FORMAT_BC6H_UF16:
+            case DXGI_FORMAT_BC6H_SF16:
+            case DXGI_FORMAT_BC7_UNORM:
+              dds.size=((width+3)>>2)*((height+3)>>2)*depth*16;
               break;
-            case D3DFMT_DXT3:
-              ok=dds_decompress_DXT3(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_DXT4:
-              ok=dds_decompress_DXT4(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_DXT5:
-              ok=dds_decompress_DXT5(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_ATI1:
-              ok=dds_decompress_BC4(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_ATI2:
-              ok=dds_decompress_3DC(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_RXGB:
-              ok=dds_decompress_RXGB(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_A2XY:
-            case D3DFMT_UYVY:
-            case D3DFMT_YUY2:
-              break;
-            case D3DFMT_R8G8_B8G8:
-              ok=dds_decompress_RGBG(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_G8R8_G8B8:
-              ok=dds_decompress_GRGB(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_R16F:
-              ok=dds_decompress_R16F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_G16R16F:
-              ok=dds_decompress_G16R16F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_A16B16G16R16F:
-              ok=dds_decompress_A16B16G16R16F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_R32F:
-              ok=dds_decompress_R32F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_G32R32F:
-              ok=dds_decompress_G32R32F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_A32B32G32R32F:
-              ok=dds_decompress_A32B32G32R32F(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_R8G8B8:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x0000FF,0x00FF00,0xFF0000,3);
-              break;
-            case D3DFMT_A8R8G8B8:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x000000FF,0x0000FF00,0x00FF0000,0xFF000000,4);
-              break;
-            case D3DFMT_X8R8G8B8:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x0000FF,0x00FF00,0xFF0000,4);
-              break;
-            case D3DFMT_R5G6B5:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x001F,0x07E0,0xF800,2);
-              break;
-            case D3DFMT_X1R5G5B5:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x001F,0x03E0,0x7C00,2);
-              break;
-            case D3DFMT_A1R5G5B5:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x001F,0x03E0,0x7C00,0x8000,2);
-              break;
-            case D3DFMT_A4R4G4B4:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x000F,0x00F0,0x0F00,0xF000,2);
-              break;
-            case D3DFMT_R3G3B2:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x07,0x38,0xC0,1);
-              break;
-            case D3DFMT_A8:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x00,0x00,0x00,0xFF,1);
-              break;
-            case D3DFMT_A8R3G3B2:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x0003,0x001C,0x00E0,0xFF00,2);
-              break;
-            case D3DFMT_X4R4G4B4:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x000F,0x00F0,0x0F00,2);
-              break;
-            case D3DFMT_A8B8G8R8:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x00FF0000,0x0000FF00,0x000000FF,0xFF000000,4);
-              break;
-            case D3DFMT_X8B8G8R8:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x00FF0000,0x0000FF00,0x000000FF,4);
-              break;
-            case D3DFMT_G16R16:
-              ok=dds_decompress_RGB(dds,(FXuchar*)data,0x00000000,0xFFFF0000,0x0000FFFF,4);
-              break;
-            case D3DFMT_A2R10G10B10:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x000003FF,0x000FFC00,0x3FF00000,0xC0000000,2);
-              break;
-            case D3DFMT_A16B16G16R16:
-              ok=dds_decompress_A16B16G16R16(dds,(FXuchar*)data);
-              break;
-            case D3DFMT_P8:
-            case D3DFMT_L8:
-              ok=dds_decompress_LUM(dds,(FXuchar*)data,0xFF,1);
-              break;
-            case D3DFMT_A8P8:
-            case D3DFMT_A8L8:
-              ok=dds_decompress_LUMA(dds,(FXuchar*)data,0x00FF,0xFF00,2);
-              break;
-            case D3DFMT_A4L4:
-              ok=dds_decompress_LUMA(dds,(FXuchar*)data,0x0F,0xF0,1);
-              break;
-            case D3DFMT_L16:
-              ok=dds_decompress_LUM(dds,(FXuchar*)data,0xFFFF,2);
-              break;
-            case D3DFMT_A1:
-              break;
-            case D3DFMT_A2B10G10R10:
-            case D3DFMT_A2B10G10R10_XR_BIAS:
-              ok=dds_decompress_RGBA(dds,(FXuchar*)data,0x3FF00000,0x000FFC00,0x000003FF,0xC0000000,2);
-              break;
+            default:
+              FXTRACE(TOPIC_DETAIL,"dds.xheader.dxgiFormat=0x%08x Unsupported\n",dds.xheader.dxgiFormat);
+              goto x;
+              }
+            break;
+*/
+          case D3DFMT_DXT2:
+          case D3DFMT_DXT3:
+          case D3DFMT_DXT4:
+          case D3DFMT_DXT5:
+          case D3DFMT_ATI2:
+          case D3DFMT_RXGB:
+            dds.size=((width+3)>>2)*((height+3)>>2)*depth*16;
+            break;
+          case D3DFMT_A1:
+            dds.size=((width+7)>>3)*height*depth;
+            break;
+          case D3DFMT_A2XY:
+          case D3DFMT_UYVY:
+          case D3DFMT_YUY2:
+            goto x;       // Unsupported compression code
+          case D3DFMT_R16F:
+          case D3DFMT_R5G6B5:
+          case D3DFMT_X1R5G5B5:
+          case D3DFMT_A1R5G5B5:
+          case D3DFMT_A4R4G4B4:
+          case D3DFMT_A8R3G3B2:
+          case D3DFMT_X4R4G4B4:
+          case D3DFMT_R8G8_B8G8:
+          case D3DFMT_G8R8_G8B8:
+          case D3DFMT_L16:
+          case D3DFMT_A8P8:
+          case D3DFMT_A8L8:
+            dds.size=width*height*depth*2;
+            break;
+          case D3DFMT_G16R16F:
+          case D3DFMT_A8R8G8B8:
+          case D3DFMT_X8R8G8B8:
+          case D3DFMT_A8B8G8R8:
+          case D3DFMT_X8B8G8R8:
+          case D3DFMT_G16R16:
+          case D3DFMT_A2R10G10B10:
+          case D3DFMT_R32F:
+          case D3DFMT_A2B10G10R10:
+          case D3DFMT_A2B10G10R10_XR_BIAS:
+            dds.size=width*height*depth*4;
+            break;
+          case D3DFMT_A32B32G32R32F:
+            dds.size=width*height*depth*16;
+            break;
+          case D3DFMT_R8G8B8:
+            dds.size=width*height*depth*3;
+            break;
+          case D3DFMT_R3G3B2:
+          case D3DFMT_A8:
+          case D3DFMT_P8:
+          case D3DFMT_L8:
+          case D3DFMT_A4L4:
+            dds.size=width*height*depth;
+            break;
+          case D3DFMT_A16B16G16R16F:
+          case D3DFMT_G32R32F:
+          case D3DFMT_A16B16G16R16:
+            dds.size=width*height*depth*8;
+            break;
+          default:
+            FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFourCC=0x%08x Unsupported\n",dds.header.ddpf.dwFourCC);
+            goto x;       // Unsupported compression code
+          }
+        }
+
+      // Figure out how much to allocate for RGB
+      else if(dds.header.ddpf.dwFlags&DDPF_RGB){
+        dds.size=width*height*depth*dds.header.ddpf.dwRGBBitCount/8;
+        }
+
+      // Luminance
+      else if(dds.header.ddpf.dwFlags&DDPF_LUMINANCE){
+        dds.size=width*height*depth*dds.header.ddpf.dwRGBBitCount/8;
+        }
+
+      // Unsupported format
+      else{
+        FXTRACE(TOPIC_DETAIL,"dds.header.ddpf.dwFlags=0x%08x Unsupported\n",dds.header.ddpf.dwFlags);
+        goto x;           // Not supported
+        }
+
+      FXTRACE(TOPIC_DETAIL,"dds.size=%d\n",dds.size);
+
+      // Allocate array for compressed data
+      if(allocElms(dds.data,dds.size)){
+
+        // Allocate output image
+        if(allocElms(data,width*height*depth)){
+
+          // Load temp array
+          store.load(dds.data,dds.size);
+
+          // FOURCC format
+          if(dds.header.ddpf.dwFlags&DDPF_FOURCC){
+            switch(dds.header.ddpf.dwFourCC){
+              case D3DFMT_DXT1:
+                result=dds_decompress_DXT1(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_DXT2:
+                result=dds_decompress_DXT2(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_DXT3:
+                result=dds_decompress_DXT3(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_DXT4:
+                result=dds_decompress_DXT4(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_DXT5:
+                result=dds_decompress_DXT5(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_ATI1:
+                result=dds_decompress_BC4(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_ATI2:
+                result=dds_decompress_3DC(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_RXGB:
+                result=dds_decompress_RXGB(dds,(FXuchar*)data);
+                break;
+/*
+              case D3DFMT_DX10:
+                switch(dds.xheader.dxgiFormat){
+                case DXGI_FORMAT_BC4_UNORM:
+                  result=dds_decompress_BC4(dds,(FXuchar*)data);
+                  break;
+                case DXGI_FORMAT_BC4_SNORM:
+                  result=dds_decompress_BC4_S(dds,(FXuchar*)data);
+                  break;
+                case DXGI_FORMAT_BC5_UNORM:
+                  result=dds_decompress_3DC(dds,(FXuchar*)data);
+                case DXGI_FORMAT_BC5_SNORM:
+                  result=dds_decompress_BC5_S(dds,(FXuchar*)data);
+                  break;
+                case DXGI_FORMAT_BC6H_UF16:
+                case DXGI_FORMAT_BC6H_SF16:
+                case DXGI_FORMAT_BC7_UNORM:
+                default:
+                  FXTRACE(TOPIC_DETAIL,"dds.xheader.dxgiFormat=0x%08x Unsupported\n",dds.xheader.dxgiFormat);
+                  goto x;
+                  }
+                break;
+*/
+              case D3DFMT_A2XY:
+              case D3DFMT_UYVY:
+              case D3DFMT_YUY2:
+                break;
+              case D3DFMT_R8G8_B8G8:
+                result=dds_decompress_RGBG(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_G8R8_G8B8:
+                result=dds_decompress_GRGB(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_R16F:
+                result=dds_decompress_R16F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_G16R16F:
+                result=dds_decompress_G16R16F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_A16B16G16R16F:
+                result=dds_decompress_A16B16G16R16F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_R32F:
+                result=dds_decompress_R32F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_G32R32F:
+                result=dds_decompress_G32R32F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_A32B32G32R32F:
+                result=dds_decompress_A32B32G32R32F(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_R8G8B8:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x0000FF,0x00FF00,0xFF0000,3);
+                break;
+              case D3DFMT_A8R8G8B8:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x000000FF,0x0000FF00,0x00FF0000,0xFF000000,4);
+                break;
+              case D3DFMT_X8R8G8B8:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x0000FF,0x00FF00,0xFF0000,4);
+                break;
+              case D3DFMT_R5G6B5:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x001F,0x07E0,0xF800,2);
+                break;
+              case D3DFMT_X1R5G5B5:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x001F,0x03E0,0x7C00,2);
+                break;
+              case D3DFMT_A1R5G5B5:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x001F,0x03E0,0x7C00,0x8000,2);
+                break;
+              case D3DFMT_A4R4G4B4:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x000F,0x00F0,0x0F00,0xF000,2);
+                break;
+              case D3DFMT_R3G3B2:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x07,0x38,0xC0,1);
+                break;
+              case D3DFMT_A8:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x00,0x00,0x00,0xFF,1);
+                break;
+              case D3DFMT_A8R3G3B2:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x0003,0x001C,0x00E0,0xFF00,2);
+                break;
+              case D3DFMT_X4R4G4B4:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x000F,0x00F0,0x0F00,2);
+                break;
+              case D3DFMT_A8B8G8R8:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x00FF0000,0x0000FF00,0x000000FF,0xFF000000,4);
+                break;
+              case D3DFMT_X8B8G8R8:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x00FF0000,0x0000FF00,0x000000FF,4);
+                break;
+              case D3DFMT_G16R16:
+                result=dds_decompress_RGB(dds,(FXuchar*)data,0x00000000,0xFFFF0000,0x0000FFFF,4);
+                break;
+              case D3DFMT_A2R10G10B10:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x000003FF,0x000FFC00,0x3FF00000,0xC0000000,2);
+                break;
+              case D3DFMT_A16B16G16R16:
+                result=dds_decompress_A16B16G16R16(dds,(FXuchar*)data);
+                break;
+              case D3DFMT_P8:
+              case D3DFMT_L8:
+                result=dds_decompress_LUM(dds,(FXuchar*)data,0xFF,1);
+                break;
+              case D3DFMT_A8P8:
+              case D3DFMT_A8L8:
+                result=dds_decompress_LUMA(dds,(FXuchar*)data,0x00FF,0xFF00,2);
+                break;
+              case D3DFMT_A4L4:
+                result=dds_decompress_LUMA(dds,(FXuchar*)data,0x0F,0xF0,1);
+                break;
+              case D3DFMT_L16:
+                result=dds_decompress_LUM(dds,(FXuchar*)data,0xFFFF,2);
+                break;
+              case D3DFMT_A1:
+                break;
+              case D3DFMT_A2B10G10R10:
+              case D3DFMT_A2B10G10R10_XR_BIAS:
+                result=dds_decompress_RGBA(dds,(FXuchar*)data,0x3FF00000,0x000FFC00,0x000003FF,0xC0000000,2);
+                break;
+              }
+            }
+
+          // RGB format
+          else if(dds.header.ddpf.dwFlags&DDPF_RGB){
+            if(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)
+              result=dds_decompress_RGBA(dds,(FXuchar*)data,dds.header.ddpf.dwBBitMask,dds.header.ddpf.dwGBitMask,dds.header.ddpf.dwRBitMask,dds.header.ddpf.dwABitMask,(dds.header.ddpf.dwRGBBitCount+7)>>3);
+            else
+              result=dds_decompress_RGB(dds,(FXuchar*)data,dds.header.ddpf.dwBBitMask,dds.header.ddpf.dwGBitMask,dds.header.ddpf.dwRBitMask,(dds.header.ddpf.dwRGBBitCount+7)>>3);
+            }
+
+          // Lumimance format
+          else if(dds.header.ddpf.dwFlags&DDPF_LUMINANCE){
+            if(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)
+              result=dds_decompress_LUMA(dds,(FXuchar*)data,dds.header.ddpf.dwRBitMask,dds.header.ddpf.dwABitMask,(dds.header.ddpf.dwRGBBitCount+7)/8);
+            else
+              result=dds_decompress_LUM(dds,(FXuchar*)data,dds.header.ddpf.dwRBitMask,(dds.header.ddpf.dwRGBBitCount+7)/8);
             }
           }
 
-        // RGB format
-        else if(dds.header.ddpf.dwFlags&DDPF_RGB){
-          if(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)
-            ok=dds_decompress_RGBA(dds,(FXuchar*)data,dds.header.ddpf.dwBBitMask,dds.header.ddpf.dwGBitMask,dds.header.ddpf.dwRBitMask,dds.header.ddpf.dwABitMask,(dds.header.ddpf.dwRGBBitCount+7)>>3);
-          else
-            ok=dds_decompress_RGB(dds,(FXuchar*)data,dds.header.ddpf.dwBBitMask,dds.header.ddpf.dwGBitMask,dds.header.ddpf.dwRBitMask,(dds.header.ddpf.dwRGBBitCount+7)>>3);
-          }
-
-        // Lumimance format
-        else if(dds.header.ddpf.dwFlags&DDPF_LUMINANCE){
-          if(dds.header.ddpf.dwFlags&DDPF_ALPHAPIXELS)
-            ok=dds_decompress_LUMA(dds,(FXuchar*)data,dds.header.ddpf.dwRBitMask,dds.header.ddpf.dwABitMask,(dds.header.ddpf.dwRGBBitCount+7)/8);
-          else
-            ok=dds_decompress_LUM(dds,(FXuchar*)data,dds.header.ddpf.dwRBitMask,(dds.header.ddpf.dwRGBBitCount+7)/8);
-          }
+        // Free temp array of encoded pixels
+        freeElms(dds.data);
         }
-
-      // Free temp array of encoded pixels
-      freeElms(dds.data);
       }
+
+    // Restore original byte orientation
+x:  store.swapBytes(swap);
     }
 
-  // Restore original byte orientation
-x:store.swapBytes(swap);
-
   // Done
-  return ok;
+  return result;
   }
 
 
 // Save a dds file to a stream
 FXbool fxsaveDDS(FXStream& store,FXColor* data,FXint width,FXint height,FXint depth){
-  DDSImage dds;
-  FXbool swap;
+  FXbool result=false;
 
-  // Must make sense
-  if(!data || width<=0 || height<=0 || depth<=0) return false;
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-  // Switch byte order for the duration
-  swap=store.swapBytes();
-  store.setBigEndian(false);
+    // Must make sense
+    if(data && 0<width && 0<height && 0<depth){
 
-  // Initialize header
-  dds.magic=DDSD_MAGIC;
-  dds.header.dwSize=sizeof(DDSHeader);
-  dds.header.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH|DDSD_PIXELFORMAT|DDSD_MIPMAPCOUNT|DDSD_LINEARSIZE;
-  dds.header.dwHeight=height;
-  dds.header.dwWidth=width;
-  dds.header.dwLinearSize=width*height*depth*4;
-  dds.header.dwDepth=depth;
-  dds.header.dwMipMapCount=1;
-  clearElms(dds.header.dwReserved1,11);
-  dds.header.ddpf.dwSize=sizeof(DDSPixelFormat);
-  dds.header.ddpf.dwFlags=DDPF_RGB;
-  dds.header.ddpf.dwFourCC=0;
-  dds.header.ddpf.dwRGBBitCount=32;
-  dds.header.ddpf.dwBBitMask=0x000000ff;
-  dds.header.ddpf.dwGBitMask=0x0000ff00;
-  dds.header.ddpf.dwRBitMask=0x00ff0000;
-  dds.header.ddpf.dwABitMask=0xff000000;
-  if(1<depth){
-    dds.header.dwCaps=DDSCAPS_COMPLEX|DDSCAPS_TEXTURE;
-    dds.header.dwCaps2=DDSCAPS2_VOLUME;
+      // Save byte order
+      FXbool swap=store.swapBytes();
+
+      // Switch byte order for the duration
+      store.setBigEndian(false);
+
+      // Initialize header
+      DDSImage dds;
+      dds.magic=DDSD_MAGIC;
+      dds.header.dwSize=sizeof(DDSHeader);
+      dds.header.dwFlags=DDSD_CAPS|DDSD_HEIGHT|DDSD_WIDTH|DDSD_PIXELFORMAT|DDSD_MIPMAPCOUNT|DDSD_LINEARSIZE;
+      dds.header.dwHeight=height;
+      dds.header.dwWidth=width;
+      dds.header.dwLinearSize=width*height*depth*4;
+      dds.header.dwDepth=depth;
+      dds.header.dwMipMapCount=1;
+      clearElms(dds.header.dwReserved1,11);
+      dds.header.ddpf.dwSize=sizeof(DDSPixelFormat);
+      dds.header.ddpf.dwFlags=DDPF_RGB;
+      dds.header.ddpf.dwFourCC=0;
+      dds.header.ddpf.dwRGBBitCount=32;
+      dds.header.ddpf.dwBBitMask=0x000000ff;
+      dds.header.ddpf.dwGBitMask=0x0000ff00;
+      dds.header.ddpf.dwRBitMask=0x00ff0000;
+      dds.header.ddpf.dwABitMask=0xff000000;
+      if(1<depth){
+        dds.header.dwCaps=DDSCAPS_COMPLEX|DDSCAPS_TEXTURE;
+        dds.header.dwCaps2=DDSCAPS2_VOLUME;
+        }
+      else{
+        dds.header.dwCaps=DDSCAPS_TEXTURE;
+        dds.header.dwCaps2=0;
+        }
+      dds.header.dwCaps3=0;
+      dds.header.dwCaps4=0;
+      dds.header.dwReserved2=0;
+
+      // Start saving now
+      store << dds.magic;
+      store << dds.header.dwSize;
+      store << dds.header.dwFlags;
+      store << dds.header.dwHeight;
+      store << dds.header.dwWidth;
+      store << dds.header.dwLinearSize;
+      store << dds.header.dwDepth;
+      store << dds.header.dwMipMapCount;
+      store.save(dds.header.dwReserved1,11);
+      store << dds.header.ddpf.dwSize;
+      store << dds.header.ddpf.dwFlags;
+      store << dds.header.ddpf.dwFourCC;
+      store << dds.header.ddpf.dwRGBBitCount;
+      store << dds.header.ddpf.dwRBitMask;
+      store << dds.header.ddpf.dwGBitMask;
+      store << dds.header.ddpf.dwBBitMask;
+      store << dds.header.ddpf.dwABitMask;
+      store << dds.header.dwCaps;
+      store << dds.header.dwCaps2;
+      store << dds.header.dwCaps3;
+      store << dds.header.dwCaps4;
+      store << dds.header.dwReserved2;
+
+      // Data array
+      store.save(data,width*height*depth);
+
+      store.swapBytes(swap);
+      result=true;
+      }
     }
-  else{
-    dds.header.dwCaps=DDSCAPS_TEXTURE;
-    dds.header.dwCaps2=0;
-    }
-  dds.header.dwCaps3=0;
-  dds.header.dwCaps4=0;
-  dds.header.dwReserved2=0;
-
-  // Start saving now
-  store << dds.magic;
-  store << dds.header.dwSize;
-  store << dds.header.dwFlags;
-  store << dds.header.dwHeight;
-  store << dds.header.dwWidth;
-  store << dds.header.dwLinearSize;
-  store << dds.header.dwDepth;
-  store << dds.header.dwMipMapCount;
-  store.save(dds.header.dwReserved1,11);
-  store << dds.header.ddpf.dwSize;
-  store << dds.header.ddpf.dwFlags;
-  store << dds.header.ddpf.dwFourCC;
-  store << dds.header.ddpf.dwRGBBitCount;
-  store << dds.header.ddpf.dwRBitMask;
-  store << dds.header.ddpf.dwGBitMask;
-  store << dds.header.ddpf.dwBBitMask;
-  store << dds.header.ddpf.dwABitMask;
-  store << dds.header.dwCaps;
-  store << dds.header.dwCaps2;
-  store << dds.header.dwCaps3;
-  store << dds.header.dwCaps4;
-  store << dds.header.dwReserved2;
-
-  // Data array
-  store.save(data,width*height*depth);
-
-  store.swapBytes(swap);
   return true;
   }
 

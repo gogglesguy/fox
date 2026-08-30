@@ -69,64 +69,73 @@ extern FXAPI FXbool fxsaveWEBP(FXStream& store,const FXColor* data,FXint width,F
 
 // Check if stream contains a WebP
 FXbool fxcheckWEBP(FXStream& store){
-  FXuchar signature[16];
-  store.load(signature,16);
-  store.position(-16,FXFromCurrent);
-  return (signature[ 0]=='R' && signature[ 1]=='I' && signature[ 2]=='F' && signature[ 3]=='F' &&
-          signature[ 8]=='W' && signature[ 9]=='E' && signature[10]=='B' && signature[11]=='P' &&
-          signature[12]=='V' && signature[13]=='P' && signature[14]=='8' && signature[15]==' ');
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[16];
+    store.load(signature,16);
+    store.position(-16,FXFromCurrent);
+    return (signature[ 0]=='R' && signature[ 1]=='I' && signature[ 2]=='F' && signature[ 3]=='F' &&
+            signature[ 8]=='W' && signature[ 9]=='E' && signature[10]=='B' && signature[11]=='P' &&
+            signature[12]=='V' && signature[13]=='P' && signature[14]=='8' && signature[15]==' ');
+    }
+  return false;
   }
 
 /*******************************************************************************/
 
 // Load a WebP image
 FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXuchar *buffer=nullptr;
-  FXlong   start;
-  FXuint   size;
-  FXbool   swap;
 
-  // Everyone remember where we parked.
-  start=store.position();
-
-  // Go directly to size chunk
-  store.position(4,FXFromCurrent);
-
-  // Read size in little endian
-  swap=store.swapBytes();
-  store.setBigEndian(false);
-  store >> size;
-  size+=8; // add riff and size fields
-  store.setBigEndian(swap);
-
-  // Start over
-  store.position(start);
-
-  // Allocate Buffer
-  if(allocElms(buffer,size)){
-
-    // Read the complete data
-    store.load(buffer,size);
-
-    // Get Info
-    if(WebPGetInfo(buffer,size,&width,&height) && width>0 && height>0){
-
-      // Allocate Output Buffer
-      if(allocElms(data,width*height)){
-
-        // Try Decoding
-        if(WebPDecodeBGRAInto(buffer,size,(FXuchar*)data,width*height*4,width*4)){
-          freeElms(buffer);
-          return true;
-          }
-        freeElms(data);
-        }
-      }
-    freeElms(buffer);
-    }
+  // Null out
   data=nullptr;
   height=0;
   width=0;
+
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXuchar *buffer=nullptr;
+    FXlong   start;
+    FXuint   size;
+    FXbool   swap;
+
+    // Everyone remember where we parked.
+    start=store.position();
+
+    // Go directly to size chunk
+    store.position(4,FXFromCurrent);
+
+    // Read size in little endian
+    swap=store.swapBytes();
+    store.setBigEndian(false);
+    store >> size;
+    size+=8; // add riff and size fields
+    store.setBigEndian(swap);
+
+    // Start over
+    store.position(start);
+
+    // Allocate Buffer
+    if(allocElms(buffer,size)){
+
+      // Read the complete data
+      store.load(buffer,size);
+
+      // Get Info
+      if(WebPGetInfo(buffer,size,&width,&height) && width>0 && height>0){
+
+        // Allocate Output Buffer
+        if(allocElms(data,width*height)){
+
+          // Try Decoding
+          if(WebPDecodeBGRAInto(buffer,size,(FXuchar*)data,width*height*4,width*4)){
+            freeElms(buffer);
+            return true;
+            }
+          freeElms(data);
+          }
+        }
+      freeElms(buffer);
+      }
+    }
   return false;
   }
 
@@ -134,12 +143,14 @@ FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
 
 // Save a WebP image
 FXbool fxsaveWEBP(FXStream& store,const FXColor* colors,FXint width,FXint height,FXfloat quality){
-  FXuchar *data=nullptr;
-  FXuint   size=WebPEncodeBGRA((const FXuchar*)colors,width,height,width*4,quality,&data);
-  if(size){
-    store.save(data,size);
-    free(data);
-    return true;
+  if(store.direction()==FXStreamSave){
+    FXuchar *data=nullptr;
+    FXuint   size=WebPEncodeBGRA((const FXuchar*)colors,width,height,width*4,quality,&data);
+    if(size){
+      store.save(data,size);
+      free(data);
+      return true;
+      }
     }
   return false;
   }
@@ -156,25 +167,30 @@ FXbool fxcheckWEBP(FXStream&){
 
 
 // Stub routine
-FXbool fxloadWEBP(FXStream&,FXColor*& data,FXint& width,FXint& height){
-  static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
-  static const FXuchar webp_bits[] = {
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0xc6,0x00,0x06,0x00,0x82,0x00,0x04,0x00,0x82,
-  0x00,0x04,0x00,0x82,0x00,0x04,0x00,0x92,0x38,0x3c,0x3e,0x92,0x44,0x44,0x44,
-  0x92,0x82,0x84,0x84,0xaa,0xfe,0x84,0x84,0xaa,0x02,0x84,0x84,0xaa,0x02,0x84,
-  0x84,0x44,0x82,0x84,0x44,0x44,0x84,0x44,0x3c,0x44,0x78,0x3c,0x04,0x00,0x00,
-  0x00,0x04,0x00,0x00,0x00,0x1e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 };
-  allocElms(data,32*32);
-  for(FXint p=0; p<32*32; p++){
-    data[p]=color[(webp_bits[p>>3]>>(p&7))&1];
+FXbool fxloadWEBP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+  if(store.direction()==FXStreamLoad){
+    static const FXColor color[2]={FXRGB(0,0,0),FXRGB(255,255,255)};
+    static const FXuchar webp_bits[]={
+      0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+      0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+      0x00,0x00,0x00,0x00,0x00,0x00,0xc6,0x00,0x06,0x00,0x82,0x00,0x04,0x00,0x82,
+      0x00,0x04,0x00,0x82,0x00,0x04,0x00,0x92,0x38,0x3c,0x3e,0x92,0x44,0x44,0x44,
+      0x92,0x82,0x84,0x84,0xaa,0xfe,0x84,0x84,0xaa,0x02,0x84,0x84,0xaa,0x02,0x84,
+      0x84,0x44,0x82,0x84,0x44,0x44,0x84,0x44,0x3c,0x44,0x78,0x3c,0x04,0x00,0x00,
+      0x00,0x04,0x00,0x00,0x00,0x1e,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+      0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+      0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+      };
+    if(allocElms(data,32*32)){
+      for(FXint p=0; p<32*32; p++){
+        data[p]=color[(webp_bits[p>>3]>>(p&7))&1];
+        }
+      width=32;
+      height=32;
+      return true;
+      }
     }
-  width=32;
-  height=32;
-  return true;
+  return false;
   }
 
 

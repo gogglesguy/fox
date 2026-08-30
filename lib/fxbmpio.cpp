@@ -46,6 +46,20 @@
     is known, then we can determine if there's a gap between bitmap info header,
     optional colormap/bitmasks, and the data area.  Skip over this space if
     we can determine its there.
+  - Dealing with bitfields, BEXTR instruction may be of use:
+
+      // Preparation [same for green, blue, alpha...]
+      rbits=pop32(rmask);
+      rshift=ctz32(rmask);
+      rext=(rbits<<8)|rshift;
+
+      // Extract and scale
+      red=(_bextr_u32(wwww,rext)*rmult)>>24;
+
+      // This replaces:
+      red=(((wwww&rmask)>>rshift)*rmult)>>24;
+
+    It may not be worth the trouble if AND + SHLX take same amount of time.
 */
 
 #define TOPIC_DETAIL 1018
@@ -218,22 +232,28 @@ static const FXuint maskmult[33]={
 
 // Check if stream contains a BMP
 FXbool fxcheckBMP(FXStream& store){
-  FXuchar signature[2];
-  store.load(signature,2);
-  store.position(-2,FXFromCurrent);
-  return signature[0]=='B' && signature[1]=='M';
+  if(store.direction()==FXStreamLoad){
+    FXuchar signature[2];
+    store.load(signature,2);
+    store.position(-2,FXFromCurrent);
+    return signature[0]=='B' && (signature[1]=='M' || signature[1]=='A');
+    }
+  return false;
   }
 
 
 // Check if stream contains ICO or CUR
 FXbool fxcheckICO(FXStream& store){
-  FXbool swap=store.swapBytes();
-  FXshort signature[3];
-  store.setBigEndian(false);
-  store.load(signature,3);
-  store.position(-6,FXFromCurrent);
-  store.swapBytes(swap);
-  return signature[0]==0 && (signature[1]==IDH_ICO || signature[1]==IDH_CUR) && signature[2]>=1;
+  if(store.direction()==FXStreamLoad){
+    FXbool swap=store.swapBytes();
+    FXshort signature[3];
+    store.setBigEndian(false);
+    store.load(signature,3);
+    store.position(-6,FXFromCurrent);
+    store.swapBytes(swap);
+    return signature[0]==0 && (signature[1]==IDH_ICO || signature[1]==IDH_CUR) && signature[2]>=1;
+    }
+  return false;
   }
 
 /*******************************************************************************/
@@ -655,7 +675,6 @@ static FXuint checkBPP(const FXColor *data,FXint width,FXint height){
 
 // Load BMP image from stream
 FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXbool swap=store.swapBytes();
   FXbool result=false;
 
   // Null out
@@ -663,53 +682,433 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   width=0;
   height=0;
 
-  // Make little-endian
-  store.setBigEndian(false);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
 
-  // Get size and offset
-  BitmapFileHeader bfh;
-  store >> bfh.bfType;
-  store >> bfh.bfSize;
-  store >> bfh.bfReserved1;
-  store >> bfh.bfReserved2;
-  store >> bfh.bfOffBits;
+    // Old swap state
+    FXbool swap=store.swapBytes();
 
-  FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfType=0x%04x\n",bfh.bfType);
-  FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfSize=%u\n",bfh.bfSize);
-  FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfOffBits=%u\n",bfh.bfOffBits);
-  FXTRACE(TOPIC_DETAIL,"fxloadBMP: bmiStart=%ld\n",store.position());
+    // Make little-endian
+    store.setBigEndian(false);
 
-  // Check signature
-  if(bfh.bfType==BMP_WNT || bfh.bfType==BMP_OS2){
+    // Get size and offset
+    BitmapFileHeader bfh;
+    store >> bfh.bfType;
+    store >> bfh.bfSize;
+    store >> bfh.bfReserved1;
+    store >> bfh.bfReserved2;
+    store >> bfh.bfOffBits;
 
-    // Read bitmap info header; default masks BGRA
+    FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfType=0x%04x\n",bfh.bfType);
+    FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfSize=%u\n",bfh.bfSize);
+    FXTRACE(TOPIC_DETAIL,"fxloadBMP: bfOffBits=%u\n",bfh.bfOffBits);
+    FXTRACE(TOPIC_DETAIL,"fxloadBMP: bmiStart=%ld\n",store.position());
+
+    // Check signature
+    if(bfh.bfType==BMP_WNT || bfh.bfType==BMP_OS2){
+
+      // Read bitmap info header; default masks BGRA
+      BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
+      store >> bmi.biSize;
+
+      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biSize=%u\n",bmi.biSize);
+
+      // Known BMP header size?
+      if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5 || bmi.biSize==BIH_OS2V1 || bmi.biSize==BIH_OS2V2){
+        RGBAPixel colormap[256];
+
+        // Older OS/2 1.x BitmapInfoHeader
+        if(bmi.biSize==BIH_OS2V1){
+          FXushort ss;
+          store >> ss; bmi.biWidth=ss;
+          store >> ss; bmi.biHeight=ss;
+          store >> bmi.biPlanes;
+          store >> bmi.biBitCount;
+          bmi.biCompression=BIH_RGB;
+          bmi.biSizeImage=(((bmi.biPlanes*bmi.biBitCount*bmi.biWidth)+31)>>5)*4*bmi.biHeight;
+          bmi.biXPelsPerMeter=0;
+          bmi.biYPelsPerMeter=0;
+          bmi.biClrUsed=(bfh.bfOffBits-BIH_OS2V1-BFH_SIZE)/3;   // As suggested
+          bmi.biClrImportant=0;
+          store.position(bmi.biSize-BIH_OS2V1,FXFromCurrent);
+          }
+
+        // Newer Windows BitmapInfoHeader
+        else{
+          store >> bmi.biWidth;
+          store >> bmi.biHeight;
+          store >> bmi.biPlanes;
+          store >> bmi.biBitCount;
+          store >> bmi.biCompression;
+          store >> bmi.biSizeImage;
+          store >> bmi.biXPelsPerMeter;
+          store >> bmi.biYPelsPerMeter;
+          store >> bmi.biClrUsed;
+          store >> bmi.biClrImportant;
+          if(bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
+            store >> colormap[0].c;       // Red mask
+            store >> colormap[1].c;       // Green mask
+            store >> colormap[2].c;       // Blue mask
+            store >> colormap[3].c;       // Alpha mask
+            store.position(bmi.biSize-BIH_WNTV3,FXFromCurrent);
+            }
+          else{
+            store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
+            }
+          }
+
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biWidth=%d\n",bmi.biWidth);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biHeight=%d\n",bmi.biHeight);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biBitCount=%d\n",bmi.biBitCount);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biClrUsed=%d\n",bmi.biClrUsed);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biSizeImage=%d\n",bmi.biSizeImage);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: biCompression=%d\n",bmi.biCompression);
+        FXTRACE(TOPIC_DETAIL,"fxloadBMP: colormapStart=%ld\n",store.position());
+
+        // Check for sensible inputs
+        if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
+          FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
+          FXint gapsize;
+
+          FXTRACE(TOPIC_DETAIL,"fxloadBMP: colors=%d\n",colors);
+
+
+          // Read bitfields if we haven't already
+          if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
+            if(bmi.biCompression==BIH_BITFIELDS){
+              store >> colormap[0].c;     // Red mask
+              store >> colormap[1].c;     // Green mask
+              store >> colormap[2].c;     // Blue mask
+              colormap[3].c=0;            // No alpha
+              }
+            if(bmi.biCompression==BIH_ALFABITFIELDS){
+              store >> colormap[0].c;     // Red mask
+              store >> colormap[1].c;     // Green mask
+              store >> colormap[2].c;     // Blue mask
+              store >> colormap[3].c;     // Alpha mask
+              }
+            }
+
+          // Read colormap
+          if(bmi.biBitCount<=8 && colors<=256){
+            if(bmi.biSize!=BIH_OS2V1){
+              for(FXuint i=0; i<colors; i++){
+                store >> colormap[i].b;   // Blue
+                store >> colormap[i].g;   // Green
+                store >> colormap[i].r;   // Red
+                store >> colormap[i].a;
+                colormap[i].a=255;
+                }
+              }
+            else{
+              for(FXuint i=0; i<colors; i++){
+                store >> colormap[i].b;   // Blue
+                store >> colormap[i].g;   // Green
+                store >> colormap[i].r;   // Red
+                colormap[i].a=255;
+                }
+              }
+            }
+
+          // Start of data is supposedly at bfh.bfOffBits, but sometimes
+          // there's a gap between end of bitmap info header and colormap
+          // to the pixel data; this gap should be positive or zero.
+          gapsize=bfh.bfOffBits-store.position();
+          FXTRACE(TOPIC_DETAIL,"fxloadBMP: gapsize=%d\n",gapsize);
+          if(0<=gapsize){
+
+            // Jump forward over the gap to get to data field
+            store.position(bfh.bfOffBits,FXFromStart);
+
+            // But wait, there's more
+            if(!store.eof()){
+
+              // Image dimensions
+              width=bmi.biWidth;
+              height=Math::iabs(bmi.biHeight);
+
+              FXTRACE(TOPIC_DETAIL,"fxloadBMP: dataStart=%ld\n",store.position());
+
+              // Load the bits
+              result=fxloadBMPBits(store,data,bmi.biWidth,bmi.biHeight,colormap,bmi.biBitCount,bmi.biCompression);
+
+              FXTRACE(TOPIC_DETAIL,"fxloadBMP: dataEnd=%ld\n",store.position());
+              }
+            }
+          }
+        }
+      }
+
+    // Restore byte order
+    store.swapBytes(swap);
+    }
+  FXTRACE(TOPIC_DETAIL,"fxloadBMP: %s\n\n",result?"OK":"FAIL");
+  return result;
+  }
+
+/*******************************************************************************/
+
+// Load DIB image from stream
+FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
+  FXbool result=false;
+
+  // Null out
+  data=nullptr;
+  width=0;
+  height=0;
+
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+
+    // Old swap state
+    FXbool swap=store.swapBytes();
+
+    // Make little-endian
+    store.setBigEndian(false);
+
+    // Read bitmap info header
     BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
     store >> bmi.biSize;
 
-    FXTRACE(TOPIC_DETAIL,"fxloadBMP: biSize=%u\n",bmi.biSize);
-
-    // Known BMP header size?
-    if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5 || bmi.biSize==BIH_OS2V1 || bmi.biSize==BIH_OS2V2){
+    // Check bitmap info header size
+    if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
       RGBAPixel colormap[256];
-
-      // Older OS/2 1.x BitmapInfoHeader
-      if(bmi.biSize==BIH_OS2V1){
-        FXushort ss;
-        store >> ss; bmi.biWidth=ss;
-        store >> ss; bmi.biHeight=ss;
-        store >> bmi.biPlanes;
-        store >> bmi.biBitCount;
-        bmi.biCompression=BIH_RGB;
-        bmi.biSizeImage=(((bmi.biPlanes*bmi.biBitCount*bmi.biWidth)+31)>>5)*4*bmi.biHeight;
-        bmi.biXPelsPerMeter=0;
-        bmi.biYPelsPerMeter=0;
-        bmi.biClrUsed=(bfh.bfOffBits-BIH_OS2V1-BFH_SIZE)/3;   // As suggested
-        bmi.biClrImportant=0;
-        store.position(bmi.biSize-BIH_OS2V1,FXFromCurrent);
+      store >> bmi.biWidth;
+      store >> bmi.biHeight;
+      store >> bmi.biPlanes;
+      store >> bmi.biBitCount;
+      store >> bmi.biCompression;
+      store >> bmi.biSizeImage;
+      store >> bmi.biXPelsPerMeter;
+      store >> bmi.biYPelsPerMeter;
+      store >> bmi.biClrUsed;
+      store >> bmi.biClrImportant;
+      if(bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
+        store >> colormap[0].c;           // Red mask
+        store >> colormap[1].c;           // Green mask
+        store >> colormap[2].c;           // Blue mask
+        store >> colormap[3].c;           // Alpha mask
+        store.position(bmi.biSize-BIH_WNTV3,FXFromCurrent);
+        }
+      else{
+        store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
         }
 
-      // Newer Windows BitmapInfoHeader
-      else{
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biWidth=%d\n",bmi.biWidth);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biHeight=%d\n",bmi.biHeight);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biBitCount=%d\n",bmi.biBitCount);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biClrUsed=%d\n",bmi.biClrUsed);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biSizeImage=%d\n",bmi.biSizeImage);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: biCompression=%d\n",bmi.biCompression);
+      FXTRACE(TOPIC_DETAIL,"fxloadDIB: colormapStart=%ld\n",store.position());
+
+      // Check for sensible inputs
+      if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
+        FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
+
+        FXTRACE(TOPIC_DETAIL,"fxloadDIB: colors=%d\n",colors);
+
+        // Read bitfields if we haven't already
+        if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
+          if(bmi.biCompression==BIH_BITFIELDS){
+            store >> colormap[0].c;       // Red mask
+            store >> colormap[1].c;       // Green mask
+            store >> colormap[2].c;       // Blue mask
+            colormap[3].c=0;              // No alpha
+            }
+          if(bmi.biCompression==BIH_ALFABITFIELDS){
+            store >> colormap[0].c;       // Red mask
+            store >> colormap[1].c;       // Green mask
+            store >> colormap[2].c;       // Blue mask
+            store >> colormap[3].c;       // Alpha mask
+            }
+          }
+
+        // Read colormap
+        if(bmi.biBitCount<=8){
+          for(FXuint i=0; i<colors; i++){
+            store >> colormap[i].b;       // Blue
+            store >> colormap[i].g;       // Green
+            store >> colormap[i].r;       // Red
+            store >> colormap[i].a;
+            colormap[i].a=255;
+            }
+          }
+
+        // But wait, there's more
+        if(!store.eof()){
+
+          // Image dimensions
+          width=bmi.biWidth;
+          height=Math::iabs(bmi.biHeight);
+
+          // Load the bits
+          result=fxloadBMPBits(store,data,bmi.biWidth,bmi.biHeight,colormap,bmi.biBitCount,bmi.biCompression);
+          }
+        }
+      }
+
+    // Restore byte order
+    store.swapBytes(swap);
+    }
+  FXTRACE(TOPIC_DETAIL,"fxloadDIB: %s\n\n",result?"OK":"FAIL");
+  return result;
+  }
+
+/*******************************************************************************/
+
+// Save BMP image to file stream
+FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
+  FXbool result=false;
+
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
+
+    // Must make sense
+    if(data && 0<width && 0<height){
+
+      // Save byte order
+      FXbool swap=store.swapBytes();
+
+      // Use alpha channel if image not opaque
+      FXushort bpp=checkBPP(data,width,height);
+
+      // Make little-endian
+      store.setBigEndian(false);
+
+      // BitmapFileHeader
+      BitmapFileHeader bfh={BMP_WNT,FXuint(14+BIH_WNTV1+height*(((width*bpp+31)>>5)<<2)),0,0,14+BIH_WNTV1};
+
+      // Initialize bitmap info header
+      BitmapInfoHeader bmi={BIH_WNTV1,width,height,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
+
+      // BitmapFileHeader
+      store << bfh.bfType;        // Magic number
+      store << bfh.bfSize;        // File size
+      store << bfh.bfReserved1;   // bfReserved1
+      store << bfh.bfReserved2;   // bfReserved2
+      store << bfh.bfOffBits;     // bfOffBits
+
+      // Bitmap Info Header
+      store << bmi.biSize;
+      store << bmi.biWidth;
+      store << bmi.biHeight;
+      store << bmi.biPlanes;
+      store << bmi.biBitCount;            // biBitCount (1,4,8,24, or 32)
+      store << bmi.biCompression;         // biCompression:  BIH_RGB, BIH_RLE8, BIH_RLE4, or BIH_BITFIELDS
+      store << bmi.biSizeImage;
+      store << bmi.biXPelsPerMeter;       // biXPelsPerMeter: (75dpi * 39" per meter)
+      store << bmi.biYPelsPerMeter;       // biYPelsPerMeter: (75dpi * 39" per meter)
+      store << bmi.biClrUsed;
+      store << bmi.biClrImportant;
+
+      // Save pixels
+      result=fxsaveBMPBits(store,data,width,height,bpp);
+
+      // Restore byte order
+      store.swapBytes(swap);
+      }
+    }
+  FXTRACE(TOPIC_DETAIL,"fxsaveBMP: %s\n\n",result?"OK":"FAIL");
+  return result;
+  }
+
+/*******************************************************************************/
+
+// Save DIB image to stream
+FXbool fxsaveDIB(FXStream& store,const FXColor *data,FXint width,FXint height){
+  FXbool result=false;
+
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
+
+    // Must make sense
+    if(data && 0<width && 0<height){
+
+      // Save byte order
+      FXbool swap=store.swapBytes();
+
+      // Use alpha channel if image not opaque
+      FXushort bpp=checkBPP(data,width,height);
+
+      // Make little-endian
+      store.setBigEndian(false);
+
+      // Initialize bitmap info header
+      BitmapInfoHeader bmi={BIH_WNTV1,width,height,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
+
+      // Bitmap Info Header
+      store << bmi.biSize;
+      store << bmi.biWidth;
+      store << bmi.biHeight;
+      store << bmi.biPlanes;
+      store << bmi.biBitCount;            // biBitCount (1,4,8,24, or 32)
+      store << bmi.biCompression;         // biCompression:  BIH_RGB, BIH_RLE8, BIH_RLE4, or BIH_BITFIELDS
+      store << bmi.biSizeImage;           // Image size in bytes
+      store << bmi.biXPelsPerMeter;       // biXPelsPerMeter: (75dpi * 39" per meter)
+      store << bmi.biYPelsPerMeter;       // biYPelsPerMeter: (75dpi * 39" per meter)
+      store << bmi.biClrUsed;
+      store << bmi.biClrImportant;
+
+      // Save pixels
+      result=fxsaveBMPBits(store,data,width,height,bpp);
+
+      // Restore byte order
+      store.swapBytes(swap);
+      }
+    }
+  FXTRACE(TOPIC_DETAIL,"fxsaveDIB: %s\n\n",result?"OK":"FAIL");
+  return result;
+  }
+
+/*******************************************************************************/
+
+// Load ICO image from stream
+FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot){
+  FXbool result=false;
+
+  // Null out
+  data=nullptr;
+  width=0;
+  height=0;
+  xspot=-1;
+  yspot=-1;
+
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
+    FXbool swap=store.swapBytes();
+
+    // Make little-endian
+    store.setBigEndian(false);
+
+    // Icon Directory Header
+    IconDirectory icd;
+    store >> icd.idReserved;      // Must be zero
+    store >> icd.idType;          // Must be 1 (icon) or 2 (cursor)
+    store >> icd.idCount;         // Only one icon
+
+    // Validity of icon directory header
+    if(icd.idReserved==0 && 0<icd.idCount && (icd.idType==IDH_ICO || icd.idType==IDH_CUR)){
+
+      // Icon Directory Entry
+      IconDirectoryEntry ice;
+      store >> ice.bWidth;
+      store >> ice.bHeight;
+      store >> ice.bColorCount;     // 0 for > 8bit/pixel
+      store >> ice.bReserved;       // 0
+      store >> ice.wXHotspot;       // X hotspot if cursor, #planes if icon
+      store >> ice.wYHotspot;       // Y hotspot if cursor, #bits/pixel if icon
+      store >> ice.dwBytesInRes;    // Total number of bytes in images (including palette data)
+      store >> ice.dwImageOffset;   // Location of image from the beginning of file
+
+      // Skip to bitmap info header
+      store.position(ice.dwImageOffset-22,FXFromCurrent);
+
+      // Initialize bitmap info header
+      BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
+      store >> bmi.biSize;
+      if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
+        RGBAPixel colormap[256];
         store >> bmi.biWidth;
         store >> bmi.biHeight;
         store >> bmi.biPlanes;
@@ -721,111 +1120,91 @@ FXbool fxloadBMP(FXStream& store,FXColor*& data,FXint& width,FXint& height){
         store >> bmi.biClrUsed;
         store >> bmi.biClrImportant;
         if(bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
-          store >> colormap[0].c;       // Red mask
-          store >> colormap[1].c;       // Green mask
-          store >> colormap[2].c;       // Blue mask
-          store >> colormap[3].c;       // Alpha mask
+          store >> colormap[0].c;   // Red mask
+          store >> colormap[1].c;   // Green mask
+          store >> colormap[2].c;   // Blue mask
+          store >> colormap[3].c;   // Alpha mask
           store.position(bmi.biSize-BIH_WNTV3,FXFromCurrent);
           }
         else{
           store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
           }
-        }
 
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biWidth=%d\n",bmi.biWidth);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biHeight=%d\n",bmi.biHeight);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biBitCount=%d\n",bmi.biBitCount);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biClrUsed=%d\n",bmi.biClrUsed);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biSizeImage=%d\n",bmi.biSizeImage);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: biCompression=%d\n",bmi.biCompression);
-      FXTRACE(TOPIC_DETAIL,"fxloadBMP: colormapStart=%ld\n",store.position());
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biWidth=%d\n",bmi.biWidth);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biHeight=%d\n",bmi.biHeight);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biBitCount=%d\n",bmi.biBitCount);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biClrUsed=%d\n",bmi.biClrUsed);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biSizeImage=%d\n",bmi.biSizeImage);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: biCompression=%d\n",bmi.biCompression);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: idCount=%d\n",icd.idCount);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: idType=%d\n",icd.idType);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: wXHotspot=%d\n",ice.wXHotspot);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: wYHotspot=%d\n",ice.wYHotspot);
+        FXTRACE(TOPIC_DETAIL,"fxloadICO: colormapStart=%ld\n",store.position());
 
-      // Check for sensible inputs
-      if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
-        FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
-        FXint gapsize;
+        // Check for sensible inputs
+        if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
+          FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
 
-        FXTRACE(TOPIC_DETAIL,"fxloadBMP: colors=%d\n",colors);
+          FXTRACE(TOPIC_DETAIL,"fxloadICO: colors=%d\n",colors);
 
-
-        // Read bitfields if we haven't already
-        if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
-          if(bmi.biCompression==BIH_BITFIELDS){
-            store >> colormap[0].c;     // Red mask
-            store >> colormap[1].c;     // Green mask
-            store >> colormap[2].c;     // Blue mask
-            colormap[3].c=0;            // No alpha
+          // Read bitfields if we haven't already
+          if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
+            if(bmi.biCompression==BIH_BITFIELDS){
+              store >> colormap[0].c;     // Red mask
+              store >> colormap[1].c;     // Green mask
+              store >> colormap[2].c;     // Blue mask
+              colormap[3].c=0;              // No alpha
+              }
+            if(bmi.biCompression==BIH_ALFABITFIELDS){
+              store >> colormap[0].c;     // Red mask
+              store >> colormap[1].c;     // Green mask
+              store >> colormap[2].c;     // Blue mask
+              store >> colormap[3].c;     // Alpha mask
+              }
             }
-          if(bmi.biCompression==BIH_ALFABITFIELDS){
-            store >> colormap[0].c;     // Red mask
-            store >> colormap[1].c;     // Green mask
-            store >> colormap[2].c;     // Blue mask
-            store >> colormap[3].c;     // Alpha mask
-            }
-          }
 
-        // Read colormap
-        if(bmi.biBitCount<=8 && colors<=256){
-          if(bmi.biSize!=BIH_OS2V1){
+          // Read colormap
+          if(bmi.biBitCount<=8){
             for(FXuint i=0; i<colors; i++){
-              store >> colormap[i].b;   // Blue
-              store >> colormap[i].g;   // Green
-              store >> colormap[i].r;   // Red
+              store >> colormap[i].b;     // Blue
+              store >> colormap[i].g;     // Green
+              store >> colormap[i].r;     // Red
               store >> colormap[i].a;
               colormap[i].a=255;
               }
             }
-          else{
-            for(FXuint i=0; i<colors; i++){
-              store >> colormap[i].b;   // Blue
-              store >> colormap[i].g;   // Green
-              store >> colormap[i].r;   // Red
-              colormap[i].a=255;
-              }
-            }
-          }
-
-        // Start of data is supposedly at bfh.bfOffBits, but sometimes
-        // there's a gap between end of bitmap info header and colormap
-        // to the pixel data; this gap should be positive or zero.
-        gapsize=bfh.bfOffBits-store.position();
-        FXTRACE(TOPIC_DETAIL,"fxloadBMP: gapsize=%d\n",gapsize);
-        if(0<=gapsize){
-
-          // Jump forward over the gap to get to data field
-          store.position(bfh.bfOffBits,FXFromStart);
 
           // But wait, there's more
           if(!store.eof()){
 
             // Image dimensions
             width=bmi.biWidth;
-            height=Math::iabs(bmi.biHeight);
+            height=Math::iabs(bmi.biHeight)/2;
 
-            FXTRACE(TOPIC_DETAIL,"fxloadBMP: dataStart=%ld\n",store.position());
+            // Copy hotspot location if cursor
+            if(icd.idType==IDH_CUR){
+              xspot=ice.wXHotspot;
+              yspot=ice.wYHotspot;
+              }
 
             // Load the bits
-            result=fxloadBMPBits(store,data,bmi.biWidth,bmi.biHeight,colormap,bmi.biBitCount,bmi.biCompression);
-
-            FXTRACE(TOPIC_DETAIL,"fxloadBMP: dataEnd=%ld\n",store.position());
+            result=fxloadICOBits(store,data,bmi.biWidth,bmi.biHeight/2,colormap,bmi.biBitCount,bmi.biCompression);
             }
           }
         }
       }
+
+    // Restore byte order
+    store.swapBytes(swap);
     }
-
-  FXTRACE(TOPIC_DETAIL,"fxloadBMP: %s\n\n",result?"OK":"FAIL");
-
-  // Restore byte order
-  store.swapBytes(swap);
+  FXTRACE(TOPIC_DETAIL,"fxloadICO: %s\n\n",result?"OK":"FAIL");
   return result;
   }
 
-/*******************************************************************************/
 
-// Load DIB image from stream
-FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXbool swap=store.swapBytes();
+// Load ICO Image from stream
+FXbool fxloadICOStream(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   FXbool result=false;
 
   // Null out
@@ -833,237 +1212,20 @@ FXbool fxloadDIB(FXStream& store,FXColor*& data,FXint& width,FXint& height){
   width=0;
   height=0;
 
-  // Make little-endian
-  store.setBigEndian(false);
+  // Stream must be loading
+  if(store.direction()==FXStreamLoad){
 
-  // Read bitmap info header
-  BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
-  store >> bmi.biSize;
-
-  // Check bitmap info header size
-  if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
-    RGBAPixel colormap[256];
-    store >> bmi.biWidth;
-    store >> bmi.biHeight;
-    store >> bmi.biPlanes;
-    store >> bmi.biBitCount;
-    store >> bmi.biCompression;
-    store >> bmi.biSizeImage;
-    store >> bmi.biXPelsPerMeter;
-    store >> bmi.biYPelsPerMeter;
-    store >> bmi.biClrUsed;
-    store >> bmi.biClrImportant;
-    if(bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
-      store >> colormap[0].c;           // Red mask
-      store >> colormap[1].c;           // Green mask
-      store >> colormap[2].c;           // Blue mask
-      store >> colormap[3].c;           // Alpha mask
-      store.position(bmi.biSize-BIH_WNTV3,FXFromCurrent);
-      }
-    else{
-      store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
-      }
-
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biWidth=%d\n",bmi.biWidth);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biHeight=%d\n",bmi.biHeight);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biBitCount=%d\n",bmi.biBitCount);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biClrUsed=%d\n",bmi.biClrUsed);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biSizeImage=%d\n",bmi.biSizeImage);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: biCompression=%d\n",bmi.biCompression);
-    FXTRACE(TOPIC_DETAIL,"fxloadDIB: colormapStart=%ld\n",store.position());
-
-    // Check for sensible inputs
-    if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
-      FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
-
-      FXTRACE(TOPIC_DETAIL,"fxloadDIB: colors=%d\n",colors);
-
-      // Read bitfields if we haven't already
-      if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
-        if(bmi.biCompression==BIH_BITFIELDS){
-          store >> colormap[0].c;       // Red mask
-          store >> colormap[1].c;       // Green mask
-          store >> colormap[2].c;       // Blue mask
-          colormap[3].c=0;              // No alpha
-          }
-        if(bmi.biCompression==BIH_ALFABITFIELDS){
-          store >> colormap[0].c;       // Red mask
-          store >> colormap[1].c;       // Green mask
-          store >> colormap[2].c;       // Blue mask
-          store >> colormap[3].c;       // Alpha mask
-          }
-        }
-
-      // Read colormap
-      if(bmi.biBitCount<=8){
-        for(FXuint i=0; i<colors; i++){
-          store >> colormap[i].b;       // Blue
-          store >> colormap[i].g;       // Green
-          store >> colormap[i].r;       // Red
-          store >> colormap[i].a;
-          colormap[i].a=255;
-          }
-        }
-
-      // But wait, there's more
-      if(!store.eof()){
-
-        // Image dimensions
-        width=bmi.biWidth;
-        height=Math::iabs(bmi.biHeight);
-
-        // Load the bits
-        result=fxloadBMPBits(store,data,bmi.biWidth,bmi.biHeight,colormap,bmi.biBitCount,bmi.biCompression);
-        }
-      }
-    }
-
-  FXTRACE(TOPIC_DETAIL,"fxloadDIB: %s\n\n",result?"OK":"FAIL");
-
-  // Restore byte order
-  store.swapBytes(swap);
-  return result;
-  }
-
-/*******************************************************************************/
-
-// Save BMP image to file stream
-FXbool fxsaveBMP(FXStream& store,const FXColor *data,FXint width,FXint height){
-  FXbool result=false;
-
-  // Must make sense
-  if(data && 0<width && 0<height){
-
-    // Save byte order
+    // Save old byte order
     FXbool swap=store.swapBytes();
 
-    // Use alpha channel if image not opaque
-    FXushort bpp=checkBPP(data,width,height);
-
-    // Make little-endian
+    // Bitmaps are little-endian
     store.setBigEndian(false);
 
-    // BitmapFileHeader
-    BitmapFileHeader bfh={BMP_WNT,FXuint(14+BIH_WNTV1+height*(((width*bpp+31)>>5)<<2)),0,0,14+BIH_WNTV1};
-
-    // Initialize bitmap info header
-    BitmapInfoHeader bmi={BIH_WNTV1,width,height,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
-
-    // BitmapFileHeader
-    store << bfh.bfType;        // Magic number
-    store << bfh.bfSize;        // File size
-    store << bfh.bfReserved1;   // bfReserved1
-    store << bfh.bfReserved2;   // bfReserved2
-    store << bfh.bfOffBits;     // bfOffBits
-
-    // Bitmap Info Header
-    store << bmi.biSize;
-    store << bmi.biWidth;
-    store << bmi.biHeight;
-    store << bmi.biPlanes;
-    store << bmi.biBitCount;            // biBitCount (1,4,8,24, or 32)
-    store << bmi.biCompression;         // biCompression:  BIH_RGB, BIH_RLE8, BIH_RLE4, or BIH_BITFIELDS
-    store << bmi.biSizeImage;
-    store << bmi.biXPelsPerMeter;       // biXPelsPerMeter: (75dpi * 39" per meter)
-    store << bmi.biYPelsPerMeter;       // biYPelsPerMeter: (75dpi * 39" per meter)
-    store << bmi.biClrUsed;
-    store << bmi.biClrImportant;
-
-    // Save pixels
-    result=fxsaveBMPBits(store,data,width,height,bpp);
-
-    // Restore byte order
-    store.swapBytes(swap);
-    }
-  return result;
-  }
-
-/*******************************************************************************/
-
-// Save DIB image to stream
-FXbool fxsaveDIB(FXStream& store,const FXColor *data,FXint width,FXint height){
-  FXbool result=false;
-
-  // Must make sense
-  if(data && 0<width && 0<height){
-
-    // Save byte order
-    FXbool swap=store.swapBytes();
-
-    // Use alpha channel if image not opaque
-    FXushort bpp=checkBPP(data,width,height);
-
-    // Make little-endian
-    store.setBigEndian(false);
-
-    // Initialize bitmap info header
-    BitmapInfoHeader bmi={BIH_WNTV1,width,height,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
-
-    // Bitmap Info Header
-    store << bmi.biSize;
-    store << bmi.biWidth;
-    store << bmi.biHeight;
-    store << bmi.biPlanes;
-    store << bmi.biBitCount;            // biBitCount (1,4,8,24, or 32)
-    store << bmi.biCompression;         // biCompression:  BIH_RGB, BIH_RLE8, BIH_RLE4, or BIH_BITFIELDS
-    store << bmi.biSizeImage;           // Image size in bytes
-    store << bmi.biXPelsPerMeter;       // biXPelsPerMeter: (75dpi * 39" per meter)
-    store << bmi.biYPelsPerMeter;       // biYPelsPerMeter: (75dpi * 39" per meter)
-    store << bmi.biClrUsed;
-    store << bmi.biClrImportant;
-
-    // Save pixels
-    result=fxsaveBMPBits(store,data,width,height,bpp);
-
-    // Restore byte order
-    store.swapBytes(swap);
-    }
-  return result;
-  }
-
-/*******************************************************************************/
-
-// Load ICO image from stream
-FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint& xspot,FXint& yspot){
-  FXbool swap=store.swapBytes();
-  FXbool result=false;
-
-  // Null out
-  data=nullptr;
-  width=0;
-  height=0;
-  xspot=-1;
-  yspot=-1;
-
-  // Make little-endian
-  store.setBigEndian(false);
-
-  // Icon Directory Header
-  IconDirectory icd;
-  store >> icd.idReserved;      // Must be zero
-  store >> icd.idType;          // Must be 1 (icon) or 2 (cursor)
-  store >> icd.idCount;         // Only one icon
-
-  // Validity of icon directory header
-  if(icd.idReserved==0 && 0<icd.idCount && (icd.idType==IDH_ICO || icd.idType==IDH_CUR)){
-
-    // Icon Directory Entry
-    IconDirectoryEntry ice;
-    store >> ice.bWidth;
-    store >> ice.bHeight;
-    store >> ice.bColorCount;     // 0 for > 8bit/pixel
-    store >> ice.bReserved;       // 0
-    store >> ice.wXHotspot;       // X hotspot if cursor, #planes if icon
-    store >> ice.wYHotspot;       // Y hotspot if cursor, #bits/pixel if icon
-    store >> ice.dwBytesInRes;    // Total number of bytes in images (including palette data)
-    store >> ice.dwImageOffset;   // Location of image from the beginning of file
-
-    // Skip to bitmap info header
-    store.position(ice.dwImageOffset-22,FXFromCurrent);
-
-    // Initialize bitmap info header
+    // Read bitmap info header
     BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
     store >> bmi.biSize;
+
+    // Check bitmap info header size
     if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
       RGBAPixel colormap[256];
       store >> bmi.biWidth;
@@ -1087,46 +1249,42 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
         store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
         }
 
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biWidth=%d\n",bmi.biWidth);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biHeight=%d\n",bmi.biHeight);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biBitCount=%d\n",bmi.biBitCount);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biClrUsed=%d\n",bmi.biClrUsed);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biSizeImage=%d\n",bmi.biSizeImage);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: biCompression=%d\n",bmi.biCompression);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: idCount=%d\n",icd.idCount);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: idType=%d\n",icd.idType);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: wXHotspot=%d\n",ice.wXHotspot);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: wYHotspot=%d\n",ice.wYHotspot);
-      FXTRACE(TOPIC_DETAIL,"fxloadICO: colormapStart=%ld\n",store.position());
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biWidth=%d\n",bmi.biWidth);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biHeight=%d\n",bmi.biHeight);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biBitCount=%d\n",bmi.biBitCount);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biClrUsed=%d\n",bmi.biClrUsed);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biSizeImage=%d\n",bmi.biSizeImage);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biCompression=%d\n",bmi.biCompression);
+      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: colormapStart=%ld\n",store.position());
 
       // Check for sensible inputs
-      if(0<bmi.biWidth && 0!=bmi.biHeight && 1<=bmi.biBitCount && bmi.biBitCount<=32){
+      if(bmi.biPlanes==1 && 0<bmi.biWidth && 0!=bmi.biHeight && bmi.biClrUsed<=256 && bmi.biCompression<=BIH_RLE4){
         FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
 
-        FXTRACE(TOPIC_DETAIL,"fxloadICO: colors=%d\n",colors);
+        FXTRACE(TOPIC_DETAIL,"fxloadICOStream: colors=%d\n",colors);
 
         // Read bitfields if we haven't already
         if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
           if(bmi.biCompression==BIH_BITFIELDS){
-            store >> colormap[0].c;     // Red mask
-            store >> colormap[1].c;     // Green mask
-            store >> colormap[2].c;     // Blue mask
+            store >> colormap[0].c;       // Red mask
+            store >> colormap[1].c;       // Green mask
+            store >> colormap[2].c;       // Blue mask
             colormap[3].c=0;              // No alpha
             }
           if(bmi.biCompression==BIH_ALFABITFIELDS){
-            store >> colormap[0].c;     // Red mask
-            store >> colormap[1].c;     // Green mask
-            store >> colormap[2].c;     // Blue mask
-            store >> colormap[3].c;     // Alpha mask
+            store >> colormap[0].c;       // Red mask
+            store >> colormap[1].c;       // Green mask
+            store >> colormap[2].c;       // Blue mask
+            store >> colormap[3].c;       // Alpha mask
             }
           }
 
         // Read colormap
         if(bmi.biBitCount<=8){
           for(FXuint i=0; i<colors; i++){
-            store >> colormap[i].b;     // Blue
-            store >> colormap[i].g;     // Green
-            store >> colormap[i].r;     // Red
+            store >> colormap[i].b;       // Blue
+            store >> colormap[i].g;       // Green
+            store >> colormap[i].r;       // Red
             store >> colormap[i].a;
             colormap[i].a=255;
             }
@@ -1137,128 +1295,19 @@ FXbool fxloadICO(FXStream& store,FXColor*& data,FXint& width,FXint& height,FXint
 
           // Image dimensions
           width=bmi.biWidth;
-          height=Math::iabs(bmi.biHeight)/2;
-
-          // Copy hotspot location if cursor
-          if(icd.idType==IDH_CUR){
-            xspot=ice.wXHotspot;
-            yspot=ice.wYHotspot;
-            }
+          height=Math::iabs(bmi.biHeight)/2;         // Topsy turvy possibility; adjust height also
 
           // Load the bits
           result=fxloadICOBits(store,data,bmi.biWidth,bmi.biHeight/2,colormap,bmi.biBitCount,bmi.biCompression);
           }
         }
       }
+
+
+    // Restore byte order
+    store.swapBytes(swap);
     }
-
-  FXTRACE(TOPIC_DETAIL,"fxloadICO: %s\n\n",result?"OK":"FAIL");
-
-  // Restore byte order
-  store.swapBytes(swap);
-  return result;
-  }
-
-
-// Load ICO Image from stream
-FXbool fxloadICOStream(FXStream& store,FXColor*& data,FXint& width,FXint& height){
-  FXbool swap=store.swapBytes();
-  FXbool result=false;
-
-  // Null out
-  data=nullptr;
-  width=0;
-  height=0;
-
-  // Bitmaps are little-endian
-  store.setBigEndian(false);
-
-  // Read bitmap info header
-  BitmapInfoHeader bmi={0,0,0,0,0,0,0,0,0,0,0};
-  store >> bmi.biSize;
-
-  // Check bitmap info header size
-  if(bmi.biSize==BIH_WNTV1 || bmi.biSize==BIH_WNTV2 || bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
-    RGBAPixel colormap[256];
-    store >> bmi.biWidth;
-    store >> bmi.biHeight;
-    store >> bmi.biPlanes;
-    store >> bmi.biBitCount;
-    store >> bmi.biCompression;
-    store >> bmi.biSizeImage;
-    store >> bmi.biXPelsPerMeter;
-    store >> bmi.biYPelsPerMeter;
-    store >> bmi.biClrUsed;
-    store >> bmi.biClrImportant;
-    if(bmi.biSize==BIH_WNTV3 || bmi.biSize==BIH_WNTV4 || bmi.biSize==BIH_WNTV5){
-      store >> colormap[0].c;   // Red mask
-      store >> colormap[1].c;   // Green mask
-      store >> colormap[2].c;   // Blue mask
-      store >> colormap[3].c;   // Alpha mask
-      store.position(bmi.biSize-BIH_WNTV3,FXFromCurrent);
-      }
-    else{
-      store.position(bmi.biSize-BIH_WNTV1,FXFromCurrent);
-      }
-
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biWidth=%d\n",bmi.biWidth);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biHeight=%d\n",bmi.biHeight);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biBitCount=%d\n",bmi.biBitCount);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biClrUsed=%d\n",bmi.biClrUsed);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biSizeImage=%d\n",bmi.biSizeImage);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: biCompression=%d\n",bmi.biCompression);
-    FXTRACE(TOPIC_DETAIL,"fxloadICOStream: colormapStart=%ld\n",store.position());
-
-    // Check for sensible inputs
-    if(bmi.biPlanes==1 && 0<bmi.biWidth && 0!=bmi.biHeight && bmi.biClrUsed<=256 && bmi.biCompression<=BIH_RLE4){
-      FXuint colors=(bmi.biBitCount<=8 && (bmi.biClrUsed==0 || bmi.biClrUsed>256)) ? 1<<bmi.biBitCount : bmi.biClrUsed;
-
-      FXTRACE(TOPIC_DETAIL,"fxloadICOStream: colors=%d\n",colors);
-
-      // Read bitfields if we haven't already
-      if(8<bmi.biBitCount && bmi.biSize<BIH_WNTV3){
-        if(bmi.biCompression==BIH_BITFIELDS){
-          store >> colormap[0].c;       // Red mask
-          store >> colormap[1].c;       // Green mask
-          store >> colormap[2].c;       // Blue mask
-          colormap[3].c=0;              // No alpha
-          }
-        if(bmi.biCompression==BIH_ALFABITFIELDS){
-          store >> colormap[0].c;       // Red mask
-          store >> colormap[1].c;       // Green mask
-          store >> colormap[2].c;       // Blue mask
-          store >> colormap[3].c;       // Alpha mask
-          }
-        }
-
-      // Read colormap
-      if(bmi.biBitCount<=8){
-        for(FXuint i=0; i<colors; i++){
-          store >> colormap[i].b;       // Blue
-          store >> colormap[i].g;       // Green
-          store >> colormap[i].r;       // Red
-          store >> colormap[i].a;
-          colormap[i].a=255;
-          }
-        }
-
-      // But wait, there's more
-      if(!store.eof()){
-
-        // Image dimensions
-        width=bmi.biWidth;
-        height=Math::iabs(bmi.biHeight)/2;         // Topsy turvy possibility; adjust height also
-
-        // Load the bits
-        result=fxloadICOBits(store,data,bmi.biWidth,bmi.biHeight/2,colormap,bmi.biBitCount,bmi.biCompression);
-        }
-      }
-    }
-
   FXTRACE(TOPIC_DETAIL,"fxloadICOStream: %s\n\n",result?"OK":"FAIL");
-
-  // Restore byte order
-  store.swapBytes(swap);
   return result;
   }
 
@@ -1268,68 +1317,73 @@ FXbool fxloadICOStream(FXStream& store,FXColor*& data,FXint& width,FXint& height
 FXbool fxsaveICO(FXStream& store,const FXColor *data,FXint width,FXint height,FXint xspot,FXint yspot){
   FXbool result=false;
 
-  // Must make sense
-  if(data && 0<width && 0<height && width<256 && height<256){
+  // Stream must be saving
+  if(store.direction()==FXStreamSave){
 
-    // Save byte order
-    FXbool swap=store.swapBytes();
+    // Must make sense
+    if(data && 0<width && 0<height && width<256 && height<256){
 
-    // Use alpha channel if image not opaque
-    FXushort bpp=checkBPP(data,width,height);
+      // Save byte order
+      FXbool swap=store.swapBytes();
 
-    // Bitmaps are little-endian
-    store.setBigEndian(false);
+      // Bitmaps are little-endian
+      store.setBigEndian(false);
 
-    // Initialize icon directory header
-    IconDirectory icd={0,IDH_CUR,1};
+      // Use alpha channel if image not opaque
+      FXushort bpp=checkBPP(data,width,height);
 
-    // Initialize icon directory entry
-    IconDirectoryEntry ice={(FXuchar)width,(FXuchar)height,0,0,(FXushort)xspot,(FXushort)yspot,FXuint(BIH_WNTV1+height*((((width*bpp+31)>>5)<<2)+(((width+31)>>5)<<2))),22};
+      // Initialize icon directory header
+      IconDirectory icd={0,IDH_CUR,1};
 
-    // Initialize bitmap info header
-    BitmapInfoHeader bmi={BIH_WNTV1,width,height*2,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
+      // Initialize icon directory entry
+      IconDirectoryEntry ice={(FXuchar)width,(FXuchar)height,0,0,(FXushort)xspot,(FXushort)yspot,FXuint(BIH_WNTV1+height*((((width*bpp+31)>>5)<<2)+(((width+31)>>5)<<2))),22};
 
-    // Save as ico if no hotspot
-    if(xspot<0 || yspot<0){
-      icd.idType=IDH_ICO;
-      ice.wXHotspot=1;
-      ice.wYHotspot=bpp;
+      // Initialize bitmap info header
+      BitmapInfoHeader bmi={BIH_WNTV1,width,height*2,1,bpp,BIH_RGB,FXuint(height*(((width*bpp+31)>>5)<<2)),75*39,75*39,0,0};
+
+      // Save as ico if no hotspot
+      if(xspot<0 || yspot<0){
+        icd.idType=IDH_ICO;
+        ice.wXHotspot=1;
+        ice.wYHotspot=bpp;
+        }
+
+      // Icon Directory Header
+      store << icd.idReserved;      // Must be zero
+      store << icd.idType;          // Must be 1 (icon) or 2 (cursor)
+      store << icd.idCount;         // Only one icon
+
+      // Icon Directory Entry
+      store << ice.bWidth;
+      store << ice.bHeight;
+      store << ice.bColorCount;     // 0 for > 8bit/pixel
+      store << ice.bReserved;       // 0
+      store << ice.wXHotspot;       // X hotspot if cursor, #planes if icon
+      store << ice.wYHotspot;       // Y hotspot if cursor, #bits/pixel if icon
+      store << ice.dwBytesInRes;    // Total number of bytes in images (including palette data)
+      store << ice.dwImageOffset;   // Location of image from the beginning of file
+
+      // Bitmap Info Header
+      store << bmi.biSize;
+      store << bmi.biWidth;
+      store << bmi.biHeight;
+      store << bmi.biPlanes;
+      store << bmi.biBitCount;
+      store << bmi.biCompression;
+      store << bmi.biSizeImage;
+      store << bmi.biXPelsPerMeter;
+      store << bmi.biYPelsPerMeter;
+      store << bmi.biClrUsed;
+      store << bmi.biClrImportant;
+
+      // Save pixels
+      result=fxsaveICOBits(store,data,width,height,bpp);
+
+      // Restore byte order
+      store.swapBytes(swap);
       }
-
-    // Icon Directory Header
-    store << icd.idReserved;      // Must be zero
-    store << icd.idType;          // Must be 1 (icon) or 2 (cursor)
-    store << icd.idCount;         // Only one icon
-
-    // Icon Directory Entry
-    store << ice.bWidth;
-    store << ice.bHeight;
-    store << ice.bColorCount;     // 0 for > 8bit/pixel
-    store << ice.bReserved;       // 0
-    store << ice.wXHotspot;       // X hotspot if cursor, #planes if icon
-    store << ice.wYHotspot;       // Y hotspot if cursor, #bits/pixel if icon
-    store << ice.dwBytesInRes;    // Total number of bytes in images (including palette data)
-    store << ice.dwImageOffset;   // Location of image from the beginning of file
-
-    // Bitmap Info Header
-    store << bmi.biSize;
-    store << bmi.biWidth;
-    store << bmi.biHeight;
-    store << bmi.biPlanes;
-    store << bmi.biBitCount;
-    store << bmi.biCompression;
-    store << bmi.biSizeImage;
-    store << bmi.biXPelsPerMeter;
-    store << bmi.biYPelsPerMeter;
-    store << bmi.biClrUsed;
-    store << bmi.biClrImportant;
-
-    // Save pixels
-    result=fxsaveICOBits(store,data,width,height,bpp);
-
-    // Restore byte order
-    store.swapBytes(swap);
     }
+  FXTRACE(TOPIC_DETAIL,"fxsaveICO: %s\n\n",result?"OK":"FAIL");
   return result;
   }
 
