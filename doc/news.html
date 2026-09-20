@@ -17,7 +17,34 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-August 29 - FOX DEVELOPMENT 1.7.92
+September 19 - FOX DEVELOPMENT 1.7.93
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Adie will trim alternate history before trimming linear history; you can set amounts of space
+beyond which trimming kicks in, and how much to trim down to when it does.</li>
+<li>GUI update handler to FXUndoList can furnish current undo buffer space used.</li>
+<li>FXUndoList clear() will properly dispose of left-over FXCommandGroups if invoked.</li>
+<li>Marked location in FXUndoList gets updated when alternate history is trimmed.</li>
+<li>Added handy messages to FXUndoList for trimming space down to 1K,...100K,1M...100M,1G.</li>
+<li>FXUndoList undo-record merging may now be merged even in FXCommandGroups.</li>
+<li>FXString::escape() tries to be safe when escaping things as hexadecimal of the form '\xHH'; when followed by digit or letter
+in the range [A-F] (upper or lower case), it will also escape the following character lest it could be interpreted as a 3 [or more]
+digits hex escape.</li>
+<li>FXUndoList has new API, trimWrinkles().  The trimWrinkles() API will find wrinkles in alternate-history
+enabled FXUndoList, and remove the wrinkle [path-not-taken], starting with the oldest.  It will proceed ironing
+out wrinkles until memory space liberated this way brings unto-memory back down to desired limits.</li>
+<li>FXUndoList's hierarchical undo got broken, this update fixes it again; the new implementation uses
+a stack, no longer an intrusive linked list.  Also, undo-record sizes in FXCommandGroups are now accounted for, even
+when the FXCommandGroup is still being added to.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+August 29 - FOX DEVELOPMENT 1.7.93
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->

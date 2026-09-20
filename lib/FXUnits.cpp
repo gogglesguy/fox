@@ -21,6 +21,7 @@
 #include "xincs.h"
 #include "fxver.h"
 #include "fxdefs.h"
+#include "fxchar.h"
 #include "fxmath.h"
 #include "fxascii.h"
 #include "FXString.h"
@@ -105,58 +106,58 @@ struct FXUnitData {
 static const FXUnitData UnitDataArray[]={
    {"A",            "Ampere",              AMPERE,           1.0},
    {"Bq",           "Becquerel",           "1/s",            1.0},
-   {"Btu",          "BritishThermalUnit",  "Kg*m^2/s^2",     1055.05585262},
+   {"Btu",          "BritishThermalUnit",  "kg*m^2/s^2",     1055.05585262},
    {"C",            "Coulomb",             "A*s",            1.0},
    {"Ci",           "Curie",               "1/s",            3737.0},
-   {"Da",           "Dalton",              "Kg",             1.66053906892E-27},
-   {"F",            "Farad",               "A^2*s^4/Kg*m^2", 1.0},
+   {"Da",           "Dalton",              "kg",             1.66053906892E-27},
+   {"F",            "Farad",               "A^2*s^4/kg*m^2", 1.0},
    {"Fdy",          "Faraday",             "A*s",            96487.0},
    {"Gy",           "Gray",                "m^2/s^2",        1.0},
-   {"H",            "Henry",               "Kg*m^2/A^2*s^2", 1.0},
+   {"H",            "Henry",               "kg*m^2/A^2*s^2", 1.0},
    {"Hz",           "Hertz",               "s^-1",           1.0},
-   {"J",            "Joule",               "Kg*m^2/s^2",     1.0},
+   {"J",            "Joule",               "kg*m^2/s^2",     1.0},
    {"K",            "Kelvin",              KELVIN,           1.0},
    {"L",            "Liter",               "m^3",            0.001},
-   {"N",            "Newton",              "Kg*m/s^2",       1.0},
+   {"N",            "Newton",              "kg*m/s^2",       1.0},
    {"Oe",           "Oersted",             "A/m",            79.57747},
-   {"Ohm",          "Ohm",                 "Kg*m^2/A^2*s^3", 1.0},
-   {"P",            "Poise",               "Kg/m*s",         0.1},
-   {"Pa",           "Pascal",              "Kg/m*s^2",       1.0},
-   {"Pdl",          "Poundal",             "Kg*m/s^2",       0.13825495376},
+   {"Ohm",          "Ohm",                 "kg*m^2/A^2*s^3", 1.0},
+   {"P",            "Poise",               "kg/m*s",         0.1},
+   {"Pa",           "Pascal",              "kg/m*s^2",       1.0},
+   {"Pdl",          "Poundal",             "kg*m/s^2",       0.13825495376},
    {"Pica",         "Pica",                "in",             1.0/72.0},
-   {"R",            "Roentgen",            "A*s/Kg",         0.000258},
-   {"S",            "Siemens",             "A^2*s^3/Kg*m^2", 1.0},
+   {"R",            "Roentgen",            "A*s/kg",         0.000258},
+   {"S",            "Siemens",             "A^2*s^3/kg*m^2", 1.0},
    {"St",           "Stokes",              "m^2/s",          0.0001},
    {"Sv",           "Sievert",             "m^2/s^2",        1.0},
-   {"T",            "Tesla",               "Kg/A*s^2",       1.0},
-   {"U",            "UnifiedAtomicMass",   "Kg",             1.66053906892E-27},
-   {"V",            "Volt",                "Kg*m^2/A*s^3",   1.0},
-   {"W",            "Watt",                "Kg*m^2/s^3",     1.0},
-   {"Wb",           "Weber",               "Kg*m^2/A*s^2",   1.0},
+   {"T",            "Tesla",               "kg/A*s^2",       1.0},
+   {"U",            "UnifiedAtomicMass",   "kg",             1.66053906892E-27},
+   {"V",            "Volt",                "kg*m^2/A*s^3",   1.0},
+   {"W",            "Watt",                "kg*m^2/s^3",     1.0},
+   {"Wb",           "Weber",               "kg*m^2/A*s^2",   1.0},
    {"a",            "Are",                 "m^2",            100.0},
    {"acre",         "Acre",                "ha",             0.40468564224},
    {"arcmin",       "ArcMinute",           "rad",            0.000290888208665721596153949},
    {"arcs",         "ArcSecond",           "rad" ,           4.84813681109535993589914E-06},
-   {"atm",          "Atmosphere",          "Kg/m*s^2",       101325.0},
+   {"atm",          "Atmosphere",          "kg/m*s^2",       101325.0},
    {"au",           "AstronomicalUnit",    "m",              149597870700.0},
    {"b",            "Barn",                "m^2",            1E-28},
-   {"bar",          "Bar",                 "Kg/m*s^2",       100000.0},
+   {"bar",          "Bar",                 "kg/m*s^2",       100000.0},
    {"bbl",          "Barrel",              "m^3",            0.158987294928},
    {"bu",           "Bushel",              "m^3",            0.03523907},
    {"c",            "Lightspeed",          "m/s",            299792458.0},
-   {"cal",          "Calorie",             "Kg*m^2/s^2",     4.1868},
+   {"cal",          "Calorie",             "kg*m^2/s^2",     4.1868},
    {"cd",           "Candela",             CANDELA,          1.0},
    {"ch",           "Chain",               "m",              20.116840234},
-   {"ct",           "Carat",               "Kg",             0.0002},
+   {"ct",           "Carat",               "kg",             0.0002},
    {"cu",           "USCup",               "m^3",            2.365882365E-4},
    {"d",            "Day",                 "s",              86400.0},
    {"day",          "Day",                 "s",              86400.0},
    {"deg",          "Degree",              "rad",            0.0174532925199432957692369},
    {"dr",           "Dram",                "g",              1.7718451953125},
    {"dwt",          "Pennyweight",         "g",              1.55517384},
-   {"dyn",          "Dyne",                "Kg*m/s^2",       0.00001},
-   {"eV",           "ElectronVolt",        "Kg*m^2/s^2",     1.60217733e-19},
-   {"erg",          "Erg",                 "Kg*m^2/s^2",     0.0000001},
+   {"dyn",          "Dyne",                "kg*m/s^2",       0.00001},
+   {"eV",           "ElectronVolt",        "kg*m^2/s^2",     1.60217733e-19},
+   {"erg",          "Erg",                 "kg*m^2/s^2",     0.0000001},
    {"fL",           "FootLambert",         "cd/m^2",         3.42625909963539052691674},
    {"fath",         "Fathom",              "m",              1.828803658},
    {"fbm",          "BoardFoot",           "m^3",            0.002359737216},
@@ -168,22 +169,22 @@ static const FXUnitData UnitDataArray[]={
    {"g",            "Gram",                GRAM,             0.001},
    {"gal",          "USGallon",            "m^3",            0.003785411784},
    {"gee",          "StandardGravity",     "m/s^2",          9.80665},
-   {"gf",           "GramForce",           "Kg*m/s^2",       0.00980665},
+   {"gf",           "GramForce",           "kg*m/s^2",       0.00980665},
    {"gr",           "Grain",               "mg",             64.79891},
    {"grad",         "Gradian",             "rad",            0.015707963267948966192313},
    {"h",            "Hour",                "s",              3600.0},
    {"ha",           "Hectare",             "m^2",            10000.0},
    {"hour",         "Hour",                "s",              3600.0},
-   {"hp",           "HorsePower",          "Kg*m^2/s^2",     745.699871582},
+   {"hp",           "HorsePower",          "kg*m^2/s^2",     745.699871582},
    {"in",           "Inch",                "m",              0.0254},
    {"kat",          "Katal",               "mol/s",          1.0},
-   {"kip",          "KiloPoundForce",      "Kg*m/s^2",       4448.22161526},
+   {"kip",          "KiloPoundForce",      "kg*m/s^2",       4448.22161526},
    {"kph",          "KilometersPerHour",   "m/s",            5.0/18.0},
    {"kt",           "Knot",                "m/s",            463.0/900.0},
    {"lam",          "Lambert",             "cd/m^2",         3183.09886183790671537768},
-   {"lb",           "AvoirdupoisPound",    "Kg",             0.45359267},
-   {"lbf",          "PoundForce",          "Kg*m/s^2",       4.44822161526},
-   {"lbt",          "TroyPound",           "Kg",             0.3732417216},
+   {"lb",           "AvoirdupoisPound",    "kg",             0.45359267},
+   {"lbf",          "PoundForce",          "kg*m/s^2",       4.44822161526},
+   {"lbt",          "TroyPound",           "kg",             0.3732417216},
    {"lm",           "Lumen",               "cd*sr",          1.0},
    {"lux",          "Lux",                 "cd*sr/m^2",      1.0},
    {"lx",           "Lux",                 "cd*sr/m^2",      1.0},
@@ -191,13 +192,13 @@ static const FXUnitData UnitDataArray[]={
    {"m",            "Meter",               METER,            1.0},
    {"mi",           "USStatuteMile",       "m",              1609.344},
    {"min",          "Minute",              "s",              60.0},
-   {"mmHg",         "MilimeterOfMercury",  "Kg/m*s^2",       133.3224},
+   {"mmHg",         "MilimeterOfMercury",  "kg/m*s^2",       133.3224},
    {"mol",          "Mole",                MOLE,             1.0},
    {"mph",          "MilesPerHour",        "m/s",            0.44704},
    {"nmi",          "NauticalMile",        "m",              1852.0},
-   {"oz",           "Ounce",               "Kg",             0.028349523125},
+   {"oz",           "Ounce",               "kg",             0.028349523125},
    {"ozfl",         "USFluidOunce",        "m^3",            2.95735295625E-5},
-   {"ozt",          "TroyOunce",           "Kg",             0.0311034768},
+   {"ozt",          "TroyOunce",           "kg",             0.0311034768},
    {"pc",           "Parsec",              "m",              3.08567758149137E16},
    {"ph",           "Phot",                "cd*sr/m^2",      10000.0},
    {"pk",           "Peck",                "L",              8.80976754172},
@@ -209,14 +210,14 @@ static const FXUnitData UnitDataArray[]={
    {"rem",          "Rem",                 "m^2/s^2",        0.01},
    {"s",            "Second",              SECOND,           1.0},
    {"sb",           "Stilb",               "cd/m^2",         10000.0},
-   {"slug",         "Slug",                "Kg",             14.5939029372},
+   {"slug",         "Slug",                "kg",             14.5939029372},
    {"sr",           "Steradian",           STERADIAN,        1.0},
-   {"st",           "ShortTon",            "Kg",             907.18},
-   {"t",            "MetricTon",           "Kg",             1000.0},
+   {"st",           "ShortTon",            "kg",             907.18},
+   {"t",            "MetricTon",           "kg",             1000.0},
    {"therm",        "USTherm",             "J",              105480400.0},
-   {"tn",           "ShortTon",            "Kg",             907.18},
-   {"ton",          "LongTon",             "Kg",             1016.047},
-   {"torr",         "Torr",                "Kg/m^2",         133.3224},
+   {"tn",           "ShortTon",            "kg",             907.18},
+   {"ton",          "LongTon",             "kg",             1016.047},
+   {"torr",         "Torr",                "kg/m^2",         133.3224},
    {"yd",           "Yard",                "m",              0.9144},
    {"yr",           "Year",                "s",              31556925.9747},
    {"\xC2\xB0",     "Degree",              "rad",            0.0174532925199432957692369},
@@ -226,7 +227,7 @@ static const FXUnitData UnitDataArray[]={
    {"\xC2\xB0" "R", "DegreesRankine",      "K",              1.0/1.8},
    {"\xC2\xB5",     "Micron",              "m",              1.0E-06},
    {"\xC3\x85",     "\xC3\x85ngstrom",     "m",              1.0E-10},
-   {"\xCE\xA9",     "Ohm",                 "Kg*m^2/A^2*s^3", 1.0},
+   {"\xCE\xA9",     "Ohm",                 "kg*m^2/A^2*s^3", 1.0},
    {"\xE2\x80\xB2", "ArcMinute",           "rad",            0.000290888208665721596153949},
    {"\xE2\x80\xB3", "ArcSecond",           "rad",            4.84813681109535993589914E-06},
    };
@@ -408,10 +409,7 @@ static const FXchar* scalex(const FXchar* unit,FXUnitConv& u){
     case 'G': k=1.0E+09; break;
     case 'M': k=1.0E+06; break;
     case 'k': k=1.0E+03; break;
-    case 'K': k=1.0E+03; break;
     case 'h': k=1.0E+02; break;
-    case 'H': k=1.0E+02; break;
-    case 'D': k=1.0E+01; break;
     case 'd': k=1.0E-01; break;
     case 'c': k=1.0E-02; break;
     case 'm': k=1.0E-03; break;
@@ -681,6 +679,7 @@ FXulong Units::dimensions(FXuint x){
 FXulong Units::dimensions(const FXchar* unit){
   if(unit){
     FXUnitConv u={0.0,DIMSBIAS};
+    while(Ascii::isSpace(*unit)) unit++;
     if(divex(unit,u)){
       return u.dims;
       }
@@ -691,8 +690,9 @@ FXulong Units::dimensions(const FXchar* unit){
 
 // Scan one unit description, return nullptr or number of characters.
 FXival Units::span(const FXchar* unit){
-  FXUnitConv u={0.0,DIMSBIAS};
   if(unit){
+    FXUnitConv u={0.0,DIMSBIAS};
+    while(Ascii::isSpace(*unit)) unit++;
     const FXchar* end=divex(unit,u);
     if(end){
       return (end-unit);

@@ -752,6 +752,7 @@ new FXMenuCommand(searchmenu,tr("Replace In Files\tShift-Ctl-R\tReplace string i
 #if defined(DEBUG)
   new FXMenuCommand(helpmenu,tr("&Dump Widgets...\t\tDump widget tree."),nullptr,getApp(),Adie::ID_DUMP);
   new FXMenuCommand(helpmenu,tr("&Dump Maps...\t\tDump message maps."),nullptr,getApp(),Adie::ID_MAPS);
+  new FXMenuCommand(helpmenu,tr("&Trim Undo...\t\tTrim undo list."),nullptr,&undolist,FXUndoList::ID_TRIM_ALT);
   new FXMenuCommand(helpmenu,tr("&Dump Undo...\t\tDump message maps."),nullptr,&undolist,FXUndoList::ID_DUMP_STATS);
 #endif
   new FXMenuSeparator(helpmenu);
@@ -868,6 +869,7 @@ void TextWindow::createStatusbar(){
 
   // Language
   language=new FXLabel(statusbar,"---",nullptr,FRAME_SUNKEN|JUSTIFY_RIGHT|LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0,2,2,1,1);
+  language->setTipText(tr("Current language syntax"));
 
   // Undo/redo block
   undoredoblock=new FXHorizontalFrame(statusbar,LAYOUT_RIGHT|LAYOUT_CENTER_Y,0,0,0,0, 0,0,0,0);
@@ -4659,7 +4661,14 @@ long TextWindow::onTextInserted(FXObject*,FXSelector,void* ptr){
   // has moved since previous text change.
   if(!undolist.busy()){
     FXbool merge=(cursormoved<=1) && mergeundos;
+
+    // Add undo command
     undolist.add(new FXTextInsert(editor,change->pos,change->nins,change->ins),false,merge);
+
+    // Trim alternate history first
+    if(undolist.size()>undoMaxSize) undolist.trimWrinkles(undoKeepSize);
+
+    // If unsufficient, trim linear history next
     if(undolist.size()>undoMaxSize) undolist.trimSize(undoKeepSize);
     }
 

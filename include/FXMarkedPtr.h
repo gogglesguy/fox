@@ -53,8 +53,11 @@ public:
   // Assignment
   FXMarkedPtr<TYPE>& operator=(const FXMarkedPtr<TYPE>& org){ as=org.as; return *this; }
 
-  // Obtain the pointer part, stripping off the flag
+  // Get pointer
   TYPE* ptr() const { Un x={as.val&~1L}; return x.ptr; }
+
+  // Set pointer, keeping the flag
+  void ptr(TYPE* p){ FXuval v=as&1; as.ptr=p; as.val|=v; }
 
   // Conversion operators
   operator TYPE*() const { return ptr(); }

@@ -394,12 +394,16 @@ language "C++"
       pattern "\\[0-7]{1,3}"
       style   "carrot"
     end
+    rule "UnicodeEscape"
+      pattern "\\u\h\h\h\h|\\U\h\h\h\h\h\h\h\h"
+      style   "fuchsia"
+    end
     rule "HexEscape"
-      pattern "\\x\h\h"
+      pattern "\\x\h+"
       style   "carrot"
     end
     rule "ControlEscape"
-      pattern "\\."
+      pattern "\\[abefnrtv'\"?]"
       style   "carrot"
     end
     rule "Format"
@@ -418,12 +422,16 @@ language "C++"
       pattern "\\[0-7]{1,3}"
       style   "carrot"
     end
+    rule "UnicodeEscape"
+      pattern "\\u\h\h\h\h|\\U\h\h\h\h\h\h\h\h"
+      style   "fuchsia"
+    end
     rule "HexEscape"
-      pattern "\\x\h\h"
+      pattern "\\x\h+"
       style   "carrot"
     end
     rule "ControlEscape"
-      pattern "\\."
+      pattern "\\[abefnrtv'\"?]"
       style   "carrot"
     end
   end
@@ -1550,7 +1558,7 @@ language "TypeScript"
       style   "fuchsia"
     end
     rule "ControlEscape"
-      pattern "\\[0'\"\\nrvtbf]"
+      pattern "\\[0'\"\\nrvtbfe]"
       style   "fuchsia"
     end
   end
@@ -1570,7 +1578,7 @@ language "TypeScript"
       style   "fuchsia"
     end
     rule "ControlEscape"
-      pattern "\\[0'\"\\nrvtbf]"
+      pattern "\\[0'\"\\nrvtbfe]"
       style   "fuchsia"
     end
   end

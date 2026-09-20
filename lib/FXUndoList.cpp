@@ -109,33 +109,24 @@
     history past that point is often not necessary and could be released
     if space is exceeded.
 
-  - FIXME want trimAltHistory() to trim non-linear history only.  Keeping
-    track of alternate history may not be as important as linear history;
-    when space is exceeded one might want to start deleting alternate
-    history before deleting linear history.
-    How to identify alternate history sequences? First, we can identify
+  - The trimWrinkles() API trims non-linear history only.  Keeping track of
+    alternate history may not be as important as linear history; when space
+    is exceeded one might want to start deleting alternate history before
+    deleting linear history.
+
+  - How to identify alternate history sequences? First, we can identify
     the end of an alternate history sequence, by the fact that the direction
     flips at that point:
 
-               __ __ __
-      C1 C2 C3 C3 C2 C1
+                           __     __ __ __
+          C1 C2 C3 ... CN  CN ... C3 C2 C1
 
     There may also be "wrinkles" in history, i.e. paths not taken *within* the
-    paths not taken; these types of undo records will have reference counts
-    that are >2.  However, it should be true that a *complete* alternate history
-    will have an even-numbered reference count. This may not remain true once
-    history is trimmed, however.
-
-    One may be able to trim undo by record-size starting from the oldest linear
-    record; this should have a reference count==1.  When finding a reference
-    count>1, identify the first direction-change (in the above, the position
-    between C3 and C3's inverse).  Delete pairs of Ci, Ci-inverse) until the
-    remaining oldest record has a refcount of 1, then proceed with oldest-
-    first as before.
+    paths not taken.
 */
 
 #define TOPIC_CONSTRUCT 1000
-#define TOPIC_DEBUG     1002
+#define TOPIC_DEBUG     1023
 
 using namespace FX;
 
@@ -173,6 +164,24 @@ FXuval FXCommand::size() const { return sizeof(FXCommand); }
 FXIMPLEMENT(FXCommandGroup,FXCommand,nullptr,0)
 
 
+// Construct initially empty undo command group
+FXCommandGroup::FXCommandGroup(){
+  FXTRACE(TOPIC_CONSTRUCT,"FXCommandGroup:%p\n",this);
+  }
+
+
+// Return true if empty
+FXbool FXCommandGroup::empty() const {
+  return (command.no()==0);
+  }
+
+
+// Called before adding command
+FXbool FXCommandGroup::cut(){
+  return true;
+  }
+
+
 // Undoing a command group undoes each sub command
 void FXCommandGroup::undo(){
   for(FXival i=command.no()-1; i>=0; --i){
@@ -205,23 +214,19 @@ void FXCommandGroup::clear(){
     command[i]->unref();
     }
   command.clear();
-  delete group;
-  group=nullptr;
   }
-
 
 
 // Destrying the command group destroys the subcommands
 FXCommandGroup::~FXCommandGroup(){
   clear();
+  FXTRACE(TOPIC_CONSTRUCT,"~FXCommandGroup:%p\n",this);
   }
 
 /*******************************************************************************/
 
 // Map
 FXDEFMAP(FXUndoList) FXUndoListMap[]={
-  FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_CLEAR,      FXUndoList::onCmdClear),
-  FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_CLEAR,      FXUndoList::onUpdClear),
   FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_REVERT,     FXUndoList::onCmdRevert),
   FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_REVERT,     FXUndoList::onUpdRevert),
   FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_UNDO,       FXUndoList::onCmdUndo),
@@ -236,6 +241,13 @@ FXDEFMAP(FXUndoList) FXUndoListMap[]={
   FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_REDO_COUNT, FXUndoList::onUpdRedoCount),
   FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_ALT_HISTORY,FXUndoList::onCmdAltHistory),
   FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_ALT_HISTORY,FXUndoList::onUpdAltHistory),
+  FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_CLEAR,      FXUndoList::onCmdClear),
+  FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_CLEAR,      FXUndoList::onUpdClear),
+  FXMAPFUNC(SEL_UPDATE,  FXUndoList::ID_SIZE,       FXUndoList::onUpdSize),
+  FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_TRIM_MARK,  FXUndoList::onCmdTrimMark),
+  FXMAPFUNCS(SEL_COMMAND,FXUndoList::ID_TRIM_COUNT_1K,FXUndoList::ID_TRIM_COUNT_1G,FXUndoList::onCmdTrimCount),
+  FXMAPFUNCS(SEL_COMMAND,FXUndoList::ID_TRIM_SIZE_1K,FXUndoList::ID_TRIM_SIZE_1G,FXUndoList::onCmdTrimSize),
+  FXMAPFUNCS(SEL_COMMAND,FXUndoList::ID_TRIM_ALT_1K,FXUndoList::ID_TRIM_ALT_1G,FXUndoList::onCmdTrimWrinkles),
   FXMAPFUNC(SEL_COMMAND, FXUndoList::ID_DUMP_STATS, FXUndoList::onCmdDumpStats),
   };
 
@@ -246,8 +258,9 @@ FXIMPLEMENT(FXUndoList,FXCommandGroup,FXUndoListMap,ARRAYNUMBER(FXUndoListMap))
 
 
 // Make new empty undo list
-FXUndoList::FXUndoList():space(0),undocount(0),redocount(0),marker(0),markset(false),alternate(true),working(false){
+FXUndoList::FXUndoList():space(0),undocount(0),redocount(0),working(0),marker(0),markset(false),alternate(true){
   FXTRACE(TOPIC_CONSTRUCT,"FXUndoList::FXUndoList\n");
+  groups.push(this);
   }
 
 
@@ -267,7 +280,7 @@ void FXUndoList::unmark(){
 
 // Check if marked
 FXbool FXUndoList::marked() const {
-  return markset && !marker && !group;
+  return markset && !marker && groups.no()==1;
   }
 
 
@@ -321,9 +334,9 @@ FXCommand* FXUndoList::current() const {
 
 // Undo last command
 void FXUndoList::undo(){
-  if(group){ fxerror("FXUndoList::undo: cannot call undo inside begin-end block.\n"); }
+  if(groups.tail()!=this){ fxerror("FXUndoList::undo: cannot call undo() inside begin-end block.\n"); }
   if(0<undocount){
-    working=true;
+    working++;
 
     // Pop off undolist BEFORE undo
     undocount--;
@@ -341,7 +354,7 @@ void FXUndoList::undo(){
     // Push to redolist AFTER undo
     redocount++;
 
-    working=false;
+    working--;
     FXTRACE(TOPIC_DEBUG,"FXUndoList::undo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   }
@@ -349,9 +362,9 @@ void FXUndoList::undo(){
 
 // Redo next command
 void FXUndoList::redo(){
-  if(group){ fxerror("FXUndoList::redo: cannot call redo inside begin-end block.\n"); }
+  if(groups.tail()!=this){ fxerror("FXUndoList::redo: cannot call redo() inside begin-end block.\n"); }
   if(0<redocount){
-    working=true;
+    working++;
 
     // Pop off redolist BEFORE redo
     redocount--;
@@ -369,32 +382,272 @@ void FXUndoList::redo(){
     // Push to undolist AFTER redo
     undocount++;
 
-    working=false;
+    working--;
     FXTRACE(TOPIC_DEBUG,"FXUndoList::redo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   }
 
 
+/*
+  FXint next(FXint p) const;
+  FXint prev(FXint p) const;
+// Advance to next record, but skip wrinkles if we start at the
+// beginning of one; the wrinkle is self-cancelling, i.e. every
+// command in the wrinkle is negated by its inverse later on.
+// Thus, if we want to advance through the undo's quickly, we
+// can skip all the commands in the wrinkle:- they have no effect
+// on the document!
+FXint FXUndoList::next(FXint p) const {
+  if(p+1<commands.no()){
+    FXint w=p;
+    while(w<command.no()){
+      if(command[w].ptr()==command[w+1].ptr()){
+        FXint i=w+1;
+        FXint j=w;
+        do{
+          --i;
+          ++j;
+          }
+        while(p<=i-1 && j+1<command.no() && command[i-1].ptr()==command[j+1].ptr());
+        FXASSERT(p<=i);
+        FXASSERT(j<command.no());
+        FXASSERT(command[i].ptr()==command[j].ptr());
+        if(p<i) break;
+        return j;
+        }
+      w++;
+      }
+    p++;
+    }
+  return p;
+  }
+
+FXint FXUndoList::prev(FXint i) const {
+  }
+*/
+
+
 // Undo all commands
+// FIXME if we can identify "wrinkles" in history, we could
+// leap over them rather than execute all the commands in the wrinkle.
 void FXUndoList::undoAll(){
+  if(groups.tail()!=this){ fxerror("FXUndoList::undoAll: cannot call undoAll() inside begin-end block.\n"); }
   while(canUndo()) undo();
   }
 
 
 // Redo all commands
+// FIXME if we can identify "wrinkles" in history, we could
+// leap over them rather than execute all the commands in the wrinkle.
 void FXUndoList::redoAll(){
+  if(groups.tail()!=this){ fxerror("FXUndoList::redoAll: cannot call redoAll() inside begin-end block.\n"); }
   while(canRedo()) redo();
   }
 
 
 // Revert to marked
 void FXUndoList::revert(){
+  if(groups.tail()!=this){ fxerror("FXUndoList::revert: cannot call revert() inside begin-end block.\n"); }
   if(markset){
     while(marker>0) undo();
     while(marker<0) redo();
     }
   }
 
+/*******************************************************************************/
+
+// Add new command, executing if desired
+FXbool FXUndoList::add(FXCommand* cmd,FXbool doit,FXbool merge){
+
+  // Current command group
+  FXCommandGroup* grp=groups.tail();
+
+  // Must pass a command
+  if(!cmd){ fxerror("FXUndoList::add: NULL command argument.\n"); }
+
+  // Adding undo while in the middle of doing something!
+  if(working){ fxerror("FXUndoList::add: already working on undo or redo.\n"); }
+
+  working++;
+
+  // Cut redo list
+  if(grp->cut()){
+
+    // Execute command
+    if(doit) cmd->redo();
+
+    // Before allowing a merge to a prior undo command, we need to check:
+    //
+    //  1) Merging is to be performed,
+    //  2) There actually is a prior command (duh!),
+    //  3) The prior command says its OK to merge.
+    //  4) We're in a subgroup, OR:
+    //  5) The undo command is a forward one, has no other references, and is not inverted,
+    //  6) And current state is not marked (merging would not allow a revert).
+    //
+    if(merge && 0<grp->command.no()){
+
+      // Previous command and flag
+      FXCommand* prv=grp->command.tail().ptr();
+      FXbool     fwd=grp->command.tail().flag();
+
+      // If command can be merged, and we're in a command-group, we can merge.
+      // If we're not in a command-group, the command must be a forward command,
+      // not shared from other slots, and would not cross the marked location.
+      if(prv->canMerge() && ((grp!=this) || (fwd && prv->nrefs()==1 && !marked()))){
+        FXuval oldsize=prv->size();             // Old size
+        FXuint code=prv->mergeWith(cmd);        // Try merge
+        FXuval newsize=prv->size();             // New size
+        if(1<=code){                            // Changed previous command
+          if(2<=code){                          // Cancelled previous command
+            grp->command.pop();                 // Pop it off
+            prv->unref();                       // Remove reference
+            newsize=0;
+
+            // Update bookkeeping only at toplevel
+            if(grp==this){
+              undocount--;
+              marker-=1;
+              }
+            }
+
+          // Update space
+          space+=newsize-oldsize;
+
+          // Delete command
+          cmd->unref();
+
+          FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
+
+          working--;
+          return true;
+          }
+        }
+      }
+
+    // Add new command to list
+    if(grp->command.push(cmd)){                 // Push it on
+
+      // Pile command onto the list
+      grp->command.tail().flag(true);
+      cmd->ref();
+
+      // Update bookkeeping only at toplevel
+      if(grp==this){
+        space+=cmd->size();
+        undocount++;
+        marker++;
+        }
+
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
+
+      working--;
+      return true;
+      }
+    }
+
+  // Delete command
+  cmd->unref();
+
+  working--;
+  return false;
+  }
+
+
+// Begin a new undo command group
+FXbool FXUndoList::begin(FXCommandGroup *cmd){
+
+  // Current command group
+  FXCommandGroup* grp=groups.tail();
+
+  // Must pass a command group
+  if(!cmd){ fxerror("FXUndoList::begin: NULL command argument.\n"); }
+
+  // Calling begin while in the middle of doing something!
+  if(working){ fxerror("FXUndoList::begin: already working on undo or redo.\n"); }
+
+  // Cut redo list
+  if(grp->cut()){
+    if(groups.push(cmd)){
+      cmd->ref();
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::begin: cmd: %p\n",cmd);
+      return true;
+      }
+    }
+
+  // Delete command
+  cmd->unref();
+
+  return false;
+  }
+
+
+// Abort undo command group
+FXbool FXUndoList::abort(){
+  FXCommandGroup* cmd=groups.tail();
+
+  // Must be called after begin
+  if(cmd==this){ fxerror("FXUndoList::abort: no matching call to begin.\n"); }
+
+  // Calling abort while in the middle of doing something!
+  if(working){ fxerror("FXUndoList::abort: already working on undo or redo.\n"); }
+
+  // Pop subgroup
+  groups.pop();
+
+  // Delete empty command
+  cmd->unref();
+
+  return true;
+  }
+
+
+// End undo command group
+FXbool FXUndoList::end(){
+  FXCommandGroup* cmd=groups.tail();
+
+  // Must have called begin
+  if(cmd==this){ fxerror("FXUndoList::end: no matching call to begin.\n"); }
+
+  // Calling end while in the middle of doing something!
+  if(working){ fxerror("FXUndoList::end: already working on undo or redo.\n"); }
+
+  // Pop subgroup
+  groups.pop();
+
+  // Add to group if non-empty
+  if(!cmd->empty()){
+
+    // Current command group
+    FXCommandGroup* grp=groups.tail();
+
+    // Pile command onto the list
+    if(grp->command.push(cmd)){
+      grp->command.tail().flag(true);
+      cmd->ref();
+
+      // Update bookkeeping only at toplevel
+      if(grp==this){
+        space+=cmd->size();
+        undocount++;
+        marker+=1;
+        }
+
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::end: cmd: %p under: %p: appended!\n",cmd,grp);
+      return true;
+      }
+    }
+
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::end: cmd: %p deleted!\n",cmd);
+
+  // Delete empty command
+  cmd->unref();
+
+  // Not added
+  return false;
+  }
+
+/*******************************************************************************/
 
 // We are taking an alternative path to the future.  After backing up from
 // state S' to state S, we are now about to go to alternate state S''.
@@ -419,7 +672,8 @@ void FXUndoList::revert(){
 //                              __ __ __ __
 //  undolist: ...  C1 C2 C3 C4  C4 C3 C2 C1
 //
-// We are still in state S, the document doesn't get changed by this!
+// We are still in state S, after all, the document doesn't get changed by
+// a sequence of commands that, pair-by-pair, cancel each other out!
 //
 // However, we are now able to walk "back" from state S to state S',
 // undoing the inverse of C1, inverse of C2, etc, until we get to S'.
@@ -452,289 +706,43 @@ FXbool FXUndoList::cut(){
 
     // Alternate history mode
     if(alternate){
-      FXint total=undocount+redocount+redocount;
 
-      // Make room if we're short
-      if(command.no()<total && !command.no(total)) return false;
+      // Room needed for the wrinkle
+      if(!command.no(undocount+redocount+redocount)) return false;
 
       undocount+=redocount;
 
-      // Add reverse order, inverted
+      // Add reverse order, inverted redo-records
       for(FXival i=0; i<redocount; ++i){
         command[undocount+i]=command[undocount-1-i];
         command[undocount+i]->ref();
         command[undocount+i].flip();
         }
 
-      // Update the books
       undocount+=redocount;
-      redocount=0;
-      FXTRACE(TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
-      return true;
       }
 
     // Linear history mode
-    for(FXival i=0; i<redocount; ++i){
-      if(command[undocount+i]->nrefs()==1){ space-=command[undocount+i]->size(); }
-      command[undocount+i]->unref();
+    else{
+
+      // Remove all redo-records
+      for(FXival i=0; i<redocount; ++i){
+        if(command[undocount+i]->nrefs()==1){ space-=command[undocount+i]->size(); }
+        command[undocount+i]->unref();
+        }
+
+      // Drop the redo
+      if(!command.no(undocount)) return false;
       }
 
-    // Update the books
     redocount=0;
+
     FXTRACE(TOPIC_DEBUG,"FXUndoList::cut: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
     }
   return true;
   }
 
-
-// Add new command, executing if desired
-FXbool FXUndoList::add(FXCommand* cmd,FXbool doit,FXbool merge){
-  FXCommandGroup* grp=this;
-
-  // Must pass a command
-  if(!cmd){ fxerror("FXUndoList::add: NULL command argument.\n"); }
-
-  // Adding undo while in the middle of doing something!
-  if(working){ fxerror("FXUndoList::add: already working on undo or redo.\n"); }
-
-  // Cut redo list
-  if(cut()){
-
-    working=true;
-
-    // Hunt for end of group chain
-    while(grp->group){ grp=grp->group; }
-
-    // Execute command
-    if(doit) cmd->redo();
-
-    // Before allowing a merge to a prior undo command, we need to check:
-    //
-    //  1) Merging is to be performed,
-    //  2) Current state is not marked (merging would not allow a revert)
-    //  3) There actually is a prior command (duh!),
-    //  4) The undo command is a forward one,
-    //  5) There is no reference to the undo record's command in a prior undo,
-    //  6) The command itself says its OK to merge.
-    //
-    // When the merge goes through, the merge may totally cancel the prior
-    // command.  In that case, we might choose to drop both the new command
-    // and the prior undo command.
-    if(merge && !marked() && 0<grp->command.no()){
-
-      // Previous command and flag
-      FXCommand* prv=grp->command.tail();
-      FXbool fwd=grp->command.tail().flag();
-
-      // Merging could either adjust the previous command,
-      // or even totally cancel it.  Either way, bookkeeping
-      // must be adjusted if this happens at the top level.
-      if(fwd && prv->nrefs()==1 && prv->canMerge()){
-        FXuval oldsize=prv->size();             // Old size
-        FXuint code=prv->mergeWith(cmd);        // Try merge
-        FXuval newsize=prv->size();             // New size
-        if(1<=code){
-          if(2<=code){
-
-            // Remove last
-            grp->command.pop();
-
-            // Remove reference
-            prv->unref();
-
-            newsize=0;
-
-            // Update bookkeeping
-            if(grp==this){
-              undocount--;
-              marker-=1;
-              }
-            }
-
-          // Update bookkeeping
-          if(grp==this){
-            space+=newsize-oldsize;
-            }
-
-          // Delete command
-          delete cmd;
-
-          working=false;
-          FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
-          return true;
-          }
-        }
-      }
-
-    // Create space if not fits
-    if(undocount<command.no() || command.no(command.no()+1)){
-
-      FXASSERT(undocount<command.no());
-
-      // Append incoming command
-      command[undocount]=cmd;
-
-      // Going forward
-      command[undocount].flag(true);
-
-      // Add reference
-      cmd->ref();
-
-      // Update bookkeeping
-      if(grp==this){
-        space+=cmd->size();
-        undocount++;
-        marker++;
-        }
-
-      working=false;
-
-      FXTRACE(TOPIC_DEBUG,"FXUndoList::add: space=%lu undocount=%d marker=%d\n",space,undoCount(),marker);
-      return true;
-      }
-    working=false;
-    }
-  return false;
-  }
-
-
-// Begin a new undo command group
-FXbool FXUndoList::begin(FXCommandGroup *cmd){
-  FXCommandGroup* grp=this;
-
-  // Must pass a command group
-  if(!cmd){ fxerror("FXUndoList::begin: NULL command argument.\n"); }
-
-  // Calling begin while in the middle of doing something!
-  if(working){ fxerror("FXUndoList::begin: already working on undo or redo.\n"); }
-
-  // Cut redo list
-  if(cut()){
-
-    // Hunt for end of group chain
-    while(grp->group){ grp=grp->group; }
-
-    // Add to end
-    grp->group=cmd;
-
-    return true;
-    }
-  return false;
-  }
-
-
-// End undo command group
-FXbool FXUndoList::end(){
-  FXCommandGroup* grp=this;
-  FXCommandGroup* cmd;
-
-  // Must have called begin
-  if(!grp->group){ fxerror("FXUndoList::end: no matching call to begin.\n"); }
-
-  // Calling end while in the middle of doing something!
-  if(working){ fxerror("FXUndoList::end: already working on undo or redo.\n"); }
-
-  // Hunt for one above end of group chain
-  while(grp->group->group){ grp=grp->group; }
-
-  // Unlink from group chain
-  cmd=grp->group;
-  grp->group=nullptr;
-
-  // Add to group if non-empty
-  if(!cmd->empty()){
-
-    // Append new command to undo list
-    grp->command.push(cmd);
-
-    // Update bookkeeping
-    if(grp==this){
-      space+=cmd->size();
-      undocount++;
-      marker+=1;
-      }
-    return true;
-    }
-
-  // Delete bottom group
-  delete cmd;
-
-  // Not added
-  return false;
-  }
-
-
-// Abort undo command group
-FXbool FXUndoList::abort(){
-  FXCommandGroup *grp=this;
-
-  // Must be called after begin
-  if(!grp->group){ fxerror("FXUndoList::abort: no matching call to begin.\n"); }
-
-  // Calling abort while in the middle of doing something!
-  if(working){ fxerror("FXUndoList::abort: already working on undo or redo.\n"); }
-
-  // Hunt for one above end of group chain
-  while(grp->group->group){ grp=grp->group; }
-
-  // Delete bottom group
-  delete grp->group;
-
-  // New end of chain
-  grp->group=nullptr;
-
-  return true;
-  }
-
-
-// Clear list
-void FXUndoList::clear(){
-  FXTRACE(TOPIC_DEBUG,"FXUndoList::clear: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
-  FXCommandGroup::clear();
-  space=0;
-  undocount=0;
-  redocount=0;
-  marker=0;
-  markset=false;
-  working=false;
-  }
-
-
-// Trim undo list down to at most nc records
-void FXUndoList::trimCount(FXint nc){
-  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimCount: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
-  if(nc<undocount){
-    FXint i=0;
-    while(i<undocount-nc){
-      if(command[i]->nrefs()==1){ space-=command[i]->size(); }
-      command[i]->unref();
-      i++;
-      }
-    command.erase(0,i);
-    undocount-=i;
-    if(undocount<marker) markset=false;
-    }
-  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
-  }
-
-
-// Trim undo list down to at most size sz
-void FXUndoList::trimSize(FXuval sz){
-  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
-  if(sz<space){
-    FXint i=0;
-    while(i<undocount && sz<space){
-      if(command[i]->nrefs()==1){ space-=command[i]->size(); }
-      command[i]->unref();
-      i++;
-      }
-    command.erase(0,i);
-    undocount-=i;
-    if(undocount<marker) markset=false;
-    }
-  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
-  }
-
+/*******************************************************************************/
 
 // Trim undo list down to (but not including) marked node.
 void FXUndoList::trimMark(){
@@ -753,6 +761,131 @@ void FXUndoList::trimMark(){
   FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
   }
 
+
+// Trim wrinkles in undo-list, linearizing oldest history until
+// space usage is brought down to below maximum size.
+void FXUndoList::trimWrinkles(FXuval sz){
+  FXint w=0;
+
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimWrinkles: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
+
+  // Find center of the oldest wrinkle
+  while(sz<space && w+1<undocount){
+
+    // Found the "crease" of the wrinkle
+    if(command[w].ptr()==command[w+1].ptr()){
+      FXint i=w+1;
+      FXint j=w;
+
+      FXTRACE(TOPIC_DEBUG,"wrinkle: command[%2d]=%p == command[%2d]=%p\n",w,command[w].ptr(),w+1,command[w+1].ptr());
+
+      // Scan forwards and backwards to fold the wrinkle starting at
+      // the crease; we stop when enough space has been liberated.
+      do{
+
+        // Work outwards from the crease
+        --i;
+        ++j;
+
+        // First and last to be equal
+        FXASSERT(command[i].ptr()==command[j].ptr());
+
+        // The pair to be deleted refers to a single undo-record,
+        // one redo and one undo; if the reference count is 2, then
+        // a decrement will free the records, and liberate the space.
+        if(command[i]->nrefs()==2){
+          space-=command[i]->size();
+          }
+
+        // Decrement reference counts
+        command[i]->unref();
+        command[j]->unref();
+        }
+      while(0<=i-1 && j+1<undocount && command[i-1].ptr()==command[j+1].ptr() && sz<space);
+
+      FXASSERT(0<=i);
+      FXASSERT(j<undocount);
+
+      // First and last to be equal
+      FXASSERT(command[i].ptr()==command[j].ptr());
+
+      FXTRACE(TOPIC_DEBUG,"FXUndoList::trimWrinkles: remove commands[%d...%d]\n",i,j);
+
+      // Remove i...j from undo list
+      command.erase(i,j-i+1);
+
+      // If marked state is somewhere inside the wrinkle, it
+      // is no longer reachable, so unmark it.
+      if(undocount-marker<=j){
+        if(i<=undocount-marker) unmark();
+        else marker-=j-i+1;
+        }
+
+      // Fewer nodes in the undo list now
+      undocount-=j-i+1;
+
+      // If we want to continue
+      w=i-1;
+      }
+    w++;
+    }
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimWrinkles: now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
+  }
+
+
+// Trim undo list down to at most size sz
+void FXUndoList::trimSize(FXuval sz){
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimSize: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
+  if(sz<space){
+    FXint i=0;
+    while(i<undocount && sz<space){
+      if(command[i]->nrefs()==1){ space-=command[i]->size(); }
+      command[i]->unref();
+      i++;
+      }
+    command.erase(0,i);
+    undocount-=i;
+    if(undocount<marker) unmark();
+    }
+  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
+  }
+
+
+// Trim undo list down to at most nc records
+void FXUndoList::trimCount(FXint nc){
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::trimCount: was: space=%lu undocount=%d; marker=%d ",space,undocount,marker);
+  if(nc<undocount){
+    FXint i=0;
+    while(i<undocount-nc){
+      if(command[i]->nrefs()==1){ space-=command[i]->size(); }
+      command[i]->unref();
+      i++;
+      }
+    command.erase(0,i);
+    undocount-=i;
+    if(undocount<marker) unmark();
+    }
+  FXTRACE(TOPIC_DEBUG,"now: space=%lu undocount=%d; marker=%d\n",space,undocount,marker);
+  }
+
+
+// Clear list
+void FXUndoList::clear(){
+  FXTRACE(TOPIC_DEBUG,"FXUndoList::clear: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
+  FXCommandGroup::clear();
+  while(1<groups.no()){
+    groups.tail()->unref();
+    groups.pop();
+    }
+  space=0;
+  undocount=0;
+  redocount=0;
+  working=0;
+  marker=0;
+  markset=false;
+  }
+
+/*******************************************************************************/
 
 // Dump statistics
 void FXUndoList::dumpStats(){
@@ -780,20 +913,7 @@ void FXUndoList::dumpStats(){
     }
   }
 
-
-// Clear undo list
-long FXUndoList::onCmdClear(FXObject*,FXSelector,void*){
-  clear();
-  return 1;
-  }
-
-
-// Update Clear undo list
-long FXUndoList::onUpdClear(FXObject* sender,FXSelector,void*){
-  sender->handle(this,(canUndo()||canRedo())?FXSEL(SEL_COMMAND,FXWindow::ID_ENABLE):FXSEL(SEL_COMMAND,FXWindow::ID_DISABLE),nullptr);
-  return 1;
-  }
-
+/*******************************************************************************/
 
 // Revert to marked
 long FXUndoList::onCmdRevert(FXObject*,FXSelector,void*){
@@ -879,12 +999,69 @@ long FXUndoList::onUpdAltHistory(FXObject* sender,FXSelector,void*){
   }
 
 
+// Trim to mark
+long FXUndoList::onCmdTrimMark(FXObject*,FXSelector,void*){
+  trimMark();
+  return 1;
+  }
+
+
+// Convenient trim sizes
+static const FXuval poten[]={
+  1000,10000,100000,1000000,10000000,100000000,1000000000
+  };
+
+
+// Trim to size
+long FXUndoList::onCmdTrimSize(FXObject*,FXSelector sel,void*){
+  trimSize(poten[FXSELID(sel)-ID_TRIM_SIZE_1K]);
+  return 1;
+  }
+
+
+// Trim wrinkles to size
+long FXUndoList::onCmdTrimWrinkles(FXObject*,FXSelector sel,void*){
+  trimWrinkles(poten[FXSELID(sel)-ID_TRIM_ALT_1K]);
+  return 1;
+  }
+
+
+// Trim to count
+long FXUndoList::onCmdTrimCount(FXObject*,FXSelector sel,void*){
+  trimCount(poten[FXSELID(sel)-ID_TRIM_COUNT_1K]);
+  return 1;
+  }
+
+
+// Update undo size
+long FXUndoList::onUpdSize(FXObject* sender,FXSelector,void*){
+  FXint memory_used=size();
+  sender->handle(this,FXSEL(SEL_COMMAND,FXWindow::ID_SETINTVALUE),(void*)&memory_used);
+  return 1;
+  }
+
+
+// Clear undo list
+long FXUndoList::onCmdClear(FXObject*,FXSelector,void*){
+  clear();
+  return 1;
+  }
+
+
+// Update Clear undo list
+long FXUndoList::onUpdClear(FXObject* sender,FXSelector,void*){
+  sender->handle(this,(canUndo()||canRedo())?FXSEL(SEL_COMMAND,FXWindow::ID_ENABLE):FXSEL(SEL_COMMAND,FXWindow::ID_DISABLE),nullptr);
+  return 1;
+  }
+
+
 // Dump stats
 long FXUndoList::onCmdDumpStats(FXObject*,FXSelector,void*){
   dumpStats();
   return 1;
   }
 
+/*******************************************************************************/
 
 // Destroy now
 FXUndoList::~FXUndoList(){

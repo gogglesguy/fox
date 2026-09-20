@@ -123,26 +123,26 @@ int main(int argc,char *argv[]){
     convertedvalue=originalvalue;
     if(fm_unit && to_unit){
       if(Units::convert(convertedvalue,fm_unit,to_unit)){
-        fxmessage("value %.14lg %s -> %.14lg %s\n",originalvalue,fm_unit,convertedvalue,to_unit);
+        fxmessage("value %.14lg %.*s -> %.14lg %.*s\n",originalvalue,Units::span(fm_unit),fm_unit,convertedvalue,Units::span(to_unit),to_unit);
         }
       else{
-        fxmessage("failed to convert: %s -> %s\n",fm_unit,to_unit);
+        fxmessage("failed to convert: %.*s -> %.*s\n",Units::span(fm_unit),fm_unit,Units::span(to_unit),to_unit);
         }
       }
     else if(fm_unit){
       if(Units::convertToSIFrom(convertedvalue,fm_unit)){
-        fxmessage("value %.14lg %s -> %.14lg S.I.\n",originalvalue,fm_unit,convertedvalue);
+        fxmessage("value %.14lg %.*s -> %.14lg S.I.\n",originalvalue,Units::span(fm_unit),fm_unit,convertedvalue);
         }
       else{
-        fxmessage("failed to convert from: %s\n",fm_unit);
+        fxmessage("failed to convert from: %.*s\n",Units::span(fm_unit),fm_unit);
         }
       }
     else if(to_unit){
       if(Units::convertFromSITo(convertedvalue,to_unit)){
-        fxmessage("value %.14lg S.I. -> %.14lg %s\n",originalvalue,convertedvalue,to_unit);
+        fxmessage("value %.14lg S.I. -> %.14lg %.*s\n",originalvalue,convertedvalue,Units::span(to_unit),to_unit);
         }
       else{
-        fxmessage("failed to convert to: %s\n",to_unit);
+        fxmessage("failed to convert to: %.*s\n",Units::span(to_unit),to_unit);
         }
       }
     }

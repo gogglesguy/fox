@@ -241,6 +241,12 @@ Preferences::Preferences(TextWindow *own):FXDialogBox(own,"Adie Preferences",DEC
   undokeeptext->setTipText(tr("Undo-buffer trim down keep-size."));
   undokeeptext->setHelpText(tr("Size of undo buffer data to keep around after trim."));
 
+  new FXLabel(matrix3,tr("Current undo size:"),nullptr,JUSTIFY_LEFT|LAYOUT_CENTER_Y);
+  FXTextField* undospacetext=new FXTextField(matrix3,10,&own->undolist,FXUndoList::ID_SIZE,FRAME_SUNKEN|FRAME_THICK|LAYOUT_CENTER_Y|LAYOUT_FILL_X|LAYOUT_FILL_COLUMN,0,0,0,0, 2,2,1,1);
+  undospacetext->setTipText(tr("Current undo-buffer size."));
+  undospacetext->setHelpText(tr("This window's undo buffer at this time."));
+
+
   //// File pattern settings button
   new FXButton(buttons,tr("Misc\tMiscellaneous\tMiscellaneous settings."),mis,switcher,FXSwitcher::ID_OPEN_FIFTH,FRAME_RAISED|ICON_ABOVE_TEXT|LAYOUT_FILL_Y);
 
