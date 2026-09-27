@@ -24,30 +24,71 @@
 #include "fxchar.h"
 #include "fxmath.h"
 #include "fxascii.h"
+#include "fxunicode.h"
 #include "FXString.h"
 #include "FXUnits.h"
 
 /*
   Notes:
 
-  - Convert between various units, in arbitrary combinations.
+  - The NEW units class performs transformations between units.  It parses
+    a unit expression, building up the transformation from one unit to another.
 
-  - We'd like convenience API, when one of the unit is from the S.I. systemm,
-    the conversion should just parse the "foreign" system; something like:
+  - The resulting FXUnits instance can be used repeatedly to transform units
+    in bulk-quantities, as long as the unit expression doesn't change.
 
-        TBool convertToSI(TDouble& value,"lbf");
+  - Apart from units, a unit expression may also be preceeded by magnitude
+    prefixes: (y,z,a,f,p,n,μ,u,m,c,d,h,k,M,G,T,P,E,Z,Y), these scale the
+    corresponding conversion.
 
-    and:
+  - The S.I. system recognizes 9 basic units: (kg,m,A,cd,mol,rad,sr,s,K).
+    All other units can be expressed in terms of these, via unit expressions.
 
-        TBool convertFromSI(TDouble& value,"psi");
+  - Unlike other such libraries, FXUnits can parse any combination of units,
+    as long as unit expression is built up out of the base units or any of the
+    pre-defined units currently incorporated in the list.
 
-    the idea is that our software, internally, works almost exclusively with
-    S.I. units and we only conver to/frm other units for human presentation
-    purposes.
+  - When converting units, it is important to ensure that the dimensions of
+    the source-unit and the destination-unit match.  To this end, FXUnits
+    not only computes the unit transformation, but also carries a dimenstion-
+    vector which describes the respective units in terms of their base-units.
 
-  - To recognize utf8 superscripts like ^2 (\xC2\xB2) or ^3 (\xC2\xB3), we might
-    need unicode character-classes.  For now, use nonpunct[] table to map only
-    nonpunctuation characters, all the rest maps to '\0'.
+    The dimension-vector is stored into a single 64-bit integer, making
+    dimension-checking into a single comparison operation.
+
+  - Convenience APIs are provided in case the source- or destination-unit
+    is part of the S.I. system.  For example, convertFromTo(srcunit) converts
+    from the given source unit to whatever S.I. unit would be equivalent to
+    that.
+
+  - To enforce dimensionality checking, another set of APIs pass the desired
+    dimension-vector. For example, convertFromToDims(srcunit,dims) can parse
+    any unit expression, but ensures that the dimensionality will match the
+    given dimensions.
+
+    This way, you can let a user pick the units he or she wants, but are
+    always assured that the program will ultimately read the required
+    dimensions.  For example,
+
+    convertFromToDims("lb",0x108421084211) reads mass. Changing "lb" to
+    "in" will fail, as "in" has dimension-vector 0x108421084230 which is
+    different from 0x108421084211.
+
+  - The dimensions() API returns the dimension-vector corresponding to
+    the unit-parameter.  You can then take these into your program and
+    let a user pick the units but ensure proper dimensions.
+
+  - The canonical() API takes a dimension-vector and returns a unit-
+    string, in S.I. units, that represents the given dimension-vector.
+
+    Thus, we have unit-expression -> dimension-vector -> unit-expression
+    roundtrip capability.
+
+  - The invert() API inverts the direction of the FXUnits transformation.
+
+  - Some UTF-8 support is available in this implementation for parsing
+    degree-sign (°C), the greek symbol for micro (μ) [1E-6], and minutes
+    and seconds of arc, Ångstrom (Å).
 
   - UTF8 superscripts ^1 '\xC2\xB9' (¹), ^2 '\xC2\xB2' (²) and ^3 '\xC2\xB3' (³).
     We also have superscript minus ^- '\xE2\x81\xBB' (⁻), ^+ '\xE2\x81\xBA' (⁺),
@@ -55,9 +96,26 @@
     Currently, this does not yet work even though code is in place; it is masked
     by all multi-byte unicode being classified as "word-character".
 
+  - Do we like parentheses in unit-expressions (m*s)^2 v,s, m^2*s^2?  We now
+    have an experimental version of this; it is kind of usefull, think about
+    being able to suffix numbers like:
+
+      frequency:  10(1/s)
+
+    Without the parentheses, the "1" in 1/s unit expression would be confused
+    with the number.  So we'll probably keep this feature.
+
+  - Do we want fractional exponents like √s ? It doesn't happen often; we would
+    have exponent with both scale and bias, instead of just bias, in the current
+    framework, we could accomodate -8...7, with increments of ½ (1/2).
+
   - Reference: "Conversion of Units of Measurement," Gordon S. Novak, Jr.,
     IEEE Trans. on Software Engineering, Vol. 21, No. 8, 1995, pp. 651-661.
 */
+
+
+// Extract exponent from dimension-vector
+#define PW(dims,x)  (((FXint)(((dims)>>((x)*5))&31))-16)
 
 using namespace FX;
 
@@ -66,171 +124,453 @@ using namespace FX;
 namespace FX {
 
 
-// This is unlikely to change, unless physics does...
-const FXuval NumBasicUnits=9;
-
-// We use 5 bits for each dimension, limiting values to -16...15 range.
-// There are a potentially 3 slots left for non-physics dimensions.
-const FXulong DIMSBIAS=0x108421084210ull;
-
-
-// Physics units dimension-index
-const FXchar* KELVIN=(const FXchar*)0ul;        // Temperature
-const FXchar* SECOND=(const FXchar*)1ul;        // Time
-const FXchar* GRAM=(const FXchar*)2ul;          // Mass
-const FXchar* METER=(const FXchar*)3ul;         // Length
-const FXchar* AMPERE=(const FXchar*)4ul;        // Electrical current
-const FXchar* MOLE=(const FXchar*)5ul;          // Mole
-const FXchar* CANDELA=(const FXchar*)6ul;       // Luminous flux
-const FXchar* RADIAN=(const FXchar*)7ul;        // Angles
-const FXchar* STERADIAN=(const FXchar*)8ul;     // Solid angles
-
-
 // Used in unit reduction
-struct FXUnitConv {
+struct FXUnits::Conv {
   FXdouble      mult;   // Multiplier
+  FXdouble      plus;   // Addend
   FXulong       dims;   // Dimensions (with DIMSBIAS)
   };
 
 
-// Used in the unit info table
-struct FXUnitData {
-  const FXchar* abbr;   // Abbreviation
-  const FXchar* full;   // Full name
-  const FXchar* expr;   // Unit-expression or dimension-index
-  FXdouble      mult;   // Multiplier
+// Biased dimensions-vector, 5-bits for each
+const FXulong DIMSBIAS=FXULONG(0x108421084210);
+
+
+// Dimensions with bias 16 for basic unit i
+static const FXulong dimmies[]={
+  DIMSBIAS+(FXULONG(1)<<(5*0)),         // Mass
+  DIMSBIAS+(FXULONG(1)<<(5*1)),         // Length
+  DIMSBIAS+(FXULONG(1)<<(5*2)),         // Current
+  DIMSBIAS+(FXULONG(1)<<(5*3)),         // Luminous flux
+  DIMSBIAS+(FXULONG(1)<<(5*4)),         // Mole
+  DIMSBIAS+(FXULONG(1)<<(5*5)),         // Angles
+  DIMSBIAS+(FXULONG(1)<<(5*6)),         // Solid angles
+  DIMSBIAS+(FXULONG(1)<<(5*7)),         // Time
+  DIMSBIAS+(FXULONG(1)<<(5*8)),         // Temperature / Kelvin
+  DIMSBIAS+(FXULONG(1)<<(5*8)),         // Temperature / Celsius
+  DIMSBIAS+(FXULONG(1)<<(5*8)),         // Temperature / Fahrenheit
+  DIMSBIAS+(FXULONG(1)<<(5*8)),         // Temperature / Rankine
   };
 
 
-// Table of all units information; some units in UTF8
-static const FXUnitData UnitDataArray[]={
-   {"A",            "Ampere",              AMPERE,           1.0},
-   {"Bq",           "Becquerel",           "1/s",            1.0},
-   {"Btu",          "BritishThermalUnit",  "kg*m^2/s^2",     1055.05585262},
-   {"C",            "Coulomb",             "A*s",            1.0},
-   {"Ci",           "Curie",               "1/s",            3737.0},
-   {"Da",           "Dalton",              "kg",             1.66053906892E-27},
-   {"F",            "Farad",               "A^2*s^4/kg*m^2", 1.0},
-   {"Fdy",          "Faraday",             "A*s",            96487.0},
-   {"Gy",           "Gray",                "m^2/s^2",        1.0},
-   {"H",            "Henry",               "kg*m^2/A^2*s^2", 1.0},
-   {"Hz",           "Hertz",               "s^-1",           1.0},
-   {"J",            "Joule",               "kg*m^2/s^2",     1.0},
-   {"K",            "Kelvin",              KELVIN,           1.0},
-   {"L",            "Liter",               "m^3",            0.001},
-   {"N",            "Newton",              "kg*m/s^2",       1.0},
-   {"Oe",           "Oersted",             "A/m",            79.57747},
-   {"Ohm",          "Ohm",                 "kg*m^2/A^2*s^3", 1.0},
-   {"P",            "Poise",               "kg/m*s",         0.1},
-   {"Pa",           "Pascal",              "kg/m*s^2",       1.0},
-   {"Pdl",          "Poundal",             "kg*m/s^2",       0.13825495376},
-   {"Pica",         "Pica",                "in",             1.0/72.0},
-   {"R",            "Roentgen",            "A*s/kg",         0.000258},
-   {"S",            "Siemens",             "A^2*s^3/kg*m^2", 1.0},
-   {"St",           "Stokes",              "m^2/s",          0.0001},
-   {"Sv",           "Sievert",             "m^2/s^2",        1.0},
-   {"T",            "Tesla",               "kg/A*s^2",       1.0},
-   {"U",            "UnifiedAtomicMass",   "kg",             1.66053906892E-27},
-   {"V",            "Volt",                "kg*m^2/A*s^3",   1.0},
-   {"W",            "Watt",                "kg*m^2/s^3",     1.0},
-   {"Wb",           "Weber",               "kg*m^2/A*s^2",   1.0},
-   {"a",            "Are",                 "m^2",            100.0},
-   {"acre",         "Acre",                "ha",             0.40468564224},
-   {"arcmin",       "ArcMinute",           "rad",            0.000290888208665721596153949},
-   {"arcs",         "ArcSecond",           "rad" ,           4.84813681109535993589914E-06},
-   {"atm",          "Atmosphere",          "kg/m*s^2",       101325.0},
-   {"au",           "AstronomicalUnit",    "m",              149597870700.0},
-   {"b",            "Barn",                "m^2",            1E-28},
-   {"bar",          "Bar",                 "kg/m*s^2",       100000.0},
-   {"bbl",          "Barrel",              "m^3",            0.158987294928},
-   {"bu",           "Bushel",              "m^3",            0.03523907},
-   {"c",            "Lightspeed",          "m/s",            299792458.0},
-   {"cal",          "Calorie",             "kg*m^2/s^2",     4.1868},
-   {"cd",           "Candela",             CANDELA,          1.0},
-   {"ch",           "Chain",               "m",              20.116840234},
-   {"ct",           "Carat",               "kg",             0.0002},
-   {"cu",           "USCup",               "m^3",            2.365882365E-4},
-   {"d",            "Day",                 "s",              86400.0},
-   {"day",          "Day",                 "s",              86400.0},
-   {"deg",          "Degree",              "rad",            0.0174532925199432957692369},
-   {"dr",           "Dram",                "g",              1.7718451953125},
-   {"dwt",          "Pennyweight",         "g",              1.55517384},
-   {"dyn",          "Dyne",                "kg*m/s^2",       0.00001},
-   {"eV",           "ElectronVolt",        "kg*m^2/s^2",     1.60217733e-19},
-   {"erg",          "Erg",                 "kg*m^2/s^2",     0.0000001},
-   {"fL",           "FootLambert",         "cd/m^2",         3.42625909963539052691674},
-   {"fath",         "Fathom",              "m",              1.828803658},
-   {"fbm",          "BoardFoot",           "m^3",            0.002359737216},
-   {"fc",           "FootCandle",          "cd*sr/m^2",      10.764},
-   {"ft",           "Foot",                "m",              0.3048},
-   {"ftUS",         "SurveyFoot",          "m",              0.304800609601},
-   {"ftn",          "Fortnight",           "s",              1209600.0},
-   {"fur",          "Furlong",             "m",              201.168402337},
-   {"g",            "Gram",                GRAM,             0.001},
-   {"gal",          "USGallon",            "m^3",            0.003785411784},
-   {"gee",          "StandardGravity",     "m/s^2",          9.80665},
-   {"gf",           "GramForce",           "kg*m/s^2",       0.00980665},
-   {"gr",           "Grain",               "mg",             64.79891},
-   {"grad",         "Gradian",             "rad",            0.015707963267948966192313},
-   {"h",            "Hour",                "s",              3600.0},
-   {"ha",           "Hectare",             "m^2",            10000.0},
-   {"hour",         "Hour",                "s",              3600.0},
-   {"hp",           "HorsePower",          "kg*m^2/s^2",     745.699871582},
-   {"in",           "Inch",                "m",              0.0254},
-   {"kat",          "Katal",               "mol/s",          1.0},
-   {"kip",          "KiloPoundForce",      "kg*m/s^2",       4448.22161526},
-   {"kph",          "KilometersPerHour",   "m/s",            5.0/18.0},
-   {"kt",           "Knot",                "m/s",            463.0/900.0},
-   {"lam",          "Lambert",             "cd/m^2",         3183.09886183790671537768},
-   {"lb",           "AvoirdupoisPound",    "kg",             0.45359267},
-   {"lbf",          "PoundForce",          "kg*m/s^2",       4.44822161526},
-   {"lbt",          "TroyPound",           "kg",             0.3732417216},
-   {"lm",           "Lumen",               "cd*sr",          1.0},
-   {"lux",          "Lux",                 "cd*sr/m^2",      1.0},
-   {"lx",           "Lux",                 "cd*sr/m^2",      1.0},
-   {"ly",           "Lightyear",           "m",              9460730472580800.0},
-   {"m",            "Meter",               METER,            1.0},
-   {"mi",           "USStatuteMile",       "m",              1609.344},
-   {"min",          "Minute",              "s",              60.0},
-   {"mmHg",         "MilimeterOfMercury",  "kg/m*s^2",       133.3224},
-   {"mol",          "Mole",                MOLE,             1.0},
-   {"mph",          "MilesPerHour",        "m/s",            0.44704},
-   {"nmi",          "NauticalMile",        "m",              1852.0},
-   {"oz",           "Ounce",               "kg",             0.028349523125},
-   {"ozfl",         "USFluidOunce",        "m^3",            2.95735295625E-5},
-   {"ozt",          "TroyOunce",           "kg",             0.0311034768},
-   {"pc",           "Parsec",              "m",              3.08567758149137E16},
-   {"ph",           "Phot",                "cd*sr/m^2",      10000.0},
-   {"pk",           "Peck",                "L",              8.80976754172},
-   {"psi",          "PoundsPerSquareInch", "Pa",             6894.757},
-   {"pt",           "Pint",                "m^3",            0.0004731765},
-   {"qt",           "Quart",               "m^3",            0.0009463529},
-   {"rad",          "Radian",              RADIAN,           1.0},
-   {"rd",           "Rod",                 "m",              5.029210058},
-   {"rem",          "Rem",                 "m^2/s^2",        0.01},
-   {"s",            "Second",              SECOND,           1.0},
-   {"sb",           "Stilb",               "cd/m^2",         10000.0},
-   {"slug",         "Slug",                "kg",             14.5939029372},
-   {"sr",           "Steradian",           STERADIAN,        1.0},
-   {"st",           "ShortTon",            "kg",             907.18},
-   {"t",            "MetricTon",           "kg",             1000.0},
-   {"therm",        "USTherm",             "J",              105480400.0},
-   {"tn",           "ShortTon",            "kg",             907.18},
-   {"ton",          "LongTon",             "kg",             1016.047},
-   {"torr",         "Torr",                "kg/m^2",         133.3224},
-   {"yd",           "Yard",                "m",              0.9144},
-   {"yr",           "Year",                "s",              31556925.9747},
-   {"\xC2\xB0",     "Degree",              "rad",            0.0174532925199432957692369},
-   {"\xC2\xB0" "C", "DegreesCelsius",      "K",              1.0},
-   {"\xC2\xB0" "F", "DegreesFahrenheit",   "K",              1.0/1.8},
-   {"\xC2\xB0" "K", "DegreesKelvin",       KELVIN,           1.0},
-   {"\xC2\xB0" "R", "DegreesRankine",      "K",              1.0/1.8},
-   {"\xC2\xB5",     "Micron",              "m",              1.0E-06},
-   {"\xC3\x85",     "\xC3\x85ngstrom",     "m",              1.0E-10},
-   {"\xCE\xA9",     "Ohm",                 "kg*m^2/A^2*s^3", 1.0},
-   {"\xE2\x80\xB2", "ArcMinute",           "rad",            0.000290888208665721596153949},
-   {"\xE2\x80\xB3", "ArcSecond",           "rad",            4.84813681109535993589914E-06},
-   };
+// Addends for each unit
+static const FXdouble addends[]={
+  0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,273.15,459.67,0.0
+  };
+
+
+// Unit symbols
+const FXchar FXUnits::symbol[NumUnits][8]={
+  "A",                          // Ampere
+  "Bq",                         // Becquerel
+  "Btu",                        // BritishThermalUnit
+  "C",                          // Coulomb
+  "Ci",                         // Curie
+  "Da",                         // Dalton
+  "F",                          // Farad
+  "Fdy",                        // Faraday
+  "Gy",                         // Gray
+  "H",                          // Henry
+  "Hz",                         // Hertz
+  "J",                          // Joule
+  "K",                          // Kelvin
+  "L",                          // Liter
+  "N",                          // Newton
+  "Oe",                         // Oersted
+  "Ohm",                        // Ohm
+  "P",                          // Poise
+  "Pa",                         // Pascal
+  "Pdl",                        // Poundal
+  "Pica",                       // Pica
+  "R",                          // Roentgen
+  "S",                          // Siemens
+  "St",                         // Stokes
+  "Sv",                         // Sievert
+  "T",                          // Tesla
+  "U",                          // UnifiedAtomicMass
+  "V",                          // Volt
+  "W",                          // Watt
+  "Wb",                         // Weber
+  "a",                          // Are
+  "acre",                       // Acre
+  "arcmin",                     // ArcMinute
+  "arcs",                       // ArcSecond
+  "atm",                        // Atmosphere
+  "au",                         // AstronomicalUnit
+  "b",                          // Barn
+  "bar",                        // Bar
+  "bbl",                        // Barrel
+  "bu",                         // Bushel
+  "c",                          // Lightspeed
+  "cal",                        // Calorie
+  "cd",                         // Candela
+  "ch",                         // Chain
+  "ct",                         // Carat
+  "cu",                         // USCup
+  "d",                          // Day
+  "day",                        // Day
+  "deg",                        // Degree
+  "dr",                         // Dram
+  "dwt",                        // Pennyweight
+  "dyn",                        // Dyne
+  "eV",                         // ElectronVolt
+  "erg",                        // Erg
+  "fL",                         // FootLambert
+  "fath",                       // Fathom
+  "fbm",                        // BoardFoot
+  "fc",                         // FootCandle
+  "ft",                         // Foot
+  "ftUS",                       // SurveyFoot
+  "ftn",                        // Fortnight
+  "fur",                        // Furlong
+  "g",                          // Gram
+  "gal",                        // USGallon
+  "gee",                        // StandardGravity
+  "gf",                         // GramForce
+  "gr",                         // Grain
+  "grad",                       // Gradian
+  "h",                          // Hour
+  "ha",                         // Hectare
+  "hour",                       // Hour
+  "hp",                         // HorsePower
+  "in",                         // Inch
+  "kat",                        // Katal
+  "kip",                        // KiloPoundForce
+  "kph",                        // KilometersPerHour
+  "kt",                         // Knot
+  "lam",                        // Lambert
+  "lb",                         // AvoirdupoisPound
+  "lbf",                        // PoundForce
+  "lbt",                        // TroyPound
+  "lm",                         // Lumen
+  "lux",                        // Lux
+  "lx",                         // Lux
+  "ly",                         // Lightyear
+  "m",                          // Meter
+  "mi",                         // USStatuteMile
+  "min",                        // Minute
+  "mmH2O",                      // MilimeterOfWater
+  "mmHg",                       // MilimeterOfMercury
+  "mmH\xE2\x82\x82O",           // MilimeterOfWater
+  "mol",                        // Mole
+  "mph",                        // MilesPerHour
+  "nmi",                        // NauticalMile
+  "oz",                         // Ounce
+  "ozfl",                       // USFluidOunce
+  "ozt",                        // TroyOunce
+  "pc",                         // Parsec
+  "ph",                         // Phot
+  "pk",                         // Peck
+  "psi",                        // PoundsPerSquareInch
+  "pt",                         // Pint
+  "qt",                         // Quart
+  "rad",                        // Radian
+  "rd",                         // Rod
+  "rem",                        // Rem
+  "rev",                        // Revolution
+  "s",                          // Second
+  "sb",                         // Stilb
+  "slug",                       // Slug
+  "sp",                         // Spat
+  "sr",                         // Steradian
+  "st",                         // Stone
+  "t",                          // MetricTon
+  "therm",                      // USTherm
+  "tn",                         // ShortTon
+  "ton",                        // LongTon
+  "torr",                       // Torr
+  "tr",                         // Turn
+  "yd",                         // Yard
+  "yr",                         // Year
+  "\xC2\xB0",                   // Degree
+  "\xC2\xB0" "C",               // DegreesCelsius
+  "\xC2\xB0" "F",               // DegreesFahrenheit
+  "\xC2\xB0" "K",               // DegreesKelvin
+  "\xC2\xB0" "R",               // DegreesRankine
+  "\xC2\xB5",                   // Micron
+  "\xC3\x85",                   // Angstrom
+  "\xCE\xA9",                   // Ohm
+  "\xE2\x80\xB2",               // ArcMinute
+  "\xE2\x80\xB3",               // ArcSecond
+  "\xE2\x84\x83",               // DegreesCelsius
+  "\xE2\x84\x89",               // DegreesFahrenheit
+  };
+
+
+// Conversion factors
+const FXdouble FXUnits::factor[NumUnits]={
+  1.0,                          // Ampere
+  1.0,                          // Becquerel
+  1055.05585262,                // BritishThermalUnit
+  1.0,                          // Coulomb
+  3737.0,                       // Curie
+  1.66053906892E-27,            // Dalton
+  1.0,                          // Farad
+  96487.0,                      // Faraday
+  1.0,                          // Gray
+  1.0,                          // Henry
+  1.0,                          // Hertz
+  1.0,                          // Joule
+  1.0,                          // Kelvin
+  0.001,                        // Liter
+  1.0,                          // Newton
+  79.57747,                     // Oersted
+  1.0,                          // Ohm
+  0.1,                          // Poise
+  1.0,                          // Pascal
+  0.13825495376,                // Poundal
+  1.0/72.0,                     // Pica
+  0.000258,                     // Roentgen
+  1.0,                          // Siemens
+  0.0001,                       // Stokes
+  1.0,                          // Sievert
+  1.0,                          // Tesla
+  1.66053906892E-27,            // UnifiedAtomicMass
+  1.0,                          // Volt
+  1.0,                          // Watt
+  1.0,                          // Weber
+  100.0,                        // Are
+  0.40468564224,                // Acre
+  0.000290888208665721596153949,// ArcMinute
+  4.84813681109535993589914E-06,// ArcSecond
+  101325.0,                     // Atmosphere
+  149597870700.0,               // AstronomicalUnit
+  1E-28,                        // Barn
+  100000.0,                     // Bar
+  0.158987294928,               // Barrel
+  0.03523907,                   // Bushel
+  299792458.0,                  // Lightspeed
+  4.1868,                       // Calorie
+  1.0,                          // Candela
+  20.116840234,                 // Chain
+  0.0002,                       // Carat
+  2.365882365E-4,               // USCup
+  86400.0,                      // Day
+  86400.0,                      // Day
+  0.0174532925199432957692369,  // Degree
+  1.7718451953125,              // Dram
+  1.55517384,                   // Pennyweight
+  0.00001,                      // Dyne
+  1.60217733e-19,               // ElectronVolt
+  0.0000001,                    // Erg
+  3.42625909963539052691674,    // FootLambert
+  1.828803658,                  // Fathom
+  0.002359737216,               // BoardFoot
+  10.764,                       // FootCandle
+  0.3048,                       // Foot
+  0.304800609601,               // SurveyFoot
+  1209600.0,                    // Fortnight
+  201.168402337,                // Furlong
+  0.001,                        // Gram
+  0.003785411784,               // USGallon
+  9.80665,                      // StandardGravity
+  0.00980665,                   // GramForce
+  64.79891,                     // Grain
+  0.015707963267948966192313,   // Gradian
+  3600.0,                       // Hour
+  10000.0,                      // Hectare
+  3600.0,                       // Hour
+  745.699871582,                // HorsePower
+  0.0254,                       // Inch
+  1.0,                          // Katal
+  4448.22161526,                // KiloPoundForce
+  5.0/18.0,                     // KilometersPerHour
+  463.0/900.0,                  // Knot
+  3183.09886183790671537768,    // Lambert
+  0.45359267,                   // AvoirdupoisPound
+  4.44822161526,                // PoundForce
+  0.3732417216,                 // TroyPound
+  1.0,                          // Lumen
+  1.0,                          // Lux
+  1.0,                          // Lux
+  9460730472580800.0,           // Lightyear
+  1.0,                          // Meter
+  1609.344,                     // USStatuteMile
+  60.0,                         // Minute
+  9.80665,                      // MilimeterOfWater
+  133.3224,                     // MilimeterOfMercury
+  9.80665,                      // MilimeterOfWater
+  1.0,                          // Mole
+  0.44704,                      // MilesPerHour
+  1852.0,                       // NauticalMile
+  0.028349523125,               // Ounce
+  2.95735295625E-5,             // USFluidOunce
+  0.0311034768,                 // TroyOunce
+  3.08567758149137E16,          // Parsec
+  10000.0,                      // Phot
+  8.80976754172,                // Peck
+  6894.757,                     // PoundsPerSquareInch
+  0.0004731765,                 // Pint
+  0.0009463529,                 // Quart
+  1.0,                          // Radian
+  5.029210058,                  // Rod
+  0.01,                         // Rem
+  6.283185307179586476925286766,// Revolution
+  1.0,                          // Second
+  10000.0,                      // Stilb
+  14.5939029372,                // Slug
+  12.566370614359172954,        // Spat
+  1.0,                          // Steradian
+  6.35029318,                   // Stone
+  1000.0,                       // MetricTon
+  105480400.0,                  // USTherm
+  907.18,                       // ShortTon
+  1016.047,                     // LongTon
+  133.3224,                     // Torr
+  6.283185307179586476925286766,// Turn
+  0.9144,                       // Yard
+  31556925.9747,                // Year
+  0.0174532925199432957692369,  // Degree
+  1.0,                          // DegreesCelsius
+  5.0/9.0,                      // DegreesFahrenheit
+  1.0,                          // DegreesKelvin
+  5.0/9.0,                      // DegreesRankine
+  1.0E-06,                      // Micron
+  1.0E-10,                      // Angstrom
+  1.0,                          // Ohm
+  0.000290888208665721596153949,// ArcMinute
+  4.84813681109535993589914E-06,// ArcSecond
+  1.0,                          // DegreesCelsius
+  5.0/9.0,                      // DegreesFahrenheit
+  };
+
+
+// Unit expressions
+const FXchar FXUnits::expression[NumUnits][16]={
+  {'\0', FXUnits::AMPERE},      // Ampere
+  "1/s",                        // Becquerel
+  "kg*m^2/s^2",                 // BritishThermalUnit
+  "A*s",                        // Coulomb
+  "1/s",                        // Curie
+  "kg",                         // Dalton
+  "A^2*s^4/kg*m^2",             // Farad
+  "A*s",                        // Faraday
+  "m^2/s^2",                    // Gray
+  "kg*m^2/A^2*s^2",             // Henry
+  "s^-1",                       // Hertz
+  "kg*m^2/s^2",                 // Joule
+  {'\0', FXUnits::KELVIN},      // Kelvin
+  "m^3",                        // Liter
+  "kg*m/s^2",                   // Newton
+  "A/m",                        // Oersted
+  "kg*m^2/A^2*s^3",             // Ohm
+  "kg/m*s",                     // Poise
+  "kg/m*s^2",                   // Pascal
+  "kg*m/s^2",                   // Poundal
+  "in",                         // Pica
+  "A*s/kg",                     // Roentgen
+  "A^2*s^3/kg*m^2",             // Siemens
+  "m^2/s",                      // Stokes
+  "m^2/s^2",                    // Sievert
+  "kg/A*s^2",                   // Tesla
+  "kg",                         // UnifiedAtomicMass
+  "kg*m^2/A*s^3",               // Volt
+  "kg*m^2/s^3",                 // Watt
+  "kg*m^2/A*s^2",               // Weber
+  "m^2",                        // Are
+  "ha",                         // Acre
+  "rad",                        // ArcMinute
+  "rad" ,                       // ArcSecond
+  "kg/m*s^2",                   // Atmosphere
+  "m",                          // AstronomicalUnit
+  "m^2",                        // Barn
+  "kg/m*s^2",                   // Bar
+  "m^3",                        // Barrel
+  "m^3",                        // Bushel
+  "m/s",                        // Lightspeed
+  "kg*m^2/s^2",                 // Calorie
+  {'\0', FXUnits::CANDELA},     // Candela
+  "m",                          // Chain
+  "kg",                         // Carat
+  "m^3",                        // USCup
+  "s",                          // Day
+  "s",                          // Day
+  "rad",                        // Degree
+  "g",                          // Dram
+  "g",                          // Pennyweight
+  "kg*m/s^2",                   // Dyne
+  "kg*m^2/s^2",                 // ElectronVolt
+  "kg*m^2/s^2",                 // Erg
+  "cd/m^2",                     // FootLambert
+  "m",                          // Fathom
+  "m^3",                        // BoardFoot
+  "cd*sr/m^2",                  // FootCandle
+  "m",                          // Foot
+  "m",                          // SurveyFoot
+  "s",                          // Fortnight
+  "m",                          // Furlong
+  {'\0', FXUnits::GRAM},        // Gram
+  "m^3",                        // USGallon
+  "m/s^2",                      // StandardGravity
+  "kg*m/s^2",                   // GramForce
+  "mg",                         // Grain
+  "rad",                        // Gradian
+  "s",                          // Hour
+  "m^2",                        // Hectare
+  "s",                          // Hour
+  "kg*m^2/s^2",                 // HorsePower
+  "m",                          // Inch
+  "mol/s",                      // Katal
+  "kg*m/s^2",                   // KiloPoundForce
+  "m/s",                        // KilometersPerHour
+  "m/s",                        // Knot
+  "cd/m^2",                     // Lambert
+  "kg",                         // AvoirdupoisPound
+  "kg*m/s^2",                   // PoundForce
+  "kg",                         // TroyPound
+  "cd*sr",                      // Lumen
+  "cd*sr/m^2",                  // Lux
+  "cd*sr/m^2",                  // Lux
+  "m",                          // Lightyear
+  {'\0', FXUnits::METER},       // Meter
+  "m",                          // USStatuteMile
+  "s",                          // Minute
+  "kg/m*s^2",                   // MilimeterOfWater
+  "kg/m*s^2",                   // MilimeterOfMercury
+  "kg/m*s^2",                   // MilimeterOfWater
+  {'\0', FXUnits::MOLE},        // Mole
+  "m/s",                        // MilesPerHour
+  "m",                          // NauticalMile
+  "kg",                         // Ounce
+  "m^3",                        // USFluidOunce
+  "kg",                         // TroyOunce
+  "m",                          // Parsec
+  "cd*sr/m^2",                  // Phot
+  "L",                          // Peck
+  "Pa",                         // PoundsPerSquareInch
+  "m^3",                        // Pint
+  "m^3",                        // Quart
+  {'\0', FXUnits::RADIAN},      // Radian
+  "m",                          // Rod
+  "m^2/s^2",                    // Rem
+  "rad",                        // Revolution
+  {'\0', FXUnits::SECOND},      // Second
+  "cd/m^2",                     // Stilb
+  "kg",                         // Slug
+  "sr",                         // Spat
+  {'\0', FXUnits::STERADIAN},   // Steradian
+  "kg",                         // Stone
+  "kg",                         // MetricTon
+  "J",                          // USTherm
+  "kg",                         // ShortTon
+  "kg",                         // LongTon
+  "kg/m^2",                     // Torr
+  "rad",                        // Turn
+  "m",                          // Yard
+  "s",                          // Year
+  "rad",                        // Degree
+  {'\0', FXUnits::CELSIUS},     // DegreesCelsius
+  {'\0', FXUnits::FAHRENHEIT},  // DegreesFahrenheit
+  {'\0', FXUnits::KELVIN},      // DegreesKelvin
+  {'\0', FXUnits::RANKINE},     // DegreesRankine
+  "m",                          // Micron
+  "m",                          // Angstrom
+  "kg*m^2/A^2*s^3",             // Ohm
+  "rad",                        // ArcMinute
+  "rad",                        // ArcSecond
+  {'\0', FXUnits::CELSIUS},     // DegreesCelsius
+  {'\0', FXUnits::KELVIN},      // DegreesFahrenheit
+  };
 
 /*******************************************************************************/
 
@@ -254,24 +594,6 @@ static const FXuchar nonpunct[256]={
   0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   };
 
-static const FXuchar nonpunct_[256]={
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,
-  0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x00,0x00,0x00,0x00,0x5f,
-  0x00,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,
-  0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  };
 
 // Compare unit-string against abbreviation.
 // Proper units consist of non-punctuation characters only.
@@ -289,85 +611,119 @@ static FXint unitCompare(const FXchar* unit,const FXchar* abbr){
 
 // Find unit in sorted table through binary search;
 // return NotFound if no such unit found.
-FXuint Units::lookup(const FXchar* unit){
-  FXint l=0,h=ARRAYNUMBER(UnitDataArray)-1,m,c;
+FXint FXUnits::lookup(const FXchar* unit){
+  FXint l=0,h=NumUnits-1,m,c;
   while(l<=h){
     m=(h+l)>>1;
-    c=unitCompare(unit,UnitDataArray[m].abbr);
+    c=unitCompare(unit,symbol[m]);
     if(c==0) return m;
     if(c<0) h=m-1;
     if(c>0) l=m+1;
     }
-  return NotFound;
+  return -1;
   }
 
 
-// Returns the number of units in the internal table.
-FXuint Units::number(){
-  return ARRAYNUMBER(UnitDataArray);
+// Look up unit string
+FXint FXUnits::lookup(const FXString& unit){
+  return lookup(unit.text());
   }
 
 
-// Return true if x is a basic unit
-FXbool Units::basic(FXuint x){
-  return (x<ARRAYNUMBER(UnitDataArray)) && ((FXuval)UnitDataArray[x].expr<NumBasicUnits);
+// Return dimension-description from a unit-string
+FXulong FXUnits::dimensions(const FXchar* unit){
+  if(unit){
+    Conv u={0.0,0.0,DIMSBIAS};
+    if(divex(unit,u)) return u.dims;
+    }
+  return 0;
   }
 
 
-// Return unit symbol (in utf8) if it exists.
-const FXchar* Units::symbol(FXuint x){
-  if(ARRAYNUMBER(UnitDataArray)<=x) return nullptr;
-  return UnitDataArray[x].abbr;
+// Return dimension-description from a unit-string
+FXulong FXUnits::dimensions(const FXString& unit){
+  return dimensions(unit.text());
   }
 
 
-// Return unit name (in utf8) if it exists.
-const FXchar* Units::name(FXuint x){
-  if(ARRAYNUMBER(UnitDataArray)<=x) return nullptr;
-  return UnitDataArray[x].full;
+// Names of basic symbols
+static const FXchar basicSymbol[][4]={
+  "kg","m","A","cd","mol","rad","sr","s","K"
+  };
+
+
+// Map power to string
+static const FXchar symbolPower[][4]={
+  "","","^2","^3","^4","^5","^6","^7","^8","^9","^10","^11","^12","^13","^14","^15","^16"
+  };
+
+
+// Return canonical unit-string from dimension-description
+// It will contain at most one '/' and be of the form:
+//
+//   kg*m/s^2
+//
+// A fancy unicode version would use superscripts for the
+// exponents; could be in a future version.
+FXString FXUnits::canonical(FXulong dims){
+  FXString num,den;
+  for(FXint x=GRAM; x<=KELVIN; ++x){
+    FXint p=PW(dims,x);
+    if(0<p){
+      if(!num.empty()) num.append('*');
+      num.append(basicSymbol[x]);
+      num.append(symbolPower[p]);
+      }
+    if(p<0){
+      if(!den.empty()) den.append('*');
+      den.append(basicSymbol[x]);
+      den.append(symbolPower[-p]);
+      }
+    }
+  if(num.empty()){
+    if(den.empty()) return "1";
+    return "1/"+den;
+    }
+  if(den.empty()) return num;
+  return num+"/"+den;
   }
 
 
-// Return unit conversion factor if it exists.
-FXdouble Units::factor(FXuint x){
-  if(ARRAYNUMBER(UnitDataArray)<=x) return 0.0;
-  return UnitDataArray[x].mult;
+// Return number of characters consumed from unit-string
+FXint FXUnits::span(const FXchar* unit){
+  if(unit){
+    Conv u={0.0,0.0,DIMSBIAS};
+    const FXchar* end=divex(unit,u);
+    if(end){
+      return FXint(end-unit);
+      }
+    }
+  return 0;
   }
 
 
-// Return units expression, if non-basic
-const FXchar* Units::expression(FXuint x){
-  if(ARRAYNUMBER(UnitDataArray)<=x) return nullptr;
-  if((FXuval)UnitDataArray[x].expr<NumBasicUnits) return nullptr;
-  return UnitDataArray[x].expr;
+// Return number of characters consumed from unit-string
+FXint FXUnits::span(const FXString& unit){
+  return span(unit.text());
   }
-
-/*******************************************************************************/
-
-// Parse division-expression
-static const char* divex(const FXchar* unit,FXUnitConv& u);
 
 
 // Lookup unit type and populate u
-static const FXchar* unitex(const FXchar* unit,FXUnitConv& u){
-  FXuint x=Units::lookup(unit);
-  if(x<ARRAYNUMBER(UnitDataArray)){
-    const FXUnitData& info=UnitDataArray[x];
-
-    // Basic unit: we're done!
-    if((FXuval)info.expr<NumBasicUnits){
-      u.dims=DIMSBIAS+(1<<(x*5));
-      u.mult=info.mult;
+const FXchar* FXUnits::unitex(const FXchar* unit,Conv& u){
+  FXint x=lookup(unit);
+  FXTRACE(1,"lookup(%s)=%d\n",unit,x);
+  if(0<=x){
+    if(!expression[x][0]){      // Unit-expression is empty for basic units
+      FXint e=expression[x][1]; // This is the basic unit enum
+      u.mult=factor[x];         // Set scale factor
+      u.plus=addends[e];        // Set addend
+      u.dims=dimmies[e];        // Set dimensions
       }
-
-    // Derived unit: expand it further!
-    else{
-      divex(info.expr,u);
-      u.mult*=info.mult;
+    else{                       // Derived unit: expand it further!
+      divex(expression[x],u);   // Parse unit sub-expression
+      u.mult*=factor[x];        // And apply scale factor
       }
-
-    // Advance past unit
-    unit+=strlen(info.abbr);
+    unit+=strlen(symbol[x]);    // Advance past unit
     return unit;
     }
   return nullptr;
@@ -375,87 +731,89 @@ static const FXchar* unitex(const FXchar* unit,FXUnitConv& u){
 
 
 // Parse scaling prefix
-static const FXchar* scalex(const FXchar* unit,FXUnitConv& u){
+const FXchar* FXUnits::scalex(const FXchar* unit,Conv& u){
   const FXchar* mark=unit;
-  FXdouble k=1.0;
 
-  // Skip white space
-  while(Ascii::isSpace(*unit)) unit++;
+  // Parse sub-expression (expr)
+  if(*mark=='('){
+    mark++;
+    mark=divex(mark,u);
+    if(mark==nullptr) return nullptr;
+    if(*mark!=')') return nullptr;
+    mark++;
+    return mark;
+    }
 
   // For example: Hz = s^-1 = 1/s
-  if(*unit=='1'){
-    unit++;
-
-    // Skip white space
-    while(Ascii::isSpace(*unit)) unit++;
-
-    u.mult=1;
+  if(*mark=='1'){
+    mark++;
+    u.mult=1.0;
+    u.plus=0.0;
     u.dims=DIMSBIAS;
-    return unit;
+    return mark;
     }
 
-  // Parse unit name w/o scaling prefix
-  unit=unitex(unit,u);
-  if(unit!=nullptr) return unit;
-  unit=mark;
+  // First try w/no scaling prefix
+  mark=unitex(mark,u);
 
-  // Parse prefix multiplier
-  switch(*unit++){
-    case 'Y': k=1.0E+24; break;
-    case 'Z': k=1.0E+21; break;
-    case 'E': k=1.0E+18; break;
-    case 'P': k=1.0E+15; break;
-    case 'T': k=1.0E+12; break;
-    case 'G': k=1.0E+09; break;
-    case 'M': k=1.0E+06; break;
-    case 'k': k=1.0E+03; break;
-    case 'h': k=1.0E+02; break;
-    case 'd': k=1.0E-01; break;
-    case 'c': k=1.0E-02; break;
-    case 'm': k=1.0E-03; break;
-    case 'u': k=1.0E-06; break;
-    case 'n': k=1.0E-09; break;
-    case 'p': k=1.0E-12; break;
-    case 'f': k=1.0E-15; break;
-    case 'a': k=1.0E-18; break;
-    case 'z': k=1.0E-21; break;
-    case 'y': k=1.0E-24; break;
-    case '\xCE': if(*unit++=='\xBC'){ k=1.0E-6; break; }
-    default: return nullptr;
+  // Maybe try w/scaling prefix
+  if(mark==nullptr){
+    FXdouble k=1.0;
+
+    mark=unit;
+
+    // Check for scaling prefix
+    switch(*mark++){
+      case 'Y': k=1.0E+24; break;
+      case 'Z': k=1.0E+21; break;
+      case 'E': k=1.0E+18; break;
+      case 'P': k=1.0E+15; break;
+      case 'T': k=1.0E+12; break;
+      case 'G': k=1.0E+09; break;
+      case 'M': k=1.0E+06; break;
+      case 'k': k=1.0E+03; break;
+      case 'h': k=1.0E+02; break;
+      case 'd': k=1.0E-01; break;
+      case 'c': k=1.0E-02; break;
+      case 'm': k=1.0E-03; break;
+      case 'u': k=1.0E-06; break;
+      case 'n': k=1.0E-09; break;
+      case 'p': k=1.0E-12; break;
+      case 'f': k=1.0E-15; break;
+      case 'a': k=1.0E-18; break;
+      case 'z': k=1.0E-21; break;
+      case 'y': k=1.0E-24; break;
+      case '\xCE': if(*mark++=='\xBC'){ k=1.0E-6; break; }
+      default: return nullptr;
+      }
+
+    // Try unit name after scaling prefix
+    mark=unitex(mark,u);
+    if(mark==nullptr) return nullptr;
+
+    unit=mark;
+
+    // Apply multiplier
+    u.mult*=k;
     }
-
-  // Parse unit name following scaling prefix
-  unit=unitex(unit,u);
-  if(unit==nullptr) return nullptr;
-
-  // Apply multiplier
-  u.mult*=k;
-
   return unit;
   }
 
 
 // Parse power-expression
-static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
-  const FXchar* mark;
+const FXchar* FXUnits::powex(const FXchar* unit,Conv& u){
+  const FXchar* mark=unit;
   FXint expo=0;
   FXint sign=0;
 
   // Parse scaling-expression
-  mark=scalex(unit,u);
+  mark=scalex(mark,u);
   if(mark==nullptr) return nullptr;
-
-  // Skip white space
-  while(Ascii::isSpace(mark[0])) mark++;
-
   unit=mark;
 
   // Exponentiation syntax like: x^2.
   if(mark[0]=='^'){
     mark++;
-
-    // Skip white space
-    while(Ascii::isSpace(mark[0])) mark++;
 
     // Sign of exponent
     sign=(mark[0]=='-');
@@ -476,8 +834,6 @@ static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
 
       // Extreme exponent won't fit in 5 bits
       if(expo>15) return nullptr;
-
-      // Absorb input
       unit=mark;
       }
     }
@@ -508,9 +864,6 @@ static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
       }
     }
 
-  // Skip white space
-  while(Ascii::isSpace(unit[0])) unit++;
-
   // Exponent is not zero
   if(expo){
 
@@ -518,8 +871,9 @@ static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
     if(sign) expo=-expo;
 
     // Perform the power
-    u.dims=(u.dims-DIMSBIAS)*expo+DIMSBIAS;
     u.mult=Math::powi(u.mult,expo);
+    u.plus=0.0;
+    u.dims=(u.dims-DIMSBIAS)*expo+DIMSBIAS;
     }
 
   return unit;
@@ -527,180 +881,276 @@ static const FXchar* powex(const FXchar* unit,FXUnitConv& u){
 
 
 // Parse multiply-expression
-static const FXchar* mulex(const FXchar* unit,FXUnitConv& u){
-  const FXchar* mark;
+const FXchar* FXUnits::mulex(const FXchar* unit,Conv& u){
+  const FXchar* mark=unit;
 
   // Parse power-expression
-  unit=powex(unit,u);
-  if(unit==nullptr) return nullptr;
-  mark=unit;
-
-  // Skip white space
-  while(Ascii::isSpace(*unit)) unit++;
+  mark=powex(mark,u);
+  if(mark==nullptr) return nullptr;
+  unit=mark;
 
   // A succession of multiply expressions
-  while(*unit=='*'){
-    FXUnitConv m={0.0,DIMSBIAS};
+  while(*mark=='*'){
+    Conv mu={0.0,0.0,DIMSBIAS};
 
-    // Eat '*'
-    unit++;
+    mark++;
 
     // Parse multiply-expression
-    unit=powex(unit,m);
-    if(unit==nullptr) return mark;
-    mark=unit;
+    mark=powex(mark,mu);
+    if(mark==nullptr) break;
+    unit=mark;
 
     // Perform multiply
-    u.dims+=m.dims-DIMSBIAS;
-    u.mult*=m.mult;
-
-    // Skip white space
-    while(Ascii::isSpace(*unit)) unit++;
+    u.mult*=mu.mult;
+    u.plus=0.0;
+    u.dims+=mu.dims-DIMSBIAS;
     }
   return unit;
   }
 
 
 // Parse divide-expression
-static const FXchar* divex(const FXchar* unit,FXUnitConv& u){
-  const FXchar* mark;
+const FXchar* FXUnits::divex(const FXchar* unit,Conv& u){
+  const FXchar* mark=unit;
 
   // Parse multiply-expression
-  unit=mulex(unit,u);
-  if(unit==nullptr) return nullptr;
-  mark=unit;
-
-  // Skip white space
-  while(Ascii::isSpace(*unit)) unit++;
+  mark=mulex(mark,u);
+  if(mark==nullptr) return nullptr;
+  unit=mark;
 
   // Got more?
-  while(*unit=='/'){
-    FXUnitConv d={0.0,DIMSBIAS};
+  while(*mark=='/'){
+    Conv du={0.0,0.0,DIMSBIAS};
 
     // Eat '/'
-    unit++;
-
-    // Parse white space
-    while(Ascii::isSpace(*unit)) unit++;
+    mark++;
 
     // Parse multiply-expression
-    unit=mulex(unit,d);
-    if(unit==nullptr) return mark;
-    mark=unit;
+    mark=mulex(mark,du);
+    if(mark==nullptr) break;
+    unit=mark;
 
     // Perform division
-    u.dims-=d.dims-DIMSBIAS;
-    u.mult/=d.mult;
-
-    // Skip white space
-    while(Ascii::isSpace(*unit)) unit++;
+    u.mult/=du.mult;
+    u.plus=0.0;
+    u.dims-=du.dims-DIMSBIAS;
     }
   return unit;
   }
 
-/*******************************************************************************/
 
 // Convert from src unit to dst unit; return true if sucess.
 // We *do* ensure both srcUnit and dstUnit are actually known units.
-FXbool Units::convert(FXdouble& value,const FXchar* srcUnit,const FXchar* dstUnit){
-  if(srcUnit && dstUnit){
-    FXUnitConv srcu={0.0,DIMSBIAS};
-    FXUnitConv dstu={0.0,DIMSBIAS};
-
-    // Skip past spaces
-    while(Ascii::isSpace(*srcUnit)) srcUnit++;
-    while(Ascii::isSpace(*dstUnit)) dstUnit++;
-
-    // Parse source unit into
-    srcUnit=divex(srcUnit,srcu);
-    if(srcUnit==nullptr) return false;
-
-    // Parse destination unit info
-    dstUnit=divex(dstUnit,dstu);
-    if(dstUnit==nullptr) return false;
-
-    // Dimensional difference?
-    if(srcu.dims!=dstu.dims) return false;
-
-    // Compute conversion
-    value*=srcu.mult;
-    value/=dstu.mult;
-    return true;
-    }
-  return false;
-  }
-
-
-// Convert from src unit to S.I. unit; return true if success
-FXbool Units::convertToSIFrom(FXdouble& value,const FXchar* srcUnit){
+FXUnits FXUnits::convertFromTo(const FXchar* srcUnit,const FXchar* dstUnit){
+  FXUnits result(0.0,0.0);
+  FXTRACE(1,"FXUnits::convertFromTo(%s,%s):\n",srcUnit,dstUnit?dstUnit:"");
   if(srcUnit){
-    FXUnitConv srcu={0.0,DIMSBIAS};
-    while(Ascii::isSpace(*srcUnit)) srcUnit++;
-    if(divex(srcUnit,srcu)){
-      value*=srcu.mult;
-      return true;
+    Conv srcu={0.0,0.0,DIMSBIAS};
+    Conv dstu={0.0,0.0,DIMSBIAS};
+
+    // Parse source unit
+    srcUnit=divex(srcUnit,srcu);
+    if(srcUnit){
+
+      FXTRACE(1,"src: %20.18lf %20.18lf\n",srcu.mult,srcu.plus);
+      FXTRACE(1,"src:   g   m   A  cd   mol rad sr  s   K\n    %4d%4d%4d%4d%4d%4d%4d%4d%4d\n",PW(srcu.dims,0),PW(srcu.dims,1),PW(srcu.dims,2),PW(srcu.dims,3),PW(srcu.dims,4),PW(srcu.dims,5),PW(srcu.dims,6),PW(srcu.dims,7),PW(srcu.dims,8));
+
+      if(dstUnit){
+
+        // Parse destination unit
+        dstUnit=divex(dstUnit,dstu);
+        if(!dstUnit) return result;
+
+        FXTRACE(1,"dst: %20.18lf %20.18lf\n",dstu.mult,dstu.plus);
+        FXTRACE(1,"dst:   g   m   A  cd   mol rad sr  s   K\n    %4d%4d%4d%4d%4d%4d%4d%4d%4d\n",PW(dstu.dims,0),PW(dstu.dims,1),PW(dstu.dims,2),PW(dstu.dims,3),PW(dstu.dims,4),PW(dstu.dims,5),PW(dstu.dims,6),PW(dstu.dims,7),PW(dstu.dims,8));
+
+        // Check dimensions
+        if(srcu.dims!=dstu.dims) return result;
+
+        // Convert to destination units
+        // Conceptually, we're implementing:
+        //
+        //   v = v + As
+        //   v = v * Ms
+        //   v = v / Md
+        //   v = v - Ad
+        //
+        // Transform this into:
+        //
+        //   v = (v + As) * Ms / Md - Ad
+        //
+        // Which becomes:
+        //
+        //   v = v * M + A
+        //
+        // where:
+        //
+        //   M = Ms / Md
+        //
+        // and:
+        //
+        //   A = As * Ms / Md - Ad  =  As * M - Ad
+        //
+        // We do this transform such that bulk-conversion of numbers becomes
+        // a single "fused-multiply-add" which is something modern processors
+        // do quite fast, typically in a single instruction.  The FMA is also
+        // usually more accurate than a multiply and add, separately.
+        result.m=srcu.mult/dstu.mult;
+        result.a=srcu.plus*result.m-dstu.plus;
+        return result;
+        }
+
+      // Convert to S.I. units
+      // This would have been implemented as:
+      //
+      //   v = v + As
+      //   v = v * Ms
+      //
+      // But as above, we prefer "fused-multiply-add" which means we want to
+      // do the multiply first, then the add.  So then the above becomes:
+      //
+      //   v = v * Ms + As * Ms, or:
+      //
+      //   v = v * M + A
+      //
+      // where:
+      //
+      //   M = Ms
+      //
+      // and:
+      //
+      //   A = As * Ms
+      //
+      // This transformation gets us back to FMA, as desired.
+      result.m=srcu.mult;
+      result.a=srcu.plus*result.m;
       }
     }
-  return false;
+  return result;
   }
 
 
-// Convert from S.I. unit to dst unit; return true if success
-FXbool Units::convertFromSITo(FXdouble& value,const FXchar* dstUnit){
+// Convert from source unit to destination unit; default is convert to S.I.
+FXUnits FXUnits::convertFromTo(const FXString& srcUnit,const FXchar* dstUnit){
+  return convertFromTo(srcUnit.text(),dstUnit);
+  }
+
+
+// Convert from source unit to destination unit; default is convert to S.I.
+FXUnits FXUnits::convertFromTo(const FXchar* srcUnit,const FXString& dstUnit){
+  return convertFromTo(srcUnit,dstUnit.text());
+  }
+
+
+// Convert from source unit to destination unit; default is convert to S.I.
+FXUnits FXUnits::convertFromTo(const FXString& srcUnit,const FXString& dstUnit){
+  return convertFromTo(srcUnit.text(),dstUnit.text());
+  }
+
+/*******************************************************************************/
+
+
+// Convert to destination unit from source unit; default is convert from S.I.
+FXUnits FXUnits::convertToFrom(const FXchar* dstUnit,const FXchar* srcUnit){
+  FXUnits result(0.0,0.0);
+  FXTRACE(1,"FXUnits::convertToFrom(%s,%s):\n",dstUnit,srcUnit?srcUnit:"");
   if(dstUnit){
-    FXUnitConv dstu={0.0,DIMSBIAS};
-    while(Ascii::isSpace(*dstUnit)) dstUnit++;
-    if(divex(dstUnit,dstu)){
-      value/=dstu.mult;
-      return true;
+    Conv srcu={0.0,0.0,DIMSBIAS};
+    Conv dstu={0.0,0.0,DIMSBIAS};
+
+    // Parse destination unit
+    dstUnit=divex(dstUnit,dstu);
+    if(dstUnit){
+
+      FXTRACE(1,"dst: %20.18lf %20.18lf\n",dstu.mult,dstu.plus);
+      FXTRACE(1,"dst:   g   m   A  cd   mol rad sr  s   K\n    %4d%4d%4d%4d%4d%4d%4d%4d%4d\n",PW(dstu.dims,0),PW(dstu.dims,1),PW(dstu.dims,2),PW(dstu.dims,3),PW(dstu.dims,4),PW(dstu.dims,5),PW(dstu.dims,6),PW(dstu.dims,7),PW(dstu.dims,8));
+
+      if(srcUnit){
+
+        // Parse source unit
+        srcUnit=divex(srcUnit,srcu);
+        if(!srcUnit) return result;
+
+        FXTRACE(1,"src: %20.18lf %20.18lf\n",srcu.mult,srcu.plus);
+        FXTRACE(1,"src:   g   m   A  cd   mol rad sr  s   K\n    %4d%4d%4d%4d%4d%4d%4d%4d%4d\n",PW(srcu.dims,0),PW(srcu.dims,1),PW(srcu.dims,2),PW(srcu.dims,3),PW(srcu.dims,4),PW(srcu.dims,5),PW(srcu.dims,6),PW(srcu.dims,7),PW(srcu.dims,8));
+
+        // Check dimensions
+        if(dstu.dims!=srcu.dims) return result;
+
+        // Convert from source unit
+        result.m=srcu.mult/dstu.mult;
+        result.a=srcu.plus*result.m-dstu.plus;
+        return result;
+        }
+
+      // Convert from S.I. units
+      result.m=1.0/dstu.mult;
+      result.a=-dstu.plus;
       }
     }
-  return false;
+  return result;
   }
 
 
-// Return unit's dimensions
-FXulong Units::dimensions(FXuint x){
-  if(x<ARRAYNUMBER(UnitDataArray)){
-    FXUnitConv u={0.0,DIMSBIAS};
-    if((FXuval)UnitDataArray[x].expr<NumBasicUnits){
-      FXuint z=(FXuint)(FXuval)UnitDataArray[x].expr;
-      return DIMSBIAS+(1<<(z*5));
-      }
-    if(divex(UnitDataArray[x].expr,u)){
-      return u.dims;
-      }
-    }
-  return 0;
+// Convert to destination unit from source unit; default is convert from S.I.
+FXUnits FXUnits::convertToFrom(const FXString& dstUnit,const FXchar* srcUnit){
+  return convertToFrom(dstUnit.text(),srcUnit);
   }
 
 
-// Return unit's dimensions
-FXulong Units::dimensions(const FXchar* unit){
-  if(unit){
-    FXUnitConv u={0.0,DIMSBIAS};
-    while(Ascii::isSpace(*unit)) unit++;
-    if(divex(unit,u)){
-      return u.dims;
-      }
-    }
-  return 0;
+// Convert to destination unit from source unit; default is convert from S.I.
+FXUnits FXUnits::convertToFrom(const FXchar* dstUnit,const FXString& srcUnit){
+  return convertToFrom(dstUnit,srcUnit.text());
   }
 
 
-// Scan one unit description, return nullptr or number of characters.
-FXival Units::span(const FXchar* unit){
-  if(unit){
-    FXUnitConv u={0.0,DIMSBIAS};
-    while(Ascii::isSpace(*unit)) unit++;
-    const FXchar* end=divex(unit,u);
-    if(end){
-      return (end-unit);
+// Convert to destination unit from source unit; default is convert from S.I.
+FXUnits FXUnits::convertToFrom(const FXString& dstUnit,const FXString& srcUnit){
+  return convertToFrom(dstUnit.text(),srcUnit.text());
+  }
+
+/*******************************************************************************/
+
+// Convert from source units to S.I., checking dimension-description
+FXUnits FXUnits::convertFromToDims(const FXchar* srcUnit,FXulong dims){
+  FXUnits result(0.0,0.0);
+  if(srcUnit){
+    Conv srcu={0.0,0.0,DIMSBIAS};
+    srcUnit=divex(srcUnit,srcu);
+    if(srcUnit && srcu.dims==dims){
+      result.m=srcu.mult;
+      result.a=srcu.plus*result.m;
       }
     }
-  return 0;
+  return result;
+  }
+
+
+// Convert from source units to S.I., checking dimension-description
+FXUnits FXUnits::convertFromToDims(const FXString& srcUnit,FXulong dims){
+  return convertFromToDims(srcUnit.text(),dims);
+  }
+
+
+// Convert to destimation units from S.I., checking dimension-description
+FXUnits FXUnits::convertToFromDims(const FXchar* dstUnit,FXulong dims){
+  FXUnits result(0.0,0.0);
+  if(dstUnit){
+    Conv dstu={0.0,0.0,DIMSBIAS};
+    dstUnit=divex(dstUnit,dstu);
+    if(dstUnit && dstu.dims==dims){
+      result.m=1.0/dstu.mult;
+      result.a=-dstu.plus;
+      }
+    }
+  return result;
+  }
+
+
+// Convert to destimation units from S.I., checking dimension-description
+FXUnits FXUnits::convertToFromDims(const FXString& dstUnit,FXulong dims){
+  return convertToFromDims(dstUnit.text(),dims);
   }
 
 }
-
 

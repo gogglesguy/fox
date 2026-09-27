@@ -42,23 +42,21 @@ void printusage(const FXchar* prog){
   fxmessage("  --from <units>           Increment value .\n");
   fxmessage("  --to <units>             Add increment this many times.\n");
   fxmessage("  --span <units>           Dump every so many times.\n");
-  fxmessage("  --dims <units>           Show dimensions code.\n");
   fxmessage("  --trace-topics <topics>  Set trace topics.\n");
-  fxmessage("  --check-table            Check table correctness.\n");
   fxmessage("  -h, --help               Print help.\n");
   }
 
 
 // Table should remain sorted; check this here.
 void checktable(){
-  FXuint N=Units::number();
-  for(FXuint u=1; u<N; ++u){
-    if(strcmp(Units::symbol(u),Units::symbol(u-1))<=0){
-      fxmessage("Units table: %s > %s is false\n",Units::symbol(u),Units::symbol(u-1));
-      return;
-      }
-    }
-  fxmessage("Units table is OK\n");
+//  FXuint N=FXUnits::number();
+//  for(FXuint u=1; u<N; ++u){
+//    if(strcmp(FXUnits::symbol(u),Units::symbol(u-1))<=0){
+//      fxmessage("Units table: %s > %s is false\n",Units::symbol(u),Units::symbol(u-1));
+//      return;
+//      }
+//    }
+//  fxmessage("Units table is OK\n");
   }
 
 
@@ -67,8 +65,10 @@ int main(int argc,char *argv[]){
   const FXchar* fm_unit=nullptr;
   const FXchar* to_unit=nullptr;
   const FXchar* sp_unit=nullptr;
+  const FXchar* force_unit=nullptr;
   FXdouble originalvalue=1.0;
   FXdouble convertedvalue=1.0;
+  FXString string;
   FXint    length=0;
   FXulong  dims;
 
@@ -80,11 +80,6 @@ int main(int argc,char *argv[]){
       }
     else if(FXString::compare(argv[arg],"--check-table")==0){
       checktable();
-      return 0;
-      }
-    else if(FXString::compare(argv[arg],"--table-size")==0){
-      fxmessage("table size=%u\n",Units::number());
-      return 0;
       }
     else if(FXString::compare(argv[arg],"--trace-topics")==0){
       if(++arg>=argc){ fxwarning("Missing argument for --trace-topics option.\n"); return 1; }
@@ -106,9 +101,13 @@ int main(int argc,char *argv[]){
       if(++arg>=argc){ fxwarning("Missing argument for --span option.\n"); return 1; }
       sp_unit=argv[arg];
       }
+    else if(FXString::compare(argv[arg],"--force")==0){
+      if(++arg>=argc){ fxwarning("Missing argument for --force option.\n"); return 1; }
+      force_unit=argv[arg];
+      }
     else if(FXString::compare(argv[arg],"--dims")==0){
       if(++arg>=argc){ fxwarning("Missing argument for --dims option.\n"); return 1; }
-      dims=Units::dimensions(argv[arg]);
+      dims=FXUnits::dimensions(argv[arg]);
       fxmessage("dimensions(%s) = 0x%llx\n",argv[arg],dims);
       }
     else{
@@ -120,38 +119,101 @@ int main(int argc,char *argv[]){
 
   // Conversion
   if(fm_unit || to_unit){
-    convertedvalue=originalvalue;
+    FXUnits units;
     if(fm_unit && to_unit){
-      if(Units::convert(convertedvalue,fm_unit,to_unit)){
-        fxmessage("value %.14lg %.*s -> %.14lg %.*s\n",originalvalue,Units::span(fm_unit),fm_unit,convertedvalue,Units::span(to_unit),to_unit);
+
+      units=FXUnits::convertFromTo(fm_unit,to_unit);
+      convertedvalue=units(originalvalue);
+
+      if(units){
+        fxmessage("value %.14lg %s -> %.14lg %s\n",originalvalue,fm_unit,convertedvalue,to_unit);
         }
       else{
-        fxmessage("failed to convert: %.*s -> %.*s\n",Units::span(fm_unit),fm_unit,Units::span(to_unit),to_unit);
+        fxmessage("failed to convert: %s -> %s\n",fm_unit,to_unit);
         }
+
+      units=FXUnits::convertToFrom(to_unit,fm_unit);
+      convertedvalue=units(originalvalue);
+
+      if(units){
+        fxmessage("value %.14lg %s -> %.14lg %s\n",originalvalue,fm_unit,convertedvalue,to_unit);
+        }
+      else{
+        fxmessage("failed to convert: %s -> %s\n",fm_unit,to_unit);
+        }
+
       }
     else if(fm_unit){
-      if(Units::convertToSIFrom(convertedvalue,fm_unit)){
-        fxmessage("value %.14lg %.*s -> %.14lg S.I.\n",originalvalue,Units::span(fm_unit),fm_unit,convertedvalue);
+      units=FXUnits::convertFromTo(fm_unit);
+      convertedvalue=units(originalvalue);
+
+      if(units){
+        fxmessage("value %.14lg %s -> %.14lg S.I.\n",originalvalue,fm_unit,convertedvalue);
         }
       else{
-        fxmessage("failed to convert from: %.*s\n",Units::span(fm_unit),fm_unit);
+        fxmessage("failed to convert from: %s\n",fm_unit);
         }
+
+      if(units){
+        FXulong dims=FXUnits::dimensions(fm_unit);
+        fxmessage("dimensions(%s) -> 0x%012llx\n",fm_unit,dims);
+        string=FXUnits::canonical(dims);
+        fxmessage("canonical(0x%012llx) -> %s\n",dims,string.text());
+        }
+
       }
     else if(to_unit){
-      if(Units::convertFromSITo(convertedvalue,to_unit)){
-        fxmessage("value %.14lg S.I. -> %.14lg %.*s\n",originalvalue,convertedvalue,Units::span(to_unit),to_unit);
+      units=FXUnits::convertToFrom(to_unit);
+      convertedvalue=units(originalvalue);
+
+      if(units){
+        fxmessage("value %.14lg S.I. -> %.14lg %s\n",originalvalue,convertedvalue,to_unit);
         }
       else{
-        fxmessage("failed to convert to: %.*s\n",Units::span(to_unit),to_unit);
+        fxmessage("failed to convert to: %s\n",to_unit);
         }
+
+      if(units){
+        FXulong dims=FXUnits::dimensions(to_unit);
+        fxmessage("dimensions(%s) -> 0x%012llx\n",to_unit,dims);
+        string=FXUnits::canonical(dims);
+        fxmessage("canonical(0x%012llx) -> %s\n",dims,string.text());
+        }
+
       }
+    }
+
+  // Only works for force-units
+  if(force_unit){
+    FXUnits units;
+
+    // Convert to SI from something than may not be a force
+    units=FXUnits::convertFromToDims(force_unit,FXLONG(0x107421084231));
+    if(!units){
+      fxmessage("failed to convert to: %s\n",force_unit);
+      return 0;
+      }
+
+    convertedvalue=units(originalvalue);
+
+    fxmessage("value %.14lg %s -> %.14lg N\n",originalvalue,force_unit,convertedvalue);
+
+    // Convert from SI to something than may not be a force
+    units=FXUnits::convertToFromDims(force_unit,FXLONG(0x107421084231));
+    if(!units){
+      fxmessage("failed to convert to: %s\n",force_unit);
+      return 0;
+      }
+
+    convertedvalue=units(originalvalue);
+
+    fxmessage("value %.14lg N -> %.14lg %s\n",originalvalue,convertedvalue,force_unit);
     }
 
   // Count bytes parsed
   if(sp_unit){
-    length=Units::span(sp_unit);
+    length=FXUnits::span(sp_unit);
     fxmessage("length(%s) = %d\n",sp_unit,length);
     }
   return 0;
   }
-

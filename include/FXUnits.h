@@ -23,51 +23,134 @@
 
 namespace FX {
 
-namespace Units {
 
-/// Returned by lookup if unit not found.
-const FXuint NotFound=0xFFFFFFFF;
+/**
+* Unit conversion class.
+* Convert from any unit to any other unit, via intermediate S.I.
+* unit representation.
+* There are 9 basic units in the S.I. system (kg,m,A,cd,mol,rad,sr,s,K).
+* We have a lot of derived units, which can be expressed in either other
+* derived units or, eventually, into a collection of the base units.
+* The derived units are described in terms of unit sub-expressions.
+* To ensure unit-dimensions are correct when setting up a conversion,
+* this class supports a so-called dimension-vector; currently, implemented
+* as a single 64-bit integer number which encodes a combination of the
+* base units.  This dimension-vector is calculated for both source-unit
+* and destination-unit, and then compared; if there is no match, then
+* an error is detected (the FXUnits object returned is empty).
+*
+* In order to bulk-transform numbers from one unit to another, the
+* operator needs to perform only a single multiply and add (hopefully,
+* your compiler will turn this into a FMA (Fused-Multiply-Add), making
+* it a single instruction only).
+*
+* Temperature scale is the only one that needs an offset; this offset
+* only applies for temperature units that are "pure temperature", i.e.
+* no other units in the mix, and no other powers than 1.
+*
+* Scaling prefixes (y,z,a,f,p,n,μ,u,m,c,d,h,k,M,G,T,P,E,Z,Y), these are
+* incorporated into the conversion automatically, like "1.21GW".
+*/
+class FXAPI FXUnits {
+private:
+  FXdouble m;           // Scale
+  FXdouble a;           // Offset
+public:
+  enum {
+    GRAM,               // Mass
+    METER,              // Length
+    AMPERE,             // Current
+    CANDELA,            // Luminous flux
+    MOLE,               // Mole
+    RADIAN,             // Angles
+    STERADIAN,          // Solid angles
+    SECOND,             // Time
+    KELVIN,             // Temperature / Kelvin
+    CELSIUS,            // Temperature / Celsius
+    FAHRENHEIT,         // Temperature / Fahrenheit
+    RANKINE,            // Temperature / Rankine
+    };
+  enum {
+    NumUnits=133        // Total number of units
+    };
+public:
 
-/// Lookup unit, if it exists.
-extern FXuint lookup(const FXchar* unit);
+  /// List of unit names.
+  static const FXchar symbol[NumUnits][8];
 
-/// Returns the number supported of units.
-extern FXuint number();
+  /// List of conversion factors.
+  static const FXdouble factor[NumUnits];
 
-/// Return true if x is a basic unit
-extern FXbool basic(FXuint x);
+  /// Unit sub-expression for non-basic units; for
+  /// basic units, this would be empty string.
+  static const FXchar expression[NumUnits][16];
+private:
+  struct Conv;
+  static const char* divex(const FXchar* unit,Conv& u);
+  static const FXchar* unitex(const FXchar* unit,Conv& u);
+  static const FXchar* scalex(const FXchar* unit,Conv& u);
+  static const FXchar* powex(const FXchar* unit,Conv& u);
+  static const FXchar* mulex(const FXchar* unit,Conv& u);
+public:
 
-/// Return unit symbol (in utf8) if it exists.
-extern const FXchar* symbol(FXuint x);
+  /// Initialize to identity
+  FXUnits():m(1.0),a(0.0){ }
 
-/// Return unit name (in utf8) if it exists.
-extern const FXchar* name(FXuint x);
+  /// Initialize only with scale
+  FXUnits(FXdouble mm,FXdouble aa=0.0):m(mm),a(aa){ }
 
-/// Return units expression, if exists and non-non-basic
-extern const FXchar* expression(FXuint x);
+  /// Copy from other units
+  FXUnits(const FXUnits& org):m(org.m),a(org.a){ }
 
-/// Return unit conversion factor if it exists.
-extern FXdouble factor(FXuint x);
+  /// Check if non-empty
+  operator FXbool() const { return (m || a); }
 
-/// Return unit's (encoded) dimensions
-extern FXulong dimensions(FXuint x);
+  /// Assign from other units
+  FXUnits& operator=(const FXUnits& org){m=org.m;a=org.a;return *this;}
 
-/// Return unit's (encoded) dimensions
-extern FXulong dimensions(const FXchar* unit);
+  /// Convert number x according to transformation
+  FXdouble operator()(FXdouble x) const { return x*m+a; }
 
-/// Convert from src unit to dst unit; return true if success.
-extern FXbool convert(FXdouble& value,const FXchar* srcUnit,const FXchar* dstUnit);
+  /// Return the transformation
+  FXUnits invert() const { return FXUnits(1.0/m,-a/m); }
 
-/// Convert from src unit to S.I. unit; return true if success
-extern FXbool convertToSIFrom(FXdouble& value,const FXchar* srcUnit);
+  /// Look up unit; return -1 if not found
+  static FXint lookup(const FXchar* unit);
+  static FXint lookup(const FXString& unit);
 
-/// Convert from S.I. unit to dst unit; return true if success
-extern FXbool convertFromSITo(FXdouble& value,const FXchar* dstUnit);
+  /// Return number of characters consumed from unit-string
+  static FXint span(const FXchar* unit);
+  static FXint span(const FXString& unit);
 
-/// Scan unit to return the number of characters.
-extern FXival span(const FXchar* unit);
+  /// Return dimension-description from a unit-string
+  static FXulong dimensions(const FXchar* unit);
+  static FXulong dimensions(const FXString& unit);
 
-}
+  /// Return canonical (S.I.) unit-string from dimension-description
+  static FXString canonical(FXulong dims);
+
+  /// Convert from source unit to destination unit; default is convert to S.I.
+  static FXUnits convertFromTo(const FXchar* srcUnit,const FXchar* dstUnit=nullptr);
+  static FXUnits convertFromTo(const FXString& srcUnit,const FXchar* dstUnit=nullptr);
+  static FXUnits convertFromTo(const FXchar* srcUnit,const FXString& dstUnit);
+  static FXUnits convertFromTo(const FXString& srcUnit,const FXString& dstUnit);
+
+  /// Convert to destination unit from source unit; default is convert from S.I.
+  static FXUnits convertToFrom(const FXchar* dstUnit,const FXchar* srcUnit=nullptr);
+  static FXUnits convertToFrom(const FXString& dstUnit,const FXchar* srcUnit=nullptr);
+  static FXUnits convertToFrom(const FXchar* dstUnit,const FXString& srcUnit);
+  static FXUnits convertToFrom(const FXString& dstUnit,const FXString& srcUnit);
+
+  /// Convert from source units to S.I., checking dimension-description
+  static FXUnits convertFromToDims(const FXchar* srcUnit,FXulong dims);
+  static FXUnits convertFromToDims(const FXString& srcUnit,FXulong dims);
+
+  /// Convert to destimation units from S.I., checking dimension-description
+  static FXUnits convertToFromDims(const FXchar* dstUnit,FXulong dims);
+  static FXUnits convertToFromDims(const FXString& dstUnit,FXulong dims);
+
+  };
+
 }
 
 #endif

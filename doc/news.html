@@ -17,6 +17,40 @@ News  <A href='news.html' target="_top" align=left><font  size=-2>[Remove Frame]
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
+September 26 - FOX DEVELOPMENT 1.7.94
+<br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
+<p>
+<!--- TOPIC TITLE -->
+<ul>
+<li>Adie can check if file being edited has been changed, or removed entirely.  If enabled,
+this will prompt user to reload (if file was changed on disk), or resave (because the only
+copy is now in the editor).  Previously, after answering this dialog, you were superfluously
+being asked again when trying to close the window.  Now, this annoyance has been removed,
+and it won't ask a 2nd time.</li>
+<li>Units conversion support has been dramatically updated.  You can build a unit-conversion
+instance (FXUnits), and use it repeatedly.  On modern CPUs the conversion should boil down
+to a single "fused-multiply-add", so pretty fast. </li>
+<li>FXUnits has functions to configure from any unit to any other unit, or from (to) any
+unit to (from) an S.I. unit.  This can now also be done with dimensions-checks!.
+Thus, you can let user pick the units, but rest assured that whatever input he or she selects,
+the dimensions will be what the program expects!</li>
+<li>Another new feature is support for parentheses in unit-expression.  A few additional
+units were added as well, mmH2O and Stone. Also, FXUnits accept degrees celsius, Kelvin,
+etc. in composed as well as separated forms.</li>
+<li>With FXUndoList "alternate history" mode, the "saved state" marker was sometimes
+updated in to complicated of a way.  Now, it is more predictable..</li>
+<li>A new API in FXUnits is cannonical().  It takes a dimension-vector and returns
+a canonical string containing the dimensions, as represented by their S.I. units.
+This is useful because this provides a human-readable way to reliably compare
+unit strings.  For example, N=kg*m/s^2 but could also be written as km*g/s/s, or m*kg*s^-2.
+The canonical method will always be in the same order, and have only a single / and never
+any negative exponents.</li>
+</ul>
+
+
+<!--- TOPIC TITLE -->
+<p>
+<table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
 September 19 - FOX DEVELOPMENT 1.7.93
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
@@ -44,7 +78,7 @@ when the FXCommandGroup is still being added to.</li>
 <!--- TOPIC TITLE -->
 <p>
 <table width=100% cellpadding=0 cellspacing=2><tr><td width=100% valign=bottom id=HEADLINE><b>
-August 29 - FOX DEVELOPMENT 1.7.93
+August 29 - FOX DEVELOPMENT 1.7.92
 <br><img src='art/line.gif' width=100% height=1></b></td></tr></table>
 <p>
 <!--- TOPIC TITLE -->

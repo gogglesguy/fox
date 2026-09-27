@@ -123,6 +123,11 @@
 
     There may also be "wrinkles" in history, i.e. paths not taken *within* the
     paths not taken.
+
+  - Possible optimization for undoAll() or redoAll() would be to skip "wrinkles"
+    in alternate history; these are sequences of undos/inverted undos which
+    have no net-effect.  Thus, if the processing of undos [esp compound ones]
+    becomes more expensive, this can become major time savings.
 */
 
 #define TOPIC_CONSTRUCT 1000
@@ -344,15 +349,14 @@ void FXUndoList::undo(){
     // Undo of forward means undo
     if(command[undocount].flag()){
       command[undocount]->undo();
-      marker--;
       }
     else{
       command[undocount]->redo();
-      marker++;
       }
 
     // Push to redolist AFTER undo
     redocount++;
+    marker--;
 
     working--;
     FXTRACE(TOPIC_DEBUG,"FXUndoList::undo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
@@ -372,15 +376,14 @@ void FXUndoList::redo(){
     // Redo of forward means redo
     if(command[undocount].flag()){
       command[undocount]->redo();
-      marker++;
       }
     else{
       command[undocount]->undo();
-      marker--;
       }
 
     // Push to undolist AFTER redo
     undocount++;
+    marker++;
 
     working--;
     FXTRACE(TOPIC_DEBUG,"FXUndoList::redo: space=%lu undocount=%d redocount=%d marker=%d\n",space,undoCount(),redoCount(),marker);
@@ -388,48 +391,7 @@ void FXUndoList::redo(){
   }
 
 
-/*
-  FXint next(FXint p) const;
-  FXint prev(FXint p) const;
-// Advance to next record, but skip wrinkles if we start at the
-// beginning of one; the wrinkle is self-cancelling, i.e. every
-// command in the wrinkle is negated by its inverse later on.
-// Thus, if we want to advance through the undo's quickly, we
-// can skip all the commands in the wrinkle:- they have no effect
-// on the document!
-FXint FXUndoList::next(FXint p) const {
-  if(p+1<commands.no()){
-    FXint w=p;
-    while(w<command.no()){
-      if(command[w].ptr()==command[w+1].ptr()){
-        FXint i=w+1;
-        FXint j=w;
-        do{
-          --i;
-          ++j;
-          }
-        while(p<=i-1 && j+1<command.no() && command[i-1].ptr()==command[j+1].ptr());
-        FXASSERT(p<=i);
-        FXASSERT(j<command.no());
-        FXASSERT(command[i].ptr()==command[j].ptr());
-        if(p<i) break;
-        return j;
-        }
-      w++;
-      }
-    p++;
-    }
-  return p;
-  }
-
-FXint FXUndoList::prev(FXint i) const {
-  }
-*/
-
-
 // Undo all commands
-// FIXME if we can identify "wrinkles" in history, we could
-// leap over them rather than execute all the commands in the wrinkle.
 void FXUndoList::undoAll(){
   if(groups.tail()!=this){ fxerror("FXUndoList::undoAll: cannot call undoAll() inside begin-end block.\n"); }
   while(canUndo()) undo();
@@ -437,8 +399,6 @@ void FXUndoList::undoAll(){
 
 
 // Redo all commands
-// FIXME if we can identify "wrinkles" in history, we could
-// leap over them rather than execute all the commands in the wrinkle.
 void FXUndoList::redoAll(){
   if(groups.tail()!=this){ fxerror("FXUndoList::redoAll: cannot call redoAll() inside begin-end block.\n"); }
   while(canRedo()) redo();
@@ -630,7 +590,7 @@ FXbool FXUndoList::end(){
       if(grp==this){
         space+=cmd->size();
         undocount++;
-        marker+=1;
+        marker++;
         }
 
       FXTRACE(TOPIC_DEBUG,"FXUndoList::end: cmd: %p under: %p: appended!\n",cmd,grp);
@@ -720,6 +680,9 @@ FXbool FXUndoList::cut(){
         }
 
       undocount+=redocount;
+
+      // Fix marker
+      marker+=redocount+redocount;
       }
 
     // Linear history mode
@@ -733,6 +696,9 @@ FXbool FXUndoList::cut(){
 
       // Drop the redo
       if(!command.no(undocount)) return false;
+
+      // Fix marker
+      if(marker<0) unmark();
       }
 
     redocount=0;

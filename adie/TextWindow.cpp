@@ -1953,7 +1953,7 @@ long TextWindow::onUpdCopyPathname(FXObject* sender,FXSelector,void*){
 FXbool TextWindow::saveChanges(){
   FXuint answer;
   if(isFilenameSet()){
-    if(0<getFiletime()){
+    if(1<getFiletime()){
       FXStat info;
 
       // File on disk was removed or renamed
@@ -5857,7 +5857,7 @@ long TextWindow::onQueryTextTip(FXObject* sender,FXSelector,void*){
     if(editor->getCursorPosition(x,y,btns)){
       if(vx<=x && vy<=y && x<vx+vw && y<vy+vh){
         pos=editor->getPosAt(x,y);
-        FXASSERT(0<=pos && pos<editor->getLength());
+        FXASSERT(0<=pos && pos<=editor->getLength());
         s=editor->getStyle(pos);
         if(0<s && s<getSyntax()->getNumRules()){
           FXString tipstring=getSyntax()->getRule(s)->getName();
